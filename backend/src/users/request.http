@@ -1,0 +1,26 @@
+GET https://api.intra.42.fr/v2/users/szhakypo
+Authorization: Bearer 86d8f3c6e2dfb47a93487cc1fcc7ee2d6baeb3d714df2a436dd608ce06ea20dd
+
+
+### sign up
+POST http://localhost:3000/users/signup
+Content-Type: application/json
+
+{
+	"email": "abcd@abcd.com",
+	"password": "lol",
+	"username": "aalhamel"
+}
+
+### authentication
+GET http://localhost:3000/auth/42
+
+### find user by id
+GET http://localhost:3000/users/1
+
+###find all users
+
+GET http://localhost:3000/users?userName=aalhamel
+
+### print goodbye
+GET http://localhost:3000/hi
