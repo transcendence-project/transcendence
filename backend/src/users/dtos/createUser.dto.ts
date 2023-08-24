@@ -1,8 +1,8 @@
 import {IsEmail, IsString,} from "class-validator"
 
-export class createUserDTO {
-	
+// DTO - used to valudate incoming requests bodies
 
+export class createUserDTO {
 	@IsEmail()
 	email: string
 

@@ -36,7 +36,7 @@ let AuthService = exports.AuthService = class AuthService {
                 id: parseInt(profile.id),
                 name: profile.displayName,
                 login: profile.username,
-                email: profile.emails,
+                email: profile.emails.toString(),
             };
             console.log(`User ID: ${user.id}`);
             console.log(`User Name: ${user.name}`);

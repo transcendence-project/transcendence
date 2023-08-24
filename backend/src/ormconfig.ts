@@ -8,5 +8,5 @@ export const typeOrmConfig: TypeOrmModuleOptions = {
 	password: '123',
 	database: 'postgres',
 	entities: [__dirname + '/**/*.entity{.ts,.js}'],
-	synchronize: true
+	synchronize: true // remove in production environment
 }

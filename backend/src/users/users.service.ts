@@ -24,5 +24,5 @@ export class UsersService {
 
 	remove(id: number) {
 		return (this.repo.delete(id))
-	}
+	} 
 }
