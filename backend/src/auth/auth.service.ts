@@ -3,12 +3,11 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Profile } from 'passport';
 import passport from 'passport';
 import { Strategy as FortyTwoStrategy } from 'passport-42';
-import { IsEmail } from 'class-validator';
-import { User } from '../users/user.entity';
+import { UsersService } from 'users/users.service';
 
 @Injectable()
 export class AuthService{
-	constructor() {
+	constructor(private userService: UsersService) {
 		this.configurePassport();
 	}
 	configurePassport() {
@@ -22,20 +21,22 @@ export class AuthService{
 			'displayName': 'displayname',
 			'emails': 'email',
 		  }
-		}, (accessToken: string, refreshToken: string, profile: Profile, done) => {
+		}, async (accessToken: string, refreshToken: string, profile: Profile, done) => {
 			// console.log('Profile:', profile);
 			const user = {
 				id: parseInt(profile.id),
 				name: profile.displayName,
 				login: profile.username,
-				email: profile.emails,
+				email: profile.emails.toString()
 			};
 			console.log(`User ID: ${user.id}`);
 			console.log(`User Name: ${user.name}`);
 			console.log(`User login: ${user.login}`);
 			console.log(`User e-mail: ${user.email}`);
+			// console.log(profile)
 			// Authentication callback logic
 			// create and store user in database
+			this.userService.create(user.email, user.login, user.name)
 			return done(null, user);
 		}));
 	 }

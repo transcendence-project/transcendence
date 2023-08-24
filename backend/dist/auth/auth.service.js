@@ -16,8 +16,10 @@ exports.AuthService = void 0;
 const common_1 = require("@nestjs/common");
 const passport_1 = __importDefault(require("passport"));
 const passport_42_1 = require("passport-42");
+const users_service_1 = require("../users/users.service");
 let AuthService = exports.AuthService = class AuthService {
-    constructor() {
+    constructor(userService) {
+        this.userService = userService;
         this.configurePassport();
     }
     configurePassport() {
@@ -31,23 +33,24 @@ let AuthService = exports.AuthService = class AuthService {
                 'displayName': 'displayname',
                 'emails': 'email',
             }
-        }, (accessToken, refreshToken, profile, done) => {
+        }, async (accessToken, refreshToken, profile, done) => {
             const user = {
                 id: parseInt(profile.id),
                 name: profile.displayName,
                 login: profile.username,
-                email: profile.emails,
+                email: profile.emails.toString()
             };
             console.log(`User ID: ${user.id}`);
             console.log(`User Name: ${user.name}`);
             console.log(`User login: ${user.login}`);
             console.log(`User e-mail: ${user.email}`);
+            this.userService.create(user.email, user.login, user.name);
             return done(null, user);
         }));
     }
 };
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [])
+    __metadata("design:paramtypes", [users_service_1.UsersService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map
