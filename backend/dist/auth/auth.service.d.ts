@@ -1,6 +1,8 @@
+import { ConfigService } from '@nestjs/config';
 import { UsersService } from 'users/users.service';
 export declare class AuthService {
     private userService;
-    constructor(userService: UsersService);
+    private configService;
+    constructor(userService: UsersService, configService: ConfigService);
     configurePassport(): void;
 }

@@ -8,7 +8,7 @@ export class UsersController {
 	constructor(private userService: UsersService){}
 	@Post('/signup')
 	createUser(@Body() body: createUserDTO) {
-		this.userService.create(body.email, body.username, body.password)
+		this.userService.create(body.email, body.login, body.name)
 	}
 
 	@Get('/:id')

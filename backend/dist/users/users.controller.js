@@ -21,7 +21,7 @@ let UsersController = exports.UsersController = class UsersController {
         this.userService = userService;
     }
     createUser(body) {
-        this.userService.create(body.email, body.username, body.password);
+        this.userService.create(body.email, body.login, body.name);
     }
     findUser(id) {
         return (this.userService.findOne(parseInt(id)));
