@@ -4,12 +4,12 @@ import { AuthService } from './auth.service';
 import { PassportModule } from '@nestjs/passport';
 import { Strategy as FortyTwoStrategy } from 'passport-42';
 import { UsersService } from 'users/users.service';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule } from '../config/config.module';
 import { UsersModule } from 'users/users.module';
 import { AppModule } from 'app.module';
 
 @Module({
-	imports: [PassportModule.register({Strategy: '42'}), UsersModule, ConfigModule.forRoot()],
+	imports: [PassportModule.register({Strategy: '42'}), UsersModule, ConfigModule],
 	controllers: [AuthController],
 	providers: [AuthService],
 })
