@@ -1,45 +1,14 @@
 import { Injectable } from '@nestjs/common';
-import { PassportStrategy } from '@nestjs/passport';
-import { Profile } from 'passport';
-import passport from 'passport';
-import { Strategy as FortyTwoStrategy } from 'passport-42';
+import { createUserDTO } from 'users/dtos/createUser.dto';
+import { User } from 'users/user.entity';
 import { UsersService } from 'users/users.service';
 
 @Injectable()
 export class AuthService{
-	constructor(private userService: UsersService) {
-		this.configurePassport();
+	constructor(private userService: UsersService) {}
+	async validate(user: createUserDTO): Promise<User> {
+		return await this.userService.create(user.email, user.username);
 	}
-	configurePassport() {
-		passport.use(new FortyTwoStrategy({
-			clientID: "u-s4t2ud-d71d93ae1ed7236dccb8c56127a16205ca6fc7aca52c8dfe81f61aaf0ec7a31a",
-			clientSecret: "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",
-		   callbackURL: "http://localhost:3000/auth/42/callback",
-		   profileFields: {
-			'id': function (obj) { return String(obj.id); },
-			'username': 'login',
-			'displayName': 'displayname',
-			'emails': 'email',
-		  }
-		}, async (accessToken: string, refreshToken: string, profile: Profile, done) => {
-			// console.log('Profile:', profile);
-			const user = {
-				id: parseInt(profile.id),
-				name: profile.displayName,
-				login: profile.username,
-				email: profile.emails.toString()
-			};
-			console.log(`User ID: ${user.id}`);
-			console.log(`User Name: ${user.name}`);
-			console.log(`User login: ${user.login}`);
-			console.log(`User e-mail: ${user.email}`);
-			// console.log(profile)
-			// Authentication callback logic
-			// create and store user in database
-			this.userService.create(user.email, user.login, user.name)
-			return done(null, user);
-		}));
-	 }
 }
 
 

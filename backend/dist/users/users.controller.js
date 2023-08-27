@@ -21,13 +21,16 @@ let UsersController = exports.UsersController = class UsersController {
         this.userService = userService;
     }
     createUser(body) {
-        this.userService.create(body.email, body.username, body.password);
+        this.userService.create(body.email, body.username);
     }
     findUser(id) {
         return (this.userService.findOne(parseInt(id)));
     }
     findAllUsers(userName) {
         return (this.userService.findAll(userName));
+    }
+    deleteUser(id) {
+        return (this.userService.remove(parseInt(id)));
     }
 };
 __decorate([
@@ -51,6 +54,13 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], UsersController.prototype, "findAllUsers", null);
+__decorate([
+    (0, common_1.Delete)('/:id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], UsersController.prototype, "deleteUser", null);
 exports.UsersController = UsersController = __decorate([
     (0, common_1.Controller)('users'),
     __metadata("design:paramtypes", [users_service_1.UsersService])

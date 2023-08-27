@@ -6,4 +6,5 @@ export declare class UsersController {
     createUser(body: createUserDTO): void;
     findUser(id: string): Promise<import("./user.entity").User>;
     findAllUsers(userName: string): Promise<import("./user.entity").User[]>;
+    deleteUser(id: string): Promise<typeof import("@nestjs/common").NotFoundException | import("typeorm").DeleteResult>;
 }

@@ -24,3 +24,6 @@ GET http://localhost:3000/users?userName=aalhamel
 
 ### print goodbye
 GET http://localhost:3000/hi
+
+### remove user
+DELETE http://localhost:3000/users/3

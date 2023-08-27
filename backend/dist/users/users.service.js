@@ -21,12 +21,18 @@ let UsersService = exports.UsersService = class UsersService {
     constructor(repo) {
         this.repo = repo;
     }
-    create(email, userName, password) {
-        const user = this.repo.create({ email, userName, password });
-        return (this.repo.save(user));
+    async create(email, userName) {
+        const user = await this.findAll(userName);
+        if (user.length)
+            return (null);
+        const user2 = this.repo.create({ email, userName });
+        return (this.repo.save(user2));
     }
     findOne(id) {
         return (this.repo.findOneBy({ id }));
+    }
+    findOneByUserName(userName) {
+        return (this.repo.findOneBy({ userName }));
     }
     findAll(userName) {
         return (this.repo.find({ where: { userName } }));
@@ -34,7 +40,11 @@ let UsersService = exports.UsersService = class UsersService {
     update(id, attrs) {
         return (this.repo.update(id, attrs));
     }
-    remove(id) {
+    async remove(id) {
+        const user = await this.findOne(id);
+        if (!user)
+            return (common_1.NotFoundException);
+        console.log(user);
         return (this.repo.delete(id));
     }
 };

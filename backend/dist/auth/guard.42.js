@@ -6,20 +6,25 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.AuthModule = void 0;
+exports.FortyTwoAuthGuard = void 0;
 const common_1 = require("@nestjs/common");
-const auth_controller_1 = require("./auth.controller");
-const auth_service_1 = require("./auth.service");
 const passport_1 = require("@nestjs/passport");
-const users_module_1 = require("../users/users.module");
-const strategy_42_1 = require("./strategy.42");
-let AuthModule = exports.AuthModule = class AuthModule {
+let FortyTwoAuthGuard = exports.FortyTwoAuthGuard = class FortyTwoAuthGuard extends (0, passport_1.AuthGuard)('42') {
+    async canActivate(context) {
+        const result = (await super.canActivate(context));
+        const request = context.switchToHttp().getRequest();
+        console.log(request);
+        await super.logIn(request);
+        return result;
+    }
+    handleRequest(err, user, info) {
+        if (err || !user) {
+            throw err || new common_1.UnauthorizedException();
+        }
+        return user;
+    }
 };
-exports.AuthModule = AuthModule = __decorate([
-    (0, common_1.Module)({
-        imports: [users_module_1.UsersModule, passport_1.PassportModule.register({ defaultStrategy: '42' })],
-        controllers: [auth_controller_1.AuthController],
-        providers: [auth_service_1.AuthService, strategy_42_1.FortyTwoStrategy],
-    })
-], AuthModule);
-//# sourceMappingURL=auth.module.js.map
+exports.FortyTwoAuthGuard = FortyTwoAuthGuard = __decorate([
+    (0, common_1.Injectable)()
+], FortyTwoAuthGuard);
+//# sourceMappingURL=guard.42.js.map

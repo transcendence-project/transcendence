@@ -21,9 +21,5 @@ __decorate([
 __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
-], createUserDTO.prototype, "password", void 0);
-__decorate([
-    (0, class_validator_1.IsString)(),
-    __metadata("design:type", String)
 ], createUserDTO.prototype, "username", void 0);
 //# sourceMappingURL=createUser.dto.js.map

@@ -9,9 +9,9 @@ export class User {
 	@Column()
 	userName: string
 
-	@Column()
-	@Exclude()
-	password: string
+	// @Column()
+	// @Exclude()
+	// password: string
 
 	@Column()
 	email: string
