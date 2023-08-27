@@ -2,12 +2,16 @@ import { Injectable } from '@nestjs/common';
 import { createUserDTO } from 'users/dtos/createUser.dto';
 import { User } from 'users/user.entity';
 import { UsersService } from 'users/users.service';
+import { JwtService } from '@nestjs/jwt';
 
 
 @Injectable()
 export class AuthService{
-	constructor(private userService: UsersService) {}
+	constructor(private userService: UsersService, private jwtService: JwtService) {}
 	async validate(user: createUserDTO): Promise<User> {
+		const token = this.jwtService.sign({username: user.username});
+		// console.log(token);
+		// const decodeToken = this.jwtService.verify(token);
 		return await this.userService.create(user.email, user.username);
 	}
 }

@@ -12,16 +12,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthService = void 0;
 const common_1 = require("@nestjs/common");
 const users_service_1 = require("../users/users.service");
+const jwt_1 = require("@nestjs/jwt");
 let AuthService = exports.AuthService = class AuthService {
-    constructor(userService, configService) {
+    constructor(userService, jwtService) {
         this.userService = userService;
+        this.jwtService = jwtService;
     }
     async validate(user) {
+        const token = this.jwtService.sign({ username: user.username });
         return await this.userService.create(user.email, user.username);
     }
 };
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [users_service_1.UsersService, config_1.ConfigService])
+    __metadata("design:paramtypes", [users_service_1.UsersService, jwt_1.JwtService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

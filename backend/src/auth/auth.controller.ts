@@ -21,6 +21,7 @@ export class AuthController {
 		return res.redirect('https://en.wikipedia.org/wiki/Pong'); // can redirect to our application page
 	}
 
+	// @Auth('jwt') // Using JWT strategy - to use jwt strategy, not in aut guards
 	// @Get('/profile')
 	// async profile(@Req()req) {
 	// 	return req.user;

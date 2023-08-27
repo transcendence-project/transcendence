@@ -2,16 +2,18 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, Profile } from 'passport-42'
 import { AuthService } from './auth.service';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class FortyTwoStrategy extends PassportStrategy(Strategy, '42') {
-  constructor( private authService: AuthService
+  constructor( private authService: AuthService, private configService: ConfigService,
   ) {
     super({
-      clientID: 'u-s4t2ud-d71d93ae1ed7236dccb8c56127a16205ca6fc7aca52c8dfe81f61aaf0ec7a31a',
-      clientSecret: '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',
-      callbackURL: 'http://localhost:3000/auth/42/callback',
+      clientID: configService.getOrThrow<string>('CLIENT_ID'),
+      clientSecret: configService.getOrThrow<string>('CLIENT_SECRET'),
+      callbackURL: configService.getOrThrow<string>('CALL_BACK_URL'),
     });
+	
   }
 
   async validate(

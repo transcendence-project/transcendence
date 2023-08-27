@@ -14,14 +14,16 @@ const common_1 = require("@nestjs/common");
 const passport_1 = require("@nestjs/passport");
 const passport_42_1 = require("passport-42");
 const auth_service_1 = require("./auth.service");
+const config_1 = require("@nestjs/config");
 let FortyTwoStrategy = exports.FortyTwoStrategy = class FortyTwoStrategy extends (0, passport_1.PassportStrategy)(passport_42_1.Strategy, '42') {
-    constructor(authService) {
+    constructor(authService, configService) {
         super({
-            clientID: 'u-s4t2ud-d71d93ae1ed7236dccb8c56127a16205ca6fc7aca52c8dfe81f61aaf0ec7a31a',
-            clientSecret: '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',
-            callbackURL: 'http://localhost:3000/auth/42/callback',
+            clientID: configService.getOrThrow('CLIENT_ID'),
+            clientSecret: configService.getOrThrow('CLIENT_SECRET'),
+            callbackURL: configService.getOrThrow('CALL_BACK_URL'),
         });
         this.authService = authService;
+        this.configService = configService;
     }
     async validate(accessToken, refreshToken, profile, done) {
         const user = await this.authService.validate({
@@ -37,6 +39,6 @@ let FortyTwoStrategy = exports.FortyTwoStrategy = class FortyTwoStrategy extends
 };
 exports.FortyTwoStrategy = FortyTwoStrategy = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [auth_service_1.AuthService])
+    __metadata("design:paramtypes", [auth_service_1.AuthService, config_1.ConfigService])
 ], FortyTwoStrategy);
 //# sourceMappingURL=strategy.42.js.map
