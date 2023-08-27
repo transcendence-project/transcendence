@@ -13,7 +13,7 @@ exports.AuthService = void 0;
 const common_1 = require("@nestjs/common");
 const users_service_1 = require("../users/users.service");
 let AuthService = exports.AuthService = class AuthService {
-    constructor(userService) {
+    constructor(userService, configService) {
         this.userService = userService;
     }
     async validate(user) {
@@ -22,6 +22,6 @@ let AuthService = exports.AuthService = class AuthService {
 };
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [users_service_1.UsersService])
+    __metadata("design:paramtypes", [users_service_1.UsersService, config_1.ConfigService])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

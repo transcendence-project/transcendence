@@ -36,5 +36,5 @@ export class UsersService {
 			return (NotFoundException)
 		console.log(user)
 		return (this.repo.delete(id))
-	}
+	} 
 }

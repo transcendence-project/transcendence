@@ -1,9 +1,14 @@
-import {IsEmail, IsString,} from "class-validator"
+import {IsEmail, IsString, IsNotEmpty} from "class-validator"
+
+// DTO - used to valudate incoming requests bodies
 
 export class createUserDTO {
 	
 	@IsEmail()
 	email: string
+
+	@IsString()
+	password: string
 
 	@IsString()
 	username: string

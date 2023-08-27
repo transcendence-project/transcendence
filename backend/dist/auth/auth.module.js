@@ -11,13 +11,14 @@ const common_1 = require("@nestjs/common");
 const auth_controller_1 = require("./auth.controller");
 const auth_service_1 = require("./auth.service");
 const passport_1 = require("@nestjs/passport");
+const config_module_1 = require("../config/config.module");
 const users_module_1 = require("../users/users.module");
 const strategy_42_1 = require("./strategy.42");
 let AuthModule = exports.AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule = __decorate([
     (0, common_1.Module)({
-        imports: [users_module_1.UsersModule, passport_1.PassportModule.register({ defaultStrategy: '42' })],
+        imports: [users_module_1.UsersModule, passport_1.PassportModule.register({ defaultStrategy: '42' }), config_module_1.ConfigModule],
         controllers: [auth_controller_1.AuthController],
         providers: [auth_service_1.AuthService, strategy_42_1.FortyTwoStrategy],
     })

@@ -1,7 +1,7 @@
 import { Controller, Get, UseGuards, Req, Res } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
-import express from 'express';
+import { ConfigService } from '@nestjs/config';
 import { User } from '../users/user.entity';
 
 @Controller('auth')
@@ -17,14 +17,13 @@ export class AuthController {
 	async callback(@Req() req, @Res() res) {
 		// the AuthGuard stores info about the authenticated
 		// user in the req object, specifically the user property
-		const user = req.user;
-		// console.log(`User ID: ${user.id}`);
-		// console.log(`User User Name: ${user.userName}`);
-		return res.redirect('https://en.wikipedia.org/wiki/Pong');
+		const user = req.user; // the authenticated user
+		return res.redirect('https://en.wikipedia.org/wiki/Pong'); // can redirect to our application page
 	}
 
 	// @Get('/profile')
 	// async profile(@Req()req) {
 	// 	return req.user;
+		// display profile page
 	//   }
 }
