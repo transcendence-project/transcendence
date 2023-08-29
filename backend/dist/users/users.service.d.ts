@@ -7,6 +7,7 @@ export declare class UsersService {
     create(email: string, userName: string): Promise<User>;
     findOne(id: number): Promise<User>;
     findOneByUserName(userName: string): Promise<User>;
+    findOneByEmail(email: string): Promise<User>;
     findAll(userName: string): Promise<User[]>;
     update(id: number, attrs: Partial<User>): Promise<import("typeorm").UpdateResult>;
     remove(id: number): Promise<typeof NotFoundException | import("typeorm").DeleteResult>;

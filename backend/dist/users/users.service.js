@@ -34,6 +34,9 @@ let UsersService = exports.UsersService = class UsersService {
     findOneByUserName(userName) {
         return (this.repo.findOneBy({ userName }));
     }
+    findOneByEmail(email) {
+        return (this.repo.findOneBy({ email }));
+    }
     findAll(userName) {
         return (this.repo.find({ where: { userName } }));
     }

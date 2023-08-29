@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
-import { InjectRepository } from '@nestjs/typeorm';
+import { InjectRepository } from '@nestjs/typeorm'
 
 @Injectable()
 export class UsersService {
@@ -12,7 +12,8 @@ export class UsersService {
 		const user = await this.findAll(userName);
 		if (user.length)
 			return (null)
-		const user2 = this.repo.create({email, userName})
+		const user2 = this.repo.create({email, userName, twoFactorSecret: null})
+		
 		return (this.repo.save(user2))
 	}
 	findOne(id: number) {
@@ -20,6 +21,10 @@ export class UsersService {
 	}
 	findOneByUserName(userName: string) {
 		return (this.repo.findOneBy({userName}))
+	}
+
+	findOneByEmail(email: string) {
+		return (this.repo.findOneBy({email}))
 	}
 
 	findAll(userName: string) {
@@ -36,5 +41,13 @@ export class UsersService {
 			return (NotFoundException)
 		console.log(user)
 		return (this.repo.delete(id))
-	} 
+	}
+	
+	async set2FA(id: number, secret: string) {
+		const user = await this.findOne(id);
+		if (!user)
+			return (NotFoundException)
+		user.twoFactorSecret = secret;
+		return (this.repo.save(user));
+	}
 }

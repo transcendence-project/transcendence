@@ -15,4 +15,10 @@ export class User {
 
 	@Column()
 	email: string
+
+	@Column({ nullable: true })
+	@Exclude()
+	twoFactorSecret: string
+
+	
 }

@@ -8,8 +8,5 @@ export class createUserDTO {
 	email: string
 
 	@IsString()
-	password: string
-
-	@IsString()
 	username: string
 }

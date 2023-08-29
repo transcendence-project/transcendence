@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards, Req, Res } from '@nestjs/common';
+import { Controller, Get, UseGuards, Req, Res, Post, Body, UnauthorizedException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { ConfigService } from '@nestjs/config';
@@ -26,4 +26,12 @@ export class AuthController {
 	// 	return req.user;
 		// display profile page
 	//   }
+
+	@Post('2fa/generate')
+	async generate2FA(@Req() req, @Body() body) {
+		const is2FAEnabled = await this.authService.is2FAEnabled(req.user.twoFactorSecret, req.user);
+		if (!is2FAEnabled)
+			throw new UnauthorizedException('2FA is not enabled');
+		await this.authService.generate2FA(req.user);
+	}
 }
