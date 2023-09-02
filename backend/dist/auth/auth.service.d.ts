@@ -1,10 +1,15 @@
 import { createUserDTO } from 'users/dtos/createUser.dto';
 import { User } from 'users/user.entity';
 import { UsersService } from 'users/users.service';
-import { JwtService } from '@nestjs/jwt';
+import { iUser } from 'users/users.inteface';
 export declare class AuthService {
     private userService;
-    private jwtService;
-    constructor(userService: UsersService, jwtService: JwtService);
+    constructor(userService: UsersService);
     validate(user: createUserDTO): Promise<User>;
+    generateTwoFactorAuthenticationSecret(user: iUser): Promise<{
+        secret: string;
+        otpauthUrl: string;
+    }>;
+    generateQrCodeDataURL(otpAuthUrl: string): Promise<string>;
+    is2faCodeValid(twoFactorAuthenticationCode: string, user: iUser): boolean;
 }

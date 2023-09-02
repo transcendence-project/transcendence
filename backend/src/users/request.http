@@ -27,3 +27,10 @@ GET http://localhost:3000/hi
 
 ### remove user
 DELETE http://localhost:3000/users/3
+
+### generate qr code
+GET  http://localhost:3000/auth/2fa/generate
+
+### authenticate 2fa
+GET  http://localhost:3000/auth/2fa/authenticate
+

@@ -16,16 +16,46 @@ exports.AuthController = void 0;
 const common_1 = require("@nestjs/common");
 const passport_1 = require("@nestjs/passport");
 const auth_service_1 = require("./auth.service");
+const jwt_1 = require("@nestjs/jwt");
 let AuthController = exports.AuthController = class AuthController {
-    constructor(authService) {
+    constructor(authService, jwtService) {
         this.authService = authService;
+        this.jwtService = jwtService;
     }
     async login() {
         ;
     }
     async callback(req, res) {
         const user = req.user;
-        return res.redirect('https://en.wikipedia.org/wiki/Pong');
+        const token = this.jwtService.sign({ username: user.username });
+        console.log('back in controller');
+        res.redirect('https://en.wikipedia.org/wiki/Pong');
+        return (token);
+    }
+    async generateQr(req, res) {
+        const user = {
+            id: 4,
+            username: 'arafeeq',
+            email: 'arafeeq@student.42abudhabi.ae',
+            twoFactorAuthenticationSecret: 'helloworld'
+        };
+        const otp = this.authService.generateTwoFactorAuthenticationSecret(user);
+        const code = await this.authService.generateQrCodeDataURL((await otp).otpauthUrl);
+        return res.redirect(code);
+    }
+    async authenticate2fa(req, body) {
+        const user = {
+            id: 4,
+            username: 'arafeeq',
+            email: 'arafeeq@student.42abudhabi.ae',
+            twoFactorAuthenticationSecret: 'EIRE46D7NJOEQ53O'
+        };
+        const isCodeValid = this.authService.is2faCodeValid("129140", user);
+        if (!isCodeValid) {
+            throw new common_1.UnauthorizedException('Wrong authentication code');
+        }
+        const token = this.jwtService.sign({ username: user.username });
+        return (token);
     }
 };
 __decorate([
@@ -44,8 +74,25 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "callback", null);
+__decorate([
+    (0, common_1.Get)('2fa/generate'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Res)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "generateQr", null);
+__decorate([
+    (0, common_1.Post)('2fa/authenticate'),
+    (0, common_1.HttpCode)(200),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "authenticate2fa", null);
 exports.AuthController = AuthController = __decorate([
     (0, common_1.Controller)('auth'),
-    __metadata("design:paramtypes", [auth_service_1.AuthService])
+    __metadata("design:paramtypes", [auth_service_1.AuthService, jwt_1.JwtService])
 ], AuthController);
 //# sourceMappingURL=auth.controller.js.map
