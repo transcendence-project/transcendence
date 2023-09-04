@@ -1,4 +1,4 @@
-import { createUserDTO } from './dtos/createUser.dto';
+import { createUserDTO } from '../dtos/createUser.dto';
 import { UsersService } from './users.service';
 export declare class UsersController {
     private userService;

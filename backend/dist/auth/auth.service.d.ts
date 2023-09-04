@@ -1,4 +1,4 @@
-import { createUserDTO } from 'users/dtos/createUser.dto';
+import { createUserDTO } from '../dtos/createUser.dto';
 import { User } from 'users/user.entity';
 import { UsersService } from 'users/users.service';
 import { iUser } from 'users/users.inteface';

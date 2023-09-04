@@ -17,14 +17,32 @@ const common_1 = require("@nestjs/common");
 const otplib_1 = require("otplib");
 const users_service_1 = require("../users/users.service");
 const qrcode_1 = __importDefault(require("qrcode"));
-const otplib_1 = require("otplib");
 let AuthService = exports.AuthService = class AuthService {
     constructor(userService) {
         this.userService = userService;
     }
     async validate(user) {
-        const token = this.jwtService.sign({ username: user.username });
-        return await this.userService.create(user.email, user.username);
+        const user1 = await this.userService.create(user.email, user.username);
+        return user1;
+    }
+    async generateTwoFactorAuthenticationSecret(user) {
+        const secret = otplib_1.authenticator.generateSecret();
+        const otpauthUrl = otplib_1.authenticator.keyuri(user.email, 'PONG 2.0', secret);
+        user.twoFactorAuthenticationSecret = secret;
+        return {
+            secret,
+            otpauthUrl
+        };
+    }
+    async generateQrCodeDataURL(otpAuthUrl) {
+        const dataURL = qrcode_1.default.toDataURL('image/png');
+        return dataURL;
+    }
+    is2faCodeValid(twoFactorAuthenticationCode, user) {
+        return otplib_1.authenticator.verify({
+            token: twoFactorAuthenticationCode,
+            secret: user.twoFactorAuthenticationSecret
+        });
     }
 };
 exports.AuthService = AuthService = __decorate([

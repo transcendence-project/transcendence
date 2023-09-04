@@ -17,8 +17,6 @@ const common_1 = require("@nestjs/common");
 const passport_1 = require("@nestjs/passport");
 const auth_service_1 = require("./auth.service");
 const jwt_1 = require("@nestjs/jwt");
-const user_entity_1 = require("../users/user.entity");
-const jwt_guard_1 = require("./jwt.guard");
 let AuthController = exports.AuthController = class AuthController {
     constructor(authService, jwtService) {
         this.authService = authService;
@@ -29,7 +27,35 @@ let AuthController = exports.AuthController = class AuthController {
     }
     async callback(req, res) {
         const user = req.user;
-        return res.redirect('https://en.wikipedia.org/wiki/Pong');
+        const token = this.jwtService.sign({ username: user.username });
+        console.log('back in controller');
+        res.redirect('https://en.wikipedia.org/wiki/Pong');
+        return (token);
+    }
+    async generateQr(req, res) {
+        const user = {
+            id: 4,
+            username: 'arafeeq',
+            email: 'arafeeq@student.42abudhabi.ae',
+            twoFactorAuthenticationSecret: 'helloworld'
+        };
+        const otp = this.authService.generateTwoFactorAuthenticationSecret(user);
+        const code = await this.authService.generateQrCodeDataURL((await otp).otpauthUrl);
+        return res.redirect(code);
+    }
+    async authenticate2fa(req, body) {
+        const user = {
+            id: 4,
+            username: 'arafeeq',
+            email: 'arafeeq@student.42abudhabi.ae',
+            twoFactorAuthenticationSecret: 'EIRE46D7NJOEQ53O'
+        };
+        const isCodeValid = this.authService.is2faCodeValid("129140", user);
+        if (!isCodeValid) {
+            throw new common_1.UnauthorizedException('Wrong authentication code');
+        }
+        const token = this.jwtService.sign({ username: user.username });
+        return (token);
     }
 };
 __decorate([

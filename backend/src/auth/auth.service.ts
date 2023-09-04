@@ -1,11 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { authenticator } from 'otplib';
-import { createUserDTO } from 'users/dtos/createUser.dto';
+import { createUserDTO } from '../dtos/createUser.dto';
 import { User } from 'users/user.entity';
 import { UsersService } from 'users/users.service';
 import { toDataURL } from 'qrcode';
 import qr from 'qrcode';
-import { authenticator } from 'otplib'
 import { iUser } from 'users/users.inteface';
 // const { createCanvas } = require('canvas');
 // const qr = require('qrcode');
