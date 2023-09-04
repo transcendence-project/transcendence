@@ -9,12 +9,12 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.JwtStrategy = void 0;
-const common_1 = require("@nestjs/common");
-const passport_1 = require("@nestjs/passport");
+exports.Jwt2faStrategy = void 0;
 const passport_jwt_1 = require("passport-jwt");
+const passport_1 = require("@nestjs/passport");
+const common_1 = require("@nestjs/common");
 const users_service_1 = require("../users/users.service");
-let JwtStrategy = exports.JwtStrategy = class JwtStrategy extends (0, passport_1.PassportStrategy)(passport_jwt_1.Strategy, 'jwt') {
+let Jwt2faStrategy = exports.Jwt2faStrategy = class Jwt2faStrategy extends (0, passport_1.PassportStrategy)(passport_jwt_1.Strategy, 'jwt-2fa') {
     constructor(userService) {
         super({
             jwtFromRequest: passport_jwt_1.ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -23,15 +23,17 @@ let JwtStrategy = exports.JwtStrategy = class JwtStrategy extends (0, passport_1
         this.userService = userService;
     }
     async validate(payload) {
-        const user = await this.userService.findOneByUserName(payload.username);
-        if (!user) {
-            throw new common_1.UnauthorizedException('Invalid token');
+        const user = await this.userService.findOne(payload.email);
+        if (!user.is2FAEnabled) {
+            return user;
         }
-        return user;
+        if (payload.isTwoFactorAuthenticated) {
+            return user;
+        }
     }
 };
-exports.JwtStrategy = JwtStrategy = __decorate([
+exports.Jwt2faStrategy = Jwt2faStrategy = __decorate([
     (0, common_1.Injectable)(),
     __metadata("design:paramtypes", [users_service_1.UsersService])
-], JwtStrategy);
-//# sourceMappingURL=jwt.startegy.js.map
+], Jwt2faStrategy);
+//# sourceMappingURL=jwt.2fa.strategy.js.map

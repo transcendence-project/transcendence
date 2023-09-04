@@ -11,4 +11,6 @@ export declare class UsersService {
     findAll(userName: string): Promise<User[]>;
     update(id: number, attrs: Partial<User>): Promise<import("typeorm").UpdateResult>;
     remove(id: number): Promise<typeof NotFoundException | import("typeorm").DeleteResult>;
+    set2FA(id: number, secret: string): Promise<User | typeof NotFoundException>;
+    enable2FA(id: number): Promise<User | typeof NotFoundException>;
 }

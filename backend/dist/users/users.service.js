@@ -25,7 +25,7 @@ let UsersService = exports.UsersService = class UsersService {
         const user = await this.findAll(userName);
         if (user.length)
             return (null);
-        const user2 = this.repo.create({ email, userName });
+        const user2 = this.repo.create({ email, userName, twoFactorSecret: null, is2FAEnabled: false });
         return (this.repo.save(user2));
     }
     findOne(id) {
@@ -49,6 +49,20 @@ let UsersService = exports.UsersService = class UsersService {
             return (common_1.NotFoundException);
         console.log(user);
         return (this.repo.delete(id));
+    }
+    async set2FA(id, secret) {
+        const user = await this.findOne(id);
+        if (!user)
+            return (common_1.NotFoundException);
+        user.twoFactorSecret = secret;
+        return (this.repo.save(user));
+    }
+    async enable2FA(id) {
+        const user = await this.findOne(id);
+        if (!user)
+            return (common_1.NotFoundException);
+        user.is2FAEnabled = true;
+        return (this.repo.save(user));
     }
 };
 exports.UsersService = UsersService = __decorate([

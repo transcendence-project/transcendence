@@ -3,6 +3,8 @@ import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { ConfigService } from '@nestjs/config';
 import { User } from '../users/user.entity';
+import { Jwt2faAuthGuard } from './jwt.2fa.auth.guard';
+import { JwtAuthGuard } from './jwt.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -28,11 +30,22 @@ export class AuthController {
 		// display profile page
 	//   }
 
-	@Post('2fa/generate')
+	@Post('2fa/turn-on')
+	@UseGuards(JwtAuthGuard)
 	async generate2FA(@Req() req, @Body() body) {
-		const is2FAEnabled = await this.authService.is2FAEnabled(req.user.twoFactorSecret, req.user);
+		console.log('test')
+		const is2FAEnabled = await this.authService.is2FAEnabled(body.twoFactorSecret, req.user);
 		if (!is2FAEnabled)
 			throw new UnauthorizedException('2FA is not enabled');
 		await this.authService.generate2FA(req.user);
+	}
+
+	@Post('2fa/enable')
+	@UseGuards(JwtAuthGuard)
+	async enable2FA(@Req() req, @Body() body: User) {
+		const is2FAEnabled = await this.authService.is2FAEnabled(body.twoFactorSecret, req.user);
+		if (!is2FAEnabled)
+			throw new UnauthorizedException('2FA is not enabled');
+		await this.authService.loginwith2FA(req.user);
 	}
 }

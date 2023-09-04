@@ -11,6 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.User = void 0;
 const typeorm_1 = require("typeorm");
+const class_transformer_1 = require("class-transformer");
 let User = exports.User = class User {
 };
 __decorate([
@@ -25,6 +26,16 @@ __decorate([
     (0, typeorm_1.Column)(),
     __metadata("design:type", String)
 ], User.prototype, "email", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ nullable: true }),
+    (0, class_transformer_1.Exclude)(),
+    __metadata("design:type", String)
+], User.prototype, "twoFactorSecret", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ default: false }),
+    (0, class_transformer_1.Exclude)(),
+    __metadata("design:type", Boolean)
+], User.prototype, "is2FAEnabled", void 0);
 exports.User = User = __decorate([
     (0, typeorm_1.Entity)()
 ], User);

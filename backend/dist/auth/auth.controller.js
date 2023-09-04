@@ -16,6 +16,8 @@ exports.AuthController = void 0;
 const common_1 = require("@nestjs/common");
 const passport_1 = require("@nestjs/passport");
 const auth_service_1 = require("./auth.service");
+const user_entity_1 = require("../users/user.entity");
+const jwt_guard_1 = require("./jwt.guard");
 let AuthController = exports.AuthController = class AuthController {
     constructor(authService) {
         this.authService = authService;
@@ -26,6 +28,19 @@ let AuthController = exports.AuthController = class AuthController {
     async callback(req, res) {
         const user = req.user;
         return res.redirect('https://en.wikipedia.org/wiki/Pong');
+    }
+    async generate2FA(req, body) {
+        console.log('test');
+        const is2FAEnabled = await this.authService.is2FAEnabled(body.twoFactorSecret, req.user);
+        if (!is2FAEnabled)
+            throw new common_1.UnauthorizedException('2FA is not enabled');
+        await this.authService.generate2FA(req.user);
+    }
+    async enable2FA(req, body) {
+        const is2FAEnabled = await this.authService.is2FAEnabled(body.twoFactorSecret, req.user);
+        if (!is2FAEnabled)
+            throw new common_1.UnauthorizedException('2FA is not enabled');
+        await this.authService.loginwith2FA(req.user);
     }
 };
 __decorate([
@@ -44,6 +59,24 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "callback", null);
+__decorate([
+    (0, common_1.Post)('2fa/turn-on'),
+    (0, common_1.UseGuards)(jwt_guard_1.JwtAuthGuard),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "generate2FA", null);
+__decorate([
+    (0, common_1.Post)('2fa/enable'),
+    (0, common_1.UseGuards)(jwt_guard_1.JwtAuthGuard),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, user_entity_1.User]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "enable2FA", null);
 exports.AuthController = AuthController = __decorate([
     (0, common_1.Controller)('auth'),
     __metadata("design:paramtypes", [auth_service_1.AuthService])

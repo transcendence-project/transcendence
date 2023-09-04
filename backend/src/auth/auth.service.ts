@@ -42,7 +42,12 @@ export class AuthService{
 	async loginwith2FA(user: Partial<User>){
 		const payload = {
 			email: user.email,
-			
+			is2FAEnabled: true
+		}
+
+		return {
+			email: payload.email,
+			access_token: this.jwtService.sign(payload)
 		}
 	}
 }

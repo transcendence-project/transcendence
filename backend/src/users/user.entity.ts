@@ -20,5 +20,7 @@ export class User {
 	@Exclude()
 	twoFactorSecret: string
 
-	
+	@Column({ default: false})
+	@Exclude()
+	is2FAEnabled: boolean
 }

@@ -11,8 +11,10 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthService = void 0;
 const common_1 = require("@nestjs/common");
+const otplib_1 = require("otplib");
 const users_service_1 = require("../users/users.service");
 const jwt_1 = require("@nestjs/jwt");
+const qrcode_1 = require("qrcode");
 let AuthService = exports.AuthService = class AuthService {
     constructor(userService, jwtService) {
         this.userService = userService;
@@ -21,6 +23,34 @@ let AuthService = exports.AuthService = class AuthService {
     async validate(user) {
         const token = this.jwtService.sign({ username: user.username });
         return await this.userService.create(user.email, user.username);
+    }
+    async generate2FA(user) {
+        const secret = otplib_1.authenticator.generateSecret();
+        const otpAuthUrl = otplib_1.authenticator.keyuri(user.email, 'Transcendence', secret);
+        await this.userService.set2FA(user.id, secret);
+        return {
+            secret,
+            otpAuthUrl
+        };
+    }
+    async is2FAEnabled(twoFactorSecret, user) {
+        return otplib_1.authenticator.verify({
+            token: twoFactorSecret,
+            secret: user.twoFactorSecret
+        });
+    }
+    async generateQrCode(otpAuthUrl) {
+        return ((0, qrcode_1.toDataURL)(otpAuthUrl));
+    }
+    async loginwith2FA(user) {
+        const payload = {
+            email: user.email,
+            is2FAEnabled: true
+        };
+        return {
+            email: payload.email,
+            access_token: this.jwtService.sign(payload)
+        };
     }
 };
 exports.AuthService = AuthService = __decorate([

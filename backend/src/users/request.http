@@ -27,3 +27,7 @@ GET http://localhost:3000/hi
 
 ### remove user
 DELETE http://localhost:3000/users/3
+
+###check auth
+
+POST http://localhost:3000/auth/2fa/turn-on

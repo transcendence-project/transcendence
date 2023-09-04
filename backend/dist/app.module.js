@@ -15,38 +15,15 @@ const config_1 = require("@nestjs/config");
 const typeorm_1 = require("@nestjs/typeorm");
 const ormconfig_1 = require("./ormconfig");
 const auth_module_1 = require("./auth/auth.module");
-const mailer_1 = require("@nestjs-modules/mailer");
-const handlebars_adapter_1 = require("@nestjs-modules/mailer/dist/adapters/handlebars.adapter");
-const mailer_2 = require("@nestjs-modules/mailer");
 let AppModule = exports.AppModule = class AppModule {
 };
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [users_module_1.UsersModule,
             typeorm_1.TypeOrmModule.forRoot(ormconfig_1.typeOrmConfig),
-            auth_module_1.AuthModule, config_1.ConfigModule.forRoot(),
-            mailer_2.MailerModule.forRoot({
-                transport: {
-                    service: 'gmail',
-                    secure: false,
-                    auth: {
-                        user: process.env.MAILER_USER,
-                        pass: process.env.MAILER_PASSWORD,
-                    },
-                },
-                defaults: {
-                    from: '"No Reply" <oabushar@student.42abudhabi.ae>',
-                },
-                template: {
-                    dir: __dirname + '/templates',
-                    adapter: new handlebars_adapter_1.HandlebarsAdapter(),
-                    options: {
-                        strict: true,
-                    },
-                },
-            })],
+            auth_module_1.AuthModule, config_1.ConfigModule.forRoot()],
         controllers: [app_controller_1.AppController],
-        providers: [app_service_1.AppService, mailer_1.MailerService],
+        providers: [app_service_1.AppService],
     })
 ], AppModule);
 //# sourceMappingURL=app.module.js.map
