@@ -3,80 +3,49 @@ import { authenticator } from 'otplib';
 import { createUserDTO } from 'users/dtos/createUser.dto';
 import { User } from 'users/user.entity';
 import { UsersService } from 'users/users.service';
-import { JwtService } from '@nestjs/jwt';
 import { toDataURL } from 'qrcode';
+import qr from 'qrcode';
+import { authenticator } from 'otplib'
+import { iUser } from 'users/users.inteface';
+// const { createCanvas } = require('canvas');
+// const qr = require('qrcode');
 
 @Injectable()
 export class AuthService{
-	constructor(private userService: UsersService, private jwtService: JwtService) {}
+	constructor(private userService: UsersService) {}
 	async validate(user: createUserDTO): Promise<User> {
-		const token = this.jwtService.sign({username: user.username});
-		// console.log(token);
-		// const decodeToken = this.jwtService.verify(token);
-		return await this.userService.create(user.email, user.username);
+		
+		const user1 = await this.userService.create(user.email, user.username);
+		// console.log(user1.userName);
+		return user1;
 	}
 
-	async generate2FA(user: User) {
+	async generateTwoFactorAuthenticationSecret(user: iUser) {
 		const secret = authenticator.generateSecret();
-
-		const otpAuthUrl = authenticator.keyuri(user.email, 'Transcendence', secret);
-		await this.userService.set2FA(user.id, secret);
-
+	
+		const otpauthUrl = authenticator.keyuri(user.email, 'PONG 2.0', secret);
+	
+		user.twoFactorAuthenticationSecret = secret;
+		// console.log(secret);
+		// this.userService.update(user.id, {twoFactorAuthenticationSecret: secret});
+		// await this.usersService.setTwoFactorAuthenticationSecret(secret, user.id);
+	
 		return {
-			secret,
-			otpAuthUrl
+		  secret,
+		  otpauthUrl
 		}
-	}
+	  }
 
-	async is2FAEnabled(twoFactorSecret: string, user: User) {
+	async generateQrCodeDataURL(otpAuthUrl: string) {
+		const dataURL = qr.toDataURL('image/png');
+		// console.log(dataURL);
+		return dataURL;
+	  }
+	
+	  is2faCodeValid(twoFactorAuthenticationCode: string, user: iUser) {
 		return authenticator.verify({
-			token: twoFactorSecret,
-			secret: user.twoFactorSecret
-		})
-	}
-
-	async generateQrCode(otpAuthUrl: string) {
-		return (toDataURL(otpAuthUrl));
-	}
-
-	async loginwith2FA(user: Partial<User>){
-		const payload = {
-			email: user.email,
-			is2FAEnabled: true
-		}
-
-		return {
-			email: payload.email,
-			access_token: this.jwtService.sign(payload)
-		}
-	}
+		  token: twoFactorAuthenticationCode,
+		  secret: user.twoFactorAuthenticationSecret
+		});
+	  }
 }
-
-
-//   const authService = new AuthService();
-  
-//   export default authService;
-
-// @Injectable()
-// export class AuthService extends PassportStrategy(Strategy, '42'){
-
-// 	constructor()
-// 	{
-// 		super()
-// 		passport.
-
-// 	}
-	// constructor() {
-	// 	super({
-	// 		client process.env.FORTYTWO_APP_ID,
-	// 		clientSecret: process.env.FORTYTWO_APP_SECRET,
-	// 		callbackURL: "http://127.0.0.1:3000/auth/42/callback"
-
-	// 	});
-	// }
-
-	// async validate(accessToken: string, refreshToken: string, profile: any): Promise<any> {
-	// 	const user = {id: profile.id, name: profile.displayName};
-	// 	return user;
-	// }
-// }

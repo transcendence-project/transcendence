@@ -13,6 +13,8 @@ export class User {
 	// @Exclude()
 	// password: string
 
+	twoFactorAuthenticationSecret: string
+
 	@Column()
 	email: string
 

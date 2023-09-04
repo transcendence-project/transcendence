@@ -10,6 +10,9 @@ export class UsersService {
 	async create(email: string, userName: string) {
 
 		const user = await this.findAll(userName);
+		// const user = await this.findOneByUserName(userName);
+		// if (user)
+		// 	return (user)
 		if (user.length)
 			return (null)
 		const user2 = this.repo.create({email, userName, twoFactorSecret: null, is2FAEnabled: false})
