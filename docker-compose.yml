@@ -9,3 +9,4 @@ services:
        - ./frontend/src:/app/frontend/src  # This maps your host's ./frontend/src directory to /app/frontend/src in the container
        - ./frontend/index.html:/app/frontend/index.html
     working_dir: /app/frontend
+    command: ["npm", "run", "serve"]
