@@ -10,8 +10,8 @@
   
   <script lang="ts">
   import { defineComponent } from "vue";
-  import TopNavBar from "@/components/TopNavBar.vue";
-  import SideNavBar from "@/components/SideNavBar.vue";
+  import TopNavBar from "../components/TopNavBar.vue";
+  import SideNavBar from "../components/SideNavBar.vue";
   
   export default defineComponent({
 	name: "homePage",
