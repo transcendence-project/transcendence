@@ -4,10 +4,7 @@ import { createUserDTO } from '../dtos/createUser.dto';
 import { User } from 'users/user.entity';
 import { UsersService } from 'users/users.service';
 import { toDataURL } from 'qrcode';
-import qr from 'qrcode';
 import { iUser } from 'users/users.inteface';
-// const { createCanvas } = require('canvas');
-// const qr = require('qrcode');
 
 @Injectable()
 export class AuthService{
@@ -36,7 +33,7 @@ export class AuthService{
 	  }
 
 	async generateQrCodeDataURL(otpAuthUrl: string) {
-		const dataURL = qr.toDataURL('image/png');
+		const dataURL = toDataURL(otpAuthUrl);
 		// console.log(dataURL);
 		return dataURL;
 	  }
