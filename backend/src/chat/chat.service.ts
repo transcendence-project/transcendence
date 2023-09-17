@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class ChatService {
+	 // -  have to inject database/repo -
+
 	// view all channels
 
 	// view all channel members
