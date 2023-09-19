@@ -13,21 +13,24 @@ export class ChatController {
 	// async view_chan(){
 
 	// }
-	@Get('message/:username') // direct message user
+	@Get('/:username/dm') // direct message user
 	async messageUser(){
 
 	}
 
 	@Post('/:chan_name')
-	async create_chan(@Param('chan_name') chan_name: string){
-		if (this.chatService.chan_exist(chan_name))
-			this.chatService.add_chan(chan_name);
-		// else
+	async create_chan(@Req() req, @Param('chan_name') chan_name: string){
+		// if (this.chatService.chan_exist(chan_name))
 			// error: chan already exist
+		// else
+			// this.chatService.add_chan(req.user.username, chan_name);
 	}
 	@Post('/:chan_name/join')
 	async joinChan(@Req() req, @Param('chan_name') chan_name: string){
-		if (this.chatService.chan_exist(chan_name))
+		// if (this.chatService.chan_exist(chan_name)) ((maybe not necessary))
+		// if (this.chatService.is_ban(req.user.userName, chan_name))
+			// error: user banned from channels
+		// else
 			this.chatService.add_chan_mem(req.user); // pass User as param or user details individually
 		// else  (maybe not necessary)
 			// throw channel does not exist error or create channel??
@@ -44,6 +47,8 @@ export class ChatController {
 	@Post('/:chan_name/message')
 	async sendChanMsg(@Req() req, @Param('chan_name')chan_name: string){
 		// after check
+		if (this.chatService.is_mute(req.user.userName, chan_name))
+			// error user is muted
 		this.chatService.msg_chan(req.user.userName, chan_name)
 	}
 
