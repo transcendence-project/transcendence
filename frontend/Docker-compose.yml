@@ -1,0 +1,12 @@
+version: '3'
+services:
+  frontend:
+    build: ./frontend  # Docker will look for Dockerfile in this directory
+    container_name: frontend
+    ports:
+      - "8080:8080"
+    volumes:
+       - ./frontend/src:/app/frontend/src  # This maps your host's ./frontend/src directory to /app/frontend/src in the container
+       - ./frontend/index.html:/app/frontend/index.html
+    working_dir: /app/frontend
+    command: /bin/sh -c "npm run serve"
