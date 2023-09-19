@@ -15,7 +15,6 @@ export class ChatController {
 	// }
 	@Get('/:username/dm') // direct message user
 	async messageUser(){
-
 	}
 
 	@Post('/:chan_name')
