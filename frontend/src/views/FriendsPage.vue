@@ -16,10 +16,10 @@
               {{ result.user }}
               <div class="status">
                 <div v-if="result.friend">
-                  <div class="usr-avail"></div>
+                  <div class="frd-usr-avail"></div>
                 </div>
                 <div v-if="!result.friend">
-                  <div class="usr-not-avail"></div>
+                  <div class="frd-usr-not-avail"></div>
                 </div>
               </div>
             </h4>
@@ -44,10 +44,10 @@
                 {{ result.user }}
               </h4>
               <div v-if="result.friend">
-                <div class="usr-avail"></div>
+                <div class="frd-usr-avail"></div>
               </div>
               <div v-if="!result.friend">
-                <div class="usr-not-avail"></div>
+                <div class="frd-usr-not-avail"></div>
               </div>
             </div>
             <OptionMenu />
@@ -295,7 +295,7 @@ export default defineComponent({
   align-items: center;
   justify-content: center;
 }
-.usr-avail {
+.frd-usr-avail {
   display: flex;
   width: 0.6rem;
   height: 0.6rem;
@@ -305,7 +305,7 @@ export default defineComponent({
   border-style: groove;
   background: green;
 }
-.usr-not-avail {
+.frd-usr-not-avail {
   display: flex;
   /* flex-direction: column; */
   width: 0.6rem;

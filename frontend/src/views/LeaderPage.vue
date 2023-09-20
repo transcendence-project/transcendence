@@ -12,7 +12,7 @@
 			<h3>Draws</h3>
 		  </div>
 		  <div v-for="(match, index) in match" :key="index" class="li-cont">
-			<li>
+			<li class="li-cls">
 			  <div class="list">
 				<h4 class="lst">{{ match.rank }}</h4>
 				<h4>
@@ -129,7 +129,7 @@
 	padding-left: 10px;
 	border-radius: 5px;
   }
-  li {
+  .li-cls {
 	list-style-type: none;
   }
   

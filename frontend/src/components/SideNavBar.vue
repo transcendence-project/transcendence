@@ -7,18 +7,8 @@
         </router-link>
       </li>
       <li>
-        <router-link to="/chattest"
-          ><img src="@/assets/chattest.svg" alt="Chat test" />
-        </router-link>
-      </li>
-      <li>
         <router-link to="/game"
           ><img src="@/assets/game.svg" alt="Game" />
-        </router-link>
-      </li>
-      <li>
-        <router-link to="/gametest"
-          ><img src="@/assets/gametest.svg" alt="GameTest" />
         </router-link>
       </li>
       <li>

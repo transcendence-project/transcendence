@@ -12,11 +12,6 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('../views/GamePage.vue')
   },
   {
-    path: '/gametest',
-    name: 'gametest',
-    component: () => import('../views/GamePageTest.vue')
-  },
-  {
     path: '/friends',
     name: 'friends',
     component: () => import('../views/FriendsPage.vue')
@@ -24,7 +19,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/profile',
     name: 'profile',
-    component: () => import('../views/ProfilePage.vue')
+    component: () => import('../views/EditProfilePage.vue')
   },
   {
     path: '/chat',
