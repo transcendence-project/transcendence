@@ -7,18 +7,8 @@
         </router-link>
       </li>
       <li>
-        <router-link to="/chattest"
-          ><img src="@/assets/chattest.svg" alt="Chat test" />
-        </router-link>
-      </li>
-      <li>
         <router-link to="/game"
           ><img src="@/assets/game.svg" alt="Game" />
-        </router-link>
-      </li>
-      <li>
-        <router-link to="/gametest"
-          ><img src="@/assets/gametest.svg" alt="GameTest" />
         </router-link>
       </li>
       <li>
@@ -37,7 +27,6 @@
 
 <style scoped>
 .side-nav-bar {
-  /* background-color: red; */
   background-color: #34373d;
   color: #fff;
   width: 70px;
@@ -56,8 +45,7 @@
 }
 
 .side-nav-links li a {
-  /* color: #fff; */
-  /* color: red; */
+  color: #fff;  
   text-decoration: none;
 }
 

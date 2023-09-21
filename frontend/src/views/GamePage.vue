@@ -1,247 +1,282 @@
 <template>
-  <div class="game">
-    <h2>Ping Pong</h2>
-    <div class="field">
-      <canvas ref="canvas" width="600" height="400"></canvas>
-    </div>
-  </div>
-</template>
+	<div class="game-container">
+		<div class="game-canvas">
 
-<script lang="ts">
-import { ref, onMounted, onBeforeUnmount } from "vue";
+			<canvas ref="canvas" id="pong" width="900" height="400"></canvas>
+		</div>
+	</div>
+  </template>
+  
+  <script setup lang="ts">
+  import { ref, onMounted } from "vue";
+  const canvas = ref<HTMLCanvasElement | null>(null);
+  
+  onMounted(() => {
+	if (canvas.value) {
+	  const PLAYER_WIDTH = 20;
+	  const PLAYER_HEIGHT = 100;
+	  const BALL_START_SPEED = 1;
+	  const player = {
+		x: 0,
+		y: canvas.value.height / 2 - PLAYER_HEIGHT / 2,
+		width: PLAYER_WIDTH,
+		height: PLAYER_HEIGHT,
+		color: "#9336B4",
+		score: 0,
+	  };
+	  const computer = {
+		x: canvas.value.width - PLAYER_WIDTH,
+		y: canvas.value.height / 2 - PLAYER_HEIGHT / 2,
+		width: PLAYER_WIDTH,
+		height: PLAYER_HEIGHT,
+		color: "#9336B4",
+		score: 0,
+	  };
+	  const net = {
+		x: canvas.value.width / 2 - 1,
+		y: 0,
+		width: 2,
+		height: 10,
+		color: "#9336B4",
+	  };
+	  interface Ball {
+		x: number;
+		y: number;
+		radius: number;
+		speed: number;
+		dirx: number;
+		diry: number;
+		color: string;
+	  }
+	  interface Paddle {
+		x: number;
+		y: number;
+		width: number;
+		height: number;
+		color: string;
+		score: number;
+	  }
+	  const ball: Ball = {
+		x: canvas.value.width / 2,
+		y: canvas.value.height / 2,
+		radius: 10,
+		speed: BALL_START_SPEED,
+		dirx: 5,
+		diry: 5,
+		color: "#19A7CE",
+	  };
+	  const ctx = canvas.value.getContext("2d");
+	  if (ctx) {
+		const drawRect = (
+		  x: number,
+		  y: number,
+		  w: number,
+		  h: number,
+		  color: string
+		) => {
+		  ctx.fillStyle = color;
+		  ctx.fillRect(x, y, w, h);
+		};
+		const drawCircle = (x: number, y: number, r: number, color: string) => {
+		  ctx.fillStyle = color;
+		  ctx.beginPath();
+		  ctx.arc(x, y, r, 0, Math.PI * 2, false);
+		  ctx.closePath();
+		  ctx.fill();
+		};
+		const drawText = (text: string, x: number, y: number, color: string) => {
+		  ctx.fillStyle = color;
+		  ctx.font = "45px fantasy";
+		  ctx.fillText(text, x, y);
+		};
+		const drawNet = () => {
+		  if (canvas.value) {
+			for (var i = 0; i <= canvas.value.height; i += 15) {
+			  drawRect(net.x, net.y + i, net.width, net.height, net.color);
+			}
+		  }
+		};
+		// check collisions
+		const collision = (b: Ball, p: Paddle): boolean => {
+		  let paddleTopEdge = p.y;
+		  let paddleBottomEdge = p.y + p.height;
+		  let paddleLeftEdge = p.x;
+		  let paddleRightEdge = p.x + p.width;
+		  let ballTopEdge = b.y - b.radius;
+		  let ballBottomEdge = b.y + b.radius;
+		  let ballLeftEdge = b.x - b.radius;
+		  let ballRightEdge = b.x + b.radius;
+		  if (
+			ballRightEdge > paddleLeftEdge &&
+			ballLeftEdge < paddleRightEdge &&
+			ballBottomEdge > paddleTopEdge &&
+			ballTopEdge < paddleBottomEdge
+		  ) {
+			// Determine which side the ball hit
+			let hitTop = Math.abs(ballBottomEdge - paddleTopEdge);
+			let hitBottom = Math.abs(ballTopEdge - paddleBottomEdge);
+			let hitLeft = Math.abs(ballRightEdge - paddleLeftEdge);
+			let hitRight = Math.abs(ballLeftEdge - paddleRightEdge);
+			let minHit = Math.min(hitTop, hitBottom, hitLeft, hitRight);
+			if (minHit === hitTop || minHit === hitBottom) {
+			  b.diry = -b.diry;
+			} else {
+			  b.dirx = -b.dirx;
+			}
+			return true;
+		  }
+		  return false;
+		};
+		// Variable to keep track of the player's movement
+		let playerMovement = 0;
+		let keyDownHandler = (event: KeyboardEvent) => {
+		  if (event.key === "w" || event.key === "W") {
+			// Move the player paddle up
+			playerMovement = -7;
+		  } else if (event.key === "s" || event.key === "S") {
+			// Move the player paddle down
+			playerMovement = 7;
+		  }
+		};
+		let keyUpHandler = (event: KeyboardEvent) => {
+		  if (
+			event.key === "w" ||
+			event.key === "W" ||
+			event.key === "s" ||
+			event.key === "S"
+		  ) {
+			// Stop moving the player paddle when key is released
+			playerMovement = 0;
+		  }
+		};
+		document.addEventListener("keydown", keyDownHandler, false);
+		document.addEventListener("keyup", keyUpHandler, false);
+		const update = () => {
+		  // Check for scoring
+		  if (canvas.value) {
+			if (ball.x - ball.radius < 0) {
+			  // Ball has passed the left edge, point for computer
+			  computer.score += 1;
+			  // Reset ball to the center
+			  ball.x = canvas.value.width / 2;
+			  ball.y = canvas.value.height / 2;
+			} else if (ball.x + ball.radius > canvas.value.width) {
+			  // Ball has passed the right edge, point for player
+			  player.score += 1;
+			  // Reset ball to the center
+			  ball.x = canvas.value.width / 2;
+			  ball.y = canvas.value.height / 2;
+			}
+			{
+			  ball.x += ball.dirx;
+			  ball.y += ball.diry;
+			  if (
+				ball.y + ball.radius > canvas.value.height ||
+				ball.y - ball.radius < 0
+			  ) {
+				ball.diry = -ball.diry;
+			  }
+			  // which player
+			  var selectedPlayer: Paddle =
+				ball.x < canvas.value.width / 2 ? player : computer;
+			  var collisionSide = collision(ball, selectedPlayer);
+			  if (collisionSide) {
+				// ball.dirx = -ball.dirx;
+			  }
+			  // computer controal
+			  var targetPos = ball.y - computer.height / 2;
+			  // let current
+			  computer.y = targetPos;
+			  // Update the player's position based on playerMovement
+			  player.y += playerMovement;
+			  // Ensure the player paddle stays within the canvas boundaries
+			  player.y = Math.max(
+				0,
+				Math.min(player.y, canvas.value.height - player.height)
+			  );
+			}
+		  }
+		};
+		const render = () => {
+		  if (canvas.value) {
+			// Clear the entire canvas
+			drawRect(0, 0, canvas.value.width, canvas.value.height, "#F6F1F1");
+			// Draw elements as before
+			drawNet();
+			drawText(
+			  player.score.toString(),
+			  canvas.value.width / 4.5,
+			  canvas.value.height / 5,
+			  "#9336B4"
+			);
+			drawText(
+			  computer.score.toString(),
+			  (3 * canvas.value.width) / 4,
+			  canvas.value.height / 5,
+			  "#9336B4"
+			);
+			drawRect(
+			  player.x,
+			  player.y,
+			  player.width,
+			  player.height,
+			  player.color
+			);
+			drawRect(
+			  computer.x,
+			  computer.y,
+			  computer.width,
+			  computer.height,
+			  computer.color
+			);
+			drawCircle(ball.x, ball.y, ball.radius, ball.color);
+		  }
+		};
+		const game = () => {
+		  update();
+		  render();
+		  requestAnimationFrame(game);
+		};
+		requestAnimationFrame(game);
+	  }
+	}
+  });
+  </script>
+  
+  <style>
+  /* * {
+	padding: 0;
+	margin: 0;
+  } */
+  
 
-interface Player {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  color: string;
-  score: number;
-}
-
-export default {
-  setup() {
-    const canvas = ref<HTMLCanvasElement | null>(null);
-    const context = ref<CanvasRenderingContext2D | null>(null);
-    const framePerSecond = 50;
-    let loop: number | null = null;
-
-    const player: Player = {
-      x: 0,
-      y: 0,
-      width: 10,
-      height: 100,
-      color: "white",
-      score: 0,
-    };
-
-    const com: Player = {
-      x: 590,
-      y: 0,
-      width: 10,
-      height: 100,
-      color: "white",
-      score: 0,
-    };
-
-    const net = {
-      x: 300,
-      y: 0,
-      width: 2,
-      height: 10,
-      color: "white",
-    };
-
-    const ball = {
-      x: 0,
-      y: 0,
-      radius: 10,
-      speed: 5,
-      velocityX: 5,
-      velocityY: 5,
-      color: "white",
-    };
-
-    const initGame = () => {
-      if (canvas.value && context.value) {
-        ball.x = canvas.value!.width / 2;
-        ball.y = canvas.value!.height / 2;
-
-        player.score = 0;
-        com.score = 0;
-      }
-    };
-
-    const movePaddle = (evt: MouseEvent) => {
-      const rect = canvas.value!.getBoundingClientRect();
-      player.y = evt.clientY - rect.top - player.height / 2;
-    };
-
-    const update = () => {
-      ball.x += ball.velocityX;
-      ball.y += ball.velocityY;
-
-      const computerLevel = 0.1;
-      com.y += (ball.y - (com.y + com.height / 2)) * computerLevel;
-
-      if (
-        ball.y + ball.radius > canvas.value!.height ||
-        ball.y - ball.radius < 0
-      ) {
-        ball.velocityY = -ball.velocityY;
-      }
-
-      const user =
-        ball.x + ball.radius < canvas.value!.width / 2 ? player : com;
-      if (collision(ball, user)) {
-        let collidePoint = ball.y - (user.y + user.height / 2);
-        collidePoint = collidePoint / (user.height / 2);
-
-        const angleRad = (Math.PI / 4) * collidePoint;
-        const direction =
-          ball.x + ball.radius < canvas.value!.width / 2 ? 1 : -1;
-
-        ball.velocityX = direction * ball.speed * Math.cos(angleRad);
-        ball.velocityY = direction * ball.speed * Math.sin(angleRad);
-
-        ball.speed += 0.1;
-      }
-    };
-
-    const collision = (ball: any, player: any): boolean => {
-      player.top = player.y;
-      player.bottom = player.y + player.height;
-      player.left = player.x;
-      player.right = player.x + player.width;
-
-      ball.top = ball.y - ball.radius;
-      ball.bottom = ball.y + ball.radius;
-      ball.left = ball.x - ball.radius;
-      ball.right = ball.x + ball.radius;
-
-      return (
-        ball.right > player.left &&
-        ball.top < player.bottom &&
-        ball.left < player.right &&
-        ball.bottom > player.top
-      );
-    };
-
-    const render = () => {
-      if (canvas.value && context.value) {
-        context.value.clearRect(0, 0, canvas.value.width, canvas.value.height);
-        drawRect(0, 0, canvas.value.width, canvas.value.height, "black");
-        drawText(
-          player.score,
-          canvas.value.width / 4,
-          canvas.value.height / 5,
-          "white"
-        );
-        drawText(
-          com.score,
-          (3 * canvas.value.width) / 4,
-          canvas.value.height / 5,
-          "white"
-        );
-        drawNet();
-        drawRect(player.x, player.y, player.width, player.height, player.color);
-        drawRect(com.x, com.y, com.width, com.height, com.color);
-        drawCircle(ball.x, ball.y, ball.radius, ball.color);
-      }
-    };
-
-    const drawRect = (
-      x: number,
-      y: number,
-      w: number,
-      h: number,
-      color: string
-    ) => {
-      if (context.value) {
-        context.value.fillStyle = color;
-        context.value.fillRect(x, y, w, h);
-      }
-    };
-
-    const drawCircle = (x: number, y: number, r: number, color: string) => {
-      if (context.value) {
-        context.value.fillStyle = color;
-        context.value.beginPath();
-        context.value.arc(x, y, r, 0, Math.PI * 2, true);
-        context.value.closePath();
-        context.value.fill();
-      }
-    };
-
-    const drawText = (text: number, x: number, y: number, color: string) => {
-      if (context.value) {
-        context.value.fillStyle = color;
-        context.value.font = "75px fantasy";
-        context.value.fillText(text.toString(), x, y);
-      }
-    };
-
-    const drawNet = () => {
-      if (context.value) {
-        for (let i = 0; i <= canvas.value!.height; i += 15) {
-          drawRect(net.x, net.y + i, net.width, net.height, net.color);
-        }
-      }
-    };
-
-    const game = () => {
-      update();
-      render();
-    };
-
-    onMounted(() => {
-      canvas.value = canvas.value as HTMLCanvasElement;
-      context.value = canvas.value?.getContext("2d");
-      if (canvas.value && context.value) {
-        initGame();
-        loop = setInterval(game, 1000 / framePerSecond);
-      }
-    });
-
-    onBeforeUnmount(() => {
-      if (loop) {
-        clearInterval(loop);
-      }
-    });
-
-    return {
-      canvas,
-      movePaddle,
-    };
-  },
-};
-</script>
-
-<style scoped>
-.game {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: #24272c;
-  margin: 20px;
-  padding: 20px;
-  border-radius: 5px;
-  width: 100%;
-  height: 100%;
-  color: white;
-}
-
-.field {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #34373d;
-  margin-bottom: 5px;
-  width: 98%;
-  height: 100%;
-  margin-bottom: 5px;
-  padding-right: 10px;
-  padding-left: 10px;
-  border-radius: 5px;
-}
-</style>
+  /* body {
+	/* height: 100vh; */
+	/* background: red !important; */
+	/* font-family: sans-serif; */
+  /* } */
+   
+  .game-container {
+	/* border: 3px solid #59CE8F; */
+	/* border-radius: 50PX; */
+	width: fit-content;
+	/* margin: 6rem auto; */
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	background: #24272C;
+	margin: 20px;
+	padding: 20px;
+	border-radius: 5px;
+	width: 100%;
+	height: 100%;
+	color: white;
+  }
+  .game-canvas {
+	padding: 0;
+	width: 100%;
+	margin: 0;
+	text-align: center;
+  }
+  </style>
+  
