@@ -67,7 +67,7 @@ export default {
         'input[type="file"]'
       ) as HTMLInputElement;
       if (fileInput) {
-        fileInput.value = ""; // Clear the file input
+        fileInput.value = "";
       }
     };
 
@@ -82,7 +82,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .profile {
   display: flex;
   flex-direction: column;
@@ -92,7 +92,6 @@ export default {
   padding: 20px;
   border-radius: 5px;
   width: 100%;
-  height: 100%;
   color: white;
 }
 
@@ -143,7 +142,6 @@ export default {
 .upbtn,
 .accbtn,
 .resbtn {
-  /* display: flex; */
   font-size: 1rem;
   padding-left: 1.5rem;
   padding-right: 1.5rem;
@@ -179,5 +177,15 @@ input[type="file"]::file-selector-button {
 
 input[type="file"]::file-selector-button:hover {
   background: #7c8392;
+}
+
+@media screen and (max-width: 768px) {
+  .editform {
+    width: 100%;
+  }
+
+  .acc-dec {
+    gap: 20px;
+  }
 }
 </style>

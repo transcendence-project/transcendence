@@ -49,7 +49,7 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 export default {
   name: "ProfilePage",
   data() {
@@ -77,7 +77,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .prof-com {
   display: flex;
   flex-direction: column;
@@ -177,5 +177,17 @@ export default {
 .usrname {
   margin-top: 45px;
   margin-left: 20px;
+}
+
+@media screen and (max-width: 768px) {
+  .up {
+    flex-direction: column;
+    align-items: center;
+  }
+  .left,
+  .right {
+    width: 80%;
+    margin: 0 auto;
+  }
 }
 </style>

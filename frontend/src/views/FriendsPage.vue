@@ -111,14 +111,13 @@ export default defineComponent({
 });
 </script>
 
-<style>
+<style scoped>
 .friend {
   background: #24272c;
   margin: 20px;
   padding: 20px;
   border-radius: 5px;
   width: 100%;
-  height: 100%;
   color: white;
 }
 
@@ -162,7 +161,6 @@ export default defineComponent({
 }
 .frnd-cont {
   margin-top: 20px;
-  /* margin: 100px; */
   padding: 0;
   border-radius: 10px;
 }
@@ -204,7 +202,7 @@ export default defineComponent({
   background: #7c8392;
   color: #d9d9da;
 }
-.usr-avail {
+/* .usr-avail {
   width: 1rem;
   height: 1rem;
   margin-top: 3rem;
@@ -221,7 +219,7 @@ export default defineComponent({
   border-radius: 50%;
   border-style: groove;
   background: rgb(231, 8, 8);
-}
+} */
 .opt-menu {
   padding-right: 20px;
 }
@@ -299,7 +297,7 @@ export default defineComponent({
   display: flex;
   width: 0.6rem;
   height: 0.6rem;
-  margin-top: 1rem;
+  /* margin-top: 1rem; */
   margin-left: 0.3rem;
   border-radius: 50%;
   border-style: groove;
@@ -307,13 +305,44 @@ export default defineComponent({
 }
 .frd-usr-not-avail {
   display: flex;
-  /* flex-direction: column; */
   width: 0.6rem;
   height: 0.6rem;
-  margin-top: 1rem;
+  /* margin-top: 1rem; */
   margin-left: 0.3rem;
   border-radius: 50%;
   border-style: groove;
   background: rgb(231, 8, 8);
+}
+
+@media screen and (max-width: 768px) {
+  .frd-srch {
+    padding-left: 20px;
+  }
+  .h-cont {
+    padding-left: 10px;
+  }
+  .srch-img {
+    width: 20px;
+  }
+  .frd-list{
+	flex-direction: column;
+	align-items: flex-start;
+  }
+
+  .addbtn,
+  .blkbtn {
+    font-size: 0.7rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+	margin-left: .2rem;
+	margin-top: 10px;
+  }
+  .frd-usr-avail,
+  .frd-usr-not-avail {
+    width: 0.5rem;
+    height: 0.5rem;
+    /* margin-top: 1rem; */
+    margin-left: 0.2rem;
+  }
 }
 </style>

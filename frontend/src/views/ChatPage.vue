@@ -50,10 +50,10 @@
                 <div class="cat-item">
                   {{ result.user }}
                   <div v-if="result.friend">
-                    <div class="usr-avail"></div>
+                    <div class="cht-usr-avail"></div>
                   </div>
                   <div v-if="!result.friend">
-                    <div class="usr-not-avail"></div>
+                    <div class="cht-usr-not-avail"></div>
                   </div>
                 </div>
               </li>
@@ -123,10 +123,12 @@ export default defineComponent({
 });
 </script>
 
-<style>
+
+<style scoped>
+
 .chat-cont {
   display: flex;
-  align-items: center;
+  flex-wrap: wrap; 
   justify-content: space-between;
   background: #24272c;
   color: white;
@@ -134,14 +136,38 @@ export default defineComponent({
   border-radius: 5px;
   padding: 10px;
   width: 100%;
-  height: 100%;
+  min-height: 100vh; 
 }
-.channel {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 20%;
+
+@media screen and (min-width: 768px) {
+  .channel {
+    width: 20%;
+  }
+  
+  .message {
+    width: 58%;
+  }
+  
+  .catagory {
+    width: 20%;
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .channel,
+  .message,
+  .catagory {
+    width: 100%; 
+    margin: 0; 
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .add-cont,
+  .chn-srch {
+    width: 100%;
+  }
+  
 }
 .chan-cont,
 .cat-cont,
@@ -157,19 +183,6 @@ export default defineComponent({
   background: #34373d;
 }
 
-.add-cont {
-  display: flex;
-  align-items: center;
-  flex-direction: center;
-  justify-content: center;
-  background: #61656e;
-  padding: 0;
-  margin: 0;
-  margin-left: 10px;
-  margin-bottom: 15px;
-  width: 85%;
-  padding: 10px;
-}
 .chnul-cont {
   display: flex;
   margin: 0;
@@ -185,9 +198,6 @@ export default defineComponent({
 .chnul-cont li {
   list-style-type: none;
   width: 100%;
-}
-.chn-srch {
-  height: 50px;
 }
 
 .search-chn {
@@ -210,24 +220,8 @@ export default defineComponent({
   height: 50px;
 }
 
-.catagory {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 20%;
-  height: 100%;
-  margin: 3px;
-}
-.message {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 58%;
-  height: 100%;
-  margin: 3px;
-}
+
+
 .msg-display {
   background: white;
   height: 420px;
@@ -330,7 +324,7 @@ export default defineComponent({
   padding-top: 10px;
   padding-bottom: 10px;
 }
-.usr-avail {
+.cht-usr-avail {
 	display: flex;
   width: 0.6rem;
   height: 0.6rem;
@@ -340,7 +334,7 @@ export default defineComponent({
   border-style: groove;
   background: green;
 }
-.usr-not-avail {
+.cht-usr-not-avail {
   display: flex;
   width: 0.6rem;
   height: 0.6rem;

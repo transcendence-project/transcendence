@@ -1,46 +1,41 @@
-import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
+import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 
 const routes: Array<RouteRecordRaw> = [
   {
-    path: '/',
-    name: 'home',
-    component: () => import('../views/HomePage.vue')
+    path: "/",
+    name: "home",
+    component: () => import("../views/HomePage.vue"),
   },
   {
-    path: '/game',
-    name: 'game',
-    component: () => import('../views/GamePage.vue')
+    path: "/game",
+    name: "game",
+    component: () => import("../views/GamePage.vue"),
   },
   {
-    path: '/friends',
-    name: 'friends',
-    component: () => import('../views/FriendsPage.vue')
+    path: "/friends",
+    name: "friends",
+    component: () => import("../views/FriendsPage.vue"),
   },
   {
-    path: '/profile',
-    name: 'profile',
-    component: () => import('../views/EditProfilePage.vue')
+    path: "/profile",
+    name: "profile",
+    component: () => import("../views/EditProfilePage.vue"),
   },
   {
-    path: '/chat',
-    name: 'chat',
-    component: () => import('../views/ChatPage.vue')
+    path: "/chat",
+    name: "chat",
+    component: () => import("../views/ChatPage.vue"),
   },
   {
-    path: '/chattest',
-    name: 'chattest',
-    component: () => import('../views/ChatTest.vue')
+    path: "/leader",
+    name: "leader",
+    component: () => import("../views/LeaderPage.vue"),
   },
-  {
-    path: '/leader',
-    name: 'leader',
-    component: () => import('../views/LeaderPage.vue')
-  }
-]
+];
 
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
-  routes
-})
+  routes,
+});
 
-export default router
+export default router;
