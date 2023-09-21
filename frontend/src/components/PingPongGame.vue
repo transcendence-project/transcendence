@@ -240,7 +240,7 @@ onMounted(() => {
 });
 </script>
 
-<style>
+<style scoped>
 * {
   padding: 0;
   margin: 0;
@@ -248,7 +248,7 @@ onMounted(() => {
 
 body {
   /* height: 100vh; */
-  /* background: red !important; */
+  background: red !important;
   font-family: sans-serif;
 }
 

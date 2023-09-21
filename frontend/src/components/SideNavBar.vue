@@ -37,6 +37,7 @@
 
 <style scoped>
 .side-nav-bar {
+  /* background-color: red; */
   background-color: #34373d;
   color: #fff;
   width: 70px;
@@ -55,7 +56,8 @@
 }
 
 .side-nav-links li a {
-  color: #fff;
+  /* color: #fff; */
+  /* color: red; */
   text-decoration: none;
 }
 
