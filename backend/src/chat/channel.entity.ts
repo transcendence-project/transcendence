@@ -6,14 +6,16 @@ export class Channel {
   id: number;
 
   @Column()
-  name: string;
+  room_name: string;
 
   @Column()
   owner: string;
 
   @Column('text', { array: true })
   admin: string[];
-  @Column()
+
+  @Column('text', { array: true })
+  members: string [];
 
   @Column('text', { array: true, nullable: true  })
   banned: string[];

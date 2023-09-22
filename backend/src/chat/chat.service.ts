@@ -1,31 +1,32 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../users/user.entity';
-import { channel } from 'diagnostics_channel';
-import * as request from 'supertest';
+import { Channel } from './channel.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class ChatService {
 	 // -  have to inject database/repo -
-	 constructor(/* Inject repo */){}
+	 constructor(@InjectRepository(Channel) private channelRepo: Repository<Channel> ){}
 
 	// view all channels
 	async get_all_chan(){
-			// return <Array>? of all channels from repo
-		}
+		return this.channelRepo.find();
+	}
 
 	// view all channel members
 	async mem_by_chan(chan_name: string){
-		// retrun <Array>? of memebers of the given channel
+		
 	}
 
 	// get channel by name
 	async chan_exist(chan_name: string)
 	{
-		// chan = <repo>.findOneBy({chan_name});
-		// if (chan)
-		// 	return true;
-		// else
-		// 	return false;
+		const chan = this.channelRepo.findOneBy({room_name: chan_name});
+		if (chan)
+			return true;
+		else
+			return false;
 	}
 	// join channel
 	async add_chan_mem(user: User)
@@ -36,7 +37,7 @@ export class ChatService {
 	// leave channel
 	async rm_chan_mem(userName: string, chan_name: string)
 	{
-		// const user = await this.<repo>.findOne({userName});
+		// const user = await this.channelRepo.findOne({mem}); from the memebers table of the cahnnel table
 		// if (user)
 		// return (this.<repo>.delete(userName))
 	}
@@ -54,28 +55,32 @@ export class ChatService {
 	}
 
 	// create channel
-	async add_chan(chan_name: string)
+	async add_chan(req_user: string, chan_name: string)
 	{
-		// this.<repo>.create (chan_name: string); // and other specifications if any
+		// this.channelRepo.create(); // and other specifications if any
+		// add to admin tabel, 
+		// add to owner table
+		// add to channel tabel, 
+		// add to member tabe
 	}
 
 	// if_admin
 	async is_admin(user_name: string, chan_name: string)
 	{
-		// user = // find user from repo admin table
-		// if (user)
-		// 	return true;
-		// else
-		// 	return false;
+		const user = this.channelRepo.findOneBy({/* user_name */}); // from the admin table/array
+		if (user)
+			return true;
+		else
+			return false;
 	}
 	// if_owner
 	async is_owner(user_name: string, chan_name: string)
 	{
-		// user = // find user from repo owner table
-		// if (user)
-		// 	return true;
-		// else
-		// 	return false;
+		const user =  this.channelRepo.findOneBy({/* user_name */}); // from the owner table/array
+		if (user)
+			return true;
+		else
+			return false;
 	}
 	async is_chan_mem(user_name: string, chan_name: string)
 	{
@@ -86,14 +91,29 @@ export class ChatService {
 		// 	return false;
 	}
 
+	async is_ban(user_name: string, chan_name: string)
+	{
+		// if in banned table of repo
+		// return true
+		// else
+			// return false;
+	}
+
+	async is_mute(user_name: string, chan_name: string)
+	{
+		// if in mute table of repo
+		// return true
+		// else
+			// return false;
+	}
+
 	// SPECIFIC TO OWNERS
 	// set channel password
 	async set_pass(chan_name: string, pass: string)
 	{
-
-			// change password of the channel (from repo or local storage?)
-		
+		// update password of the channel (from repo or local storage?)
 	}
+
 	// set admin
 	async set_admin(req_user: string, chan_name: string, user_name: string)
 	{
@@ -115,6 +135,11 @@ export class ChatService {
 	async mute_user(req_user: string, user_to_mute: string, chan_name: string)
 	{
 		// if (this.is_owner(req_user) || this.is_admin(req_user))
-			// add user to the mute table??
+			// add user to the mute table?
+	}
+	async unmute_user(req_user: string, user_to_mute: string, chan_name: string)
+	{
+		// if (this.is_owner(req_user) || this.is_admin(req_user))
+			// delete user to the mute table?
 	}
 }

@@ -9,12 +9,14 @@ import { typeOrmConfig } from './ormconfig';
 import { AuthModule } from './auth/auth.module';
 import { ChatModule } from './chat/chat.module';
 import { GameModule } from './game/game.module';
+import { WebsocketGateway } from './websocket/websocket.gateway';
+import { WebsocketModule } from './websocket/websocket.module';
 
 @Module({
   imports: [UsersModule,
 		TypeOrmModule.forRoot(typeOrmConfig),
-		AuthModule, ConfigModule.forRoot(), ChatModule, GameModule],
+		AuthModule, ConfigModule.forRoot(), ChatModule, GameModule, WebsocketModule],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, WebsocketGateway],
 })
 export class AppModule {}
