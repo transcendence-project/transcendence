@@ -22,7 +22,7 @@ export class ChatService {
 	// get channel by name
 	async chan_exist(chan_name: string)
 	{
-		const chan = this.channelRepo.findOneBy({chan_name});
+		const chan = this.channelRepo.findOneBy({room_name: chan_name});
 		if (chan)
 			return true;
 		else

@@ -6,7 +6,7 @@ export class Channel {
   id: number;
 
   @Column()
-  chan_name: string;
+  room_name: string;
 
   @Column()
   owner: string;
