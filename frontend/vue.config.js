@@ -11,5 +11,5 @@ module.exports = defineConfig({
           poll: 1000,
       },
   },
-  transpileDependencies: true,
+//   transpileDependencies: false,
 });

@@ -22,18 +22,18 @@
   });
   </script>
   
-  <style scoped>
-  body {
-	font-family: "Arial", sans-serif;
-	margin: 0;
-	padding: 0;
-  }
-  .side-cont {
-	display: flex;
-  }
-  .prof-cont {
-	flex: 1;
-	padding: 20px;
-  }
-  </style>
+<style scoped>
+	body {
+		font-family: "Arial", sans-serif;
+		margin: 0;
+		padding: 0;
+	}
+	.side-cont {
+		display: flex;
+	}
+	.prof-cont {
+		flex: 1;
+		padding: 20px;
+	}
+</style>
   
