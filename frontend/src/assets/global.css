@@ -4,6 +4,11 @@ body{
 	margin: 0;
 	padding: 0;
 }
-.logo{
+/* .logo{
 	color: white;
-}
+} */
+
+/* src/main.css */
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';

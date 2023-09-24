@@ -1,17 +1,17 @@
 <template>
-  <aside class="side-nav-bar">
-    <ul class="side-nav-links">
-      <li>
+  <aside class="bg-abd p-5">
+    <ul class="side-nav-links list-none p-0">
+      <li class="mb-5">
         <router-link to="/chat"
           ><img src="@/assets/chat.svg" alt="Chat" />
         </router-link>
       </li>
-      <li>
+      <li class="mb-5">
         <router-link to="/game"
           ><img src="@/assets/game.svg" alt="Game" />
         </router-link>
       </li>
-      <li>
+      <li class="mb-5">
         <router-link to="/leader"
           ><img src="@/assets/leader.svg" alt="Leader board"
         /></router-link>
@@ -25,7 +25,7 @@
   </aside>
 </template>
 
-<style scoped>
+<!-- <style scoped>
 .side-nav-bar {
   background-color: #34373d;
   color: #fff;
@@ -52,4 +52,4 @@
 .side-nav-links li a:hover {
   text-decoration: underline;
 }
-</style>
+</style> -->

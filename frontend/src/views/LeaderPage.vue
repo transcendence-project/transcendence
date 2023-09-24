@@ -1,5 +1,5 @@
 <template>
-  <div class="lead">
+  <div class="lead text-white flex flex-col items-center mt-5 bg- w-full p-2">
     <h2>Leader Board</h2>
     <div class="lead-stat">
       <ul>
@@ -85,7 +85,7 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.lead {
+/* .lead {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -96,7 +96,7 @@ export default defineComponent({
   width: 100%;
   height: 100%;
   color: white;
-}
+} */
 
 .lead-stat {
   padding: 0;

@@ -23,6 +23,7 @@
   </script>
   
 <style scoped>
+@import './assets/global.css';
 	body {
 		font-family: "Arial", sans-serif;
 		margin: 0;
