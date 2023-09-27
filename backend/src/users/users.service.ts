@@ -7,7 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm'
 export class UsersService {
 	constructor(@InjectRepository(User) private repo: Repository<User>){}
 
-	async create(email: string, userName: string) {
+	async create(email: string, userName: string){
 
 		const user = await this.findAll(userName);
 		// const user = await this.findOneByUserName(userName);

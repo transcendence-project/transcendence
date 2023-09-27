@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { PassportModule } from '@nestjs/passport';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
@@ -9,7 +8,7 @@ import { typeOrmConfig } from './ormconfig';
 import { AuthModule } from './auth/auth.module';
 import { ChatModule } from './chat/chat.module';
 import { GameModule } from './game/game.module';
-import { WebsocketGateway } from './websocket/websocket.gateway';
+// import { WebsocketGateway } from './websocket/websocket.gateway';
 import { WebsocketModule } from './websocket/websocket.module';
 
 @Module({
@@ -17,6 +16,6 @@ import { WebsocketModule } from './websocket/websocket.module';
 		TypeOrmModule.forRoot(typeOrmConfig),
 		AuthModule, ConfigModule.forRoot(), ChatModule, GameModule, WebsocketModule],
   controllers: [AppController],
-  providers: [AppService, WebsocketGateway],
+  providers: [AppService, /* WebsocketGateway */],
 })
 export class AppModule {}
