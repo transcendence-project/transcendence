@@ -7,7 +7,7 @@ import { Repository } from 'typeorm';
 
 @WebSocketGateway()
 export class WebsocketGateway {
-  constructor(private chatService: ChatService, /* @InjectRepository(Channel) private roomRepo: Repository<Channel> */) {}
+  constructor(private chatService: ChatService /* @InjectRepository(Channel) private roomRepo: Repository<Channel> */) {}
   @WebSocketServer()
   server: Server;
 

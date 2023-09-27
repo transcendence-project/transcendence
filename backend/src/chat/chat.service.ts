@@ -20,48 +20,61 @@ export class ChatService {
 	}
 
 	// get channel by name
-	async chan_exist(chan_name: string)
+	chan_by_name(chan_name: string) // or by id
 	{
-		const chan = this.channelRepo.findOneBy({room_name: chan_name});
-		if (chan)
-			return true;
-		else
-			return false;
+		return (this.channelRepo.findOneBy({room_name: chan_name}));
 	}
+
+	async create_chan(chan_name: string, user: User)
+	{
+		const chan = this.chan_by_name(chan_name);
+		if (chan)
+		console.log("Channel already exists\n");// error: channel already exist
+		else
+		{
+			const chan2 = this.channelRepo.create({room_name: chan_name, owner: user, password: ""});
+			chan2.members.push(user);
+			this.channelRepo.save(chan2);
+		}
+		// any condition if there is password??
+	}
+
 	// join channel
-	async add_chan_mem(user: User)
+	async add_chan_mem(user: User, chan_name: string)
 	{
 		// insert or create the user in the channel memeber table
+		const chanPromise = this.chan_by_name(chan_name);
+		if (chanPromise)
+		{
+			const chan = await chanPromise;
+			chan.members.push(user);
+			await this.channelRepo.save(chan);
+		}
+	}
+
+	async add_chan_admin(user: User, chan_name: string)
+	{
+		// insert or create the user in the channel memeber table
+		const chanPromise = this.chan_by_name(chan_name);
+		if (chanPromise)
+		{
+			const chan = await chanPromise;
+			chan.admin.push(user);
+			await this.channelRepo.save(chan);
+		}
 	}
 
 	// leave channel
-	async rm_chan_mem(userName: string, chan_name: string)
+	async rm_chan_mem(user: User, chan_name: string)
 	{
-		// const user = await this.channelRepo.findOne({mem}); from the memebers table of the cahnnel table
-		// if (user)
-		// return (this.<repo>.delete(userName))
-	}
-
-	// message channel
-	msg_chan(sender: string, chan_name: string)
-	{
-
-	}
-
-	// message individual user
-	msg_user(sender: string, reciever: string)
-	{
-		
-	}
-
-	// create channel
-	async add_chan(req_user: string, chan_name: string)
-	{
-		// this.channelRepo.create(); // and other specifications if any
-		// add to admin tabel, 
-		// add to owner table
-		// add to channel tabel, 
-		// add to member tabe
+		const userIdToRemove = user.id;
+		const chanPromise = this.chan_by_name(chan_name);
+		if (chanPromise)
+		{
+			const chan = await chanPromise;
+			chan.members = chan.members.filter(member => member.id !== userIdToRemove); // Remove the user
+			await this.channelRepo.save(chan);
+		}
 	}
 
 	// if_admin

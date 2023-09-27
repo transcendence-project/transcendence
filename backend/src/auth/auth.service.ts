@@ -22,7 +22,7 @@ export class AuthService{
 		const otpauthUrl = authenticator.keyuri(user.email, 'PONG 2.0', secret);
 	
 		user.twoFactorAuthenticationSecret = secret;
-		// console.log(secret);
+		console.log(secret);
 		// this.userService.update(user.id, {twoFactorAuthenticationSecret: secret});
 		// await this.usersService.setTwoFactorAuthenticationSecret(secret, user.id);
 	
