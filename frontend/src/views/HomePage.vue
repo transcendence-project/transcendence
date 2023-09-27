@@ -1,5 +1,16 @@
 <template>
-  <div class="prof-com">
+    <div>
+    <!-- Display data if it exists -->
+    <div v-if="data">
+      {{ data }}
+    </div>
+
+    <!-- Display a loading message while data is being fetched -->
+    <div v-else>
+      Loading...
+    </div>
+  </div>
+  <!-- <div class="prof-com">
     <div class="prof-div">
       <div class="up">
         <div class="left">
@@ -46,34 +57,59 @@
         </ul>
       </div>
     </div>
-  </div>
+  </div> -->
 </template>
 
+
+<!-- <script lang="ts">
+{
+  import axios from 'axios';
+  import { ref, onMounted } from 'vue';
+  
+  export default {
+    setup()
+    {
+      const data = ref(null);
+
+      onMounted(async () => {
+        try {
+          const response = await axios.get('http://localhost:3000/users/1');
+          data.value = response.data;
+        } catch (error) {
+          console.error('An error occurred while fetching data:', error);
+        }
+      });
+
+      return {
+        data
+      };
+    }
+  };
+}
+</script> -->
+
 <script lang="ts">
+import axios from 'axios';
+import { ref, onMounted } from 'vue';
+
 export default {
-  name: "ProfilePage",
-  data() {
+  setup() {
+    const data = ref(null);
+
+    onMounted(async () => {
+      try {
+        const response = await axios.get('http://localhost:3000/users/1');
+        data.value = response.data;
+        console.log(response);
+      } catch (error) {
+        console.error('An error occurred while fetching data:', error);
+      }
+    });
+
     return {
-      match: [
-        { date: "2023-08-15", opponent: "Player A", result: "Win" },
-        { date: "2023-08-10", opponent: "Player B", result: "Loss" },
-        { date: "2023-08-05", opponent: "Player C", result: "Draw" },
-        { date: "2023-08-15", opponent: "Player A", result: "Win" },
-        { date: "2023-08-10", opponent: "Player B", result: "Loss" },
-        { date: "2023-08-05", opponent: "Player C", result: "Draw" },
-        { date: "2023-08-15", opponent: "Player A", result: "Win" },
-        { date: "2023-08-10", opponent: "Player B", result: "Loss" },
-        { date: "2023-08-05", opponent: "Player C", result: "Draw" },
-      ],
-      fullname: "Yonas Yohannes",
-      imgname: "head.svg",
-      win: 65,
-      lose: 5,
-      draw: 9,
-      rank: 3,
-      avail: false,
+      data
     };
-  },
+  }
 };
 </script>
 

@@ -1,5 +1,5 @@
 <template>
-  <aside class="bg-abd p-5">
+  <aside class="bg-sideNav p-5">
     <ul class="side-nav-links list-none p-0">
       <li class="mb-5">
         <router-link to="/chat"
@@ -24,32 +24,3 @@
     </ul>
   </aside>
 </template>
-
-<!-- <style scoped>
-.side-nav-bar {
-  background-color: #34373d;
-  color: #fff;
-  width: 70px;
-  height: 100vh;
-  padding: 20px;
-  margin-left: 0;
-}
-
-.side-nav-links {
-  list-style: none;
-  padding: 0;
-}
-
-.side-nav-links li {
-  margin-bottom: 15px;
-}
-
-.side-nav-links li a {
-  color: #fff;  
-  text-decoration: none;
-}
-
-.side-nav-links li a:hover {
-  text-decoration: underline;
-}
-</style> -->

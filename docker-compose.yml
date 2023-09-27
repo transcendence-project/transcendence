@@ -1,6 +1,8 @@
 version: '3'
 services:
   backend:
+    depends_on:
+      - database
     image: node:19
     container_name: backend
     ports:
@@ -9,16 +11,23 @@ services:
     volumes:
       - ./backend:/app/backend
     working_dir: /app/backend
+    networks:
+      - mynetwork
     command: >
       bash -c "sleep infinity"
   database:
     image: postgres:13
+    networks:
+      - mynetwork
+    container_name: database
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 123
       POSTGRES_DB: postgres
 
   frontend:
+    depends_on:
+         - backend # uncomment if you want to use the backend as a dependency for your app.
     build: ./frontend  # Docker will look for Dockerfile in this directory
     container_name: frontend
     ports:
@@ -26,3 +35,8 @@ services:
     volumes:
        - ./frontend/src:/app/frontend/src  # This maps your host's ./frontend/src directory to /app/frontend/src in the container
     working_dir: /app/frontend
+    networks:
+      - mynetwork
+networks:
+  mynetwork:
+    driver: bridge

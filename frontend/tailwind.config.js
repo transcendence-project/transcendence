@@ -10,7 +10,9 @@ module.exports = {
   theme: {
     extend: {
       backgroundColor:{
-        'abd' : "#34373d"        
+        'sideNav' : "#34373d",      
+        'topNav' : "#212327",
+        
       }
     },
   },

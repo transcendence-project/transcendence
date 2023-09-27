@@ -1,5 +1,5 @@
 <template>
-  <div class="chat-cont">
+  <div class="flex flex-wrap justify-between bg-black text-white w-full m-5 rounded-md p-2.5 min-h-[85.9vh]">
     <div class="channel">
       <h2>Channel</h2>
       <div class="chan-cont">
