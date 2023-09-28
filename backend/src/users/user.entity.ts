@@ -13,11 +13,14 @@ export class User {
 	// @Exclude()
 	// password: string
 
-	twoFactorAuthenticationSecret: string
+	// twoFactorAuthenticationSecret: string
 
 	@Column()
 	email: string
 
+	@Column({ nullable: true })
+	profileImage: string
+	
 	@Column({ nullable: true })
 	@Exclude()
 	twoFactorSecret: string

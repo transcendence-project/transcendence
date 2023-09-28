@@ -99,6 +99,7 @@ export default {
       try {
         const response = await axios.get('http://localhost:3000/users/1');
         data.value = response.data;
+		console.log(data.value);
       } catch (error) {
         console.error('An error occurred while fetching data:', error);
       }
