@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, ManyToMany } from 'typeorm';
+import { Entity,JoinTable, PrimaryGeneratedColumn, Column, ManyToOne, ManyToMany } from 'typeorm';
 import { User } from '../users/user.entity';
 
 @Entity()
@@ -9,13 +9,15 @@ export class Channel {
   @Column()
   room_name: string;
 
-@ManyToOne(type => User, { eager: true })
+  //   @JoinColumn()
+  @ManyToOne(() => User) // meaning each channel has one owner (a user), and each user can own multiple channels.
   owner: User;
 
   @ManyToMany(type => User, { eager: true })
-  admin: User[];
+  admins: User[];
 
   @ManyToMany(type => User, { eager: true })
+  @JoinTable()
   members: User [];
 
 //   @Column('text', { array: true, nullable: true  })
