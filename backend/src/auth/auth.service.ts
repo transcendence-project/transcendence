@@ -5,15 +5,30 @@ import { User } from 'users/user.entity';
 import { UsersService } from 'users/users.service';
 import { toDataURL } from 'qrcode';
 import { iUser } from 'users/users.inteface';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService{
-	constructor(private userService: UsersService) {}
+	constructor(private userService: UsersService, private jwtService: JwtService) {}
 	async validate(user: createUserDTO): Promise<User> {
 		
 		const user1 = await this.userService.create(user.email, user.username);
 		// console.log(user1.userName);
 		return user1;
+	}
+
+	generate_jwt_token(username: string ){
+		return this.jwtService.sign({ username: username });
+	}
+
+	decode_token(token: string) {
+		return this.jwtService.verify(token);
+	}
+	async user_by_token(token: string)
+	{
+		const decodeToken = this.decode_token(token);
+		return (await this.userService.findOneByUserName(decodeToken.username));
+		
 	}
 
 	async generateTwoFactorAuthenticationSecret(user: iUser) {
@@ -31,7 +46,7 @@ export class AuthService{
 		  otpauthUrl
 		}
 	  }
-
+	  
 	async generateQrCodeDataURL(otpAuthUrl: string) {
 		const dataURL = toDataURL(otpAuthUrl);
 		// console.log(dataURL);

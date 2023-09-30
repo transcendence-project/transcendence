@@ -2,6 +2,7 @@ import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnectio
 import { Server } from 'socket.io';
 import { ChatService } from '../chat/chat.service';
 import { WebsocketService } from './websocket.service';
+
 import { Channel } from '../chat/channel.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -11,15 +12,15 @@ import { User } from '../entities/user.entity';
 @WebSocketGateway()
 export class WebsocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	
-	constructor(private chatService: ChatService, private websocketService: WebsocketService/* , @InjectRepository(Channel) private roomRepo: Repository<Channel> */) { }
+	constructor(private chatService: ChatService, private websocketService: WebsocketService,
+		/* , @InjectRepository(Channel) private roomRepo: Repository<Channel> */) { }
 	@WebSocketServer()
 	server: Server;
 
 	// method for client connection
 	handleConnection(client: any, ...args: any[]) {
 		console.log(`Client connected: ${client.id}`);
-		this.websocketService.set_user(client);
-		// can check for valid auth code
+		this.websocketService.set_user(client); // client should have user entity
 	}
 
 	// method for client disconnection

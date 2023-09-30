@@ -6,11 +6,10 @@ import { User } from '../users/user.entity';
 import { FortyTwoStrategy } from './strategy.42';
 import { FortyTwoAuthGuard } from './guard.42';
 import { JwtAuthGuard } from './jwt.guard';
-import { JwtService } from '@nestjs/jwt';
 
 @Controller('auth')
 export class AuthController {
-	constructor(private authService: AuthService, private jwtService: JwtService) {
+	constructor(private authService: AuthService) {
 	}
 	@Get('42')
 	@UseGuards(AuthGuard('42'))
@@ -24,10 +23,12 @@ export class AuthController {
 		// the AuthGuard stores info about the authenticated
 		// user in the req object, specifically the user property
 		const user = req.user; // the authenticated user
-		const token = this.jwtService.sign({ username: user.username });
-		// const decodeToken = this.jwtService.verify(token);
+		const token = this.authService.generate_jwt_token(user.userName);
+		// const decodeToken = this.authService.decode_token(token);
+		// const user1 = await this.authService.user_by_token(token);
 		console.log('back in controller');
-		console.log("Token", token)
+		// console.log("Decoded Token", decodeToken);
+		// console.log('user from token', user1);
 		// console.log(user.email);
 		res.redirect('https://en.wikipedia.org/wiki/Pong'); // can redirect to our application page
 		return (token); // will store it local storage front end
@@ -66,7 +67,7 @@ export class AuthController {
 			throw new UnauthorizedException('Wrong authentication code');
 		}
 		// else login to game, display user profile
-		const token = this.jwtService.sign({ username: user.username }); // will later be req.user.username
+		const token = this.authService.generate_jwt_token(user.username); // will later be req.user.username
 		return (token) // will store it local storage front end
 	}
 }
