@@ -1,24 +1,30 @@
 import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect, } from '@nestjs/websockets';
 import { Server } from 'socket.io';
 import { ChatService } from '../chat/chat.service';
+import { WebsocketService } from './websocket.service';
 import { Channel } from '../chat/channel.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Injectable } from '@nestjs/common';
+import { User } from '../entities/user.entity';
 
 @WebSocketGateway()
 export class WebsocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
-	constructor(private chatService: ChatService/* , @InjectRepository(Channel) private roomRepo: Repository<Channel> */) { }
+	
+	constructor(private chatService: ChatService, private websocketService: WebsocketService/* , @InjectRepository(Channel) private roomRepo: Repository<Channel> */) { }
 	@WebSocketServer()
 	server: Server;
 
 	// method for client connection
 	handleConnection(client: any, ...args: any[]) {
 		console.log(`Client connected: ${client.id}`);
+		this.websocketService.set_user(client);
 		// can check for valid auth code
 	}
 
 	// method for client disconnection
 	handleDisconnect(client: any) {
+		this.websocketService.delete_user(client);
 		console.log(`Client disconnected: ${client.id}`);
 	}
 
@@ -31,12 +37,11 @@ export class WebsocketGateway implements OnGatewayConnection, OnGatewayDisconnec
 
 	@SubscribeMessage('create_room')
 	async create_room(client: any, room_name: string): Promise<void> {
-		const new_room = new Channel(); //or with the create function like in users
-		new_room.room_name = room_name;
-		// save it in chat service repo by making channel repo in chatService public or
-		// inject repository into gateway 
-		// await this.roomRepo.save(new_room);
-		// join the room??
+
+		const user = await this.websocketService.find_user(client);
+		// have to change user as User??
+		await this.chatService.create_chan(room_name, user);
+		// join the room ?
 	}
 
 	@SubscribeMessage('join_room')
@@ -71,9 +76,9 @@ export class WebsocketGateway implements OnGatewayConnection, OnGatewayDisconnec
 		//
 	}
 
-
 	// chat history retrieval
 	// user status - online or offline
+
 }
 
 // ----------------------------------------------------------

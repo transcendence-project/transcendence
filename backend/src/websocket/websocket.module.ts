@@ -9,6 +9,6 @@ import { WebsocketService } from './websocket.service';
 @Module({
 	imports: [TypeOrmModule.forFeature([Channel]), ChatModule],
 	providers: [WebsocketGateway, WebsocketService],
-	exports: [WebsocketGateway]
+	exports: [WebsocketGateway, WebsocketService]
 })
 export class WebsocketModule { }
