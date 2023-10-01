@@ -10,7 +10,7 @@ import { AuthService } from 'auth/auth.service';
 
 @Injectable()
 export class WebsocketService {
-	private connected_users: Map<string, any> = new Map();
+	private connected_users: Map<string, User> = new Map();
 
 	constructor(@InjectRepository(Channel) private roomRepo: Repository<Channel>, private authService: AuthService){}
 
@@ -19,6 +19,13 @@ export class WebsocketService {
 			if (userID === client.id){
 				return user;
 			}
+	}
+
+	find_id(username: string){
+		for (const [userID, user] of this.connected_users.entries())
+		if (user.userName === username){
+			return userID;
+		}
 	}
 
 	async set_user(client: any){
@@ -38,6 +45,14 @@ export class WebsocketService {
 			if (userID === client.id)
 				return true;
 		return false;
+	}
+
+	allowed_to_join(user: User, room_name: string, arg: string): boolean {
+		// check if channel is private, has password, is private 
+		// , or already part of it if user has the credentials or is eligible
+			return true;
+		// else
+			// return false;
 	}
 
 }

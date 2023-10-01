@@ -83,7 +83,8 @@ export class ChatService {
 		}
 	}
 
-	// if_admin
+
+	//  ----------------------- CHECKS -----------------------------
 	async is_admin(user_name: string, chan_name: string) {
 		const user = this.channelRepo.findOneBy({/* user_name */ }); // from the admin table/array
 		if (user)
@@ -91,7 +92,6 @@ export class ChatService {
 		else
 			return false;
 	}
-	// if_owner
 	async is_owner(user_name: string, chan_name: string) {
 		const user = this.channelRepo.findOneBy({/* user_name */ }); // from the owner table/array
 		if (user)
@@ -121,14 +121,13 @@ export class ChatService {
 		// return false;
 	}
 
-	// SPECIFIC TO OWNERS
-	// set channel password
+// -----------------------------------SPECIFIC TO OWNERS---------------------------------
 	async set_pass(chan_name: string, pass: string) {
-		// update password of the channel (from repo or local storage?)
+		// update/set password of the channel (from repo or local storage?)
 	}
 
-	// SPECIFIC TO OWNERS/ADMINISTRATORS
-	// kick user
+// --------------------------------SPECIFIC TO OWNERS/ADMINISTRATORS-------------------------
+
 	async kick_user(user_to_kick: string, chan_name: string) {
 		// rm chan_mem
 	}
@@ -146,3 +145,4 @@ export class ChatService {
 		// delete user to the mute table?
 	}
 }
+// -------------------------------------------------------------------------------

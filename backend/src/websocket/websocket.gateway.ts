@@ -17,22 +17,29 @@ export class WebsocketGateway implements OnGatewayConnection, OnGatewayDisconnec
 	@WebSocketServer()
 	server: Server;
 
-	// method for client connection
 	handleConnection(client: any, ...args: any[]) {
 		console.log(`Client connected: ${client.id}`);
-		this.websocketService.set_user(client); // client should have user entity
+		this.websocketService.set_user(client);
+		// rejoin rooms already part of ??
 	}
 
-	// method for client disconnection
 	handleDisconnect(client: any) {
 		this.websocketService.delete_user(client);
 		console.log(`Client disconnected: ${client.id}`);
 	}
 
-	@SubscribeMessage('send_message')
-	send_message(client: any, payload: any): void {
-		const { room, message } = payload;
-		// this.server.to(room).emit(/* event or message to send back to the sender*/, { message, sender: client.id });
+	@SubscribeMessage('send_message_to_chan')
+	send_message_chan(client: any, payload: any): void {
+		const { room_name, message } = payload;
+		this.server.to(room_name).emit('room_message', { message, sender: client.id });
+		// save the message in the database
+	}
+
+	@SubscribeMessage('private_messgae')
+	send_message_dm(client: any, payload: any): void {
+		const { username, message } = payload;
+		const reciever_id = this.websocketService.find_id(username);
+		this.server.to(reciever_id).emit('priv_message', { message, sender: client.id });
 		// save the message in the database
 	}
 
@@ -40,45 +47,32 @@ export class WebsocketGateway implements OnGatewayConnection, OnGatewayDisconnec
 	async create_room(client: any, room_name: string): Promise<void> {
 
 		const user = await this.websocketService.find_user(client);
-		// have to change user as User??
 		await this.chatService.create_chan(room_name, user);
 		// join the room ?
 	}
 
 	@SubscribeMessage('join_room')
 	join_room(client: any, room_name: string): void {
-		// To get the list of rooms the client is currently in
-		const rooms = Object.keys(client.rooms);
-		// check if they are part of the room (if channel) from the databse, if yes
-		if (!rooms.includes(room_name)) {
-			// check if the channel is invite only, if yes
+		const user = this.websocketService.find_user(client.id);
+		if (this.websocketService.allowed_to_join(user, room_name, "")) // "" = the args such as password, invite etc.
+		{
+			this.chatService.add_chan_mem(user, room_name);
 			client.join(room_name);
-			// 
-			// else
-			// channel is invite only
-			// (will private rooms appear for the user if they are a part of it?)
+			// send successfully joined message to user
 		}
-		//   else
-		// already part of the channel or room  / alread joined the room
 	}
 
 	@SubscribeMessage('leave_room')
-	leave_room(client: any, room_name: string): void { // client can be User later
-		const rooms = Object.keys(client.rooms);
-		if (!rooms.includes(room_name)) {
-			client.leave(room_name);
-		}
-		// else
-		//   not part of the channel
+	leave_room(client: any, room_name: string): void {
+		const user = this.websocketService.find_user(client);
+		this.chatService.rm_chan_mem(user, room_name);
+		client.leave(room_name);
 	}
 
 	@SubscribeMessage('mute_user')
 	mute_user(client: any, room_name: string): void {
 		//
 	}
-
-	// chat history retrieval
-	// user status - online or offline
 
 }
 
