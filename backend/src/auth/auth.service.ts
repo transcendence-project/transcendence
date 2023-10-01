@@ -1,10 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { authenticator } from 'otplib';
 import { createUserDTO } from '../dtos/createUser.dto';
-import { User } from 'users/user.entity';
+import { User } from '../entities/user.entity';
 import { UsersService } from 'users/users.service';
 import { toDataURL } from 'qrcode';
-import { iUser } from 'users/users.inteface';
 import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
@@ -31,12 +30,12 @@ export class AuthService{
 		
 	}
 
-	async generateTwoFactorAuthenticationSecret(user: iUser) {
+	async generateTwoFactorAuthenticationSecret(user: Partial<User>) {
 		const secret = authenticator.generateSecret();
 	
 		const otpauthUrl = authenticator.keyuri(user.email, 'PONG 2.0', secret);
 	
-		user.twoFactorAuthenticationSecret = secret;
+		user.twoFactorSecret = secret;
 		console.log(secret);
 		// this.userService.update(user.id, {twoFactorAuthenticationSecret: secret});
 		// await this.usersService.setTwoFactorAuthenticationSecret(secret, user.id);
@@ -53,10 +52,10 @@ export class AuthService{
 		return dataURL;
 	  }
 	
-	  is2faCodeValid(twoFactorAuthenticationCode: string, user: iUser) {
+	  is2faCodeValid(twoFactorAuthenticationCode: string, user: Partial<User>) {
 		return authenticator.verify({
 		  token: twoFactorAuthenticationCode,
-		  secret: user.twoFactorAuthenticationSecret
+		  secret: user.twoFactorSecret
 		});
 	  }
 }

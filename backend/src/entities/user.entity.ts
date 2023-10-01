@@ -1,4 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToMany, JoinTable } from "typeorm";
+// import { Exclude } from "class-transformer";
 import { Match } from "./match.entity";
 import { Achievement } from "./achievement.entity";
 // import { Friend } from "./friend.entity";
@@ -17,8 +18,12 @@ export class User {
 	@Column()
 	email: string
 	
-	// @Column()
-	// is2FAEnabled: boolean
+	@Column()
+	is2FAEnabled: boolean
+
+	@Column({ nullable: true })
+	// @Exclude()
+	twoFactorSecret: string
 
 	@ManyToMany(() => User, user => user.friends)
 	@JoinTable({

@@ -3,7 +3,7 @@ import { Server } from 'socket.io';
 import { ChatService } from '../chat/chat.service';
 import { WebsocketService } from './websocket.service';
 
-import { Channel } from '../chat/channel.entity';
+import { Channel } from '../entities/channel.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';

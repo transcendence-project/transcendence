@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { WebsocketGateway } from './websocket.gateway';
 import { ChatModule } from '../chat/chat.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Channel } from '../chat/channel.entity'
+import { Channel } from '../entities/channel.entity'
 import { WebsocketService } from './websocket.service';
 import { AuthModule } from '../auth/auth.module';
 

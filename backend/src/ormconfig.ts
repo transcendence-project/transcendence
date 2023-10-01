@@ -1,5 +1,5 @@
 import { TypeOrmModuleOptions } from "@nestjs/typeorm";
-import { Channel } from "./chat/channel.entity";
+// import { Channel } from "./entities/channel.entity";
 
 export const typeOrmConfig: TypeOrmModuleOptions = {
 	type: 'postgres',
@@ -8,6 +8,6 @@ export const typeOrmConfig: TypeOrmModuleOptions = {
 	username: 'postgres',
 	password: '123',
 	database: 'postgres',
-	entities: [__dirname + '/**/*.entity{.ts,.js}', Channel],
+	entities: [__dirname + '/**/*.entity{.ts,.js}'],
 	synchronize: true // remove in production environment
 }

@@ -2,7 +2,7 @@ import { Controller, Get, UseGuards, Req, Res, Post, HttpCode, Body, Unauthorize
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { ConfigService } from '@nestjs/config';
-import { User } from '../users/user.entity';
+import { User } from '../entities/user.entity';
 import { FortyTwoStrategy } from './strategy.42';
 import { FortyTwoAuthGuard } from './guard.42';
 import { JwtAuthGuard } from './jwt.guard';
@@ -39,9 +39,9 @@ export class AuthController {
 	async generateQr(@Req() req, @Res() res) {
 		const user = { // for testing purposes
 			id: 4,
-			username: 'arafeeq',
+			userName: 'arafeeq',
 			email: 'arafeeq@student.42abudhabi.ae',
-			twoFactorAuthenticationSecret: 'helloworld'
+			twoFactorSecret: 'helloworld'
 		}
 		const otp = this.authService.generateTwoFactorAuthenticationSecret(user); // will be req.user later
 		// console.log(`user 2fa secret = ${user.twoFactorAuthenticationSecret}`);
