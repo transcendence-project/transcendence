@@ -11,12 +11,17 @@ import { ChatModule } from './chat/chat.module';
 import { GameModule } from './game/game.module';
 import { WebsocketGateway } from './websocket/websocket.gateway';
 import { WebsocketModule } from './websocket/websocket.module';
+import { ChatService } from './chat/chat.service';
 
 @Module({
-  imports: [UsersModule,
+	imports: [UsersModule,
 		TypeOrmModule.forRoot(typeOrmConfig),
 		AuthModule, ConfigModule.forRoot(), ChatModule, GameModule, WebsocketModule],
-  controllers: [AppController],
-  providers: [AppService, WebsocketGateway],
+	controllers: [AppController],
+	providers: [AppService, WebsocketGateway],
 })
-export class AppModule {}
+export class AppModule { }
+
+
+// ...typeOrmConfig, // Spread all properties from typeOrmConfig
+// typeOrmConfig // efers to a single object, which contains the configuration settings for TypeORM
