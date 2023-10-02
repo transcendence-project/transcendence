@@ -17,15 +17,21 @@ export class WebsocketGateway implements OnGatewayConnection, OnGatewayDisconnec
 	@WebSocketServer()
 	server: Server;
 
-	handleConnection(client: any, ...args: any[]) {
+	handleConnection(client: any, ...args: any[]) { // called automatically when frontend establish websocket connection
 		console.log(`Client connected: ${client.id}`);
 		this.websocketService.set_user(client);
+		client.emit('connection_success'); // socket.addEventListener('message', .... )
 		// rejoin rooms already part of ??
+		// In case of error
+		/*  client.on('error', (error) => { // to handle websocket errors
+			client.emit('connection_failure');
+		});*/
 	}
 
 	handleDisconnect(client: any) {
 		this.websocketService.delete_user(client);
 		console.log(`Client disconnected: ${client.id}`);
+		client.emit('disconnection_success');
 	}
 
 	@SubscribeMessage('send_message_to_chan')
@@ -48,6 +54,7 @@ export class WebsocketGateway implements OnGatewayConnection, OnGatewayDisconnec
 
 		const user = await this.websocketService.find_user(client);
 		await this.chatService.create_chan(room_name, user);
+		client.emit('create_room_success');
 		// join the room ?
 	}
 
@@ -58,7 +65,7 @@ export class WebsocketGateway implements OnGatewayConnection, OnGatewayDisconnec
 		{
 			this.chatService.add_chan_mem(user, room_name);
 			client.join(room_name);
-			// send successfully joined message to user
+			client.emit('join_room_success');
 		}
 	}
 
@@ -67,6 +74,7 @@ export class WebsocketGateway implements OnGatewayConnection, OnGatewayDisconnec
 		const user = this.websocketService.find_user(client);
 		this.chatService.rm_chan_mem(user, room_name);
 		client.leave(room_name);
+		client.emit('leave_room_success');
 	}
 
 	@SubscribeMessage('mute_user')
@@ -80,15 +88,15 @@ export class WebsocketGateway implements OnGatewayConnection, OnGatewayDisconnec
 
 // IN FRONT END (to test)
 
-// const socket = new WebSocket('ws://localhost:8080', 'custom data or authentication codes');
-// socket.emit('join_room', 'room_name');
+// const socket = new WebSocket('ws://localhost:3000', 'custom data or authentication codes');
+// socket.send(JSON.stringify({ event: 'join_room', room_name: roomName })); // to join room
 
-// // Send a message to a specific room
-// const message = {
-//   room: 'test_room',
-//   content: 'Hello, test room!',
-// };
-// socket.emit('send_message', message);
+// socket.addEventListener('message', (event) => {
+//   const data = JSON.parse(event.data);
+//   if (data.event === 'join_room_success') {
+//     // Update the UI to indicate successful room join
+//   }
+// });
 
 // ----------------------------------------------------------
 
