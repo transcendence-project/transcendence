@@ -54,9 +54,8 @@ export class ChatService {
 	// join channel
 	async add_chan_mem(user: User, chan_name: string) {
 		// insert or create the user in the channel memeber table
-		const chanPromise = this.chan_by_name(chan_name);
-		if (chanPromise) {
-			const chan = await chanPromise;
+		const chan = await this.chan_by_name(chan_name);
+		if (chan) {
 			chan.members.push(user);
 			await this.channelRepo.save(chan);
 		}
@@ -64,9 +63,8 @@ export class ChatService {
 
 	async add_chan_admin(user: User, chan_name: string) {
 		// insert or create the user in the channel memeber table
-		const chanPromise = this.chan_by_name(chan_name);
-		if (chanPromise) {
-			const chan = await chanPromise;
+		const chan = await this.chan_by_name(chan_name);
+		if (chan) {
 			chan.admins.push(user);
 			await this.channelRepo.save(chan);
 		}
@@ -75,9 +73,8 @@ export class ChatService {
 	// leave channel
 	async rm_chan_mem(user: User, chan_name: string) {
 		const userIdToRemove = user.id;
-		const chanPromise = this.chan_by_name(chan_name);
-		if (chanPromise) {
-			const chan = await chanPromise;
+		const chan = await this.chan_by_name(chan_name);
+		if (chan) {
 			chan.members = chan.members.filter(member => member.id !== userIdToRemove); // Remove the user
 			await this.channelRepo.save(chan);
 		}
