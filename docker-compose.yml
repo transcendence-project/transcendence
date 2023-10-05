@@ -1,3 +1,4 @@
+version: '3'
 services:
   backend:
     image: node:19
@@ -16,5 +17,12 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 123
       POSTGRES_DB: postgres
+
+  frontend:
+    build: ./frontend  # Docker will look for Dockerfile in this directory
+    container_name: frontend
     ports:
-      - "5432:5432"
+      - "8080:8080"
+    volumes:
+       - ./frontend/src:/app/frontend/src  # This maps your host's ./frontend/src directory to /app/frontend/src in the container
+    working_dir: /app/frontend

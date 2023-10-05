@@ -1,3 +1,9 @@
+// import { SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
+// import { Server } from 'socket.io';
+// import { InjectRepository } from '@nestjs/typeorm';
+// // import { ChatService } from '../chat/chat.service';
+// import { Channel } from 'chat/channel.entity';
+// import { Repository } from 'typeorm';
 import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect, } from '@nestjs/websockets';
 import { Server } from 'socket.io';
 import { ChatService } from '../chat/chat.service';
@@ -17,6 +23,8 @@ export class WebsocketGateway implements OnGatewayConnection, OnGatewayDisconnec
 	@WebSocketServer()
 	server: Server;
 
+//   // method for client connection
+//   // method for client disconnection
 	// method for client connection
 	handleConnection(client: any, ...args: any[]) {
 		console.log(`Client connected: ${client.id}`);
@@ -82,24 +90,24 @@ export class WebsocketGateway implements OnGatewayConnection, OnGatewayDisconnec
 
 }
 
-// ----------------------------------------------------------
+// // ----------------------------------------------------------
 
-// IN FRONT END (to test)
+// // IN FRONT END (to test)
 
 // const socket = new WebSocket('ws://localhost:8080', 'custom data or authentication codes');
 // socket.emit('join_room', 'room_name');
 
-// // Send a message to a specific room
-// const message = {
-//   room: 'test_room',
-//   content: 'Hello, test room!',
-// };
-// socket.emit('send_message', message);
+// // // Send a message to a specific room
+// // const message = {
+// //   room: 'test_room',
+// //   content: 'Hello, test room!',
+// // };
+// // socket.emit('send_message', message);
 
-// ----------------------------------------------------------
+// // ----------------------------------------------------------
 
-// @WebSocketGateway():
-// @WebSocketServer():
-// @SubscribeMessage(event: string)
-// @MessageBody():
-// @ConnectedSocket():
+// // @WebSocketGateway():
+// // @WebSocketServer():
+// // @SubscribeMessage(event: string)
+// // @MessageBody():
+// // @ConnectedSocket():
