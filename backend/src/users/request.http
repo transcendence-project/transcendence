@@ -1,15 +1,10 @@
+###Get my user
+GET http://localhost:3000/auth/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im9hYnVzaGFyIiwiaWF0IjoxNjk2NTIxNDY2fQ.XJQufYYBokgvuECUWHFL97MknHBfNkt0T5vbBu_rol8
 
-@host = http://localhost:3000
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2OTY0MjQ0NjJ9.1zKJofQDuK087iE_-SV4-1UZgy7WkO_aw4APhWs-YI8
-
-### Get the logged-in user's details or any endpoint requiring auth
-GET {{host}}/auth/me
-Authorization: Bearer {{token}}
-
-
-###
-GET https://api.intra.42.fr/v2/users/szhakypo
-Authorization: Bearer 86d8f3c6e2dfb47a93487cc1fcc7ee2d6baeb3d714df2a436dd608ce06ea20dd
+### Get Mawad user
+GET http://localhost:3000/auth/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1hd2FkIiwiaWF0IjoxNjk2NTM2NDk2fQ.JYbsrSGJkzb6RVH6UzvN0Zq_u7TmNvu_sSO1GF2vDzg
 
 
 ### sign up
@@ -45,9 +40,8 @@ GET  http://localhost:3000/auth/2fa/generate
 GET  http://localhost:3000/auth/2fa/authenticate
 
 ###
-POST http://localhost:3000/friend-requests
+POST http://localhost:3000/friend-requests/10
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im9hYnVzaGFyIiwiaWF0IjoxNjk2NTIxNDY2fQ.XJQufYYBokgvuECUWHFL97MknHBfNkt0T5vbBu_rol8
 
-
-### get current user
-GET http://localhost:3000/auth/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2OTY0MjQ0NjJ9.1zKJofQDuK087iE_-SV4-1UZgy7WkO_aw4APhWs-YI8
+###
+GET http://localhost:3000/friend-requests/10
