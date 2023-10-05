@@ -17,6 +17,14 @@ export class AuthController {
 		;
 	}
 
+
+	@Get('/me')
+	@UseGuards(JwtAuthGuard)
+	getProfile(@Req() req) {
+		console.log('in get profile, req.user: ', req.user);
+		return req.user;
+	}
+
 	@Get('42/callback')
 	@UseGuards(AuthGuard('42'))
 	async callback(@Req() req, @Res() res) {
@@ -24,9 +32,10 @@ export class AuthController {
 		// user in the req object, specifically the user property
 		const user = req.user; // the authenticated user
 		const token = this.authService.generate_jwt_token(user.userName);
-		// const decodeToken = this.authService.decode_token(token);
+		const decodeToken = this.authService.decode_token(token);
 		// const user1 = await this.authService.user_by_token(token);
 		console.log('back in controller');
+		console.log("Token: ", token);
 		// console.log("Decoded Token", decodeToken);
 		// console.log('user from token', user1);
 		// console.log(user.email);

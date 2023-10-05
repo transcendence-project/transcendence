@@ -97,7 +97,7 @@ export default {
 
     onMounted(async () => {
       try {
-        const response = await axios.get('http://localhost:3000/users/2');
+        const response = await axios.get('http://localhost:3000/users/3');
         data.value = response.data;
 		console.log(data.value);
       } catch (error) {
