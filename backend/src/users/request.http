@@ -1,3 +1,13 @@
+
+@host = http://localhost:3000
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2OTY0MjQ0NjJ9.1zKJofQDuK087iE_-SV4-1UZgy7WkO_aw4APhWs-YI8
+
+### Get the logged-in user's details or any endpoint requiring auth
+GET {{host}}/auth/me
+Authorization: Bearer {{token}}
+
+
+###
 GET https://api.intra.42.fr/v2/users/szhakypo
 Authorization: Bearer 86d8f3c6e2dfb47a93487cc1fcc7ee2d6baeb3d714df2a436dd608ce06ea20dd
 
@@ -34,3 +44,10 @@ GET  http://localhost:3000/auth/2fa/generate
 ### authenticate 2fa
 GET  http://localhost:3000/auth/2fa/authenticate
 
+###
+POST http://localhost:3000/friend-requests
+
+
+### get current user
+GET http://localhost:3000/auth/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2OTY0MjQ0NjJ9.1zKJofQDuK087iE_-SV4-1UZgy7WkO_aw4APhWs-YI8

@@ -8,6 +8,8 @@ import { typeOrmConfig } from './ormconfig';
 import { AuthModule } from './auth/auth.module';
 // import { ChatModule } from './chat/chat.module';
 import { GameModule } from './game/game.module';
+import { FriendRequestController } from 'FriendRequests/FriendRequest.controller';
+import { FriendRequestService } from 'FriendRequests/FriendRequests.service';
 // import { WebsocketGateway } from './websocket/websocket.gateway';
 // import { WebsocketModule } from './websocket/websocket.module';
 
@@ -16,6 +18,6 @@ import { GameModule } from './game/game.module';
 		TypeOrmModule.forRoot(typeOrmConfig),
 		AuthModule, ConfigModule.forRoot(), /* ChatModule,*/ GameModule, /*WebsocketModule*/],
   controllers: [AppController],
-  providers: [AppService, /* WebsocketGateway */],
+  providers: [AppService /* WebsocketGateway */],
 })
 export class AppModule {}

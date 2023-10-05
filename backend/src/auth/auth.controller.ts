@@ -29,8 +29,14 @@ export class AuthController {
 		console.log('back in controller');
 		console.log("Token", token)
 		// console.log(user.email);
-		res.redirect('https://en.wikipedia.org/wiki/Pong'); // can redirect to our application page
+		res.redirect('http://localhost:3000'); // can redirect to our application page
 		return (token); // will store it local storage front end
+	}
+
+	@Get('me')
+	@UseGuards(JwtAuthGuard)
+	getProfile(@Req() req) {
+		return req.user;
 	}
 
 	@Get('2fa/generate') // GET just for testing, will later be POST

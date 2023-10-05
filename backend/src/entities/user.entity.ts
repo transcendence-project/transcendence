@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToMany, JoinTable } from "typeorm";
 import { Match } from "./match.entity";
 import { Achievement } from "./achievement.entity";
+import { FriendRequest } from "./friend-request.entity";
 // import { Friend } from "./friend.entity";
 import { Channel } from "./channel.entity";
 
@@ -33,6 +34,12 @@ export class User {
 		}
 	})
 	friends: User[]
+
+	@OneToMany(() => User, user => user.friendRequestsSent)
+	friendRequestsSent: FriendRequest[]
+
+	@OneToMany(() => User, user => user.friendRequestsReceived)
+	friendRequestsReceived: FriendRequest[]
 
 	@OneToMany(() => User, user => user.matches)
 	matches: Match[]

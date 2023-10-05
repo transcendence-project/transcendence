@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
-import { User } from './user.entity';
+import { User } from '../entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm'
 
 @Injectable()
@@ -15,7 +15,7 @@ export class UsersService {
 		// 	return (user)
 		if (user.length)
 			return (null)
-		const user2 = this.repo.create({email, userName, twoFactorSecret: null, is2FAEnabled: false})
+		const user2 = this.repo.create({email, userName})
 		
 		return (this.repo.save(user2))
 	}
@@ -46,19 +46,19 @@ export class UsersService {
 		return (this.repo.delete(id))
 	}
 	
-	async set2FA(id: number, secret: string) {
-		const user = await this.findOne(id);
-		if (!user)
-			return (NotFoundException)
-		user.twoFactorSecret = secret;
-		return (this.repo.save(user));
-	}
+	// async set2FA(id: number, secret: string) {
+	// 	const user = await this.findOne(id);
+	// 	if (!user)
+	// 		return (NotFoundException)
+	// 	user.twoFactorSecret = secret;
+	// 	return (this.repo.save(user));
+	// }
 
-	async enable2FA(id: number) {
-		const user = await this.findOne(id);
-		if (!user)
-			return (NotFoundException)
-		user.is2FAEnabled = true;
-		return (this.repo.save(user));
-	}
+	// async enable2FA(id: number) {
+	// 	const user = await this.findOne(id);
+	// 	if (!user)
+	// 		return (NotFoundException)
+	// 	user.is2FAEnabled = true;
+	// 	return (this.repo.save(user));
+	// }
 }

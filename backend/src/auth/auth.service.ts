@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { authenticator } from 'otplib';
 import { createUserDTO } from '../dtos/createUser.dto';
-import { User } from 'users/user.entity';
+import { User } from '../entities/user.entity';
 import { UsersService } from 'users/users.service';
 import { toDataURL } from 'qrcode';
 import { iUser } from 'users/users.inteface';
