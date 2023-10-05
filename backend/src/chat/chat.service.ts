@@ -54,9 +54,8 @@ export class ChatService {
 	// join channel
 	async add_chan_mem(user: User, chan_name: string) {
 		// insert or create the user in the channel memeber table
-		const chanPromise = this.chan_by_name(chan_name);
-		if (chanPromise) {
-			const chan = await chanPromise;
+		const chan = await this.chan_by_name(chan_name);
+		if (chan) {
 			chan.members.push(user);
 			await this.channelRepo.save(chan);
 		}
@@ -64,9 +63,8 @@ export class ChatService {
 
 	async add_chan_admin(user: User, chan_name: string) {
 		// insert or create the user in the channel memeber table
-		const chanPromise = this.chan_by_name(chan_name);
-		if (chanPromise) {
-			const chan = await chanPromise;
+		const chan = await this.chan_by_name(chan_name);
+		if (chan) {
 			chan.admins.push(user);
 			await this.channelRepo.save(chan);
 		}
@@ -75,15 +73,15 @@ export class ChatService {
 	// leave channel
 	async rm_chan_mem(user: User, chan_name: string) {
 		const userIdToRemove = user.id;
-		const chanPromise = this.chan_by_name(chan_name);
-		if (chanPromise) {
-			const chan = await chanPromise;
+		const chan = await this.chan_by_name(chan_name);
+		if (chan) {
 			chan.members = chan.members.filter(member => member.id !== userIdToRemove); // Remove the user
 			await this.channelRepo.save(chan);
 		}
 	}
 
-	// if_admin
+
+	//  ----------------------- CHECKS -----------------------------
 	async is_admin(user_name: string, chan_name: string) {
 		const user = this.channelRepo.findOneBy({/* user_name */ }); // from the admin table/array
 		if (user)
@@ -91,7 +89,6 @@ export class ChatService {
 		else
 			return false;
 	}
-	// if_owner
 	async is_owner(user_name: string, chan_name: string) {
 		const user = this.channelRepo.findOneBy({/* user_name */ }); // from the owner table/array
 		if (user)
@@ -121,14 +118,13 @@ export class ChatService {
 		// return false;
 	}
 
-	// SPECIFIC TO OWNERS
-	// set channel password
+// -----------------------------------SPECIFIC TO OWNERS---------------------------------
 	async set_pass(chan_name: string, pass: string) {
-		// update password of the channel (from repo or local storage?)
+		// update/set password of the channel (from repo or local storage?)
 	}
 
-	// SPECIFIC TO OWNERS/ADMINISTRATORS
-	// kick user
+// --------------------------------SPECIFIC TO OWNERS/ADMINISTRATORS-------------------------
+
 	async kick_user(user_to_kick: string, chan_name: string) {
 		// rm chan_mem
 	}
@@ -146,3 +142,4 @@ export class ChatService {
 		// delete user to the mute table?
 	}
 }
+// -------------------------------------------------------------------------------
