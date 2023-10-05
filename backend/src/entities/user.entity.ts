@@ -45,7 +45,7 @@ export class User {
 	@OneToMany(() => User, user => user.achievements)
 	achievements: Achievement[]
 
-	@ManyToMany(() => User, user => user.channels)
-	@JoinTable({ name: "channel_users"})
+	@ManyToMany(() => Channel, channel => channel.members)
+	@JoinTable({ name: "my_channels"})
 	channels: Channel[]
 }

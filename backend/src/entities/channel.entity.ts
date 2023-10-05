@@ -27,11 +27,20 @@ export class Channel {
     @ManyToMany(() => User, user => user.channels)
     members: User[];
 
+	@ManyToMany(type => User)
+	invites: User[];
+
     @Column()
     isGroupChannel: boolean;
 
-	@Column({ nullable: true })
+	@Column({ nullable: true})
 	password: string;
+
+	@Column({nullable: true})
+	is_private: boolean;
+
+	@Column({nullable: true})
+	is_protected: boolean;
 
 	//   @Column('text', { array: true, nullable: true  })
 //   banned: string[];
