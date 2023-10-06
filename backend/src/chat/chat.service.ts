@@ -3,11 +3,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../entities/user.entity';
 import { Channel } from '../entities/channel.entity';
 import { Repository } from 'typeorm';
+import { Message } from '../entities/message.entity';
 
 @Injectable()
 export class ChatService {
 	// -  have to inject database/repo -
-	constructor(@InjectRepository(Channel) private channelRepo: Repository<Channel>){}
+	constructor(@InjectRepository(Channel) private channelRepo: Repository<Channel>,
+	@InjectRepository(Message) private messageRepo: Repository<Message> ){}
 
 	// view all channels
 	async get_all_chan() {
@@ -51,7 +53,6 @@ export class ChatService {
 		// any condition if there is password??
 	}
 
-	// join channel
 	async add_chan_mem(user: User, chan_name: string) {
 		// insert or create the user in the channel memeber table
 		const chan = await this.chan_by_name(chan_name);
@@ -80,6 +81,15 @@ export class ChatService {
 		}
 	}
 
+	async save_dm(sender: User, reciever: User){
+		const message = await this.messageRepo.findOne({where: {senderId: sender.id, recipientID: reciever.id}})
+		// if (message)
+			// message.content.
+	}
+
+	async save_chan_message(sender: User, reciever: Channel){
+
+	}
 
 	//  ----------------------- CHECKS -----------------------------
 	async is_admin(user_name: string, chan_name: string) {

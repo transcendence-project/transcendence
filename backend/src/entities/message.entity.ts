@@ -15,11 +15,17 @@ export class Message {
 	@ManyToOne(() => User)
 	sender: User
 
+	@Column()
+	recipientID: number;
+
+	@ManyToOne(() => User, { nullable: true })
+	recipient: User;
+
 	@ManyToOne(() => Channel, channel	=> channel.messages)
 	channel: Channel
 
 	@Column()
-	content: string
+	content: string[]
 
 	@Column()
 	createdAt: Date

@@ -21,7 +21,7 @@ export class WebsocketGateway implements OnGatewayConnection, OnGatewayDisconnec
 		console.log(`Client connected: ${client.id}`);
 		this.websocketService.set_user(client);
 		const user = this.websocketService.find_user_with_id(client.id);
-		for (const channel of user.channels) // rejoin 
+		for (const channel of user.channels) // rejoin
 			client.join(channel.room_name);
 			client.emit('connection_success'); // socket.addEventListener('message', .... )
 		// In case of error
