@@ -62,16 +62,6 @@ export class ChatService {
 		}
 	}
 
-	async add_chan_admin(user: User, chan_name: string) {
-		// insert or create the user in the channel memeber table
-		const chan = await this.chan_by_name(chan_name);
-		if (chan) {
-			chan.admins.push(user);
-			await this.channelRepo.save(chan);
-		}
-	}
-
-	// leave channel
 	async rm_chan_mem(user: User, chan_name: string) {
 		const userIdToRemove = user.id;
 		const chan = await this.chan_by_name(chan_name);
@@ -81,14 +71,33 @@ export class ChatService {
 		}
 	}
 
-	async save_dm(sender: User, reciever: User){
-		const message = await this.messageRepo.findOne({where: {senderId: sender.id, recipientID: reciever.id}})
-		// if (message)
-			// message.content.
+	async add_chan_admin(user: User, chan_name: string) {
+		const chan = await this.chan_by_name(chan_name);
+		if (chan) {
+			chan.admins.push(user);
+			await this.channelRepo.save(chan);
+		}
 	}
 
-	async save_chan_message(sender: User, reciever: Channel){
+	async rem_chan_admin(user: User, chan_name: string) {
+		const admin_to_rem = user.userName;
+		const chan = await this.chan_by_name(chan_name);
+		if (chan) {
+			chan.admins = chan.admins.filter(admin => admin.userName !== admin_to_rem);
+			await this.channelRepo.save(chan);
+		}
+	}
 
+	async save_chan_message(sender: User, chan_name: string, content: string){
+		const chan = await this.chan_by_name(chan_name);
+		const new_message = new Message();
+		new_message.channel = chan;
+		new_message.content = content;
+		new_message.createdAt = new Date();
+		new_message.sender = sender;
+		new_message.senderID = sender.id;
+		chan.messages.push(new_message);
+		await this.channelRepo.save(chan);
 	}
 
 	//  ----------------------- CHECKS -----------------------------
@@ -107,11 +116,12 @@ export class ChatService {
 			return false;
 	}
 	async is_chan_mem(user_name: string, chan_name: string) {
-		// user = this.repo.findOneBy({user_name});
-		// if (user)
-		// 	return true
-		// else
-		// 	return false;
+		const memebers = await this.mem_by_chan(chan_name);
+		const user = memebers.find(memeber => memeber.userName === user_name);
+		if (user)
+			return true
+		else
+			return false;
 	}
 
 	async is_ban(user_name: string, chan_name: string) {

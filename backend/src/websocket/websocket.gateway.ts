@@ -39,8 +39,10 @@ export class WebsocketGateway implements OnGatewayConnection, OnGatewayDisconnec
 
 	@SubscribeMessage('send_message_to_chan')
 	send_message_chan(client: any, payload: any): void {
+		const user = this.websocketService.find_user_with_id(client.id);
 		const { room_name, message } = payload;
 		this.server.to(room_name).emit('room_message', { message, sender: client.id });
+		this.chatService.save_chan_message(user, room_name, message);
 		// save the message in the database
 		client.emit('chan_msg_success');
 	}
@@ -48,16 +50,26 @@ export class WebsocketGateway implements OnGatewayConnection, OnGatewayDisconnec
 	@SubscribeMessage('private_messgae')
 	send_message_dm(client: any, payload: any): void {
 		const { username, message } = payload;
-		const reciever_id = this.websocketService.find_id(username);
-		this.server.to(reciever_id).emit('priv_message', { message, sender: client.id });
-		// save the message in the database
+		const user = this.websocketService.find_user_with_id(client.id);
+		const reciever = this.websocketService.find_user_with_id(username);
+		// check if user and reciever are friends, if no, error mesage
+		const dm_name = this.websocketService.find_priv_msg_room(reciever, user);
+		if (dm_name)
+		{
+			this.server.to(this.websocketService.find_id(username)).emit('priv_message', { message, sender: client.id });
+			this.websocketService.set_direct_msg(reciever, user, dm_name, message);
+		}
+		else{
+			const new_dm_name = user.userName + "_" + reciever.userName;
+			this.websocketService.set_direct_msg(reciever, user, new_dm_name, message);
+		}
 		client.emit('priv_msg_success');
 	}
 
 	@SubscribeMessage('create_room')
 	async create_room(client: any, room_name: string): Promise<void> {
 
-		const user = await this.websocketService.find_user_with_id(client.id);
+		const user = this.websocketService.find_user_with_id(client.id);
 		await this.chatService.create_chan(room_name, user);
 		// set user as owner and admin
 		client.join(room_name);
@@ -69,7 +81,7 @@ export class WebsocketGateway implements OnGatewayConnection, OnGatewayDisconnec
 		const { room_name, arg } = payload; // args: password
 		const user = this.websocketService.find_user_with_id(client.id);
 		const room = await this.chatService.chan_by_name(room_name);
-	;	if (this.websocketService.allowed_to_join(user, room, arg))
+	;	if (this.websocketService.can_join(user, room, arg))
 		{
 			this.chatService.add_chan_mem(user, room_name);
 			client.join(room_name);
@@ -99,6 +111,7 @@ export class WebsocketGateway implements OnGatewayConnection, OnGatewayDisconnec
 		const inviter = this.websocketService.find_user_with_id(client.id);
 		const invitee = this.websocketService.find_user_with_name(invitee_);
 		this.websocketService.invite_user_to_game(inviter, invitee);
+		// send message to invitee that he has been invited
 	}
 
 	@SubscribeMessage('add_user_to_priv')
@@ -124,6 +137,20 @@ export class WebsocketGateway implements OnGatewayConnection, OnGatewayDisconnec
 		if (this.chatService.is_admin(user.userName, room_name) || this.chatService.is_owner(user.userName, room_name))
 		{
 			this.chatService.add_chan_admin(admin_to_add, room_name);
+			// send to admin_to_add that they are an admin
+		}
+		// else
+			// send to user that they are not an admin or owner
+	}
+
+	@SubscribeMessage('rem_admin')
+	rem_admin(client: any, payload)
+	{
+		const { admin_to_rem, room_name } = payload;
+		const user = this.websocketService.find_user_with_id(client.id);
+		if (this.chatService.is_admin(user.userName, room_name) || this.chatService.is_owner(user.userName, room_name))
+		{
+			this.chatService.rem_chan_admin(admin_to_rem, room_name);
 			// send to admin_to_add that they are an admin
 		}
 		// else
