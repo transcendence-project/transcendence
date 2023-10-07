@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../entities/user.entity'
 import { AuthService } from 'auth/auth.service';
+import { Message } from '../entities/message.entity';
 
 // for now websocket service mainly to save in the repository / store real time 
 // because injecting repo in gateway isn't workin for some reason
@@ -11,7 +12,8 @@ import { AuthService } from 'auth/auth.service';
 @Injectable()
 export class WebsocketService {
 	private connected_users: Map<string, User> = new Map();
-	private game_invites: Map<User, User> = new Map();
+	private game_invites: Map<string, string[]> = new Map(); // store only user names?
+	private direct_msg: Map<string, {to: string, from: string, content: string, created: Date }[]> = new Map();
 
 	constructor(@InjectRepository(Channel) private roomRepo: Repository<Channel>, private authService: AuthService){}
 
@@ -50,13 +52,19 @@ export class WebsocketService {
 
 	rem_user_invites(client: any) {
 		const user = this.find_user_with_id(client.id);
-		for (const [sender, recipient] of this.game_invites.entries()) {
-		  if (sender.userName === user.userName || recipient.userName === user.userName) {
-			this.game_invites.delete(sender);
-		  }
+		for (const [recipient, senders] of this.game_invites.entries()) {
+		  if (recipient === user.userName)
+			this.game_invites.delete(recipient);
 		}
-	  }
+	}
 
+	invite_user_to_game(inviter: User, invitee: User)
+	{
+		const senders = this.game_invites.get(invitee.userName) || [];
+		senders.push(inviter.userName);
+		this.game_invites.set(inviter.userName, senders);
+	}
+	
 	is_online(client: any): boolean{ // or set user as online in databse ??
 		for (const [userID, user] of this.connected_users.entries())
 			if (userID === client.id)
@@ -64,13 +72,13 @@ export class WebsocketService {
 		return false;
 	}
 
-	allowed_to_join(user: User, room: Channel, arg: string): boolean {
+	can_join(user: User, room: Channel, arg: string): boolean {
 		//  IF CHANNEL IS PRIVATE 
 		// maybe not necessary because we wont display the channel in the list if it is private
 		if (room.is_private == false)
 			return true;
 
-		// IF CHANNEL HAS PASSOWRD AND THE USER HAS PROVIDED IT
+		// IF CHANNEL HAS PASSOWRD
 		if (room.password){
 			if (arg === room.password){
 				return true;
@@ -82,10 +90,22 @@ export class WebsocketService {
 		return true;
 	}
 
-	invite_user_to_game(inviter: User, invitee: User)
-	{
-		this.game_invites.set(inviter, invitee);
-		// send message to invitee that he has been invited
+	find_priv_msg_room(to: User, from: User){
+		for (const [room_name, messages] of this.direct_msg.entries()){
+			for (const msg_contents of messages){
+				if (msg_contents.to === to.userName && msg_contents.from === from.userName || 
+					msg_contents.to === from.userName && msg_contents.to === from.userName){
+					return room_name;
+				}
+			}
+		}
 	}
-
+	set_direct_msg(to: User, from: User, room_name: string, content: string)
+	{
+		const message = {to: to.userName, from: from.userName, content: content, created: new Date()};
+		// Retrieve the existing array of messages for the room or create a new one if it doesn't exist
+		const dms = this.direct_msg.get(room_name) || [];
+		dms.push(message);
+		this.direct_msg.set(room_name, dms);
+	}
 }
