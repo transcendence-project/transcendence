@@ -18,6 +18,7 @@ import { AppModule } from 'app.module';
 	  })],
 	controllers: [AuthController],
 	providers: [AuthService, FortyTwoStrategy, JwtStrategy, ConfigService],
+	exports: [AuthService]
 })
 export class AuthModule {
 	// constructor() {
