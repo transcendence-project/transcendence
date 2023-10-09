@@ -14,13 +14,13 @@ export class FriendRequestController {
 	}
 
 	@Patch('/:id/accept')
-	async acceptRequest(@Param("id") requestId: number): Promise<FriendRequest> {
-		return await this.friendRequestService.acceptRequest(requestId);
+	async acceptRequest(@Param("id") requestId: number) {
+		await this.friendRequestService.acceptRequest(requestId);
 	}
 
 	@Patch('/:id/reject')
-	async rejectRequest(@Param("id") requestId: number): Promise<FriendRequest> {
-		return await this.friendRequestService.rejectRequest(requestId);
+	async rejectRequest(@Param("id") requestId: number){
+		this.friendRequestService.rejectRequest(requestId);
 	}
 
 	@Get('/:id')

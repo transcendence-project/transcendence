@@ -17,6 +17,8 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: 123
       POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
 
   frontend:
     build: ./frontend  # Docker will look for Dockerfile in this directory

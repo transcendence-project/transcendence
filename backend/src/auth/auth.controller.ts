@@ -2,7 +2,7 @@ import { Controller, Get, UseGuards, Req, Res, Post, HttpCode, Body, Unauthorize
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { ConfigService } from '@nestjs/config';
-import { User } from '../users/user.entity';
+import { User } from '../entities/user.entity';
 import { FortyTwoStrategy } from './strategy.42';
 import { FortyTwoAuthGuard } from './guard.42';
 import { JwtAuthGuard } from './jwt.guard';
@@ -24,10 +24,11 @@ export class AuthController {
 		// the AuthGuard stores info about the authenticated
 		// user in the req object, specifically the user property
 		const user = req.user; // the authenticated user
-		const token = this.jwtService.sign({ username: user.username });
+		const token = this.jwtService.sign({ username: user.userName });
 		// const decodeToken = this.jwtService.verify(token);
-		console.log('back in controller');
+		// console.log('back in controller');
 		console.log("Token", token)
+		// console.log("User: ", user.userName)
 		// console.log(user.email);
 		res.redirect('http://localhost:3000'); // can redirect to our application page
 		return (token); // will store it local storage front end
@@ -36,7 +37,9 @@ export class AuthController {
 	@Get('me')
 	@UseGuards(JwtAuthGuard)
 	getProfile(@Req() req) {
-		return req.user;
+		const user = req.user;
+		console.log(user);
+		return user;
 	}
 
 	@Get('2fa/generate') // GET just for testing, will later be POST

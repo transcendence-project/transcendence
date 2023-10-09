@@ -25,4 +25,9 @@ export class UsersController {
 	deleteUser(@Param('id') id: string){
 		return (this.userService.remove(parseInt(id)))
 	}
+
+	@Delete('/:id/friends/:friendId')
+	deleteFriend(@Param('id') id: string, @Param('friendId') friendId: string){
+		return (this.userService.removeFriend(parseInt(id), parseInt(friendId)))
+	}
 }

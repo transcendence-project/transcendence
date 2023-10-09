@@ -1,10 +1,10 @@
 ###Get my user
 GET http://localhost:3000/auth/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im9hYnVzaGFyIiwiaWF0IjoxNjk2NTIxNDY2fQ.XJQufYYBokgvuECUWHFL97MknHBfNkt0T5vbBu_rol8
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im9hYnVzaGFyIiwiaWF0IjoxNjk2ODM5NTYxfQ.0KE5GjriSoWDstut-A3zH7X9aLRxks9hipa4rzfSLyE
 
-### Get Mawad user
+### Get faal-zub user
 GET http://localhost:3000/auth/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1hd2FkIiwiaWF0IjoxNjk2NTM2NDk2fQ.JYbsrSGJkzb6RVH6UzvN0Zq_u7TmNvu_sSO1GF2vDzg
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImZhYWwtenViIiwiaWF0IjoxNjk2ODM5NjY2fQ.JD1thTJPoImNvB0kWDNOjo1qRZg7KdpWrhob6lD2K90
 
 
 ### sign up
@@ -39,9 +39,18 @@ GET  http://localhost:3000/auth/2fa/generate
 ### authenticate 2fa
 GET  http://localhost:3000/auth/2fa/authenticate
 
-###
-POST http://localhost:3000/friend-requests/10
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im9hYnVzaGFyIiwiaWF0IjoxNjk2NTIxNDY2fQ.XJQufYYBokgvuECUWHFL97MknHBfNkt0T5vbBu_rol8
+### send friend request to user with id: 
+POST http://localhost:3000/friend-requests/2
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im9hYnVzaGFyIiwiaWF0IjoxNjk2ODM5NTYxfQ.0KE5GjriSoWDstut-A3zH7X9aLRxks9hipa4rzfSLyE
 
-###
-GET http://localhost:3000/friend-requests/10
+### check friend requests
+GET http://localhost:3000/friend-requests/2
+
+### accept friend request
+PATCH http://localhost:3000/friend-requests/9/accept
+
+### reject friend request
+PATCH http://localhost:3000/friend-requests/8/reject
+
+### Delete friend
+DELETE http://localhost:3000/users/2/friends/1

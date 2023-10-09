@@ -1,7 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { User } from '../entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm'
+import { FriendRequest } from 'entities/friend-request.entity';
+import { FriendRequestService } from 'FriendRequests/FriendRequests.service';
+import { throwError } from 'rxjs';
 
 @Injectable()
 export class UsersService {
@@ -45,20 +48,30 @@ export class UsersService {
 		console.log(user)
 		return (this.repo.delete(id))
 	}
-	
-	// async set2FA(id: number, secret: string) {
-	// 	const user = await this.findOne(id);
-	// 	if (!user)
-	// 		return (NotFoundException)
-	// 	user.twoFactorSecret = secret;
-	// 	return (this.repo.save(user));
-	// }
 
-	// async enable2FA(id: number) {
-	// 	const user = await this.findOne(id);
-	// 	if (!user)
-	// 		return (NotFoundException)
-	// 	user.is2FAEnabled = true;
-	// 	return (this.repo.save(user));
-	// }
+	async addFriend(userId: number, friend: User) {
+		const user = await this.repo.findOne({where: {id: userId}, relations: ['friends']});
+		if (!user.friends){
+			user.friends = [];
+		}
+		if (user.friends.find(f => f.id === friend.id)){
+			throw new ConflictException('Friend already added');
+		}
+		user.friends.push(friend);
+		return this.repo.save(user);
+	}
+
+	async removeFriend(userId: number, friendId: number) {
+		const user = await this.repo.findOne({where: {id: userId}, relations: ['friends']});
+		const friend = await this.repo.findOne({where: {id: friendId}, relations: ['friends']});
+		if (!user.friends){
+			user.friends = [];
+		}
+		user.friends = user.friends.filter(friend => friend.id !== friendId);
+		friend.friends = friend.friends.filter(friend => friend.id !== userId);
+
+		await this.repo.save(friend);
+		return this.repo.save(user);
+	}
+	  
 }
