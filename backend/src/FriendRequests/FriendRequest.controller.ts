@@ -1,0 +1,30 @@
+import { Controller, Get, Param, Patch, Post, Req, UseGuards } from "@nestjs/common";
+import { FriendRequestService } from "./FriendRequests.service";
+import { FriendRequest } from "entities/friend-request.entity";
+import { JwtAuthGuard } from "auth/jwt.guard";
+
+@Controller('friend-requests')
+export class FriendRequestController {
+	constructor(private friendRequestService: FriendRequestService) {}
+
+	@Post('/:receiverId')
+	@UseGuards(JwtAuthGuard)
+	async sendFriendRequest(@Param("receiverId") receiverID: number, @Req() req): Promise<FriendRequest> {
+		return await this.friendRequestService.sendFriendRequest(req.user.id, receiverID);
+	}
+
+	@Patch('/:id/accept')
+	async acceptRequest(@Param("id") requestId: number): Promise<FriendRequest> {
+		return await this.friendRequestService.acceptRequest(requestId);
+	}
+
+	@Patch('/:id/reject')
+	async rejectRequest(@Param("id") requestId: number): Promise<FriendRequest> {
+		return await this.friendRequestService.rejectRequest(requestId);
+	}
+
+	@Get('/:id')
+	async getFriendRequest(@Param("id") requestId: number): Promise<FriendRequest[]> {
+		return await this.friendRequestService.getFriendRequests(requestId);
+	}
+}

@@ -1,11 +1,6 @@
+###Get my user
 GET http://localhost:3000/auth/me
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im9hYnVzaGFyIiwiaWF0IjoxNjk2NTIxNDY2fQ.XJQufYYBokgvuECUWHFL97MknHBfNkt0T5vbBu_rol8
-
-
-### different user login
-GET http://localhost:3000/auth/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1hd2FkIiwiaWF0IjoxNjk2NTM2NDk2fQ.JYbsrSGJkzb6RVH6UzvN0Zq_u7TmNvu_sSO1GF2vDzg
-
 
 ### sign up
 POST http://localhost:3000/users/signup
@@ -39,3 +34,9 @@ GET  http://localhost:3000/auth/2fa/generate
 ### authenticate 2fa
 GET  http://localhost:3000/auth/2fa/authenticate
 
+###
+POST http://localhost:3000/friend-requests/10
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im9hYnVzaGFyIiwiaWF0IjoxNjk2NTIxNDY2fQ.XJQufYYBokgvuECUWHFL97MknHBfNkt0T5vbBu_rol8
+
+###
+GET http://localhost:3000/friend-requests/10
