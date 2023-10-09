@@ -3,6 +3,10 @@ import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
+    redirect: "/login",
+  },
+  {
+    path: "/home",
     name: "home",
     component: () => import("../views/HomePage.vue"),
   },
@@ -46,6 +50,8 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   if (to.path === '/login') {
     document.body.style.backgroundColor = '#3A1078';
+  }else {
+    document.body.style.backgroundColor = '#5E6367';  // Reset to default or another color
   }
   next();
 });

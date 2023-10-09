@@ -20,9 +20,9 @@
 	  SideNavBar,
 	},
   });
-  </script>
-  
-  <style scoped>
+</script>
+
+<style scoped>
   body {
 	font-family: "Arial", sans-serif;
 	margin: 0;
