@@ -14,7 +14,7 @@
 		<router-link to="/chat" @click.native="closeDropdownopt">Leave channel</router-link>
 	  </div>
 	</div>
-  </template>
+</template>
   
   <script lang="ts">
   import { Options, Vue } from 'vue-class-component';
