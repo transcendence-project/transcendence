@@ -31,11 +31,23 @@ const routes: Array<RouteRecordRaw> = [
     name: "leader",
     component: () => import("../views/LeaderPage.vue"),
   },
+  {
+    path: "/login",
+    name: "login",
+    component: () => import("../views/LoginPage.vue"),
+  },
 ];
 
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
   routes,
+});
+
+router.beforeEach((to, from, next) => {
+  if (to.path === '/login') {
+    document.body.style.backgroundColor = '#3A1078';
+  }
+  next();
 });
 
 export default router;

@@ -25,7 +25,7 @@
   </aside>
 </template>
 
-<!-- <style scoped>
+<style scoped>
 .side-nav-bar {
   background-color: #34373d;
   color: #fff;
@@ -52,4 +52,4 @@
 .side-nav-links li a:hover {
   text-decoration: underline;
 }
-</style> -->
+</style>
