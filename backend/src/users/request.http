@@ -18,20 +18,20 @@ Content-Type: application/json
 }
 
 ### authentication
-GET https://localhost:3000/auth/42
+GET http://localhost:3000/auth/42
 
 ### find user by id
-GET http://localhost:3000/users/1
+GET http://localhost:3000/users/
 
 ###find all users
 
-GET http://localhost:3000/users?userName=aalhamel
+GET http://localhost:3000/users?userName=mawad
 
 ### print goodbye
 GET http://localhost:3000/hi
 
 ### remove user
-DELETE http://localhost:3000/users/1
+DELETE http://localhost:3000/users/9
 
 ### generate qr code
 GET  http://localhost:3000/auth/2fa/generate

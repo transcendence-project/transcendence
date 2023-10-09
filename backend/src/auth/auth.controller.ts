@@ -3,19 +3,27 @@ import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { ConfigService } from '@nestjs/config';
 import { User } from '../entities/user.entity';
+import { User } from '../entities/user.entity';
 import { FortyTwoStrategy } from './strategy.42';
 import { FortyTwoAuthGuard } from './guard.42';
 import { JwtAuthGuard } from './jwt.guard';
-import { JwtService } from '@nestjs/jwt';
 
 @Controller('auth')
 export class AuthController {
-	constructor(private authService: AuthService, private jwtService: JwtService) {
+	constructor(private authService: AuthService) {
 	}
 	@Get('42')
 	@UseGuards(AuthGuard('42'))
 	async login() {
 		;
+	}
+
+
+	@Get('/me')
+	@UseGuards(JwtAuthGuard)
+	getProfile(@Req() req) {
+		console.log('in get profile, req.user: ', req.user);
+		return req.user;
 	}
 
 	@Get('42/callback')
@@ -47,9 +55,9 @@ export class AuthController {
 	async generateQr(@Req() req, @Res() res) {
 		const user = { // for testing purposes
 			id: 4,
-			username: 'arafeeq',
+			userName: 'arafeeq',
 			email: 'arafeeq@student.42abudhabi.ae',
-			twoFactorAuthenticationSecret: 'helloworld'
+			twoFactorSecret: 'helloworld'
 		}
 		const otp = this.authService.generateTwoFactorAuthenticationSecret(user); // will be req.user later
 		// console.log(`user 2fa secret = ${user.twoFactorAuthenticationSecret}`);
@@ -75,7 +83,7 @@ export class AuthController {
 			throw new UnauthorizedException('Wrong authentication code');
 		}
 		// else login to game, display user profile
-		const token = this.jwtService.sign({ username: user.username }); // will later be req.user.username
+		const token = this.authService.generate_jwt_token(user.username); // will later be req.user.username
 		return (token) // will store it local storage front end
 	}
 }

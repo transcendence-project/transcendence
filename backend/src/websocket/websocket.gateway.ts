@@ -4,82 +4,180 @@
 // // import { ChatService } from '../chat/chat.service';
 // import { Channel } from 'chat/channel.entity';
 // import { Repository } from 'typeorm';
+import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect, } from '@nestjs/websockets';
+import { Server } from 'socket.io';
+import { ChatService } from '../chat/chat.service';
+import { WebsocketService } from './websocket.service';
 
-// @WebSocketGateway()
-// export class WebsocketGateway {
-//   constructor(private chatService: ChatService, /* @InjectRepository(Channel) private roomRepo: Repository<Channel> */) {}
-//   @WebSocketServer()
-//   server: Server;
+import { Channel } from '../entities/channel.entity';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Injectable } from '@nestjs/common';
+import { User } from '../entities/user.entity';
 
-//   // method for client connection
-//   // method for client disconnection
+@WebSocketGateway()
+export class WebsocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
+	
+	constructor(private chatService: ChatService, private websocketService: WebsocketService
+		/* , @InjectRepository(Channel) private roomRepo: Repository<Channel> */) { }
+	@WebSocketServer()
+	server: Server;
 
-//   @SubscribeMessage('send_message')
-//   send_message(client: any, payload: any): void {
-// 	const {room, message} = payload;
-// 	// this.server.to(room).emit(/* event or message to send back to the sender*/, { message, sender: client.id });
-// 	// save the message in the database
-//   }
+	handleConnection(client: any, ...args: any[]) { // called automatically when frontend establish websocket connection
+		console.log(`Client connected: ${client.id}`);
+		this.websocketService.set_user(client);
+		const user = this.websocketService.find_user_with_id(client.id);
+		for (const channel of user.channels) // rejoin
+			client.join(channel.room_name);
+			client.emit('connection_success'); // socket.addEventListener('message', .... )
+		// In case of error
+		/*  client.on('error', (error) => { // to handle websocket errors
+			client.emit('connection_failure');
+		});*/
+	}
 
-//   @SubscribeMessage('create_room')
-//   async create_room(client: any, room_name: string): Promise<void> {
-// 	const new_room = new Channel(); //or with the create function like in users
-//     new_room.room_name = room_name;
-// 	// save it in chat service repo by making channel repo in chatService public or
-// 	// inject repository into gateway 
-// 	// await this.roomRepo.save(new_room);
-// 	// join the room??
-//   }
+	handleDisconnect(client: any) {
+		this.websocketService.delete_user(client);
+		this.websocketService.rem_user_invites(client);
+		console.log(`Client disconnected: ${client.id}`);
+		client.emit('disconnection_success');
+	}
 
-//   @SubscribeMessage('join_room')
-//   join_room(client: any, room_name: string): void {
-// 	// To get the list of rooms the client is currently in
-// 	const rooms = Object.keys(client.rooms);
-// 	// check if they are part of the room (if channel) from the databse, if yes
-// 	if (!rooms.includes(room_name)) {
-// 		// check if the channel is invite only, if yes
-// 			client.join(room_name);
-// 			// 
-// 		// else
-// 			// channel is invite only
-// 		// (will private rooms appear for the user if they are a part of it?)
-// 	  }
-// 	//   else
-// 	  	// already part of the channel or room  / alread joined the room
-//   }
+	@SubscribeMessage('send_message_to_chan')
+	send_message_chan(client: any, payload: any): void {
+		const user = this.websocketService.find_user_with_id(client.id);
+		const { room_name, message } = payload;
+		this.server.to(room_name).emit('room_message', { message, sender: client.id });
+		this.chatService.save_chan_message(user, room_name, message);
+		// save the message in the database
+		client.emit('chan_msg_success');
+	}
 
-//   @SubscribeMessage('leave_room')
-//   leave_room(client: any, room_name: string) : void{ // client can be User later
-// 	const rooms = Object.keys(client.rooms);
-// 	if (!rooms.includes(room_name)) {
-// 			client.leave(room_name);
-// 	  }
-// 	// else
-// 	//   not part of the channel
-//   }
+	@SubscribeMessage('private_messgae')
+	send_message_dm(client: any, payload: any): void {
+		const { username, message } = payload;
+		const user = this.websocketService.find_user_with_id(client.id);
+		const reciever = this.websocketService.find_user_with_id(username);
+		// check if user and reciever are friends, if no, error mesage
+		const dm_name = this.websocketService.find_priv_msg_room(reciever, user);
+		if (dm_name)
+		{
+			this.server.to(this.websocketService.find_id(username)).emit('priv_message', { message, sender: client.id });
+			this.websocketService.set_direct_msg(reciever, user, dm_name, message);
+		}
+		else{
+			const new_dm_name = user.userName + "_" + reciever.userName;
+			this.websocketService.set_direct_msg(reciever, user, new_dm_name, message);
+		}
+		client.emit('priv_msg_success');
+	}
 
-//   @SubscribeMessage('mute_user')
-//   mute_user(client: any, room_name: string) : void{
-// 	//
-// 	}
+	@SubscribeMessage('create_room')
+	async create_room(client: any, room_name: string): Promise<void> {
 
-  
-//   // chat history retrieval
-//   // user status - online or offline
-// }
+		const user = this.websocketService.find_user_with_id(client.id);
+		await this.chatService.create_chan(room_name, user);
+		// set user as owner and admin
+		client.join(room_name);
+		client.emit('create_room_success');
+	}
+
+	@SubscribeMessage('join_room')
+	async join_room(client: any, payload: any) {
+		const { room_name, arg } = payload; // args: password
+		const user = this.websocketService.find_user_with_id(client.id);
+		const room = await this.chatService.chan_by_name(room_name);
+	;	if (this.websocketService.can_join(user, room, arg))
+		{
+			this.chatService.add_chan_mem(user, room_name);
+			client.join(room_name);
+			client.emit('join_room_success');
+		}
+	}
+
+	@SubscribeMessage('leave_room')
+	leave_room(client: any, room_name: string): void {
+		const user = this.websocketService.find_user_with_id(client.id);
+		this.chatService.rm_chan_mem(user, room_name); // removing from databse
+		client.leave(room_name);
+		client.emit('leave_room_success');
+	}
+
+	@SubscribeMessage('mute_user')
+	mute_user(client: any, payload: any): void {
+
+		const { user_to_mute, room_name } = payload;
+		const user = this.websocketService.find_user_with_id(client.id);
+		// mute user
+		// send to user_to_mute is mute
+	}
+
+	@SubscribeMessage('invite_to_game')
+	invite_user(client: any, invitee_: string): void {
+		const inviter = this.websocketService.find_user_with_id(client.id);
+		const invitee = this.websocketService.find_user_with_name(invitee_);
+		this.websocketService.invite_user_to_game(inviter, invitee);
+		// send message to invitee that he has been invited
+	}
+
+	@SubscribeMessage('add_user_to_priv')
+	add_priv_user(client: any, payload: any){
+		const { user_to_add, room_name } = payload;
+		const user = this.websocketService.find_user_with_id(client.id);
+		if (this.chatService.is_admin(user.userName, room_name) || this.chatService.is_owner(user.userName, room_name))
+		{
+			const add_user = this.websocketService.find_user_with_name(user_to_add);
+			this.chatService.add_chan_mem(user, room_name);
+			client.join(room_name);
+			client.emit('add_user_success');
+		}
+		//else
+		// send error message to user: user not owner or admin
+	}
+
+	@SubscribeMessage('set_admin')
+	set_admin(client: any, payload: any)
+	{
+		const { admin_to_add, room_name } = payload;
+		const user = this.websocketService.find_user_with_id(client.id);
+		if (this.chatService.is_admin(user.userName, room_name) || this.chatService.is_owner(user.userName, room_name))
+		{
+			this.chatService.add_chan_admin(admin_to_add, room_name);
+			// send to admin_to_add that they are an admin
+		}
+		// else
+			// send to user that they are not an admin or owner
+	}
+
+	@SubscribeMessage('rem_admin')
+	rem_admin(client: any, payload)
+	{
+		const { admin_to_rem, room_name } = payload;
+		const user = this.websocketService.find_user_with_id(client.id);
+		if (this.chatService.is_admin(user.userName, room_name) || this.chatService.is_owner(user.userName, room_name))
+		{
+			this.chatService.rem_chan_admin(admin_to_rem, room_name);
+			// send to admin_to_add that they are an admin
+		}
+		// else
+			// send to user that they are not an admin or owner
+	}
+
+}
 
 // // ----------------------------------------------------------
 
 // // IN FRONT END (to test)
 
-// // socket.emit('join_room', 'room_name');
+// const socket = new WebSocket('ws://localhost:3000', 'custom data or authentication codes');
+// socket.send(JSON.stringify({ event: 'join_room', room_name: roomName })); // to join room
 
-// // // Send a message to a specific room
-// // const message = {
-// //   room: 'test_room',
-// //   content: 'Hello, test room!',
-// // };
-// // socket.emit('send_message', message);
+// socket.addEventListener('message', (event) => {
+//   const data = JSON.parse(event.data);
+//   if (data.event === 'join_room_success') {
+//     // Update the UI to indicate successful room join
+//   }
+// });
 
 // // ----------------------------------------------------------
 
