@@ -3,7 +3,7 @@ import { Repository } from 'typeorm';
 import { User } from '../entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm'
 import { FriendRequest } from 'entities/friend-request.entity';
-import { FriendRequestService } from 'FriendRequests/FriendRequests.service';
+import { FriendRequestService } from 'friend-requests/FriendRequests.service';
 import { throwError } from 'rxjs';
 
 @Injectable()
@@ -73,5 +73,21 @@ export class UsersService {
 		await this.repo.save(friend);
 		return this.repo.save(user);
 	}
-	  
+
+	async getAchievements(userId: number) {
+		const user = await this.repo.findOne({where: {id: userId}, relations: ['achievements']});
+		if (!user)
+			throw new NotFoundException('User not found');
+		return user.achievements;
+	}
+
+	async addAchievement(userId: number, achievementTitle: string) {
+	
+		const user = await this.repo.findOne({where: {id: userId}, relations: ['achievements']});
+		if (!user)
+			throw new NotFoundException('User not found');
+		if (user.achievements.find(a => a.title === achievementTitle))
+			throw new ConflictException('Achievement already added');
+		
+	}
 }

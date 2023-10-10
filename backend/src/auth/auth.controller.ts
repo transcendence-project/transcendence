@@ -3,14 +3,14 @@ import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { ConfigService } from '@nestjs/config';
 import { User } from '../entities/user.entity';
-import { User } from '../entities/user.entity';
 import { FortyTwoStrategy } from './strategy.42';
 import { FortyTwoAuthGuard } from './guard.42';
 import { JwtAuthGuard } from './jwt.guard';
+import { JwtService } from '@nestjs/jwt';
 
 @Controller('auth')
 export class AuthController {
-	constructor(private authService: AuthService) {
+	constructor(private authService: AuthService, private jwtService: JwtService) {
 	}
 	@Get('42')
 	@UseGuards(AuthGuard('42'))
@@ -42,14 +42,6 @@ export class AuthController {
 		return (token); // will store it local storage front end
 	}
 
-	@Get('me')
-	@UseGuards(JwtAuthGuard)
-	getProfile(@Req() req) {
-		const user = req.user;
-		console.log(user);
-		return user;
-	}
-
 	@Get('2fa/generate') // GET just for testing, will later be POST
 	// @UseGuards(JwtAuthGuard) // will get the user which is linked to the sent Bearer token
 	async generateQr(@Req() req, @Res() res) {
@@ -73,7 +65,8 @@ export class AuthController {
 			id: 4,
 			username: 'arafeeq',
 			email: 'arafeeq@student.42abudhabi.ae',
-			twoFactorAuthenticationSecret: 'EIRE46D7NJOEQ53O'
+			twoFactorAuthenticationSecret: 'EIRE46D7NJOEQ53O',
+			is2fa: false
 		}
 		const isCodeValid = this.authService.is2faCodeValid(
 			"129140",// will later be body.twoFactorAuthenticationCode

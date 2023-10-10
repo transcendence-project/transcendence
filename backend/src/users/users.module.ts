@@ -4,8 +4,8 @@ import { UsersService } from './users.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'entities/user.entity';
 import { AuthModule } from 'auth/auth.module';
-import { FriendRequestController } from 'FriendRequests/FriendRequest.controller';
-import { FriendRequestService } from 'FriendRequests/FriendRequests.service';
+import { FriendRequestController } from 'friend-requests/FriendRequest.controller';
+import { FriendRequestService } from 'friend-requests/FriendRequests.service';
 import { FriendRequest } from 'entities/friend-request.entity';
 
 @Module({

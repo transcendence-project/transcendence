@@ -19,7 +19,7 @@ export class User {
 	@Column()
 	email: string
 	
-	@Column()
+	@Column({ nullable: true })
 	is2FAEnabled: boolean
 
 	@Column({ nullable: true })
@@ -49,7 +49,8 @@ export class User {
 	@OneToMany(() => User, user => user.matches)
 	matches: Match[]
 
-	@OneToMany(() => User, user => user.achievements)
+	@ManyToMany(() => User, user => user.achievements)
+	@JoinTable()
 	achievements: Achievement[]
 
 	@ManyToMany(() => Channel, channel => channel.members)
