@@ -23,7 +23,7 @@ export class WebsocketGateway implements OnGatewayConnection, OnGatewayDisconnec
 	@WebSocketServer()
 	server: Server;
 
-	handleConnection(client: any, ...args: any[]) { // called automatically when frontend establish websocket connection
+	handleConnection(client: any) { // called automatically when frontend establish websocket connection
 		console.log(`Client connected: ${client.id}`);
 		this.websocketService.set_user(client);
 		const user = this.websocketService.find_user_with_id(client.id);
@@ -74,11 +74,12 @@ export class WebsocketGateway implements OnGatewayConnection, OnGatewayDisconnec
 
 	@SubscribeMessage('create_room')
 	async create_room(client: any, room_name: string): Promise<void> {
-
+		console.log("reached create room - websockets");
 		const user = this.websocketService.find_user_with_id(client.id);
 		await this.chatService.create_chan(room_name, user);
 		// set user as owner and admin
 		client.join(room_name);
+		const success_data = {message: `chan ${room_name} created successfully`}
 		client.emit('create_room_success');
 	}
 
@@ -129,7 +130,7 @@ export class WebsocketGateway implements OnGatewayConnection, OnGatewayDisconnec
 			const add_user = this.websocketService.find_user_with_name(user_to_add);
 			this.chatService.add_chan_mem(user, room_name);
 			client.join(room_name);
-			client.emit('add_user_success');
+			client.emit('add_user_success', );
 		}
 		//else
 		// send error message to user: user not owner or admin

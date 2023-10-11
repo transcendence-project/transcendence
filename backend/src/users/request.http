@@ -31,7 +31,7 @@ GET http://localhost:3000/users?userName=mawad
 GET http://localhost:3000/hi
 
 ### remove user
-DELETE http://localhost:3000/users/9
+DELETE http://localhost:3000/users/4
 
 ### generate qr code
 GET  http://localhost:3000/auth/2fa/generate

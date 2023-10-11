@@ -21,26 +21,21 @@ export class AuthController {
 	@Get('/me')
 	@UseGuards(JwtAuthGuard)
 	getProfile(@Req() req) {
-		console.log('in get profile, req.user: ', req.user);
+		// console.log('in get profile, req.user: ', req.user);
 		return req.user;
 	}
 
 	@Get('42/callback')
 	@UseGuards(AuthGuard('42'))
 	async callback(@Req() req, @Res() res) {
-		// the AuthGuard stores info about the authenticated
-		// user in the req object, specifically the user property
 		const user = req.user; // the authenticated user
 		const token = this.authService.generate_jwt_token(user.userName);
 		const decodeToken = this.authService.decode_token(token);
-		// const user1 = await this.authService.user_by_token(token);
 		console.log('back in controller');
 		console.log("Token: ", token);
-		// console.log("Decoded Token", decodeToken);
-		// console.log('user from token', user1);
-		// console.log(user.email);
-		res.redirect('https://en.wikipedia.org/wiki/Pong'); // can redirect to our application page
-		return (token); // will store it local storage front end
+		const url = new URL('http://localhost:8080/home');
+		url.searchParams.set('code', token);
+		res.status(200).redirect(url.href);
 	}
 
 	@Get('2fa/generate') // GET just for testing, will later be POST
@@ -60,7 +55,7 @@ export class AuthController {
 
 	@Post('2fa/authenticate')
 	@HttpCode(200)
-	// @UseGuards(JwtAuthGuard) // will get the user which is linked to the sent Bearer token
+	@UseGuards(JwtAuthGuard)
 	async authenticate2fa(@Req() req, @Body() body) {
 		const user = { // for testing purposes
 			id: 4,

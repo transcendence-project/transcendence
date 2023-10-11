@@ -1,6 +1,6 @@
 <template>
   <nav class="top-nav-bar">
-    <div class="logo"><router-link to="/">PING PONG</router-link></div>
+    <div class="logo"><router-link to="/home">PING PONG</router-link></div>
     <div class="user-menu">
       <div class="user-name">{{ username }}</div>
       <DropdownMenu />

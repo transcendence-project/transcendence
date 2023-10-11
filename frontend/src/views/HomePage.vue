@@ -1,16 +1,16 @@
 <template>
-    <div>
-    <!-- Display data if it exists -->
-    <div v-if="data">
-      {{ data }}
-    </div>
+	<div>
+		<!-- Display data if it exists -->
+		<div v-if="data">
+			{{ data }}
+		</div>
 
-    <!-- Display a loading message while data is being fetched -->
-    <div v-else>
-      Loading...
-    </div>
-  </div>
-  <!-- <div class="prof-com">
+		<!-- Display a loading message while data is being fetched -->
+		<div v-else>
+			Loading...
+		</div>
+	</div>
+	<!-- <div class="prof-com">
     <div class="prof-div">
       <div class="up">
         <div class="left">
@@ -92,137 +92,163 @@ import axios from 'axios';
 import { ref, onMounted } from 'vue';
 
 export default {
-  setup() {
-    const data = ref(null);
+	setup() {
+		const data = ref(null);
 
-    onMounted(async () => {
-      try {
-        const response = await axios.get('http://localhost:3000/users/3');
-        data.value = response.data;
-		console.log(data.value);
-      } catch (error) {
-        console.error('An error occurred while fetching data:', error);
-      }
-    });
+		onMounted(async () => {
+			if (!localStorage.getItem('id')) {
+				// const response = await axios.get('http://localhost:3000/users/1')
+				axios.get('http://localhost:3000/auth/me', {
+					headers: {
+						Authorization: `Bearer ${localStorage.getItem('token')}`,
+					},
+				}).then((response) => {
+					data.value = response.data;
+					console.log(data.value);
+				}).catch ((error) => {
+				console.error('An error occurred while fetching data:', error);
+			});
+			}
+			// try {
+			// 	const response = await axios.get('http://localhost:3000/users/1');
+			// 	data.value = response.data;
+			// 	console.log(data.value);
+			// } catch (error) {
+			// 	console.error('An error occurred while fetching data:', error);
+			// }
+		});
 
-    return {
-      data
-    };
-  }
+		return {
+			data
+		};
+	}
 };
 </script>
 
 <style scoped>
 .prof-com {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: #24272c;
-  margin: 20px;
-  padding: 20px;
-  border-radius: 5px;
-  width: 100%;
-  height: 100%;
-  color: white;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	background: #24272c;
+	margin: 20px;
+	padding: 20px;
+	border-radius: 5px;
+	width: 100%;
+	height: 100%;
+	color: white;
 }
+
 .prof-div {
-  padding: 0;
-  width: 100%;
-  margin: 0;
-  text-align: center;
+	padding: 0;
+	width: 100%;
+	margin: 0;
+	text-align: center;
 }
+
 .up {
-  display: flex;
-  align-content: center;
-  justify-content: space-between;
+	display: flex;
+	align-content: center;
+	justify-content: space-between;
 }
+
 .left {
-  display: flex;
-  background: #34373d;
-  border-radius: 5px;
-  padding: 10px;
-  width: 45%;
+	display: flex;
+	background: #34373d;
+	border-radius: 5px;
+	padding: 10px;
+	width: 45%;
 }
+
 .usr-avail {
-  width: 1rem;
-  height: 1rem;
-  margin-top: 3rem;
-  margin-left: 0.5rem;
-  border-radius: 50%;
-  border-style: groove;
-  background: green;
+	width: 1rem;
+	height: 1rem;
+	margin-top: 3rem;
+	margin-left: 0.5rem;
+	border-radius: 50%;
+	border-style: groove;
+	background: green;
 }
+
 .usr-not-avail {
-  width: 1rem;
-  height: 1rem;
-  margin-top: 3rem;
-  margin-left: 0.5rem;
-  border-radius: 50%;
-  border-style: groove;
-  background: rgb(231, 8, 8);
+	width: 1rem;
+	height: 1rem;
+	margin-top: 3rem;
+	margin-left: 0.5rem;
+	border-radius: 50%;
+	border-style: groove;
+	background: rgb(231, 8, 8);
 }
+
 .right {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  background: #34373d;
-  width: 45%;
-  border-radius: 5px;
-  padding: 10px;
-  text-align: center;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	background: #34373d;
+	width: 45%;
+	border-radius: 5px;
+	padding: 10px;
+	text-align: center;
 }
+
 .stat {
-  display: flex;
-  align-items: center;
-  background: #5e6367;
-  justify-content: space-between;
-  margin-bottom: 5px;
-  padding-left: 50px;
-  padding-right: 50px;
-  padding-bottom: 10px;
-  padding-top: 5px;
-  border-radius: 5px;
+	display: flex;
+	align-items: center;
+	background: #5e6367;
+	justify-content: space-between;
+	margin-bottom: 5px;
+	padding-left: 50px;
+	padding-right: 50px;
+	padding-bottom: 10px;
+	padding-top: 5px;
+	border-radius: 5px;
 }
+
 .bottom {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  background: #34373d;
-  margin-top: 10px;
-  border-radius: 5px;
-  padding: 10px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: space-between;
+	background: #34373d;
+	margin-top: 10px;
+	border-radius: 5px;
+	padding: 10px;
 }
+
 .history {
-  list-style-type: none;
-  padding: 0;
-  width: 80%;
-  text-align: center;
+	list-style-type: none;
+	padding: 0;
+	width: 80%;
+	text-align: center;
 }
+
 .history li {
-  background: #5e6367;
-  padding: 10px;
-  margin: 5px;
-  border-radius: 5px;
+	background: #5e6367;
+	padding: 10px;
+	margin: 5px;
+	border-radius: 5px;
 }
+
 .prof-img {
-  width: 100px;
-  border-radius: 50%;
+	width: 100px;
+	border-radius: 50%;
 }
+
 .usrname {
-  margin-top: 45px;
-  margin-left: 20px;
+	margin-top: 45px;
+	margin-left: 20px;
 }
 
 @media screen and (max-width: 768px) {
-  .up {
-    flex-direction: column;
-    align-items: center;
-  }
-  .left,
-  .right {
-    width: 80%;
-    margin: 0 auto;
-  }
+	.up {
+		flex-direction: column;
+		align-items: center;
+	}
+
+	.left,
+	.right {
+		width: 80%;
+		margin: 0 auto;
+	}
 }
 </style>
