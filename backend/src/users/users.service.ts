@@ -4,11 +4,12 @@ import { User } from '../entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm'
 import { FriendRequest } from 'entities/friend-request.entity';
 import { FriendRequestService } from 'friend-requests/FriendRequests.service';
-import { throwError } from 'rxjs';
+import { Achievement } from 'entities/achievement.entity';
+import { SeederService } from '../achievements/achievement.seed';
 
 @Injectable()
 export class UsersService {
-	constructor(@InjectRepository(User) private repo: Repository<User>){}
+	constructor(private seederService: SeederService, @InjectRepository(User) private repo: Repository<User>){}
 
 	async create(email: string, userName: string){
 
@@ -74,10 +75,11 @@ export class UsersService {
 		return this.repo.save(user);
 	}
 
-	async getAchievements(userId: number) {
+	async getAchievements(userId: number): Promise<Achievement[]> {
 		const user = await this.repo.findOne({where: {id: userId}, relations: ['achievements']});
 		if (!user)
 			throw new NotFoundException('User not found');
+		console.log('in get achievements, user achievements: ', user.achievements);
 		return user.achievements;
 	}
 
@@ -88,6 +90,10 @@ export class UsersService {
 			throw new NotFoundException('User not found');
 		if (user.achievements.find(a => a.title === achievementTitle))
 			throw new ConflictException('Achievement already added');
-		
+		const achievement = await this.seederService.getAchievementByTitle(achievementTitle);
+		if (!achievement)
+			throw new NotFoundException('Achievement not found');
+		user.achievements.push(achievement);
+		return this.repo.save(user);
 	}
 }

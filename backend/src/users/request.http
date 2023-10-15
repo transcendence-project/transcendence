@@ -1,8 +1,8 @@
 ###Get my user
 GET http://localhost:3000/auth/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im9hYnVzaGFyIiwiaWF0IjoxNjk2ODM5NTYxfQ.0KE5GjriSoWDstut-A3zH7X9aLRxks9hipa4rzfSLyE
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im9hYnVzaGFyIiwiaWF0IjoxNjk3MTE1Mzg5fQ.HLbMYfXoSsuV6LasSMZnX9l9g4aSj9WxDt3o7turDdo
 
-### Get faal-zub user
+### Get  user
 GET http://localhost:3000/auth/me
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImZhYWwtenViIiwiaWF0IjoxNjk2ODM5NjY2fQ.JD1thTJPoImNvB0kWDNOjo1qRZg7KdpWrhob6lD2K90
 
@@ -54,3 +54,11 @@ PATCH http://localhost:3000/friend-requests/8/reject
 
 ### Delete friend
 DELETE http://localhost:3000/users/2/friends/1
+
+### Get oabushar achievements
+GET http://localhost:3000/users/1/achievements
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im9hYnVzaGFyIiwiaWF0IjoxNjk3MTE1Mzg5fQ.HLbMYfXoSsuV6LasSMZnX9l9g4aSj9WxDt3o7turDdo
+
+### Give oabushar achievement
+PATCH http://localhost:3000/users/1/giveAchievement/1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im9hYnVzaGFyIiwiaWF0IjoxNjk3MTE1Mzg5fQ.HLbMYfXoSsuV6LasSMZnX9l9g4aSj9WxDt3o7turDdo
