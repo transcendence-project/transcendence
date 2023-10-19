@@ -65,21 +65,35 @@
   </div>
 </template>
 
+
+
+
+
 <script lang="ts">
-import { defineComponent } from "vue";
+import { ref, onMounted,  defineComponent } from "vue";
 import ChannelOption from "@/components/ChannelOption.vue";
+import io from 'socket.io-client';
+import store from '../store'
 
 interface ChannelList {
-  channel: string;
-  group: string;
-  user: string;
-  friend: boolean;
+	channel: string;
+	group: string;
+	user: string;
+	friend: boolean;
 }
 
 export default defineComponent({
-  components: {
-    ChannelOption,
-  },
+	components: {
+		ChannelOption,
+	},
+	created(){
+		console.log(store.state.chat.test);
+		store.state.chat.socket = io("http://localhost:3000", {
+			auth: {
+				token: localStorage.getItem('token'),
+			},
+	});
+},
   data() {
     return {
       channels: [

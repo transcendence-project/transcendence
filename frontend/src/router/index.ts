@@ -54,7 +54,6 @@ router.beforeEach((to: any, from: any, next: any) => {
   }else {
     document.body.style.backgroundColor = '#5E6367';  // Reset to default or another color
 	console.log(`Navigating from ${from.fullPath} to ${to.fullPath}`);
-	console.log(`to.path ${to.path}`);
   }
   next();
   if (to.path == '/home' && to.query.code)

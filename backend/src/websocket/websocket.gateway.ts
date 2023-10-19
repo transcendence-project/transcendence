@@ -1,21 +1,10 @@
-// import { SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
-// import { Server } from 'socket.io';
-// import { InjectRepository } from '@nestjs/typeorm';
-// // import { ChatService } from '../chat/chat.service';
-// import { Channel } from 'chat/channel.entity';
-// import { Repository } from 'typeorm';
 import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect, } from '@nestjs/websockets';
-import { Server } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import { ChatService } from '../chat/chat.service';
 import { WebsocketService } from './websocket.service';
 
-import { Channel } from '../entities/channel.entity';
-import { Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Injectable } from '@nestjs/common';
-import { User } from '../entities/user.entity';
 
-@WebSocketGateway()
+@WebSocketGateway({cors:{origin:'http://localhost:8080'}})
 export class WebsocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	
 	constructor(private chatService: ChatService, private websocketService: WebsocketService
@@ -23,13 +12,14 @@ export class WebsocketGateway implements OnGatewayConnection, OnGatewayDisconnec
 	@WebSocketServer()
 	server: Server;
 
-	handleConnection(client: any) { // called automatically when frontend establish websocket connection
+	async handleConnection(client: Socket) { // called automatically when frontend establish websocket connection
 		console.log(`Client connected: ${client.id}`);
-		this.websocketService.set_user(client);
+		await this.websocketService.set_user(client);
 		const user = this.websocketService.find_user_with_id(client.id);
-		for (const channel of user.channels) // rejoin
-			client.join(channel.room_name);
-			client.emit('connection_success'); // socket.addEventListener('message', .... )
+		// console.log(user);
+		// for (const channel of user.channels) // rejoin
+		// 	client.join(channel.room_name);
+		// 	client.emit('connection_success'); // socket.addEventListener('message', .... )
 		// In case of error
 		/*  client.on('error', (error) => { // to handle websocket errors
 			client.emit('connection_failure');
@@ -40,6 +30,7 @@ export class WebsocketGateway implements OnGatewayConnection, OnGatewayDisconnec
 		this.websocketService.delete_user(client);
 		this.websocketService.rem_user_invites(client);
 		console.log(`Client disconnected: ${client.id}`);
+		//  remove from connected_users
 		client.emit('disconnection_success');
 	}
 

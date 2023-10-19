@@ -10,6 +10,8 @@ COPY package*.json ./
 # Install dependencies
 RUN npm install
 
+RUN npm install socket.io-client
+
 # Copy all files
 COPY . .
 

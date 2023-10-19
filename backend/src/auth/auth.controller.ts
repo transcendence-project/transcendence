@@ -30,9 +30,9 @@ export class AuthController {
 	async callback(@Req() req, @Res() res) {
 		const user = req.user; // the authenticated user
 		const token = this.authService.generate_jwt_token(user.userName);
-		const decodeToken = this.authService.decode_token(token);
-		console.log('back in controller');
-		console.log("Token: ", token);
+		// const decodeToken = this.authService.decode_token(token);
+		// console.log('back in controller');
+		// console.log("Token: ", token);
 		const url = new URL('http://localhost:8080/home');
 		url.searchParams.set('code', token);
 		res.status(200).redirect(url.href);
