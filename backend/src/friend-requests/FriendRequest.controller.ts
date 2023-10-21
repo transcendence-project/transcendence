@@ -23,8 +23,9 @@ export class FriendRequestController {
 		this.friendRequestService.rejectRequest(requestId);
 	}
 
-	@Get('/:id')
-	async getFriendRequest(@Param("id") requestId: number): Promise<FriendRequest[]> {
-		return await this.friendRequestService.getFriendRequests(requestId);
+	@Get('/my-friend-requests')
+	@UseGuards(JwtAuthGuard)
+	async getFriendRequest(@Req() req): Promise<FriendRequest[]> {
+		return await this.friendRequestService.getFriendRequests(req.user.id);
 	}
 }

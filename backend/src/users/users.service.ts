@@ -85,6 +85,8 @@ export class UsersService {
 
 	async addAchievement(userId: number, achievementTitle: string) {
 	
+		console.log('in add achievement, userId: ', userId);
+		console.log('in add achievement, achievementTitle: ', achievementTitle);
 		const user = await this.repo.findOne({where: {id: userId}, relations: ['achievements']});
 		if (!user)
 			throw new NotFoundException('User not found');
@@ -93,6 +95,9 @@ export class UsersService {
 		const achievement = await this.seederService.getAchievementByTitle(achievementTitle);
 		if (!achievement)
 			throw new NotFoundException('Achievement not found');
+		console.log('in add achievement, achievement: ', achievement);
+		console.log('in add achievement, user.achievements: ', user.achievements);
+		console.log('in add achievement, user: ', user);
 		user.achievements.push(achievement);
 		return this.repo.save(user);
 	}

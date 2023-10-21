@@ -1,10 +1,13 @@
+@Host=http://localhost:3000
+@myToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im9hYnVzaGFyIiwiaWF0IjoxNjk3ODgzOTUwfQ.wrhXtS0BIUXGqkHK-GqIS-O9mal_hbvvJq_ZWH-qE5A
+@akeryanToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFrZXJ5YW4iLCJpYXQiOjE2OTc4ODM2MDR9.UJuF_fTDSeieZJFadUzR7RbkdCbjWryqg2RNq8UCU4E
 ###Get my user
 GET http://localhost:3000/auth/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im9hYnVzaGFyIiwiaWF0IjoxNjk3MTE1Mzg5fQ.HLbMYfXoSsuV6LasSMZnX9l9g4aSj9WxDt3o7turDdo
+Authorization: Bearer {{myToken}}
 
-### Get  user
+### Get akeryan user
 GET http://localhost:3000/auth/me
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImZhYWwtenViIiwiaWF0IjoxNjk2ODM5NjY2fQ.JD1thTJPoImNvB0kWDNOjo1qRZg7KdpWrhob6lD2K90
+Authorization: Bearer {{akeryanToken}}
 
 
 ### sign up
@@ -25,13 +28,13 @@ GET http://localhost:3000/users/
 
 ###find all users
 
-GET http://localhost:3000/users?userName=mawad
+GET http://localhost:3000/users?userName=oabushar
 
 ### print goodbye
 GET http://localhost:3000/hi
 
 ### remove user
-DELETE http://localhost:3000/users/9
+DELETE http://localhost:3000/users/3
 
 ### generate qr code
 GET  http://localhost:3000/auth/2fa/generate
@@ -40,14 +43,15 @@ GET  http://localhost:3000/auth/2fa/generate
 GET  http://localhost:3000/auth/2fa/authenticate
 
 ### send friend request to user with id: 
-POST http://localhost:3000/friend-requests/2
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im9hYnVzaGFyIiwiaWF0IjoxNjk2ODM5NTYxfQ.0KE5GjriSoWDstut-A3zH7X9aLRxks9hipa4rzfSLyE
+POST http://localhost:3000/friend-requests/4
+Authorization: Bearer {{myToken}}
 
 ### check friend requests
-GET http://localhost:3000/friend-requests/2
+GET http://localhost:3000/friend-requests/my-friend-requests
+Authorization: Bearer {{akeryanToken}}
 
 ### accept friend request
-PATCH http://localhost:3000/friend-requests/9/accept
+PATCH http://localhost:3000/friend-requests/10/accept
 
 ### reject friend request
 PATCH http://localhost:3000/friend-requests/8/reject
@@ -57,8 +61,8 @@ DELETE http://localhost:3000/users/2/friends/1
 
 ### Get oabushar achievements
 GET http://localhost:3000/users/1/achievements
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im9hYnVzaGFyIiwiaWF0IjoxNjk3MTE1Mzg5fQ.HLbMYfXoSsuV6LasSMZnX9l9g4aSj9WxDt3o7turDdo
+Authorization: Bearer {{myToken}}
 
 ### Give oabushar achievement
-PATCH http://localhost:3000/users/1/giveAchievement/1
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im9hYnVzaGFyIiwiaWF0IjoxNjk3MTE1Mzg5fQ.HLbMYfXoSsuV6LasSMZnX9l9g4aSj9WxDt3o7turDdo
+PATCH http://localhost:3000/users/3/giveAchievement/First%20Win
+Authorization: Bearer {{myToken}}

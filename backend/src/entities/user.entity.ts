@@ -49,9 +49,20 @@ export class User {
 	@OneToMany(() => User, user => user.matches)
 	matches: Match[]
 
-	@ManyToMany(() => User, user => user.achievements)
-	@JoinTable()
-	achievements: Achievement[]
+	@ManyToMany(() => Achievement, achievement => achievement.users)
+	@JoinTable({
+		name: 'user_achievements_user',
+		joinColumn: {
+			name: 'user_id',
+			referencedColumnName: 'id'
+		},
+		inverseJoinColumn: {
+			name: 'achievement_id',
+			referencedColumnName: 'id'
+		}
+	})
+	achievements: Achievement[];
+	
 
 	@ManyToMany(() => Channel, channel => channel.members)
 	@JoinTable({ name: "my_channels"})

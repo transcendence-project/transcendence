@@ -2,7 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToMany} from 'typeorm';
 import { User } from './user.entity';
 
 @Entity()
-export class Achievement {
+export class  Achievement {
     @PrimaryGeneratedColumn()
     id: number;
 

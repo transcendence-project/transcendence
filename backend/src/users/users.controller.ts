@@ -44,7 +44,7 @@ export class UsersController {
 
 	@Patch(':id/giveAchievement/:achievementTitle')
 	@UseGuards(JwtAuthGuard)
-	giveAchievement(@Req() req, @Param('id') id: string, @Param('achievementId') achievementTitle: string){
+	giveAchievement(@Req() req, @Param('id') id: string, @Param('achievementTitle') achievementTitle: string){
 		console.log('in give achievement, req.user.id: ', req.user.id);
 		return (this.userService.addAchievement(req.user.id, achievementTitle))
 	}
