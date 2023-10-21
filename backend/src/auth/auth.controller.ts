@@ -6,10 +6,11 @@ import { User } from '../entities/user.entity';
 import { FortyTwoStrategy } from './strategy.42';
 import { FortyTwoAuthGuard } from './guard.42';
 import { JwtAuthGuard } from './jwt.guard';
+import { JwtService } from '@nestjs/jwt';
 
 @Controller('auth')
 export class AuthController {
-	constructor(private authService: AuthService) {
+	constructor(private authService: AuthService, private jwtService: JwtService) {
 	}
 	@Get('42')
 	@UseGuards(AuthGuard('42'))
@@ -31,22 +32,14 @@ export class AuthController {
 		// the AuthGuard stores info about the authenticated
 		// user in the req object, specifically the user property
 		const user = req.user; // the authenticated user
-		const token = this.authService.generate_jwt_token(user.userName);
-		const decodeToken = this.authService.decode_token(token);
-		// const user1 = await this.authService.user_by_token(token);
-		console.log('back in controller');
-		console.log("Token: ", token);
-		// console.log("Decoded Token", decodeToken);
-		// console.log('user from token', user1);
+		const token = this.jwtService.sign({ username: user.userName });
+		// const decodeToken = this.jwtService.verify(token);
+		// console.log('back in controller');
+		console.log("Token", token)
+		// console.log("User: ", user.userName)
 		// console.log(user.email);
 		res.redirect('http://localhost:3000'); // can redirect to our application page
 		return (token); // will store it local storage front end
-	}
-
-	@Get('me')
-	@UseGuards(JwtAuthGuard)
-	getProfile(@Req() req) {
-		return req.user;
 	}
 
 	@Get('2fa/generate') // GET just for testing, will later be POST
@@ -72,7 +65,8 @@ export class AuthController {
 			id: 4,
 			username: 'arafeeq',
 			email: 'arafeeq@student.42abudhabi.ae',
-			twoFactorAuthenticationSecret: 'EIRE46D7NJOEQ53O'
+			twoFactorAuthenticationSecret: 'EIRE46D7NJOEQ53O',
+			is2fa: false
 		}
 		const isCodeValid = this.authService.is2faCodeValid(
 			"129140",// will later be body.twoFactorAuthenticationCode

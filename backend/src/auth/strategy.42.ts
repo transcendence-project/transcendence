@@ -11,9 +11,8 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy, '42') {
     super({
       clientID: configService.getOrThrow<string>('CLIENT_ID'),
       clientSecret: configService.getOrThrow<string>('CLIENT_SECRET'),
-      callbackURL: configService.getOrThrow<string>('CALL_BACK_URL'),
+      callbackURL: configService.getOrThrow<string>('CALLBACK_URL'),
     });
-	
   }
 
   async validate(
