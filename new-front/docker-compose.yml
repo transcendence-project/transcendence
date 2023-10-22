@@ -1,0 +1,54 @@
+version: "3"
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: ./Dockerfile
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: postgres://user:password@postgres:5432/db
+      NODE_ENV: development
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./backend:/app
+    networks:
+      - backend
+    # working_dir: /app/backend
+    # restart: unless-stopped
+
+  postgres:
+    image: postgres:10.4
+    ports:
+      - "35000:5432"
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: db
+    # restart: unless-stopped
+    volumes:
+      - data:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: ./Dockerfile
+    depends_on:
+      - backend
+    ports:
+      - "8080:8080"
+    networks:
+      - backend
+    volumes:
+       - ./frontend:/app
+    # working_dir: /app/frontend
+    # restart: unless-stopped
+volumes:
+  data:
+
+networks:
+  backend:
