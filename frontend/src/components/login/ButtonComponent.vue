@@ -13,7 +13,7 @@ import router from '../../router/index';
 export default {
 	methods: {
 		async login42() {
-			console.log("Button Clickedd");
+			// console.log("Button Clickedd");
 			window.location.href = 'http://localhost:3000/auth/42/callback';
 		}
 	}

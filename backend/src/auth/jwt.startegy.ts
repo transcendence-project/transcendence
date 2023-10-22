@@ -20,9 +20,9 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 	// console.log(`jwt strtategy payload.username = ${payload.username}`);
 	  const user = await this.userService.findOneByUserName(payload.username);
 	  
-	  if (!user) {
-		  throw new UnauthorizedException('Invalid token');
-		}
+	//   if (!user) {
+	// 	  throw new UnauthorizedException('Invalid token');
+	// 	}
     return user;
   }
 }

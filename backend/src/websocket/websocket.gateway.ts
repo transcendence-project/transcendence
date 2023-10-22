@@ -65,12 +65,10 @@ export class WebsocketGateway implements OnGatewayConnection, OnGatewayDisconnec
 
 	@SubscribeMessage('create_room')
 	async create_room(client: any, room_name: string): Promise<void> {
-		console.log("reached create room - websockets");
+		console.log("reached create room - backend websockets");
 		const user = this.websocketService.find_user_with_id(client.id);
 		await this.chatService.create_chan(room_name, user);
-		// set user as owner and admin
 		client.join(room_name);
-		const success_data = {message: `chan ${room_name} created successfully`}
 		client.emit('create_room_success');
 	}
 

@@ -11,8 +11,7 @@ export class UsersService {
 
 		// const user = await this.findAll(userName);
 		const user = await this.findOneByUserName(userName);
-		// if (user)
-		// 	return (user)
+		console.log(user);
 		if (user)
 			return (user)
 		const user2 = this.repo.create({email, userName, twoFactorSecret: null, is2FAEnabled: false})

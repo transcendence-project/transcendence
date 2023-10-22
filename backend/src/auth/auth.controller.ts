@@ -14,9 +14,7 @@ export class AuthController {
 	@Get('42')
 	@UseGuards(AuthGuard('42'))
 	async login() {
-		;
 	}
-
 
 	@Get('/me')
 	@UseGuards(JwtAuthGuard)
@@ -67,9 +65,9 @@ export class AuthController {
 			"129140",// will later be body.twoFactorAuthenticationCode
 			user, // will later be req.user
 		);
-		if (!isCodeValid) {
-			throw new UnauthorizedException('Wrong authentication code');
-		}
+		// if (!isCodeValid) {
+		// 	throw new UnauthorizedException('Wrong authentication code');
+		// }
 		// else login to game, display user profile
 		const token = this.authService.generate_jwt_token(user.username); // will later be req.user.username
 		return (token) // will store it local storage front end

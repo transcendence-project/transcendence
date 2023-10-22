@@ -24,13 +24,13 @@ export class Channel {
 	@ManyToMany(type => User)
 	admins: User[];
 
-    @ManyToMany(() => User, user => user.channels)
+    @ManyToMany(() => User, user => user.channels,)
     members: User[];
 
 	@ManyToMany(type => User)
 	invites: User[];
 
-    @Column()
+    @Column({default: false})
     isGroupChannel: boolean;
 
 	@Column({ nullable: true})

@@ -3,7 +3,7 @@
     <div class="channel">
       <h2>Channel</h2>
       <div class="chan-cont">
-        <h4 class="add-cont">Add</h4>
+        <h4 class="add-cont" @click="create_room">Add</h4>
         <div class="chn-srch">
           <input
             v-model="text"
@@ -88,11 +88,24 @@ export default defineComponent({
 	},
 	created(){
 		console.log(store.state.chat.test);
-		store.state.chat.socket = io("http://localhost:3000", {
-			auth: {
-				token: localStorage.getItem('token'),
-			},
-	});
+		if (!store.state.chat.socket)
+		{
+			store.state.chat.socket = io("http://localhost:3000", {
+				auth: {
+					token: localStorage.getItem('token'),
+				},
+			});
+		}
+		store.state.chat.socket.on('create_room_success', () => { // event listener
+			console.log('Room created successfully and back in front end');
+		});
+},
+methods: {
+	create_room(){
+		console.log("in frontend create room func");
+		if (store.state.chat.socket)
+			store.state.chat.socket.emit( 'create_room', 'azrachan');
+	}
 },
   data() {
     return {
