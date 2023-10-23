@@ -6,10 +6,11 @@ import { User } from '../entities/user.entity';
 import { FortyTwoStrategy } from './strategy.42';
 import { FortyTwoAuthGuard } from './guard.42';
 import { JwtAuthGuard } from './jwt.guard';
+import { JwtService } from '@nestjs/jwt';
 
 @Controller('auth')
 export class AuthController {
-	constructor(private authService: AuthService) {
+	constructor(private authService: AuthService, private jwtService: JwtService) {
 	}
 	@Get('42')
 	@UseGuards(AuthGuard('42'))
@@ -59,7 +60,8 @@ export class AuthController {
 			id: 4,
 			username: 'arafeeq',
 			email: 'arafeeq@student.42abudhabi.ae',
-			twoFactorAuthenticationSecret: 'EIRE46D7NJOEQ53O'
+			twoFactorAuthenticationSecret: 'EIRE46D7NJOEQ53O',
+			is2fa: false
 		}
 		const isCodeValid = this.authService.is2faCodeValid(
 			"129140",// will later be body.twoFactorAuthenticationCode

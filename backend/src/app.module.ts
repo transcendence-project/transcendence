@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { PassportModule } from '@nestjs/passport';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
@@ -9,6 +8,9 @@ import { typeOrmConfig } from './ormconfig';
 import { AuthModule } from './auth/auth.module';
 import { ChatModule } from './chat/chat.module';
 import { GameModule } from './game/game.module';
+
+import { FriendRequestController } from 'friend-requests/FriendRequest.controller';
+import { FriendRequestService } from 'friend-requests/FriendRequests.service';
 import { WebsocketGateway } from './websocket/websocket.gateway';
 import { WebsocketModule } from './websocket/websocket.module';
 import { ChatService } from './chat/chat.service';

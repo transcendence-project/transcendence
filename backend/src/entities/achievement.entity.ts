@@ -1,15 +1,15 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToMany} from 'typeorm';
 import { User } from './user.entity';
 
 @Entity()
-export class Achievement {
+export class  Achievement {
     @PrimaryGeneratedColumn()
     id: number;
 
     @Column()
     title: string;
 
-	@ManyToOne(() => User, user => user.achievements)
-	users: User;
+	@ManyToMany(() => User, user => user.achievements)
+	users: User[];
     // maybe add more properties here
 }

@@ -2,6 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToMany, JoinTabl
 // import { Exclude } from "class-transformer";
 import { Match } from "./match.entity";
 import { Achievement } from "./achievement.entity";
+import { FriendRequest } from "./friend-request.entity";
 // import { Friend } from "./friend.entity";
 import { Channel } from "./channel.entity";
 
@@ -18,7 +19,7 @@ export class User {
 	@Column()
 	email: string
 	
-	@Column()
+	@Column({ nullable: true })
 	is2FAEnabled: boolean
 
 	@Column({ nullable: true })
@@ -39,11 +40,29 @@ export class User {
 	})
 	friends: User[]
 
+	@OneToMany(() => User, user => user.friendRequestsSent)
+	friendRequestsSent: FriendRequest[]
+
+	@OneToMany(() => User, user => user.friendRequestsReceived)
+	friendRequestsReceived: FriendRequest[]
+
 	@OneToMany(() => User, user => user.matches)
 	matches: Match[]
 
-	@OneToMany(() => User, user => user.achievements)
-	achievements: Achievement[]
+	@ManyToMany(() => Achievement, achievement => achievement.users)
+	@JoinTable({
+		name: 'user_achievements_user',
+		joinColumn: {
+			name: 'user_id',
+			referencedColumnName: 'id'
+		},
+		inverseJoinColumn: {
+			name: 'achievement_id',
+			referencedColumnName: 'id'
+		}
+	})
+	achievements: Achievement[];
+	
 
 	@ManyToMany(() => Channel, channel => channel.members)
 	@JoinTable({ name: "my_channels"})

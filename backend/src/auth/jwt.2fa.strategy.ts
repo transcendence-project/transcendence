@@ -12,14 +12,14 @@ export class Jwt2faStrategy extends PassportStrategy(Strategy, 'jwt-2fa') {
     });
   }
 
-  async validate(payload: any) {
-    const user = await this.userService.findOne(payload.email);
+//   async validate(payload: any) {
+//     const user = await this.userService.findOne(payload.email);
 
-    if (!user.is2FAEnabled) {
-      return user;
-    }
-    if (payload.isTwoFactorAuthenticated) {
-      return user;
-    }
-  }
+//     if (!user.is2FAEnabled) {
+//       return user;
+//     }
+//     if (payload.isTwoFactorAuthenticated) {
+//       return user;
+//     }
+//   }
 }
