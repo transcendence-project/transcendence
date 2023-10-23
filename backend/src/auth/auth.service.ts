@@ -11,7 +11,7 @@ export class AuthService{
 	constructor(private userService: UsersService, private jwtService: JwtService) {}
 	async validate(user: createUserDTO): Promise<User> {
 		const user1 = await this.userService.create(user.email, user.username);
-		// console.log(user1.userName);
+		console.log(user1.userName);
 		return user1;
 	}
 

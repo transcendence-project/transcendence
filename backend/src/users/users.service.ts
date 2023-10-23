@@ -11,11 +11,9 @@ export class UsersService {
 
 		// const user = await this.findAll(userName);
 		const user = await this.findOneByUserName(userName);
-		console.log(user);
 		if (user)
 			return (user)
-		const user2 = this.repo.create({email, userName, twoFactorSecret: null, is2FAEnabled: false})
-		
+		const user2 = this.repo.create({email, userName, twoFactorSecret: null, is2FAEnabled: false, friends: [], channels: [], matches: [], achievements: []});
 		return (this.repo.save(user2))
 	}
 	findOne(id: number) {

@@ -17,9 +17,10 @@ export class WebsocketGateway implements OnGatewayConnection, OnGatewayDisconnec
 		await this.websocketService.set_user(client);
 		const user = this.websocketService.find_user_with_id(client.id);
 		// console.log(user);
-		// for (const channel of user.channels) // rejoin
-		// 	client.join(channel.room_name);
-		// 	client.emit('connection_success'); // socket.addEventListener('message', .... )
+		// if (user.channels)
+		// 	for (const channel of user.channels) // rejoin
+		// 		client.join(channel.room_name);
+		// 	client.emit('connection_success');
 		// In case of error
 		/*  client.on('error', (error) => { // to handle websocket errors
 			client.emit('connection_failure');
@@ -34,7 +35,7 @@ export class WebsocketGateway implements OnGatewayConnection, OnGatewayDisconnec
 		client.emit('disconnection_success');
 	}
 
-	@SubscribeMessage('send_message_to_chan')
+	@SubscribeMessage('send_msg_to_chan')
 	send_message_chan(client: any, payload: any): void {
 		const user = this.websocketService.find_user_with_id(client.id);
 		const { room_name, message } = payload;
@@ -44,7 +45,7 @@ export class WebsocketGateway implements OnGatewayConnection, OnGatewayDisconnec
 		client.emit('chan_msg_success');
 	}
 
-	@SubscribeMessage('private_messgae')
+	@SubscribeMessage('private_message')
 	send_message_dm(client: any, payload: any): void {
 		const { username, message } = payload;
 		const user = this.websocketService.find_user_with_id(client.id);
