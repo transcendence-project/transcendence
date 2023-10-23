@@ -3,7 +3,7 @@
     <div class="channel">
       <h2>Channel</h2>
       <div class="chan-cont">
-        <h4 class="add-cont">Add</h4>
+        <h4 class="add-cont" @click="create_room">Add</h4>
         <div class="chn-srch">
           <input
             v-model="text"
@@ -65,21 +65,69 @@
   </div>
 </template>
 
+
+
+
+
 <script lang="ts">
-import { defineComponent } from "vue";
+import { ref, onMounted,  defineComponent } from "vue";
 import ChannelOption from "@/components/ChannelOption.vue";
+import io from 'socket.io-client';
+import store from '../store'
 
 interface ChannelList {
-  channel: string;
-  group: string;
-  user: string;
-  friend: boolean;
+	channel: string;
+	group: string;
+	user: string;
+	friend: boolean;
 }
 
 export default defineComponent({
-  components: {
-    ChannelOption,
-  },
+	components: {
+		ChannelOption,
+	},
+	created(){
+		console.log(store.state.chat.test);
+		if (!store.state.chat.socket)
+		{
+			store.state.chat.socket = io("http://localhost:3000", {
+				auth: {
+					token: localStorage.getItem('token'),
+				},
+			});
+		}
+		store.state.chat.socket.on('create_room_success', () => { // event listener
+			console.log('Room created successfully and back in front end');
+		});
+		store.state.chat.socket.on('join_room_success', () => {
+			console.log('Joined the channel successfully and back in front end');
+		});
+		store.state.chat.socket.on('chan_msg_success', () => {
+			console.log('Send message to channel successfully and back in front end');
+		});
+		store.state.chat.socket.on('priv_msg_success', () => {
+			console.log('Send message to channel successfully and back in front end');
+		});
+		
+},
+methods: {
+	create_room(){
+		if (store.state.chat.socket)
+			store.state.chat.socket.emit( 'create_room', 'azrachan');
+	},
+	join_chan(){
+		if (store.state.chat.socket)
+			store.state.chat.socket.emit('join_room', {room_name:'azrachan', arg: ""});
+	},
+	send_chan_msg(){
+		if (store.state.chat.socket)
+			store.state.chat.socket.emit('send_msg_to_chan', {room_name:'azrachan', message:'hello world'});
+	},
+	send_priv_msg(){
+		if (store.state.chat.socket)
+			store.state.chat.socket.emit('private_message')
+	}
+},
   data() {
     return {
       channels: [

@@ -20,7 +20,7 @@ import { ChatService } from './chat/chat.service';
 		TypeOrmModule.forRoot(typeOrmConfig),
 		AuthModule, ConfigModule.forRoot(), ChatModule, GameModule, WebsocketModule],
 	controllers: [AppController],
-	providers: [AppService, WebsocketGateway],
+	providers: [AppService],
 })
 export class AppModule { }
 

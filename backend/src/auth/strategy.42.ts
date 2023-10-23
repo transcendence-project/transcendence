@@ -25,10 +25,10 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy, '42') {
 	email: profile._json.email,
 	username: profile.username,
 	});
-	console.log(user)
-	if (!user) {
-	  return done(new UnauthorizedException(), false);
-	}
+	// console.log(user)
+	// if (!user) {
+	//   return done(new UnauthorizedException(), false);
+	// }
 	done(null, user);
   }
 }
