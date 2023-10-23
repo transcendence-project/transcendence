@@ -23,8 +23,9 @@ export class UsersService {
 	findOne(id: number) {
 		return (this.repo.findOneBy({id}))
 	}
-	findOneByUserName(userName: string) {
-		return (this.repo.findOneBy({userName}))
+	async findOneByUserName(userName: string) {
+		const user = await this.repo.findOneBy({userName});
+		return (user);
 	}
 
 	findOneByEmail(email: string) {

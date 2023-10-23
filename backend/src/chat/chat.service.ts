@@ -49,7 +49,7 @@ export class ChatService {
 			console.log(`Channel ${chan_name} already exists`);
 		}
 		else {
-			const chan2 = this.channelRepo.create({ room_name: chan_name, owner: user, password: "", members: [], description: "" });
+			const chan2 = this.channelRepo.create({ room_name: chan_name, owner: user, password: "", members: [], admins: [], description: "" });
 			chan2.members.push(user);
 			chan2.admins.push(user);
 			this.channelRepo.save(chan2);
