@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 dist
 node_modules
 .git
 .vscode
+=======
+node_modules
+>>>>>>> 5b40791f438c177ae17bc91335c875a0dac977ff

@@ -8,7 +8,7 @@
 	</div>
   </template>
   
-  <script lang="ts">
+<script lang="ts">
   import { defineComponent } from "vue";
   import TopNavBar from "@/components/TopNavBar.vue";
   import SideNavBar from "@/components/SideNavBar.vue";
@@ -20,9 +20,9 @@
 	  SideNavBar,
 	},
   });
-  </script>
+</script>
   
-  <style scoped>
+<style scoped>
   body {
 	font-family: "Arial", sans-serif;
 	margin: 0;
@@ -35,5 +35,5 @@
 	flex: 1;
 	padding: 20px;
   }
-  </style>
+</style>
   
