@@ -23,9 +23,9 @@
 	name: 'DropdownoptComponent',
   })
   export default class DropdownoptComponent extends Vue {
-	private showDropdownopt: boolean = false;
+	public showDropdownopt: boolean = false;
   
-	private toggleDropdownopt(): void {
+	public toggleDropdownopt(): void {
 	  this.showDropdownopt = !this.showDropdownopt;
   
 	  if (this.showDropdownopt) {
@@ -35,14 +35,14 @@
 	  }
 	}
   
-	private closeDropdownoptOnClickOutside(event: MouseEvent): void {
+	public closeDropdownoptOnClickOutside(event: MouseEvent): void {
 	  if (this.$refs.dropdownopt instanceof HTMLElement &&
 		  !this.$refs.dropdownopt.contains(event.target as Node)) {
 		this.showDropdownopt = false;
 		document.removeEventListener('click', this.closeDropdownoptOnClickOutside);
 	  }
 	}
-	private closeDropdownopt(): void {
+	public closeDropdownopt(): void {
 	  this.showDropdownopt = false;
 	  document.removeEventListener('click', this.closeDropdownoptOnClickOutside);
 	}
@@ -50,10 +50,10 @@
   </script>
   
   <style scoped>
-  .dropsbtnch {
-	cursor: pointer;
-	width: 40px;
-  }
+	.dropsbtnch {
+		cursor: pointer;
+		width: 40px;
+	}
   
   .dropdownopt-content {
 	display: none;
