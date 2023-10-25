@@ -4,6 +4,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
     redirect: "/login",
+    // component: () => import("../views/HomePage.vue"),
   },
   {
     path: "/home",
@@ -36,9 +37,9 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import("../views/LeaderPage.vue"),
   },
   {
-    path: "/login",
-    name: "login",
-    component: () => import("../views/LoginPage.vue"),
+    path: "/student",
+    name: "student",
+    component: () => import("../views/StudentPage.vue"),
   },
 ];
 
@@ -48,21 +49,5 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach((to: any, from: any, next: any) => {
-  if (to.path === '/login') {
-    document.body.style.backgroundColor = '#3A1078';
-  }else {
-    document.body.style.backgroundColor = '#5E6367';  // Reset to default or another color
-	console.log(`Navigating from ${from.fullPath} to ${to.fullPath}`);
-  }
-  next();
-  if (to.path == '/home' && to.query.code)
-  {
-		const token = to.query.code;
-		// console.log(`token = ${to.query.code}`);
-		localStorage.setItem('token', token);
-		// console.log(`token from local storage = ${localStorage.getItem('token')}`);
-  }
-});
 
 export default router;

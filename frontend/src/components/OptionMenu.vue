@@ -24,9 +24,9 @@
 	name: 'DropdownsComponent',
   })
   export default class DropdownsComponent extends Vue {
-	private showDropdowns: boolean = false;
+	public showDropdowns: boolean = false;
   
-	private toggleDropdowns(): void {
+	public toggleDropdowns(): void {
 	  this.showDropdowns = !this.showDropdowns;
   
 	  if (this.showDropdowns) {
@@ -36,7 +36,7 @@
 	  }
 	}
   
-	private closeDropdownsOnClickOutside(event: MouseEvent): void {
+	public closeDropdownsOnClickOutside(event: MouseEvent): void {
 	  if (this.$refs.dropdowns instanceof HTMLElement &&
 		  !this.$refs.dropdowns.contains(event.target as Node)) {
 		this.showDropdowns = false;

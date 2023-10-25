@@ -1,56 +1,56 @@
 <template>
-  <div class="friend">
-    <h2 class="fnd-head">{{ filteredSearch.length }} friends</h2>
-    <div class="frd-srch">
-      <input v-model="text" placeholder="Search friend" class="search-frd" />
+  <div class="bg-gradient-to-r from-[#451952] via-[#451952] to-[#ae4188] shadow-custom m-5 p-5 rounded-md w-full text-white min-h-[85.4vh] md:min-h-[85.10vh] lg:min-h-[85.9vh]">
+    <h2>{{ filteredSearch.length }} friends</h2>
+    <div class="flex justify-center pl-0  pt-2.5 pb-2.5 rounded-md m-0 mb-[5px] bg-[#AE445A]">
+      <input v-model="text" placeholder="Search friend" class="w-[60%] h-[2rem] rounded-full text-center focus:border-0 focus:outline-none text-black" />
     </div>
-    <ul class="ul-cont">
+    <ul class="m-0 mt-4 p-0 rounded-md">
       <div v-for="(result, index) in filteredSearch" :key="index">
-        <li class="li-cont">
-          <div class="frd-list">
-            <h4 class="h-cont">
+        <li class="list-none p-0 m-0 mb-2">
+          <div class="flex items-center justify-between bg-[#AE445A] m-0 pt-3 md:pt-0 pb-3 md:pb-0 pr-6 pl-2 flex-col md:flex-row">
+            <h4 class="pl-[30px] m-2.5 rounded-md flex flex-row">
               <img
-                class="srch-img"
+                class="w-7 rounded-full p-0 m-0 mr-2"
                 :src="require(`@/assets/${result.imgname}`)"
               />
               {{ result.user }}
-              <div class="status">
+              <div class="flex items-center justify-between">
                 <div v-if="result.friend">
-                  <div class="frd-usr-avail"></div>
+                  <StatusUser :isFriend="result.friend"/>
                 </div>
                 <div v-if="!result.friend">
-                  <div class="frd-usr-not-avail"></div>
+                  <StatusUser :isFriend="result.friend"/>
                 </div>
               </div>
             </h4>
-            <div>
-              <button class="addbtn">Add</button>
-              <button class="blkbtn">Block</button>
+            <div class="flex justify-between">
+              <ButtonComponent btnContent="Add"/>
+              <ButtonComponent btnContent="Block"/>
             </div>
           </div>
         </li>
       </div>
     </ul>
-    <ul class="frnd-cont">
+    <ul class="mt-5 p-0 rounded-md">
       <div v-for="(result, index) in filteredSearch" :key="index">
-        <li class="li-cont">
-          <div class="frd-list">
-            <div class="status">
-              <h4 class="h-cont">
+        <li class="list-none p-0 m-0 mb-2">
+          <div class="flex items-center justify-between bg-[#AE445A] m-0 pt-3 md:pt-0 pb-3 md:pb-0 pr-2 pl-2">
+            <div class="flex items-center justify-between">
+              <h4 class="pl-[30px] m-2.5 rounded-md flex flex-row">
                 <img
-                  class="srch-img"
+                  class="w-7 rounded-full p-0 m-0 mr-2.5"
                   :src="require(`@/assets/${result.imgname}`)"
                 />
                 {{ result.user }}
               </h4>
               <div v-if="result.friend">
-                <div class="frd-usr-avail"></div>
-              </div>
-              <div v-if="!result.friend">
-                <div class="frd-usr-not-avail"></div>
-              </div>
+                  <StatusUser :isFriend="result.friend"/>
+                </div>
+                <div v-if="!result.friend">
+                  <StatusUser :isFriend="result.friend"/>
+                </div>
             </div>
-            <OptionMenu />
+            <OptionMenu class="relative pr-5"/>
           </div>
         </li>
       </div>
@@ -61,6 +61,8 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import OptionMenu from "@/components/OptionMenu.vue";
+import StatusUser from "@/components/StatusUser.vue";
+import ButtonComponent from "@/components/ButtonComponent.vue";
 
 interface SearchItem {
   user: string;
@@ -72,6 +74,8 @@ export default defineComponent({
   name: "TopNavBar",
   components: {
     OptionMenu,
+    StatusUser,
+    ButtonComponent,
   },
   data() {
     return {
@@ -110,239 +114,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style scoped>
-.friend {
-  background: #24272c;
-  margin: 20px;
-  padding: 20px;
-  border-radius: 5px;
-  width: 100%;
-  color: white;
-}
-
-.search-frd {
-  width: 60%;
-  height: 2rem;
-  border: none;
-  border-radius: 20px;
-  padding-left: 15px;
-}
-.search-frd:focus {
-  border: none;
-  outline: none;
-}
-.frd-srch {
-  display: flex;
-  padding-left: 50px;
-  padding-top: 10px;
-  padding-bottom: 10px;
-  border-radius: 10px;
-  margin: 0;
-  margin-bottom: 5px;
-  background: #34373d;
-}
-
-.frd-list {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: #34373d;
-  margin: 0;
-  padding-top: 0;
-  padding-bottom: 0;
-  padding-right: 10px;
-  padding-left: 10px;
-}
-.ul-cont {
-  margin: 0;
-  padding: 0;
-  border-radius: 10px;
-}
-.frnd-cont {
-  margin-top: 20px;
-  padding: 0;
-  border-radius: 10px;
-}
-
-.li-cont {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-}
-.h-cont {
-  padding-left: 30px;
-  margin: 10px;
-  border-radius: 10px;
-}
-.srch-img {
-  width: 30px;
-  border-radius: 50%;
-  padding: 0;
-  margin: 0;
-  margin-right: 10px;
-}
-
-.addbtn,
-.blkbtn {
-  font-size: 0.8rem;
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-  border-radius: 5px;
-  margin-left: 10px;
-  cursor: pointer;
-  color: white;
-  background: #697692;
-  border: none;
-}
-.addbtn:hover,
-.blkbtn:hover {
-  background: #7c8392;
-  color: #d9d9da;
-}
-/* .usr-avail {
-  width: 1rem;
-  height: 1rem;
-  margin-top: 3rem;
-  margin-left: 0.5rem;
-  border-radius: 50%;
-  border-style: groove;
-  background: green;
-}
-.usr-not-avail {
-  width: 1rem;
-  height: 1rem;
-  margin-top: 3rem;
-  margin-left: 0.5rem;
-  border-radius: 50%;
-  border-style: groove;
-  background: rgb(231, 8, 8);
-} */
-.opt-menu {
-  padding-right: 20px;
-}
-.opt-menu img {
-  width: 35px;
-}
-.main-container {
-  display: flex;
-}
-.top-navbar {
-  display: flex;
-  align-items: center;
-  background-color: #333;
-  color: white;
-  padding: 10px;
-}
-
-.nav-item {
-  margin: 0 10px;
-  cursor: pointer;
-}
-
-.nav-item:hover {
-  text-decoration: underline;
-}
-.dropdowns {
-  position: relative;
-}
-
-.dropdowns a {
-  cursor: pointer;
-}
-
-.dropdowns-menu {
-  display: none;
-  position: absolute;
-  top: 100%;
-  left: 0;
-  list-style: none;
-  background-color: #fff;
-  border: 1px solid #ccc;
-  padding: 0;
-  margin: 0;
-}
-
-.dropdowns.active .dropdowns-menu {
-  display: block;
-}
-
-.dropdowns-menu li {
-  padding: 8px 16px;
-  border-top: 1px solid #ccc;
-}
-
-.dropdowns-menu li a {
-  text-decoration: none;
-  color: #333;
-  display: block;
-}
-
-.dropdowns-menu li a:hover {
-  background-color: #f2f2f2;
-}
-.status {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.h-cont {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.frd-usr-avail {
-  display: flex;
-  width: 0.6rem;
-  height: 0.6rem;
-  /* margin-top: 1rem; */
-  margin-left: 0.3rem;
-  border-radius: 50%;
-  border-style: groove;
-  background: green;
-}
-.frd-usr-not-avail {
-  display: flex;
-  width: 0.6rem;
-  height: 0.6rem;
-  /* margin-top: 1rem; */
-  margin-left: 0.3rem;
-  border-radius: 50%;
-  border-style: groove;
-  background: rgb(231, 8, 8);
-}
-
-@media screen and (max-width: 768px) {
-  .frd-srch {
-    padding-left: 20px;
-  }
-  .h-cont {
-    padding-left: 10px;
-  }
-  .srch-img {
-    width: 20px;
-  }
-  .frd-list{
-	flex-direction: column;
-	align-items: flex-start;
-  }
-
-  .addbtn,
-  .blkbtn {
-    font-size: 0.7rem;
-    padding-left: 1rem;
-    padding-right: 1rem;
-	margin-left: .2rem;
-	margin-top: 10px;
-  }
-  .frd-usr-avail,
-  .frd-usr-not-avail {
-    width: 0.5rem;
-    height: 0.5rem;
-    /* margin-top: 1rem; */
-    margin-left: 0.2rem;
-  }
-}
-</style>

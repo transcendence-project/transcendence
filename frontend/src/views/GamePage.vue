@@ -244,27 +244,16 @@
   </script>
   
   <style>
-  /* * {
-	padding: 0;
-	margin: 0;
-  } */
-  
 
-  /* body {
-	/* height: 100vh; */
-	/* background: red !important; */
-	/* font-family: sans-serif; */
-  /* } */
-   
   .game-container {
-	/* border: 3px solid #59CE8F; */
-	/* border-radius: 50PX; */
+
 	width: fit-content;
-	/* margin: 6rem auto; */
+
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	background: #24272C;
+	background: linear-gradient(to right, #451952, #451952, #ae4188);
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.5); 
 	margin: 20px;
 	padding: 20px;
 	border-radius: 5px;
