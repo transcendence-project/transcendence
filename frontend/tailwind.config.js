@@ -27,7 +27,12 @@ module.exports = {
         'groove': 'groove',
       },
       boxShadow:{
-        'custom': '0 4px 4px rgba(0, 0, 0, 0.5)'
+        'custom': '0 4px 4px rgba(0, 0, 0, 0.5)',
+        'seconed': '4px 2px 0 rgba(0, 0, 0, 0.5);',
+        'third' : '0 2px 4px rgba(0, 0, 0, 0.5)',
+      },
+      textShadow: {
+        'default' : '6px 3px 2px rgba(0, 0 , 0,.2)',
       },
     },
   },

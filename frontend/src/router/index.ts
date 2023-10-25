@@ -3,6 +3,11 @@ import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
+    redirect: "/login",
+    // component: () => import("../views/HomePage.vue"),
+  },
+  {
+    path: "/home",
     name: "home",
     component: () => import("../views/HomePage.vue"),
   },
@@ -35,12 +40,14 @@ const routes: Array<RouteRecordRaw> = [
     path: "/student",
     name: "student",
     component: () => import("../views/StudentPage.vue"),
-  }
+  },
 ];
 
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
+//   history: createWebHistory(process.env.BASE_URL),
+  history: createWebHistory('/'),
   routes,
 });
+
 
 export default router;
