@@ -42,13 +42,18 @@ export class ChatService {
 	}
 
 	async create_chan(chan_name: string, user: User) {
-		const chan = this.chan_by_name(chan_name);
-		if (chan)
-			console.log("Channel already exists\n");// error: channel already exist
+		const chan = await this.chan_by_name(chan_name);
+		if (chan){
+			const all_chan = await this.get_all_chan();
+			console.log(all_chan);
+			console.log(`Channel ${chan_name} already exists`);
+		}
 		else {
-			const chan2 = this.channelRepo.create({ room_name: chan_name, owner: user, password: "" });
+			const chan2 = this.channelRepo.create({ room_name: chan_name, owner: user, password: "", members: [], admins: [], description: "" });
 			chan2.members.push(user);
+			chan2.admins.push(user);
 			this.channelRepo.save(chan2);
+			console.log(`Channel ${chan_name} created successfully`);
 		}
 		// any condition if there is password??
 	}
@@ -60,6 +65,7 @@ export class ChatService {
 			chan.members.push(user);
 			await this.channelRepo.save(chan);
 		}
+		// else channel doesnot exist
 	}
 
 	async rm_chan_mem(user: User, chan_name: string) {

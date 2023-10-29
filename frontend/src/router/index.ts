@@ -2,7 +2,12 @@ import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 
 const routes: Array<RouteRecordRaw> = [
   {
-    path: "/",
+    path: "/login",
+    name: "login", 
+    component: () => import("../views/LoginPage.vue"),
+  },
+  {
+    path: "/home",
     name: "home",
     component: () => import("../views/HomePage.vue"),
   },
@@ -31,11 +36,18 @@ const routes: Array<RouteRecordRaw> = [
     name: "leader",
     component: () => import("../views/LeaderPage.vue"),
   },
+  {
+    path: "/student",
+    name: "student",
+    component: () => import("../views/StudentPage.vue"),
+  },
 ];
 
 const router = createRouter({
   history: createWebHistory(process.env.BASE_URL),
+  // history: createWebHistory('/'),
   routes,
 });
+
 
 export default router;

@@ -15,31 +15,26 @@ export class AuthController {
 	@Get('42')
 	@UseGuards(AuthGuard('42'))
 	async login() {
-		;
 	}
-
 
 	@Get('/me')
 	@UseGuards(JwtAuthGuard)
 	getProfile(@Req() req) {
-		console.log('in get profile, req.user: ', req.user);
+		// console.log('in get profile, req.user: ', req.user);
 		return req.user;
 	}
 
 	@Get('42/callback')
 	@UseGuards(AuthGuard('42'))
 	async callback(@Req() req, @Res() res) {
-		// the AuthGuard stores info about the authenticated
-		// user in the req object, specifically the user property
 		const user = req.user; // the authenticated user
-		const token = this.jwtService.sign({ username: user.userName });
-		// const decodeToken = this.jwtService.verify(token);
+		const token = this.authService.generate_jwt_token(user.userName);
+		// const decodeToken = this.authService.decode_token(token);
 		// console.log('back in controller');
-		console.log("Token", token)
-		// console.log("User: ", user.userName)
-		// console.log(user.email);
-		res.redirect('http://localhost:3000'); // can redirect to our application page
-		return (token); // will store it local storage front end
+		// console.log("Token: ", token);
+		const url = new URL('http://localhost:8080/home');
+		url.searchParams.set('code', token);
+		res.status(200).redirect(url.href);
 	}
 
 	@Get('2fa/generate') // GET just for testing, will later be POST
@@ -59,7 +54,7 @@ export class AuthController {
 
 	@Post('2fa/authenticate')
 	@HttpCode(200)
-	// @UseGuards(JwtAuthGuard) // will get the user which is linked to the sent Bearer token
+	@UseGuards(JwtAuthGuard)
 	async authenticate2fa(@Req() req, @Body() body) {
 		const user = { // for testing purposes
 			id: 4,
@@ -72,9 +67,9 @@ export class AuthController {
 			"129140",// will later be body.twoFactorAuthenticationCode
 			user, // will later be req.user
 		);
-		if (!isCodeValid) {
-			throw new UnauthorizedException('Wrong authentication code');
-		}
+		// if (!isCodeValid) {
+		// 	throw new UnauthorizedException('Wrong authentication code');
+		// }
 		// else login to game, display user profile
 		const token = this.authService.generate_jwt_token(user.username); // will later be req.user.username
 		return (token) // will store it local storage front end

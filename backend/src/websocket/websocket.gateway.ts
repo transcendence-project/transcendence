@@ -1,21 +1,10 @@
-// import { SubscribeMessage, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
-// import { Server } from 'socket.io';
-// import { InjectRepository } from '@nestjs/typeorm';
-// // import { ChatService } from '../chat/chat.service';
-// import { Channel } from 'chat/channel.entity';
-// import { Repository } from 'typeorm';
 import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect, } from '@nestjs/websockets';
-import { Server } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import { ChatService } from '../chat/chat.service';
 import { WebsocketService } from './websocket.service';
 
-import { Channel } from '../entities/channel.entity';
-import { Repository } from 'typeorm';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Injectable } from '@nestjs/common';
-import { User } from '../entities/user.entity';
 
-@WebSocketGateway()
+@WebSocketGateway({cors:{origin:'http://localhost:8080'}})
 export class WebsocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	
 	constructor(private chatService: ChatService, private websocketService: WebsocketService
@@ -23,13 +12,15 @@ export class WebsocketGateway implements OnGatewayConnection, OnGatewayDisconnec
 	@WebSocketServer()
 	server: Server;
 
-	handleConnection(client: any, ...args: any[]) { // called automatically when frontend establish websocket connection
+	async handleConnection(client: Socket) { // called automatically when frontend establish websocket connection
 		console.log(`Client connected: ${client.id}`);
-		this.websocketService.set_user(client);
+		await this.websocketService.set_user(client);
 		const user = this.websocketService.find_user_with_id(client.id);
-		for (const channel of user.channels) // rejoin
-			client.join(channel.room_name);
-			client.emit('connection_success'); // socket.addEventListener('message', .... )
+		// console.log(user);
+		// if (user.channels)
+		// 	for (const channel of user.channels) // rejoin
+		// 		client.join(channel.room_name);
+		// 	client.emit('connection_success');
 		// In case of error
 		/*  client.on('error', (error) => { // to handle websocket errors
 			client.emit('connection_failure');
@@ -40,10 +31,11 @@ export class WebsocketGateway implements OnGatewayConnection, OnGatewayDisconnec
 		this.websocketService.delete_user(client);
 		this.websocketService.rem_user_invites(client);
 		console.log(`Client disconnected: ${client.id}`);
+		//  remove from connected_users
 		client.emit('disconnection_success');
 	}
 
-	@SubscribeMessage('send_message_to_chan')
+	@SubscribeMessage('send_msg_to_chan')
 	send_message_chan(client: any, payload: any): void {
 		const user = this.websocketService.find_user_with_id(client.id);
 		const { room_name, message } = payload;
@@ -53,7 +45,7 @@ export class WebsocketGateway implements OnGatewayConnection, OnGatewayDisconnec
 		client.emit('chan_msg_success');
 	}
 
-	@SubscribeMessage('private_messgae')
+	@SubscribeMessage('private_message')
 	send_message_dm(client: any, payload: any): void {
 		const { username, message } = payload;
 		const user = this.websocketService.find_user_with_id(client.id);
@@ -74,10 +66,9 @@ export class WebsocketGateway implements OnGatewayConnection, OnGatewayDisconnec
 
 	@SubscribeMessage('create_room')
 	async create_room(client: any, room_name: string): Promise<void> {
-
+		console.log("reached create room - backend websockets");
 		const user = this.websocketService.find_user_with_id(client.id);
 		await this.chatService.create_chan(room_name, user);
-		// set user as owner and admin
 		client.join(room_name);
 		client.emit('create_room_success');
 	}
@@ -129,7 +120,7 @@ export class WebsocketGateway implements OnGatewayConnection, OnGatewayDisconnec
 			const add_user = this.websocketService.find_user_with_name(user_to_add);
 			this.chatService.add_chan_mem(user, room_name);
 			client.join(room_name);
-			client.emit('add_user_success');
+			client.emit('add_user_success', );
 		}
 		//else
 		// send error message to user: user not owner or admin

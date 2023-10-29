@@ -5,6 +5,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../entities/user.entity'
 import { AuthService } from 'auth/auth.service';
 import { Message } from '../entities/message.entity';
+import { Socket } from 'socket.io';
 
 // for now websocket service mainly to save in the repository / store real time 
 // because injecting repo in gateway isn't workin for some reason
@@ -17,11 +18,9 @@ export class WebsocketService {
 
 	constructor(@InjectRepository(Channel) private roomRepo: Repository<Channel>, private authService: AuthService){}
 
-	find_user_with_id(client_id: any){
-		for (const [userID, user] of this.connected_users.entries())
-			if (userID === client_id){
-				return user;
-			}
+	find_user_with_id(client_id: string){
+		const user = this.connected_users.get(client_id);
+		return user;
 	}
 
 	find_user_with_name(username: string){
@@ -38,10 +37,23 @@ export class WebsocketService {
 		}
 	}
 
-	async set_user(client: any){
-		const token = client.handshake.query.token; // should supposedly give the jwt token sent by the front end
+
+	async set_user(client: Socket){
+		const token = client.handshake.auth.token;
 		const user = await this.authService.user_by_token(token);
+		// console.log('user from set_user below');
+		// console.log(user);
 		this.connected_users.set(client.id, user);
+		// for (const [userID, user] of this.connected_users.entries())
+		// {
+		// 	console.log('comes here?????');
+		// 	console.log(userID);
+		// 	console.log(user);
+			// if (userID === client_id){
+			// 	console.log("USER FOUNDDD!!!!!");
+				// return user;
+			// }
+		// }
 		// set user as online
 	}
 

@@ -13,21 +13,19 @@ export class UsersService {
 
 	async create(email: string, userName: string){
 
-		const user = await this.findAll(userName);
-		// const user = await this.findOneByUserName(userName);
-		// if (user)
-		// 	return (user)
-		if (user.length)
-			return (null)
-		const user2 = this.repo.create({email, userName})
-		
+		// const user = await this.findAll(userName);
+		const user = await this.findOneByUserName(userName);
+		if (user)
+			return (user)
+		const user2 = this.repo.create({email, userName, twoFactorSecret: null, is2FAEnabled: false, friends: [], channels: [], matches: [], achievements: []});
 		return (this.repo.save(user2))
 	}
 	findOne(id: number) {
 		return (this.repo.findOneBy({id}))
 	}
-	findOneByUserName(userName: string) {
-		return (this.repo.findOneBy({userName}))
+	async findOneByUserName(userName: string) {
+		const user = await this.repo.findOneBy({userName});
+		return (user);
 	}
 
 	findOneByEmail(email: string) {
