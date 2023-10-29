@@ -1,5 +1,4 @@
 import { TypeOrmModuleOptions } from "@nestjs/typeorm";
-// import { Channel } from "./entities/channel.entity";
 
 export const typeOrmConfig: TypeOrmModuleOptions = {
 	type: 'postgres',

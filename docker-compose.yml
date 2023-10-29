@@ -1,16 +1,13 @@
 version: '3'
 services:
   backend:
-    image: node:19
+    build: ./backend  # Docker will look for Dockerfile in this directory
     container_name: backend
     ports:
       - "3000:3000"
-    restart: always
     volumes:
-      - ./backend:/app/backend
-    working_dir: /app/backend
-    command: >
-      bash -c "sleep infinity"
+       - ./backend/src:/app/backend/src
+    working_dir: /app/backend # This maps your host's ./backend/src directory to /app/backend/src in the container
   database:
     image: postgres:13
     environment:
