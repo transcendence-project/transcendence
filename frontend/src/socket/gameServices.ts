@@ -5,13 +5,13 @@ import { io, Socket } from 'socket.io-client';
 const socket: Ref<Socket | null> = ref(null);
 
 export const connectWebSocket = (url: string, authToken: string): void => {
-  socket.value = io(url, {
-    withCredentials: true,
-    extraHeaders: {
-        // message: 'this is from the client-side',
-      Authorization: `Bearer ${authToken}`,
-    },
-  });
+    const _token = localStorage.getItem('token');
+    const headers = {
+      withCredentials: true,
+      extraHeaders: _token ? { token:  _token} : undefined,
+    };
+  
+  socket.value = io(url,headers);
 };
 
 export const getSocket = (): Socket | null => {

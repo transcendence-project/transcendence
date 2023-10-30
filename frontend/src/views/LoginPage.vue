@@ -1,6 +1,8 @@
 <template>
-    <BallComponent />
-    <ButtonComponent />
+    <div class="bg-gradient-to-r from-[#451952] via-[#451952] to-[#ae4188]">
+        <BallComponent />
+        <ButtonComponent />
+    </div>
 </template>
 
 

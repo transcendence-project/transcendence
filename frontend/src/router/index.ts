@@ -2,7 +2,7 @@ import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 
 const routes: Array<RouteRecordRaw> = [
   {
-    path: "/login",
+    path: "/",
     name: "login", 
     component: () => import("../views/LoginPage.vue"),
   },
@@ -44,10 +44,23 @@ const routes: Array<RouteRecordRaw> = [
 ];
 
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
-  // history: createWebHistory('/'),
+//   history: createWebHistory(process.env.BASE_URL),
+  history: createWebHistory('/'),
   routes,
 });
 
-
+router.beforeEach((to: any, from: any, next: any) => {
+    // if (to.path === '/login') {
+    //   document.body.style.backgroundColor = '#3A1078';
+    // }else {
+    //   document.body.style.backgroundColor = '#5E6367';
+    //   console.log(`Navigating from ${from.fullPath} to ${to.fullPath}`);
+    // }
+    next();
+    if (to.path == '/home' && to.query.code)
+    {
+          const token = to.query.code;
+          localStorage.setItem('token', token);
+    }
+  });
 export default router;

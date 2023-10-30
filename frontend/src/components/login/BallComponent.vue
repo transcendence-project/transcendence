@@ -12,6 +12,7 @@
     top: 50%;
     left: 50%;
     transform: translate(-505,-50%);
+    
 }
 
 .ball {
