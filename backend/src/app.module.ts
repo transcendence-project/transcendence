@@ -11,14 +11,13 @@ import { GameModule } from './game/game.module';
 
 import { FriendRequestController } from 'friend-requests/FriendRequest.controller';
 import { FriendRequestService } from 'friend-requests/FriendRequests.service';
-import { WebsocketGateway } from './websocket/websocket.gateway';
-import { WebsocketModule } from './websocket/websocket.module';
+import { ChatGateway } from './chat/chat.gateway';
 import { ChatService } from './chat/chat.service';
 
 @Module({
 	imports: [UsersModule,
 		TypeOrmModule.forRoot(typeOrmConfig),
-		AuthModule, ConfigModule.forRoot(), ChatModule, GameModule, WebsocketModule],
+		AuthModule, ConfigModule.forRoot(), ChatModule, GameModule],
 	controllers: [AppController],
 	providers: [AppService],
 })
