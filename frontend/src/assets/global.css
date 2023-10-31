@@ -1,5 +1,6 @@
 body{
-	background: #5E6367;
+	background: linear-gradient(to bottom, #F39F5A, #AE445A, #451952);
+
 	font-family: 'Arial', sans-serif;
 	margin: 0;
 	padding: 0;
@@ -7,3 +8,6 @@ body{
 .logo{
 	color: white;
 }
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';

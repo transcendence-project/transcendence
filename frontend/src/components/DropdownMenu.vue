@@ -1,13 +1,13 @@
 <template>
 	<div class="dropdown" ref="dropdown">
 	  <img
-		class="dropbtn"
+		class="cursor-pointer w-10"
 		src="@/assets/game.svg"
 		alt="Dropdown Button"
 		@click="toggleDropdown"
 	  />
 	  <div
-		class="dropdown-content"
+		class="dropdown-content hidden absolute"
 		:class="{ active: showDropdown }"
 		@click.stop=""
 	  >
@@ -16,53 +16,45 @@
 		<router-link to="/logout" @click.native="closeDropdown">Logout</router-link>
 	  </div>
 	</div>
-  </template>
-  
-  <script lang="ts">
-  import { Options, Vue } from 'vue-class-component';
-  
-  @Options({
-	name: 'DropdownMenu',
-  })
-  export default class DropdownMenu extends Vue {
-	private showDropdown: boolean = false;
-  
-	private toggleDropdown(): void {
-	  this.showDropdown = !this.showDropdown;
-  
-	  if (this.showDropdown) {
-		document.addEventListener('click', this.closeDropdownOnClickOutside);
-	  } else {
-		document.removeEventListener('click', this.closeDropdownOnClickOutside);
-	  }
+</template>
+
+<!----------------------------------------------------- TypeScript code ---------------------------------------------------------------------------------->
+<script setup lang="ts">
+	import { ref, onMounted, onBeforeUnmount } from 'vue';
+
+	const showDropdown = ref(false);
+	const dropdownRef = ref<HTMLElement | null>(null); // Define the type of dropdownRef
+
+	const toggleDropdown = () => {
+	showDropdown.value = !showDropdown.value;
+	};
+
+	const closeDropdownOnClickOutside = (event: MouseEvent) => {
+	if (dropdownRef.value?.contains(event.target as Node)) { // Use optional chaining
+		showDropdown.value = false;
+		document.removeEventListener('click', closeDropdownOnClickOutside);
 	}
-  
-	private closeDropdownOnClickOutside(event: MouseEvent): void {
-	  if (this.$refs.dropdown instanceof HTMLElement) {
-		if (!this.$refs.dropdown.contains(event.target as Node)) {
-		  this.showDropdown = false;
-		  document.removeEventListener('click', this.closeDropdownOnClickOutside);
-		}
-	  }
-	}
-	
-	private closeDropdown(): void {
-	  this.showDropdown = false;
-	  document.removeEventListener('click', this.closeDropdownOnClickOutside);
-	}
-  }
-  </script>
-  
-  
-  <style scoped>
-  .dropbtn {
-	cursor: pointer;
-	width: 40px;
-  }
-  
+	};
+
+	const closeDropdown = () => {
+	showDropdown.value = false;
+	document.removeEventListener('click', closeDropdownOnClickOutside);
+	};
+
+	onMounted(() => {
+	document.addEventListener('click', closeDropdownOnClickOutside);
+	});
+
+	onBeforeUnmount(() => {
+	document.removeEventListener('click', closeDropdownOnClickOutside);
+	});
+</script>  
+
+<!----------------------------------------------- CSS ------------------------------------------------------->
+<style scoped>
   .dropdown-content {
-	display: none;
-	position: absolute;
+	/* display: none; */
+	/* position: absolute; */
 	background-color: #f9f9f9;
 	min-width: 160px;
 	box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);

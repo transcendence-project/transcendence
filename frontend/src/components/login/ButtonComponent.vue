@@ -29,7 +29,7 @@ export default {
     transform: translate(-50%,-50%) perspective(500px) rotateY(-15deg) !important;
     text-align: center;
     font-size: 20px;
-    background:linear-gradient(90deg,#3A1078,#4E31AA);
+    /* background:linear-gradient(90deg,#3A1078,#4E31AA); */
     text-shadow: 6px 3px 2px rgba(0, 0 , 0,.2);
     color: #fff;
     text-decoration: none;
@@ -53,7 +53,7 @@ button::before {
     left: -100%;
     width: 100%;
     height: 100%;
-    background-color: #2F58CD;
+    background-color: #451952;
     transition: 0.5s;
 }
 

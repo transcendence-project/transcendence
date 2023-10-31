@@ -1,13 +1,13 @@
 @Host=http://localhost:3000
-@myToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im9hYnVzaGFyIiwiaWF0IjoxNjk3ODgzOTUwfQ.wrhXtS0BIUXGqkHK-GqIS-O9mal_hbvvJq_ZWH-qE5A
-@akeryanToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFrZXJ5YW4iLCJpYXQiOjE2OTc4ODM2MDR9.UJuF_fTDSeieZJFadUzR7RbkdCbjWryqg2RNq8UCU4E
+@myToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im9hYnVzaGFyIiwiaWF0IjoxNjk4MDQ2ODY4fQ.q6vDl1LZamJA1B7MjrHpDzumQoitYgd5Py6qzT3KbKs
+@amhusseiToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFtaHVzc2VpIiwiaWF0IjoxNjk4MDQ3MjY1fQ.tXVcsCmlUBDTmmFnrq29XY90AfhWe-C7tLGph3L7bHo
 ###Get my user
 GET http://localhost:3000/auth/me
 Authorization: Bearer {{myToken}}
 
-### Get akeryan user
+### Get amhussei user
 GET http://localhost:3000/auth/me
-Authorization: Bearer {{akeryanToken}}
+Authorization: Bearer {{amhusseiToken}}
 
 
 ### sign up
@@ -34,7 +34,7 @@ GET http://localhost:3000/users?userName=oabushar
 GET http://localhost:3000/hi
 
 ### remove user
-DELETE http://localhost:3000/users/3
+DELETE http://localhost:3000/users/
 
 ### generate qr code
 GET  http://localhost:3000/auth/2fa/generate
@@ -48,7 +48,7 @@ Authorization: Bearer {{myToken}}
 
 ### check friend requests
 GET http://localhost:3000/friend-requests/my-friend-requests
-Authorization: Bearer {{akeryanToken}}
+Authorization: Bearer {{amhusseiToken}}
 
 ### accept friend request
 PATCH http://localhost:3000/friend-requests/10/accept

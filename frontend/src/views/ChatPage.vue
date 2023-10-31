@@ -1,59 +1,62 @@
 <template>
-  <div class="chat-cont">
-    <div class="channel">
+  <div class="flex flex-wrap justify-between bg-gradient-to-r from-[#451952] via-[#451952] to-[#ae4188] shadow-custom text-white w-full m-5  rounded-md p-2.5 min-h-[85.9vh] text-center">
+    <div class="w-full lg:w-1/5 m-0">
       <h2>Channel</h2>
-      <div class="chan-cont">
-        <h4 class="add-cont" @click="create_room">Add</h4>
-        <div class="chn-srch">
+      <!-- <div class="chan-cont"> -->
+        <div class="flex-col items-center justify-center p-0 m-0 mt-5 w-full h-[500px] bg-gradient-to-r from-[#ae445a] to-[#662549] shadow-custom  rounded-[10px]">
+        <h4 class="py-2">Add</h4>
+        <div>
           <input
             v-model="text"
             placeholder="Search channel"
-            class="search-chn"
+            class="w-9/12 md:w-10/12 h-[1.5rem] border-0 text-black ml-2 rounded-md pl-4 mb-2 focus:border-0 focus:outline-none"
           />
         </div>
-        <div class="chnul-cont">
-          <ul>
+        <div class="flex justify-center m-0 mt-2 p-0 w-full h-[350px]">
+          <ul class="w-[85%] p-1 m-1">
             <div v-for="(result, index) in filteredSearch" :key="index">
-              <li>
-                <div class="chan-item">
+              <li class="list-none w-full mb-5">
+                <div class="flex items-center justify-between mb-2 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom mx-1 px-1 w-full rounded-[10px]">
                   {{ result.channel }}
                   {{ result.group }}
-                  <ChannelOption />
+                  <ChannelOption class="relative" />
                 </div>
               </li>
             </div>
           </ul>
         </div>
-        <div class="chn-btm">
-          <button class="grpbtn">Group</button>
-          <button class="dmbtn">DM</button>
+        <div class="flex items-center justify-center h-12">
+          <ButtonComponent btnContent="Group"/>
+          <ButtonComponent btnContent="DM"/>
         </div>
       </div>
     </div>
-    <div class="message">
+    <div class="w-full lg:w-58 m-0 my-5">
       <h2>Chat</h2>
-      <div class="msg-cont">
-        <div class="msg-display"></div>
-        <div class="msg-input">
-          <input v-model="message" placeholder="message" class="send-msg" />
-          <button class="sndbtn">Send</button>
+      <div class="flex-col items-center justify-center p-0 m-0 mt-5 w-full h-[500px] bg-gradient-to-r from-[#ae445a] to-[#662549] shadow-custom">
+        <div class="bg-white h-[420px] p-1 mb-2 m-1"></div>
+        <div class="w-full">
+          <input v-model="message" placeholder="message" 
+          class="w-[80%] h-[2rem] border-0 text-black ml-2 mr-1 rounded-full pl-4
+           mb-2 focus:border-0 focus:outline-none" />
+           <ButtonComponent btnContent="Send"/>
         </div>
       </div>
     </div>
-    <div class="catagory">
+    <div class="catagory w-full lg:w-1/5 m-0">
       <h2>Catagory</h2>
-      <div class="cat-cont">
-        <div class="chnul-cont">
+      <div class="flex-col items-center justify-center p-1 m-0 mt-5 w-full h-[500px] bg-gradient-to-r from-[#ae445a] to-[#662549] shadow-custom rounded-[10px]">
+        <div>
           <ul>
             <div v-for="(result, index) in filteredSearch" :key="index">
               <li>
-                <div class="cat-item">
+                <div class="flex bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom m-2.5 px-2 py-2 rounded-[10px]">
                   {{ result.user }}
                   <div v-if="result.friend">
-                    <div class="cht-usr-avail"></div>
+                    <StatusUser :isFriend="result.friend" class="flex mt-[0.3rem]"/>
                   </div>
                   <div v-if="!result.friend">
-                    <div class="cht-usr-not-avail"></div>
+                    <StatusUser :isFriend="result.friend" class="flex mt-[0.3rem]"/>
                   </div>
                 </div>
               </li>
@@ -65,69 +68,24 @@
   </div>
 </template>
 
-
-
-
-
 <script lang="ts">
-import { ref, onMounted,  defineComponent } from "vue";
+import { defineComponent } from "vue";
 import ChannelOption from "@/components/ChannelOption.vue";
-import io from 'socket.io-client';
-import store from '../store'
-
+import StatusUser from "@/components/StatusUser.vue";
+import ButtonComponent from "@/components/ButtonComponent.vue";
 interface ChannelList {
-	channel: string;
-	group: string;
-	user: string;
-	friend: boolean;
+  channel: string;
+  group: string;
+  user: string;
+  friend: boolean;
 }
 
 export default defineComponent({
-	components: {
-		ChannelOption,
-	},
-	created(){
-		console.log(store.state.chat.test);
-		if (!store.state.chat.socket)
-		{
-			store.state.chat.socket = io("http://localhost:3000", {
-				auth: {
-					token: localStorage.getItem('token'),
-				},
-			});
-		}
-		store.state.chat.socket.on('create_room_success', () => { // event listener
-			console.log('Room created successfully and back in front end');
-		});
-		store.state.chat.socket.on('join_room_success', () => {
-			console.log('Joined the channel successfully and back in front end');
-		});
-		store.state.chat.socket.on('chan_msg_success', () => {
-			console.log('Send message to channel successfully and back in front end');
-		});
-		store.state.chat.socket.on('priv_msg_success', () => {
-			console.log('Send message to channel successfully and back in front end');
-		});
-		
-},
-methods: {
-	create_room(){
-		if (store.state.chat.socket)
-			store.state.chat.socket.emit( 'create_room', 'azrachan');
-	},
-	join_chan(){
-		if (store.state.chat.socket)
-			store.state.chat.socket.emit('join_room', {room_name:'azrachan', arg: ""});
-	},
-	send_chan_msg(){
-		if (store.state.chat.socket)
-			store.state.chat.socket.emit('send_msg_to_chan', {room_name:'azrachan', message:'hello world'});
-	},
-	send_priv_msg(){
-		if (store.state.chat.socket)
-			store.state.chat.socket.emit('private_message')
-	}
-},
+  components: {
+    ChannelOption,
+    StatusUser,
+    ButtonComponent,
+  },
   data() {
     return {
       channels: [
@@ -170,226 +128,3 @@ methods: {
   },
 });
 </script>
-
-
-<style scoped>
-
-.chat-cont {
-  display: flex;
-  flex-wrap: wrap; 
-  justify-content: space-between;
-  background: #24272c;
-  color: white;
-  margin: 20px;
-  border-radius: 5px;
-  padding: 10px;
-  width: 100%;
-  min-height: 100vh; 
-}
-
-@media screen and (min-width: 768px) {
-  .channel {
-    width: 20%;
-  }
-  
-  .message {
-    width: 58%;
-  }
-  
-  .catagory {
-    width: 20%;
-  }
-}
-
-@media screen and (max-width: 767px) {
-  .channel,
-  .message,
-  .catagory {
-    width: 100%; 
-    margin: 0; 
-  }
-}
-
-@media screen and (max-width: 480px) {
-  .add-cont,
-  .chn-srch {
-    width: 100%;
-  }
-  
-}
-.chan-cont,
-.cat-cont,
-.msg-cont {
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 0;
-  margin: 0;
-  margin-top: 20px;
-  width: 100%;
-  height: 500px;
-  background: #34373d;
-}
-
-.chnul-cont {
-  display: flex;
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 350px;
-}
-.chnul-cont ul {
-  width: 85%;
-  padding: 5px;
-  margin: 5px;
-}
-.chnul-cont li {
-  list-style-type: none;
-  width: 100%;
-}
-
-.search-chn {
-  width: 85%;
-  height: 1.5rem;
-  border: none;
-  margin-left: 10px;
-  border-radius: 5px;
-  padding-left: 15px;
-  margin-bottom: 10px;
-}
-.search-chn:focus {
-  border: none;
-  outline: none;
-}
-.chn-btm {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 50px;
-}
-
-
-
-.msg-display {
-  background: white;
-  height: 420px;
-  padding: 5px;
-  margin-bottom: 10px;
-  margin: 5px;
-}
-.msg-input {
-  width: 100%;
-}
-.send-msg {
-  width: 80%;
-  height: 2rem;
-  border: none;
-  margin-left: 10px;
-  margin-right: 5px;
-  border-radius: 10px;
-  padding-left: 15px;
-  margin-bottom: 10px;
-}
-.send-msg:focus {
-  border: none;
-  outline: none;
-}
-.grpbtn,
-.dmbtn,
-.sndbtn {
-  font-size: 0.8rem;
-  padding-left: 1rem;
-  padding-right: 1rem;
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-  border-radius: 5px;
-  margin-left: 10px;
-  cursor: pointer;
-  color: white;
-  background: #697692;
-  border: none;
-}
-.grpbtn:hover,
-.dmbtn:hover,
-.sndbtn:hover {
-  background: #7c8392;
-  color: #d9d9da;
-}
-
-.dropdownopt {
-  position: relative;
-}
-
-.dropdownopt a {
-  cursor: pointer;
-}
-
-.dropdownopt-menu {
-  display: none;
-  position: absolute;
-  top: 100%;
-  left: 0;
-  list-style: none;
-  background-color: #fff;
-  border: 1px solid #ccc;
-  padding: 0;
-  margin: 0;
-}
-
-.dropdownopt.active .dropdownopt-menu {
-  display: block;
-}
-
-.dropdownopt-menu li {
-  padding: 8px 16px;
-  border-top: 1px solid #ccc;
-}
-
-.dropdownopt-menu li a {
-  text-decoration: none;
-  color: #333;
-  display: block;
-}
-
-.dropdownopt-menu li a:hover {
-  background-color: #f2f2f2;
-}
-.chan-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: #61656e;
-  margin: 3px;
-  padding-left: 5px;
-  padding-right: 5px;
-  width: 100%;
-}
-.cat-item {
-	display: flex;
-  background: #61656e;
-  margin: 3px;
-  padding-left: 10px;
-  padding-top: 10px;
-  padding-bottom: 10px;
-}
-.cht-usr-avail {
-	display: flex;
-  width: 0.6rem;
-  height: 0.6rem;
-  margin-top: .3rem;
-  margin-left: 0.3rem;
-  border-radius: 50%;
-  border-style: groove;
-  background: green;
-}
-.cht-usr-not-avail {
-  display: flex;
-  width: 0.6rem;
-  height: 0.6rem;
-  margin-top: .3rem;
-  margin-left: 0.3rem;
-  border-radius: 50%;
-  border-style: groove;
-  background: rgb(231, 8, 8);
-}
-</style>

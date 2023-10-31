@@ -1,5 +1,17 @@
 <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-<circle cx="32" cy="32" r="32" fill="#697692"/>
+  <defs>
+    <linearGradient id="backgroundGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color: #F39F5A" />
+      <stop offset="100%" style="stop-color: #FF5733" />
+    </linearGradient>
+
+    <filter id="drop-shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="3" dy="3" stdDeviation="3" flood-color="rgba(0, 0, 0, 0.3)" />
+    </filter>
+  </defs>
+
+  <circle cx="32" cy="32" r="32" fill="url(#backgroundGradient)" filter="url(#drop-shadow)" />
+
 <g filter="url(#filter0_d_17_51)">
 <path d="M34.6701 18.6451C39.398 12.8268 48.2759 12.0737 53.3594 16.6029C58.9513 21.585 59.9308 30.2087 54.4958 36.3089C50.5085 40.7842 44.029 42.1897 39.9753 40.5927C38.8541 40.151 37.4357 40.3077 36.7545 41.3018L30.2042 50.8593C29.5229 51.8534 28.1238 52.0236 27.224 51.222L26.1241 50.242L24.9198 49.169C24.0577 48.4009 24.0233 47.0643 24.8448 46.2529L33.2177 37.9822C34.0392 37.1707 33.9904 35.8305 33.3639 34.8605C30.7618 30.8314 30.5743 23.6856 34.6701 18.6451Z" fill="#E7E5E5"/>
 </g>
