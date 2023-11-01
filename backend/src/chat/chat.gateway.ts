@@ -16,7 +16,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   async handleConnection(client: Socket) { // called automatically when frontend establish websocket connection
 	console.log(`Client connected: ${client.id}`);
-	await this.chatService.set_user(client);
+	// await this.chatService.set_user(client); // after login page fix
 	const user = this.chatService.find_user_with_id(client.id);
 	// console.log(user);
 	// if (user.channels)

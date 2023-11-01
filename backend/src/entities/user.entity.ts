@@ -67,4 +67,7 @@ export class User {
 	@ManyToMany(() => Channel, channel => channel.members)
 	@JoinTable({ name: "my_channels"})
 	channels: Channel[]
+
+	@Column({default: false})
+	isOnline: boolean;
 }
