@@ -197,6 +197,7 @@ export class ChatService {
 
 	async set_user(client: Socket){
 		const token = client.handshake.auth.token;
+		// console.log(token);
 		const user = await this.authService.user_by_token(token);
 		// console.log('user from set_user below');
 		// console.log(user);
