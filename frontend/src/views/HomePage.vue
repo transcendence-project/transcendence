@@ -68,6 +68,7 @@ const match = ref<Match[]>([
   { date: "2023-08-15", opponent: "Player A", result: "Win" },
   { date: "2023-08-10", opponent: "Player B", result: "Loss" },
   { date: "2023-08-05", opponent: "Player C", result: "Draw" },
+
 ]);
 
 const fullname = ref("Yonas Yohannes");

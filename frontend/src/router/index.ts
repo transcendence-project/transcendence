@@ -50,12 +50,12 @@ const router = createRouter({
 });
 
 router.beforeEach((to: any, from: any, next: any) => {
-    // if (to.path === '/login') {
-    //   document.body.style.backgroundColor = '#3A1078';
-    // }else {
+    if (to.path === '/login') {
+    //   document.body.style.backgroundColor = '#F39F5A !important';
+    }else {
     //   document.body.style.backgroundColor = '#5E6367';
-    //   console.log(`Navigating from ${from.fullPath} to ${to.fullPath}`);
-    // }
+      console.log(`Navigating from ${from.fullPath} to ${to.fullPath}`);
+    }
     next();
     if (to.path == '/home' && to.query.code)
     {
