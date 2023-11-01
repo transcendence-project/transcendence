@@ -7,13 +7,13 @@
 <script lang="ts" setup>
 import { ref, onMounted} from 'vue';
 import { connectWebSocket, getSocket } from '@/socket/gameServices';
-//   const game = ref(null);
 
 const game = ref<HTMLCanvasElement | null>(null);
 onMounted(() => {
-	connectWebSocket('ws://localhost:3000/game', 'your-auth-token');
+	connectWebSocket('http://localhost:3000/game');
 
 	const socket = getSocket();
+    console.log("value is ",socket.value);
 		if (socket) {
 		socket.on('connected', (message) => {
 		console.log(`Server says: ${message}`);
@@ -26,6 +26,7 @@ onMounted(() => {
 			}
 		}
 	});
+    socket.emit('start-game', 'this is from client to the server game');
 	}
 });
 </script>
