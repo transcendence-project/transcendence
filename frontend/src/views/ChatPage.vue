@@ -73,6 +73,9 @@ import { defineComponent } from "vue";
 import ChannelOption from "@/components/ChannelOption.vue";
 import StatusUser from "@/components/StatusUser.vue";
 import ButtonComponent from "@/components/ButtonComponent.vue";
+import io from 'socket.io-client';
+import store from '../store'
+
 interface ChannelList {
   channel: string;
   group: string;
@@ -119,6 +122,48 @@ export default defineComponent({
       activeDropdownopt: null as number | null,
     };
   },
+	created(){
+		console.log(`test inside chatpage: ${store.state.chat.test}`);
+			if (!store.state.chat.socket)
+			{
+				store.state.chat.socket = io('http://localhost:3000/chat', {
+					auth: {
+						token: localStorage.getItem('token'),
+					},
+				});
+			}
+			store.state.chat.socket.on('create_room_success', () => { // event listener
+				console.log('Room created successfully and back in front end');
+			});
+			store.state.chat.socket.on('join_room_success', () => {
+				console.log('Joined the channel successfully and back in front end');
+			});
+			store.state.chat.socket.on('chan_msg_success', () => {
+				console.log('Send message to channel successfully and back in front end');
+			});
+			store.state.chat.socket.on('priv_msg_success', () => {
+				console.log('Send message to channel successfully and back in front end');
+			});
+			
+	},
+	methods: {
+		create_room(){
+			if (store.state.chat.socket)
+				store.state.chat.socket.emit( 'create_room', 'azrachan');
+		},
+		join_chan(){
+			if (store.state.chat.socket)
+				store.state.chat.socket.emit('join_room', {room_name:'azrachan', arg: ""});
+		},
+		send_chan_msg(){
+			if (store.state.chat.socket)
+				store.state.chat.socket.emit('send_msg_to_chan', {room_name:'azrachan', message:'hello world'});
+		},
+		send_priv_msg(){
+			if (store.state.chat.socket)
+				store.state.chat.socket.emit('private_message')
+		}
+	},
   computed: {
     filteredSearch(): ChannelList[] {
       return this.channels.filter((item) =>

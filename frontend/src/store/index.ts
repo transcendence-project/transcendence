@@ -4,18 +4,24 @@ import {Socket}  from 'socket.io-client';
 
 
 export default createStore({
-  state: {
+  state: { // define the data (state) that you want to manage in your application. 
 	chat:  {
 		socket: null as Socket | null,
 		test: "inside chat in store.. testingg",
 	},
   },
-  getters: {
+  getters: { // used to retrieve computed properties or derived state from the store.
+	getTest: (state: any) => state.chat.test,
   },
-  mutations: {
+  mutations: { //used to modify the state. synchronous functions, take current state as argument & make changes to it. (i.e setters)
+	setTest(state: any, new_test: string){
+		state.chat.test = "this is a changes test";
+	}
   },
-  actions: {
+  actions: { // asynchronous functions used to perform operations and commit mutations, like API requests
+
+	// axos requests to database
   },
-  modules: {
+  modules: { // allow you to organize your store into separate namespaces.
   }
 })
