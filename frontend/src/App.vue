@@ -1,12 +1,12 @@
 <template>
 	<div id="home">
-	  <TopNavBar />
+	  <TopNavBar v-if="!['login'].includes($route.name)"/>
 	  <div class="side-cont">
-		<SideNavBar />
+          <SideNavBar v-if="!['login'].includes($route.name)"/>
 		<router-view />
 	  </div>
 	</div>
-  </template>
+</template>
   
 <script lang="ts">
   import { defineComponent } from "vue";

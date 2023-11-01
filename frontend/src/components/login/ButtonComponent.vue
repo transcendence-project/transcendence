@@ -29,7 +29,7 @@ export default {
     transform: translate(-50%,-50%) perspective(500px) rotateY(-15deg) !important;
     text-align: center;
     font-size: 20px;
-    /* background:linear-gradient(90deg,#3A1078,#4E31AA); */
+    background:linear-gradient(90deg,#F39F5A, #AE445A, #451952);
     text-shadow: 6px 3px 2px rgba(0, 0 , 0,.2);
     color: #fff;
     text-decoration: none;
