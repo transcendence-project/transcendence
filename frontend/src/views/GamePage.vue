@@ -1,37 +1,43 @@
 <template>
 	<div class="game-container">
-	  <canvas ref="game" id="pong" width="900" height="400"></canvas>
+	  <canvas ref="game" id="pong"></canvas>
+      <button @click="startGame">Start Game</button>
 	</div>
   </template>
   
 <script lang="ts" setup>
-import { ref, onMounted} from 'vue';
-import { connectWebSocket, getSocket } from '@/socket/gameServices';
+    import { ref, onMounted} from 'vue';
+    import { connectWebSocket, getSocket } from '@/socket/gameServices';
 
-const game = ref<HTMLCanvasElement | null>(null);
-onMounted(() => {
-	connectWebSocket('http://localhost:3000/game');
-
-	const socket = getSocket();
-	console.log("value is ",socket.value);
-	if (socket) {
-		socket.on('connected', (message) => {
-		console.log(`Server says: ${message}`);
-		if (game.value)
-		{
-			const context = game.value.getContext('2d');
-			if (context) {
-				context.fillStyle = 'red';
-				context.fillRect(50, 0, 100, 100);
-			}
-		}
-	});
-	socket.on('disconnected', (message) => {
-		console.log(`Server says disconnected : ${message}`);
-	})
-    socket.emit('start-game', 'this is from client to the server game');
-	}
-});
+    connectWebSocket('http://localhost:3000/game');
+    const socket = getSocket();
+    // socket.on('start-game', (data) => {
+    //     console.log("this is the width ", data[0]);
+    // })
+    const startGame = () => {
+            if (socket) {
+            socket.emit('start-game', 'This is from the client to the server game');
+            }
+        };
+    const game = ref<HTMLCanvasElement | null>(null);
+    onMounted(() => {
+            if (socket) {
+            socket.on('connected', (message) => {
+            console.log(`Server says: ${message}`);
+            if (game.value)
+            {
+                const context = game.value.getContext('2d');
+                // context.value.width = 900;
+                // context.value.height = 400;
+                if (context) {
+                    context.fillStyle = 'red';
+                    // context
+                    context.fillRect(50, 0, 100, 100);
+                }
+            }
+        });
+        }
+    });
 </script>
   
   

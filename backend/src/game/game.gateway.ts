@@ -30,9 +30,7 @@ export class GameGateway implements OnGatewayInit , OnGatewayConnection, OnGatew
     await this.gameService.set_online_user(client,token);
     const user = this.gameService.find_user_with_id(client.id);
     console.log("from websocket user output ", user);
-    // console.log("his is id ",client.id)
-    // console.log('Received token:', token);
-    // console.log("Client connected");
+    console.log("from the client ", client.id);
   }
 
   handleDisconnect(client: any) {
@@ -42,8 +40,9 @@ export class GameGateway implements OnGatewayInit , OnGatewayConnection, OnGatew
   }
 
   @SubscribeMessage('start-game')
-  start_game(@ConnectedSocket() client: Socket,@MessageBody() payload: any)
+  start_game(@ConnectedSocket() client: Socket,@MessageBody() payload: any): number[]
   {
-    console.log("this is the client id",client.id ,"and this is the message from server",payload);
+      console.log("start-game working");
+    return this.gameService.init_table(client);
   }
 }
