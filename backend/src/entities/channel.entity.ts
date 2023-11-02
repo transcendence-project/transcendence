@@ -12,7 +12,7 @@ export class Channel {
     room_name: string;
 
     @Column()
-    description: string;
+    description: string; // ??
 
     @OneToMany(() => Message, message => message.channel)
     messages: Message[];

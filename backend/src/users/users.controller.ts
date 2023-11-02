@@ -48,4 +48,9 @@ export class UsersController {
 		console.log('in give achievement, req.user.id: ', req.user.id);
 		return (this.userService.addAchievement(req.user.id, achievementTitle))
 	}
+	@Get('my_channels')
+	@UseGuards(JwtAuthGuard)
+	async my_channels(@Req() req){
+		return (await this.userService.findUserChan(req.user.id));
+	}
 }

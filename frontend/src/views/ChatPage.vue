@@ -75,6 +75,7 @@ import StatusUser from "@/components/StatusUser.vue";
 import ButtonComponent from "@/components/ButtonComponent.vue";
 import io from 'socket.io-client';
 import store from '../store'
+// import { useStore } from 'vuex'
 
 interface ChannelList {
   channel: string;
@@ -89,6 +90,10 @@ export default defineComponent({
     StatusUser,
     ButtonComponent,
   },
+//   setup(){
+// 	const store = userStore();
+//   },
+
   data() {
     return {
       channels: [
@@ -123,7 +128,6 @@ export default defineComponent({
     };
   },
 	created(){
-		console.log(`test inside chatpage: ${store.state.chat.test}`);
 			if (!store.state.chat.socket)
 			{
 				store.state.chat.socket = io('http://localhost:3000/chat', {
@@ -132,6 +136,9 @@ export default defineComponent({
 					},
 				});
 			}
+			store.dispatch('fetchAllChan');
+			// console.log(store.getters.getTest);
+			// console.log(store.getters.getAllChannel);
 			store.state.chat.socket.on('create_room_success', () => { // event listener
 				console.log('Room created successfully and back in front end');
 			});

@@ -36,6 +36,11 @@ export class UsersService {
 		return (this.repo.find({where: {userName}}))
 	}
 
+	async findUserChan(user_id: number){
+		const user = await this.findOne(user_id);
+		return user.channels;
+	}
+
 	update(id: number, attrs: Partial<User>) {
 		return (this.repo.update(id, attrs))
 	}
