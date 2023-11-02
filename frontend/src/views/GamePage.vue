@@ -13,8 +13,8 @@ onMounted(() => {
 	connectWebSocket('http://localhost:3000/game');
 
 	const socket = getSocket();
-    console.log("value is ",socket.value);
-		if (socket) {
+	console.log("value is ",socket.value);
+	if (socket) {
 		socket.on('connected', (message) => {
 		console.log(`Server says: ${message}`);
 		if (game.value)
@@ -26,6 +26,9 @@ onMounted(() => {
 			}
 		}
 	});
+	socket.on('disconnected', (message) => {
+		console.log(`Server says disconnected : ${message}`);
+	})
     socket.emit('start-game', 'this is from client to the server game');
 	}
 });

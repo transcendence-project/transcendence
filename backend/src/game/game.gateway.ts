@@ -1,6 +1,6 @@
 import { Logger } from '@nestjs/common';
 import { OnGatewayInit, OnGatewayConnection ,OnGatewayDisconnect,MessageBody ,SubscribeMessage, WebSocketGateway ,WebSocketServer, ConnectedSocket } from '@nestjs/websockets';
-import { Socket } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import { GameService } from './game.service';
 
 @WebSocketGateway({
@@ -10,25 +10,35 @@ import { GameService } from './game.service';
   },
 })
 export class GameGateway implements OnGatewayInit , OnGatewayConnection, OnGatewayDisconnect {
-    
+  @WebSocketServer()
+  private server: Server;
+
   private readonly logger = new Logger('GameGateway');
   constructor(private readonly gameService:GameService){}
   afterInit():void {
     this.logger.log('WebSocket Gateay Game created');
   }
 
-  handleConnection(client: Socket, ...args: any[]) {
-    client.emit('connected', 'Successfully connected to the server');
+  private clientCount = 0;
+
+  async handleConnection(client: Socket, ...args: any[]) {
+    // this.clientCount++;
+    this.server.emit('connected', this.clientCount);
     const header = client.handshake.headers;
 
     const token = header.token;
-    console.log("his is id ",client.id)
-    console.log('Received token:', token);
-    console.log("Client connected");
+    await this.gameService.set_online_user(client,token);
+    const user = this.gameService.find_user_with_id(client.id);
+    console.log("from websocket user output ", user);
+    // console.log("his is id ",client.id)
+    // console.log('Received token:', token);
+    // console.log("Client connected");
   }
 
   handleDisconnect(client: any) {
+    this.clientCount--;
     console.log("Client disconnected");
+    client.emit('disconnected', this.clientCount);
   }
 
   @SubscribeMessage('start-game')
