@@ -11,14 +11,14 @@
 
     connectWebSocket('http://localhost:3000/game');
     const socket = getSocket();
-    // socket.on('start-game', (data) => {
-    //     console.log("this is the width ", data[0]);
-    // })
+    socket.on('start-game', (data) => {
+        console.log("this is the width ", data);
+    })
     const startGame = () => {
             if (socket) {
             socket.emit('start-game', 'This is from the client to the server game');
             }
-        };
+    };
     const game = ref<HTMLCanvasElement | null>(null);
     onMounted(() => {
             if (socket) {
