@@ -73,9 +73,9 @@ async create_room(client: any, payload: any): Promise<void> {
 	console.log(`channel name in backend: ${channel_name}`);
 	console.log(`password in backend: ${password}`);
 	const user = this.chatService.find_user_with_id(client.id);
-	await this.chatService.create_chan(channel_name, user);
-	// client.join(channel_name);
-	// client.emit('create_room_success');
+	await this.chatService.create_chan(channel_name, user, password);
+	client.join(channel_name);
+	client.emit('create_room_success');
 }
 
 @SubscribeMessage('join_room')

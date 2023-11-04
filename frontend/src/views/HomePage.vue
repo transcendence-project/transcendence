@@ -60,6 +60,10 @@ interface Match {
 	result: string;
 }
 
+onMounted(() => {
+	store.dispatch('fetchUserData');
+	});
+
 const match = ref<Match[]>([
 	{ date: "2023-08-15", opponent: "Player A", result: "Win" },
 	{ date: "2023-08-10", opponent: "Player B", result: "Loss" },
