@@ -11,9 +11,12 @@
 
     connectWebSocket('http://localhost:3000/game');
     const socket = getSocket();
-    // socket.on('start-game', (data) => {
-    //     console.log("this is the width ", data[0]);
-    // })
+	// if (socket)
+	// {
+	// 	socket.on('table', (data) => {
+	// 		console.log("this is the width ", data[0]);
+	// 	});
+	// }
     const startGame = () => {
             if (socket) {
             socket.emit('start-game', 'This is from the client to the server game');
@@ -22,15 +25,15 @@
     const game = ref<HTMLCanvasElement | null>(null);
     onMounted(() => {
             if (socket) {
-            socket.on('connected', (message) => {
-            console.log(`Server says: ${message}`);
+            socket.on('table', (message) => {
+            // console.log(`Server says: ${message}`);
             if (game.value)
             {
                 const context = game.value.getContext('2d');
-                // context.value.width = 900;
-                // context.value.height = 400;
+                game.value.width = message[0];
+                game.value.height = message[1];
                 if (context) {
-                    context.fillStyle = 'red';
+					context.fillStyle = 'red';
                     // context
                     context.fillRect(50, 0, 100, 100);
                 }
