@@ -67,12 +67,15 @@ send_message_dm(client: any, payload: any): void {
 }
 
 @SubscribeMessage('create_room')
-async create_room(client: any, room_name: string): Promise<void> {
+async create_room(client: any, payload: any): Promise<void> {
 	console.log("reached create room - backend websockets");
+	const { channel_name, password } = payload;
+	console.log(`channel name in backend: ${channel_name}`);
+	console.log(`password in backend: ${password}`);
 	const user = this.chatService.find_user_with_id(client.id);
-	await this.chatService.create_chan(room_name, user);
-	client.join(room_name);
-	client.emit('create_room_success');
+	await this.chatService.create_chan(channel_name, user);
+	// client.join(channel_name);
+	// client.emit('create_room_success');
 }
 
 @SubscribeMessage('join_room')
