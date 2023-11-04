@@ -40,9 +40,9 @@ export class GameGateway implements OnGatewayInit , OnGatewayConnection, OnGatew
   }
 
   @SubscribeMessage('start-game')
-  start_game(@ConnectedSocket() client: Socket,@MessageBody() payload: any): number[]
+  start_game(@ConnectedSocket() client: Socket,@MessageBody() payload: any): { event: string; data: number[] }
   {
       console.log("start-game working");
-    return this.gameService.init_table(client);
+    return {event:'table' ,data: this.gameService.init_table(client)};
   }
 }

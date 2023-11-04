@@ -3,44 +3,38 @@
 	  <canvas ref="game" id="pong"></canvas>
       <button @click="startGame">Start Game</button>
 	</div>
-  </template>
+</template>
   
 <script lang="ts" setup>
     import { ref, onMounted} from 'vue';
-    import { connectWebSocket, getSocket } from '@/socket/gameServices';
+    import WebSocketPlugin from '@/plugins/websocket-plugin';
 
-    connectWebSocket('http://localhost:3000/game');
-    const socket = getSocket();
-    socket.on('start-game', (data) => {
-        console.log("this is the width ", data);
-    })
     const startGame = () => {
-            if (socket) {
-            socket.emit('start-game', 'This is from the client to the server game');
-            }
+        if (this.$socket) {
+            $socket.emit('start-game', 'This is from the client to the server game');
+        }
     };
     const game = ref<HTMLCanvasElement | null>(null);
-    onMounted(() => {
-            if (socket) {
-            socket.on('connected', (message) => {
-            console.log(`Server says: ${message}`);
+    onMounted(() => {   
+            if (this.$socket) {
+                this.$socket?.on('table', (message: any[]) => {
             if (game.value)
             {
                 const context = game.value.getContext('2d');
-                // context.value.width = 900;
-                // context.value.height = 400;
+                game.value.width = message[0];
+                game.value.height = message[1];
                 if (context) {
-                    context.fillStyle = 'red';
+					context.fillStyle = 'red';
                     // context
                     context.fillRect(50, 0, 100, 100);
                 }
             }
         });
         }
-    });
+    }); 
 </script>
-  
-  
+
+   
   
   <style>
 
