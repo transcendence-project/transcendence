@@ -26,7 +26,7 @@ export class Channel {
 	admins: User[];
 
     @ManyToMany(() => User, user => user.channels,)
-	@JoinTable()
+	// @JoinTable()
     members: User[];
 
 	@ManyToMany(type => User)

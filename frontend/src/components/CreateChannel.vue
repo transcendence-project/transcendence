@@ -4,11 +4,11 @@
       <h2 class="adchn">Create Channel</h2>
       <div class="editform">
         <input
-          v-model="text"
+          v-model="channel_name"
           placeholder="Channel name"
           class="input text-left"
         />
-        <input v-model="text" placeholder="Password" class="input text-left" />
+        <input v-model="password" placeholder="Password" class="input text-left" />
         <div class="psopt">
           <p>* password is optional</p>
         </div>
@@ -30,19 +30,21 @@ import { defineComponent, ref } from 'vue';
 import store from "@/store";
 
 export default defineComponent({
-	setup(){
-		const text = ref('');
-		return {
-			text, 
-		};
-	},
+	data() {
+    return {
+      channel_name: '',
+      password: '',
+    };
+  },
   methods: {
     closePage(): void {
       this.$emit('close');
     },
 	create_room(){
+		// console.log(this.channel_name);
+		// console.log(this.password);
 		if (store.state.chat.socket)
-			store.state.chat.socket.emit( 'create_room', 'azrachan');
+			store.state.chat.socket.emit( 'create_room', {channel_name: this.channel_name, password: this.password});
 	},
   },
 });
