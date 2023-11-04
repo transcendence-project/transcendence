@@ -10,7 +10,7 @@ export class UsersController {
 	constructor(private userService: UsersService){}
 	@Post('/signup')
 	createUser(@Body() body: createUserDTO) {
-		this.userService.create(body.email, body.username)
+		this.userService.create(body.email, body.username, body.fullname, body.image);
 	}
 
 	@Get('/:id')

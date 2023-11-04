@@ -8,7 +8,7 @@
         class="flex-col items-center justify-center p-0 m-0 mt-5 w-full h-[500px] bg-gradient-to-r from-[#ae445a] to-[#662549] shadow-custom rounded-[10px]"
       >
         <ButtonComponent
-          btnContent="Add Channel"
+          btnContent="Create Channel"
           class="m-2"
           @click="AddChannelForm"
         />
@@ -89,6 +89,8 @@ import ChannelOption from "@/components/ChannelOption.vue";
 import ButtonComponent from "@/components/ButtonComponent.vue";
 import CreateChannel from "@/components/CreateChannel.vue";
 import OptionMenu from "@/components/OptionMenu.vue";
+import io from 'socket.io-client';
+import store from "@/store";
 
 interface ChannelList {
   channel: string;
@@ -154,16 +156,58 @@ export default defineComponent({
       );
     },
   },
+	created(){
+			if (!store.state.chat.socket)
+			{
+				store.state.chat.socket = io('http://localhost:3000/chat', {
+					auth: {
+						token: localStorage.getItem('token'),
+					},
+				});
+			}
+			store.dispatch('fetchAllChan');
+			// console.log(store.getters.getTest);
+			// console.log(store.getters.getAllChannel);
+			store.state.chat.socket.on('create_room_success', () => { // event listener
+				console.log('Room created successfully and back in front end');
+			});
+			store.state.chat.socket.on('join_room_success', () => {
+				console.log('Joined the channel successfully and back in front end');
+			});
+			store.state.chat.socket.on('chan_msg_success', () => {
+				console.log('Send message to channel successfully and back in front end');
+			});
+			store.state.chat.socket.on('priv_msg_success', () => {
+				console.log('Send message to channel successfully and back in front end');
+			});
+			
+	},
   methods: {
-    AddChannelForm() {
-      this.isAddChannelForm = true; // Open the component
-    },
-    closeAddChannelForm() {
-      this.isAddChannelForm = false; // Close the component
-    },
-    showUserList(result: ChannelList) {
-      this.selectedItem = result;
-    },
+		create_room(){
+			if (store.state.chat.socket)
+				store.state.chat.socket.emit( 'create_room', 'azrachan');
+		},
+		join_chan(){
+			if (store.state.chat.socket)
+				store.state.chat.socket.emit('join_room', {room_name:'azrachan', arg: ""});
+		},
+		send_chan_msg(){
+			if (store.state.chat.socket)
+				store.state.chat.socket.emit('send_msg_to_chan', {room_name:'azrachan', message:'hello world'});
+		},
+		send_priv_msg(){
+			if (store.state.chat.socket)
+				store.state.chat.socket.emit('private_message')
+		},
+		AddChannelForm() {
+		this.isAddChannelForm = true; // Open the component
+		},
+		closeAddChannelForm() {
+		this.isAddChannelForm = false; // Close the component
+		},
+		showUserList(result: ChannelList) {
+		this.selectedItem = result;
+		},
   },
 });
 </script>

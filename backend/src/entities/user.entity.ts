@@ -14,7 +14,14 @@ export class User {
 	id: number
 
 	@Column()
+	fullname: string
+
+	@Column()
 	userName: string
+
+	@Column()
+	image: string
+
 
 	@Column()
 	email: string

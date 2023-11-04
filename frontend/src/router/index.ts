@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
+import store from '@/store';
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -61,6 +62,7 @@ router.beforeEach((to: any, from: any, next: any) => {
     {
           const token = to.query.code;
           localStorage.setItem('token', token);
+		  store.dispatch('fetchUserData');
     }
   });
 export default router;
