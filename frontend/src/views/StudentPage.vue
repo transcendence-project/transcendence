@@ -33,30 +33,20 @@
 import Vue from "vue";
 import axios, { AxiosResponse } from "axios";
 import { defineComponent } from "vue";
+import { IStudent } from "@/models/student";
 
-interface Students {
-  id: number;
-  first_name: string;
-  last_name: string;
-  email: string;
-  status: string;
-  win: number;
-  lose: number;
-  draw: number;
-  rank: number;
-}
 
 export default defineComponent({
   name: "StudentList",
   data() {
     return {
-      student: [] as Students[],
+      student: [] as IStudent[],
     };
   },
   mounted() {
     axios
       .get("http://localhost:3000/users")
-      .then((resp: AxiosResponse<Students[]>) => {
+      .then((resp: AxiosResponse<IStudent[]>) => {
         this.student = resp.data;
       })
       .catch((error) => {

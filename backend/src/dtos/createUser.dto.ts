@@ -9,4 +9,9 @@ export class createUserDTO {
 
 	@IsString()
 	username: string
+
+	@IsString()
+	fullname: string
+
+	image: string
 }

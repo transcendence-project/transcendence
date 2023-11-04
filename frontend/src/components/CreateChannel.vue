@@ -1,7 +1,7 @@
 <template>
   <div class="channel">
     <div class="edit-cont" >
-      <h2 class="adchn">Add Channel</h2>
+      <h2 class="adchn">Create Channel</h2>
       <div class="editform">
         <input
           v-model="text"
@@ -17,7 +17,7 @@
             <button class="closebtn" @click="closePage">Close</button>
           </div>
           <div class="add">
-            <button class="addbtn" @click="addchn">Add</button>
+            <button class="addbtn" @click="create_room">Add</button>
           </div>
         </div>
       </div>
@@ -26,15 +26,27 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, ref } from 'vue';
+import store from "@/store";
 
 export default defineComponent({
+	setup(){
+		const text = ref('');
+		return {
+			text, 
+		};
+	},
   methods: {
     closePage(): void {
       this.$emit('close');
     },
+	create_room(){
+		if (store.state.chat.socket)
+			store.state.chat.socket.emit( 'create_room', 'azrachan');
+	},
   },
 });
+
 </script>
 
 <style scoped>

@@ -14,7 +14,12 @@
 
 <script lang="ts" setup>
 import DropdownMenu from "./DropdownMenu.vue";
-const username = "yoyohann";
+import { computed } from 'vue';
+import store from '@/store';
+
+const username = computed(() => { // computed -> to update automatically
+      return store.getters.getUserName;
+    });
 </script>
 
 <style scoped>
