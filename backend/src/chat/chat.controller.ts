@@ -8,9 +8,9 @@ export class ChatController {
 	}
 
 	// all channels
-	@Get('channels')
+	@Get('all_channels')
 	async all_channels(){
-		// return all the channels from the repo
+		return (await this.chatService.get_all_chan());
 	}
 
 	// could add it in the users service

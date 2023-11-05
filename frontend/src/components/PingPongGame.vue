@@ -1,4 +1,77 @@
 <template>
+  <div>
+    <!-- Your component content here -->
+  </div>
+</template>
+
+<script lang="ts">
+import { ref, onMounted } from 'vue';
+import { connectWebSocket, getSocket } from '@/socket/gameServices';
+
+export default {
+  setup() {
+    const socket = getSocket();
+    const message = ref('');
+
+    const sendMessage = () => {
+      if (socket) {
+        socket.emit('chat-message', message.value);
+      }
+    };
+
+    onMounted(() => {
+      // You may call this when the component is mounted
+      connectWebSocket('ws://backend:3000/game', 'your-auth-token');
+
+      const socket = getSocket();
+        if (socket) {
+          socket.on('connected', (message) => {
+          console.log(`Server says: ${message}`);
+          // You can perform any additional actions here upon successful connection.
+        });
+      }
+    });
+
+    return {
+      message,
+      sendMessage,
+    };
+  },
+};
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- <template>
   <div class="game-container">
     <canvas ref="canvas" id="pong" width="900" height="400"></canvas>
   </div>
@@ -258,4 +331,4 @@ body {
   width: fit-content;
   margin: 6rem auto;
 }
-</style>
+</style> -->

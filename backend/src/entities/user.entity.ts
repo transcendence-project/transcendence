@@ -15,7 +15,14 @@ export class User {
 	id: number
 
 	@Column()
+	fullname: string
+
+	@Column()
 	userName: string
+
+	@Column()
+	image: string
+
 
 	@Column()
 	email: string
@@ -67,6 +74,9 @@ export class User {
 	@ManyToMany(() => Channel, channel => channel.members)
 	@JoinTable({ name: "my_channels"})
 	channels: Channel[]
+
+	@Column({default: false})
+	isOnline: boolean;
 
 	@Column({ nullable: true })
 	@OneToMany(() => User, user => user.receivedInvites)

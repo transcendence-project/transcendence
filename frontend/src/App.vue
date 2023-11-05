@@ -1,28 +1,47 @@
 <template>
 	<div id="home">
-	  <TopNavBar />
+	  <TopNavBar v-if="!isLoginPage"/>
 	  <div class="side-cont">
-		<SideNavBar />
-		<router-view />
+		<SideNavBar  v-if="!isLoginPage"/>
+		<router-view v-slot="{ Component }">
+		  <Transition name="slide" mode="out-in">
+			<component :is="Component" :key="$route.path"></component>
+		  </Transition>
+		</router-view>
 	  </div>
 	</div>
   </template>
   
-<script lang="ts">
-  import { defineComponent } from "vue";
+  <script lang="ts">
+  import { defineComponent, computed } from "vue";
+  import { useRouter } from "vue-router";
   import TopNavBar from "@/components/TopNavBar.vue";
   import SideNavBar from "@/components/SideNavBar.vue";
   
   export default defineComponent({
-	name: "homePage",
+	name: "App",
 	components: {
 	  TopNavBar,
 	  SideNavBar,
 	},
-  });
-</script>
+	// computed: {
+	// 	isLoginPage(): boolean{
+	// 		return this.$store.getters.getReady;
+	// 	},
+	// }
+	setup() {
+	  const router = useRouter();
   
-<style scoped>
+	  const isLoginPage = computed(() => {
+		return router.currentRoute.value.name === "login";
+	  });
+  
+	  return { isLoginPage };
+	},
+  });
+  </script>
+  
+  <style scoped>
   body {
 	font-family: "Arial", sans-serif;
 	margin: 0;
@@ -35,5 +54,20 @@
 	flex: 1;
 	padding: 20px;
   }
-</style>
+  
+  .slide-enter-active{
+	transition: all 0.3s ease-out;
+  }
+  .slide-leave-active {
+	transition: all 0.5s cubic-bezier(1, 0.5, 0.8, 1);
+  }
+  .nav{
+	width: 100%;
+  }
+  .slide-enter-from,
+  .slide-leave-to {
+	opacity: 0;
+	transform: translateX(20px);
+  }
+  </style>
   

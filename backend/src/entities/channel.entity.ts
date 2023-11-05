@@ -11,7 +11,7 @@ export class Channel {
     room_name: string;
 
     @Column()
-    description: string;
+    description: string; // ??
 
     @OneToMany(() => Message, message => message.channel)
     messages: Message[];
@@ -25,6 +25,7 @@ export class Channel {
 	admins: User[];
 
     @ManyToMany(() => User, user => user.channels,)
+	// @JoinTable()
     members: User[];
 
 	@ManyToMany(type => User)

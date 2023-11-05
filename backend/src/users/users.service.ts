@@ -11,13 +11,13 @@ import { SeederService } from '../achievements/achievement.seed';
 export class UsersService {
 	constructor(private seederService: SeederService, @InjectRepository(User) private repo: Repository<User>){}
 
-	async create(email: string, userName: string){
+	async create(email: string, userName: string, fullname: string, image: string){
 
 		// const user = await this.findAll(userName);
 		const user = await this.findOneByUserName(userName);
 		if (user)
 			return (user)
-		const user2 = this.repo.create({email, userName, twoFactorSecret: null, is2FAEnabled: false, friends: [], channels: [], matches: [], achievements: []});
+		const user2 = this.repo.create({email, fullname, userName, image, twoFactorSecret: null, is2FAEnabled: false, friends: [], channels: [], matches: [], achievements: []});
 		return (this.repo.save(user2))
 	}
 	findOne(id: number) {
@@ -34,6 +34,11 @@ export class UsersService {
 
 	findAll(userName: string) {
 		return (this.repo.find({where: {userName}}))
+	}
+
+	async findUserChan(user_id: number){
+		const user = await this.findOne(user_id);
+		return user.channels;
 	}
 
 	update(id: number, attrs: Partial<User>) {

@@ -22,9 +22,12 @@ async validate(
     profile: Profile,
     done: any,
 	): Promise<any> {
+		// console.log(profile);
     const user = await this.authService.validate({
 	email: profile._json.email,
 	username: profile.username,
+	fullname: profile.displayName,
+	image: profile._json.image.link
 	});
 	// console.log(user)
 	// if (!user) {
