@@ -5,6 +5,7 @@ import { Achievement } from "./achievement.entity";
 import { FriendRequest } from "./friend-request.entity";
 // import { Friend } from "./friend.entity";
 import { Channel } from "./channel.entity";
+import { Invitation } from "./invitations.entity";
 
 
 @Entity()
@@ -63,8 +64,15 @@ export class User {
 	})
 	achievements: Achievement[];
 	
-
 	@ManyToMany(() => Channel, channel => channel.members)
 	@JoinTable({ name: "my_channels"})
 	channels: Channel[]
+
+	@Column({ nullable: true })
+	@OneToMany(() => User, user => user.receivedInvites)
+	receivedInvites: Invitation[]
+
+	@Column({ nullable: true })
+	@OneToMany(() => User, user => user.sentInvites)
+	sentInvites: User[]
 }
