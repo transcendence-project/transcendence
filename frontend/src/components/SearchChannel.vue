@@ -23,7 +23,7 @@
 <script lang="ts">
 import { defineComponent} from "vue";
 
-interface ChannelList {
+export interface ChannelList {
   channel: string;
   group: string;
   user: string[];

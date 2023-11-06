@@ -17,26 +17,17 @@
   </nav>
 </template>
 
-<!-- <script lang="ts" setup>
-
-</script> -->
-
 <script lang="ts">
 import Vue from "vue";
 import axios, { AxiosResponse } from "axios";
 import { defineComponent } from "vue";
 import DropdownMenu from "./DropdownMenu.vue";
-<<<<<<< HEAD
-const username = "yoyohann";
-=======
 import { computed } from 'vue';
 import store from '@/store';
 
 const username = computed(() => { // computed -> to update automatically
       return store.getters.getUserName;
     });
-</script>
->>>>>>> efb9a2fd24a901613556d0555207f160bd53347e
 
 interface Students {
   id: number;

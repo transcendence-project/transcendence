@@ -62,12 +62,8 @@ const routes: Array<RouteRecordRaw> = [
 ];
 
 const router = createRouter({
-<<<<<<< HEAD
-  history: createWebHistory(process.env.BASE_URL),
-=======
 //   history: createWebHistory(process.env.BASE_URL),
   history: createWebHistory('/'),
->>>>>>> efb9a2fd24a901613556d0555207f160bd53347e
   routes,
 
 
@@ -76,10 +72,6 @@ scrollBehavior (to, from , savedPosition){
 }
 });
 
-<<<<<<< HEAD
-
-
-=======
 router.beforeEach((to: any, from: any, next: any) => {
     if (to.path === '/login') {
     //   document.body.style.backgroundColor = '#F39F5A !important';
@@ -95,5 +87,4 @@ router.beforeEach((to: any, from: any, next: any) => {
 		  store.dispatch('fetchUserData');
     }
   });
->>>>>>> efb9a2fd24a901613556d0555207f160bd53347e
 export default router;
