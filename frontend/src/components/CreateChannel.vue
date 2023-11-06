@@ -44,7 +44,12 @@ export default defineComponent({
 		// console.log(this.channel_name);
 		// console.log(this.password);
 		if (store.state.chat.socket)
-			store.state.chat.socket.emit( 'create_room', {channel_name: this.channel_name, password: this.password});
+		{
+			if (this.password)
+				store.state.chat.socket.emit( 'create_prot_room', {channel_name: this.channel_name, password: this.password});
+			else
+				store.state.chat.socket.emit( 'create_pub_room', {channel_name: this.channel_name, password: this.password});
+		}
 	},
   },
 });

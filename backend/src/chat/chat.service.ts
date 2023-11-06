@@ -51,21 +51,35 @@ export class ChatService {
 	async create_chan(chan_name: string, user: User, pass: string) {
 		const chan = await this.chan_by_name(chan_name);
 		if (chan){
-			const all_chan = await this.get_all_chan();
-			console.log(all_chan);
+			// const all_chan = await this.get_all_chan();
+			// console.log(all_chan);
 			console.log(`Channel ${chan_name} already exists`);
+			return null;
 		}
 		else {
 			try{
-				const chan2 = this.channelRepo.create({ room_name: chan_name, owner: user, password: pass, members: [], admins: [], description: "" });
-				chan2.members.push(user);
-				chan2.admins.push(user);
-				await this.channelRepo.save(chan2);
-				console.log(`Channel ${chan_name} created successfully`);
+				if (pass){
+					const chan2 = this.channelRepo.create({ room_name: chan_name, owner: user, password: pass, 
+						members: [], admins: [], description: "", isGroupChannel: true, is_protected: true });
+					chan2.members.push(user);
+					chan2.admins.push(user);
+					await this.channelRepo.save(chan2);
+					console.log(`Channel ${chan_name} created successfully`);
+					return (chan2)
+				}
+				else
+				{
+					const chan2 = this.channelRepo.create({ room_name: chan_name, owner: user, password: pass, 
+						members: [], admins: [], description: "", isGroupChannel: true, is_public: true });
+					chan2.members.push(user);
+					chan2.admins.push(user);
+					await this.channelRepo.save(chan2);
+					console.log(`Channel ${chan_name} created successfully`);
+					return (chan2)
+				}
 
 			}catch (error) {
 			console.error('Error while saving channel:', error);
-		// any condition if there is password??
 			}
 		}
 	}
