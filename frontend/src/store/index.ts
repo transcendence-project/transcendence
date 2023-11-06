@@ -59,6 +59,7 @@ const store = createStore({
 		setAllChannel(state: any, all_chan: any) {
 			console.log('inside setAllChannel');
 			state.chat.all_channels = all_chan; // or push?
+			// state.chat.all_channels.push(all_chan);
 		},
 		setMyChannel(state: any, my_chan: any) {
 			state.chat.my_channels = my_chan; // or push?

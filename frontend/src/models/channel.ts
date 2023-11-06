@@ -7,7 +7,7 @@ export interface IChannel{
 	members: null; // will be user interface
 	invites: null;  // will be user interface
 	password: string;
-	state: string;
+	// state: string;
 	// isGroupChan: boolean;
 	// isPrivate: boolean;
 	// isProtected: boolean;

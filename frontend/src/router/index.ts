@@ -79,6 +79,10 @@ router.beforeEach((to: any, from: any, next: any) => {
     //   document.body.style.backgroundColor = '#5E6367';
       console.log(`Navigating from ${from.fullPath} to ${to.fullPath}`);
     }
+	if (from.fullPath === '/chat') { // Replace 'chatRoute' with your chat route name
+		// Clear the channels array or perform any other necessary cleanup
+		store.state.chat.socket.off('create_room_success');
+	  }
     next();
     if (to.path == '/home' && to.query.code)
     {
