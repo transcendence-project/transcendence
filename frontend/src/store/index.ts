@@ -1,3 +1,4 @@
+import Vue from 'vue'
 import { createStore } from 'vuex'
 import { IChannel } from '@/models/channel';
 import axios, { AxiosResponse } from "axios";

@@ -11,6 +11,7 @@
 		:class="{ active: showDropdowns }"
 		@click.stop=""
 	  >
+		<router-link to="/home">Profile</router-link>
 		<router-link to="/chat">Message</router-link>
 		<router-link to="/game">Remove</router-link>
 	  </div>

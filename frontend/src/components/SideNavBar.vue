@@ -1,8 +1,10 @@
 <template>
-  <aside class="bg-gradient-to-t from-[#AE445A] to-[#451952] shadow-custom  p-5 min-h-[85.4vh] md:min-h-[85.10vh] lg:min-h-[85.9vh]">
+  <aside
+    class="bg-gradient-to-t from-[#AE445A] to-[#451952] shadow-custom p-5 min-h-[85.4vh] md:min-h-[85.10vh] lg:min-h-[95.9vh]"
+  >
     <ul class="list-none p-0">
       <li class="mb-5">
-        <router-link to="/chat" 
+        <router-link to="/chat"
           ><img src="@/assets/chat.svg" alt="Chat" />
         </router-link>
       </li>
@@ -59,3 +61,4 @@
   text-decoration: underline;
 }
 </style> -->
+
