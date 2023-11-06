@@ -1,6 +1,14 @@
 <template>
   <div class="channel">
     <div class="edit-cont" >
+      <h2 class="adchn">Add Channel</h2>
+      <div class="editform">
+        <input
+          v-model="text"
+          placeholder="Channel name"
+          class="input text-left"
+        />
+        <input v-model="text" placeholder="Password" class="input text-left" />
       <h2 class="adchn">Create Channel</h2>
       <div class="editform">
         <input
@@ -17,6 +25,8 @@
             <button class="closebtn" @click="closePage">Close</button>
           </div>
           <div class="add">
+            <button class="addbtn" @click="addchn">Add</button>
+=======
             <button class="addbtn" @click="create_room">Add</button>
           </div>
         </div>
@@ -26,6 +36,11 @@
 </template>
 
 <script lang="ts">
+<<<<<<< HEAD
+import { defineComponent } from 'vue';
+
+export default defineComponent({
+=======
 import { defineComponent, ref } from 'vue';
 import store from "@/store";
 
@@ -36,10 +51,15 @@ export default defineComponent({
       password: '',
     };
   },
+>>>>>>> efb9a2fd24a901613556d0555207f160bd53347e
   methods: {
     closePage(): void {
       this.$emit('close');
     },
+<<<<<<< HEAD
+  },
+});
+=======
 	create_room(){
 		// console.log(this.channel_name);
 		// console.log(this.password);
@@ -49,6 +69,7 @@ export default defineComponent({
   },
 });
 
+>>>>>>> efb9a2fd24a901613556d0555207f160bd53347e
 </script>
 
 <style scoped>

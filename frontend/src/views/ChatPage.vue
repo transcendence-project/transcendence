@@ -8,25 +8,37 @@
         class="flex-col items-center justify-center p-0 m-0 mt-5 w-full h-[500px] bg-gradient-to-r from-[#ae445a] to-[#662549] shadow-custom rounded-[10px]"
       >
         <ButtonComponent
+<<<<<<< HEAD
+          btnContent="Add Channel"
+=======
           btnContent="Create Channel"
+>>>>>>> efb9a2fd24a901613556d0555207f160bd53347e
           class="m-2"
           @click="AddChannelForm"
         />
         <CreateChannel v-if="isAddChannelForm" @close="closeAddChannelForm" />
         <div>
           <input
-            v-model="text"
             placeholder="Search channel"
+            @click="showSearchChannel"
             class="w-9/12 md:w-10/12 h-[1.5rem] border-0 text-black ml-2 rounded-md pl-4 mb-2 focus:border-0 focus:outline-none"
           />
         </div>
+        <SearchChannel
+          v-if="isSearchChannelVisible"
+          @close="showSearchChannel"
+        />
         <div class="flex justify-center m-0 mt-2 p-0 w-full h-[350px]">
           <ul class="w-[95%] p-1 m-1">
             <div v-for="(result, index) in filteredSearch" :key="index">
               <li class="list-none w-full mb-2">
                 <a @click="showUserList(result)" class="cursor-pointer">
                   <div
+<<<<<<< HEAD
+                    class="flex items-center justify-between mb-2 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom px-1 w-full rounded-[10px]"
+=======
                     class="flex items-center justify-between mb-2 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom mx-3 px-1 w-full rounded-[10px]"
+>>>>>>> efb9a2fd24a901613556d0555207f160bd53347e
                   >
                     {{ result.channel }}
                     {{ result.group }}
@@ -37,21 +49,52 @@
             </div>
           </ul>
         </div>
+<<<<<<< HEAD
+
+        <div class="chn-btm">
+          <button class="grpbtn">Group</button>
+          <button class="dmbtn">DM</button>
+        </div>
+=======
+>>>>>>> efb9a2fd24a901613556d0555207f160bd53347e
       </div>
     </div>
     <div class="w-full lg:w-58 m-0">
       <h1 class="text-2xl">Chat</h1>
       <div
+<<<<<<< HEAD
+        class="flex-col items-center justify-center p-2 m-1 mt-8 w-full h-[500px] bg-gradient-to-r from-[#ae445a] to-[#662549] shadow-custom"
+      >
+        <div
+          class="bg-white h-[420px] p-1 mb-5 m-1 text-black"
+          style="text-align: right"
+        >
+          <div v-for="(chatMessage, index) in chatMessage" :key="index">
+            <div
+              class="bg-gray-500 text-black py-2 px-4 inline-block m-1 mx-5 rounded-md"
+              style="max-width: 300px"
+            >
+              {{ chatMessage }}
+            </div>
+          </div>
+        </div>
+
+=======
         class="flex-col items-center justify-center p-0 m-0 mt-8 w-full h-[500px] bg-gradient-to-r from-[#ae445a] to-[#662549] shadow-custom"
       >
         <div class="bg-white h-[420px] p-1 mb-5 m-1"></div>
+>>>>>>> efb9a2fd24a901613556d0555207f160bd53347e
         <div class="w-full">
           <input
             v-model="message"
             placeholder="message"
             class="w-[80%] h-[2rem] border-0 text-black ml-2 mr-1 rounded-full pl-4 mb-2 focus:border-0 focus:outline-none"
           />
+<<<<<<< HEAD
+          <ButtonComponent btnContent="Send" @click="sendMessage" />
+=======
           <ButtonComponent btnContent="Send" />
+>>>>>>> efb9a2fd24a901613556d0555207f160bd53347e
         </div>
       </div>
     </div>
@@ -89,8 +132,12 @@ import ChannelOption from "@/components/ChannelOption.vue";
 import ButtonComponent from "@/components/ButtonComponent.vue";
 import CreateChannel from "@/components/CreateChannel.vue";
 import OptionMenu from "@/components/OptionMenu.vue";
+<<<<<<< HEAD
+import SearchChannel from "@/components/SearchChannel.vue";
+=======
 import io from 'socket.io-client';
 import store from "@/store";
+>>>>>>> efb9a2fd24a901613556d0555207f160bd53347e
 
 interface ChannelList {
   channel: string;
@@ -105,6 +152,10 @@ export default defineComponent({
     ButtonComponent,
     CreateChannel,
     OptionMenu,
+<<<<<<< HEAD
+    SearchChannel,
+=======
+>>>>>>> efb9a2fd24a901613556d0555207f160bd53347e
   },
   data() {
     return {
@@ -113,6 +164,19 @@ export default defineComponent({
           channel: "fruits",
           group: "private",
           user: ["orange", "banana", "apple", "lemon", "peach"],
+          friend: false,
+        },
+        {
+<<<<<<< HEAD
+          channel: "computer",
+          group: "private",
+          user: ["monitor", "window", "cpu", "mouse", "keybord"],
+          friend: false,
+        },
+        {
+          channel: "furniture",
+          group: "public",
+          user: ["door", "chair", "bed", "table", "tv", "gate"],
           friend: false,
         },
         {
@@ -128,8 +192,53 @@ export default defineComponent({
           friend: true,
         },
         {
+          channel: "mamamls",
+          group: "public",
+          user: [
+            "dog",
+            "cat",
+            "cow",
+            "lion",
+            "tiger",
+            "elephant",
+            "fish",
+            "donkey",
+          ],
+          friend: false,
+        },
+        {
+          channel: "domestci",
+          group: "public",
+          user: [
+            "dog",
+            "cat",
+            "cow",
+            "lion",
+            "tiger",
+            "elephant",
+            "fish",
+            "donkey",
+          ],
+          friend: false,
+        },
+        {
+          channel: "species",
+          group: "public",
+          channel: "cars",
+          group: "public",
+          user: ["mercedes", "volvo", "BMW", "Ferrari"],
+          friend: true,
+        },
+        {
+          channel: "plants",
+          group: "public",
+          user: ["tree", "grass", "bush", "leaf"],
+          friend: true,
+        },
+        {
           channel: "animals",
           group: "private",
+>>>>>>> efb9a2fd24a901613556d0555207f160bd53347e
           user: [
             "dog",
             "cat",
@@ -146,14 +255,49 @@ export default defineComponent({
       text: "" as string,
       message: "" as string,
       isAddChannelForm: false,
+<<<<<<< HEAD
+      isSearchChannelVisible: false,
       selectedItem: null as ChannelList | null,
+      isMessageSent: false,
+      chatMessage: [] as string[],
+=======
+      selectedItem: null as ChannelList | null,
+>>>>>>> efb9a2fd24a901613556d0555207f160bd53347e
     };
   },
   computed: {
     filteredSearch(): ChannelList[] {
-      return this.channels.filter((item) =>
-        item.channel.toLowerCase().includes(this.text.toLowerCase())
-      );
+      if (this.text === "") {
+        return this.channels.filter((item) => item.group === "public");
+      } else {
+        return this.channels.filter((item) => {
+          return (
+            item.channel.toLowerCase().includes(this.text.toLowerCase()) &&
+            item.group === "public"
+          );
+        });
+      }
+    },
+  },
+  methods: {
+    AddChannelForm() {
+      this.isAddChannelForm = true;
+    },
+    closeAddChannelForm() {
+      this.isAddChannelForm = false;
+    },
+    showUserList(result: ChannelList) {
+      this.selectedItem = result;
+    },
+    showSearchChannel() {
+      this.isSearchChannelVisible = !this.isSearchChannelVisible;
+    },
+    sendMessage() {
+      if (this.message) {
+        this.chatMessage.push(this.message);
+        this.isMessageSent = true;
+        this.message = "";
+      }
     },
   },
 	created(){
@@ -211,3 +355,32 @@ export default defineComponent({
   },
 });
 </script>
+
+<style scoped>
+.chn-btm {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 50px;
+}
+
+.grpbtn,
+.dmbtn {
+  font-size: 0.8rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-radius: 5px;
+  margin-left: 10px;
+  cursor: pointer;
+  color: white;
+  background: #451952;
+  border: none;
+}
+.grpbtn:hover,
+.dmbtn:hover {
+  background: #ae4488;
+  color: #d9d9da;
+}
+</style>
