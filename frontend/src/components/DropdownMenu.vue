@@ -13,7 +13,7 @@
 	  >
 		<router-link to="/profile" @click.native="closeDropdown">Edit Profile</router-link>
 		<router-link to="/twofactor" @click.native="closeDropdown">Two-factor-AUTH</router-link>
-		<router-link to="/logout" @click.native="closeDropdown">Logout</router-link>
+		<router-link to="/login" @click.native="closeDropdown">Logout</router-link>
 	  </div>
 	</div>
 </template>

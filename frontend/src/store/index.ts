@@ -1,6 +1,11 @@
+import Vue from 'vue'
 import { createStore } from 'vuex'
+<<<<<<< HEAD
+// import { vuex } from 'vuex'
+=======
 import { IChannel } from '@/models/channel';
 import axios, { AxiosResponse } from "axios";
+>>>>>>> efb9a2fd24a901613556d0555207f160bd53347e
 import {Socket}  from 'socket.io-client';
 import { IStudent } from '../models/student';
 
@@ -27,6 +32,10 @@ const store = createStore({
 		test: "inside chat in store.. testingg",
 	},
   },
+<<<<<<< HEAD
+  getters: {
+	// getReady: state => state.ready,
+=======
   getters: { // used to retrieve computed properties or derived state from the store.
 
 	// GETTERS FOR CHAT
@@ -47,6 +56,7 @@ const store = createStore({
 	getDraw: (state: any) => state.user.draw,
 	getRank: (state: any) => state.user.rank,
 
+>>>>>>> efb9a2fd24a901613556d0555207f160bd53347e
   },
   mutations: { //used to modify the state. synchronous functions, take current state as argument & make changes to it. (i.e setters)
 

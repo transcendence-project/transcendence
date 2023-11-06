@@ -1,55 +1,85 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 import store from '@/store';
 
+
 const routes: Array<RouteRecordRaw> = [
   {
     path: "/",
     name: "login", 
-    component: () => import("../views/LoginPage.vue"),
+    component: () => import(/* webpackChunkName: "login" */ "../views/LoginPage.vue"),
+	meta:{
+		allowAnonymous: true
+	}
   },
+
   {
-    path: "/home",
+    path: "/",
     name: "home",
-    component: () => import("../views/HomePage.vue"),
+	alias: '/home',
+    component: () => import(/* webpackChunkName: "home" */ "../views/HomePage.vue"),
+
   },
   {
     path: "/game",
     name: "game",
-    component: () => import("../views/GamePage.vue"),
+    component: () => import(/* webpackChunkName: "game" */ "../views/GamePage.vue"),
   },
   {
     path: "/friends",
     name: "friends",
-    component: () => import("../views/FriendsPage.vue"),
+    component: () => import(/* webpackChunkName: "game" */ "../views/FriendsPage.vue"),
   },
   {
     path: "/profile",
     name: "profile",
-    component: () => import("../views/EditProfilePage.vue"),
+    component: () => import(/* webpackChunkName: "game" */ "../views/EditProfilePage.vue"),
   },
   {
     path: "/chat",
     name: "chat",
-    component: () => import("../views/ChatPage.vue"),
+    component: () => import(/* webpackChunkName: "chat" */ "../views/ChatPage.vue"),
   },
   {
     path: "/leader",
     name: "leader",
-    component: () => import("../views/LeaderPage.vue"),
+    component: () => import(/* webpackChunkName: "leader" */ "../views/LeaderPage.vue"),
   },
   {
     path: "/student",
     name: "student",
-    component: () => import("../views/StudentPage.vue"),
+    component: () => import(/* webpackChunkName: "student" */ "../views/StudentPage.vue"),
+  },
+  {
+    path: "/twofactor",
+    name: "twofactor",
+    component: () => import(/* webpackChunkName: "twofactor" */ "../views/TwoFactorAuth.vue"),
+  },
+  {
+    path: "/:pathMatch(.*)*",
+    name: "NotFound",
+    component: () => import(/* webpackChunkName: "notfound" */ "../views/NotFound.vue"),
   },
 ];
 
 const router = createRouter({
+<<<<<<< HEAD
+  history: createWebHistory(process.env.BASE_URL),
+=======
 //   history: createWebHistory(process.env.BASE_URL),
   history: createWebHistory('/'),
+>>>>>>> efb9a2fd24a901613556d0555207f160bd53347e
   routes,
+
+
+scrollBehavior (to, from , savedPosition){
+	return savedPosition || { top: 0}
+}
 });
 
+<<<<<<< HEAD
+
+
+=======
 router.beforeEach((to: any, from: any, next: any) => {
     if (to.path === '/login') {
     //   document.body.style.backgroundColor = '#F39F5A !important';
@@ -65,4 +95,5 @@ router.beforeEach((to: any, from: any, next: any) => {
 		  store.dispatch('fetchUserData');
     }
   });
+>>>>>>> efb9a2fd24a901613556d0555207f160bd53347e
 export default router;
