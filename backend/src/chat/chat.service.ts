@@ -45,7 +45,7 @@ export class ChatService {
 	// get channel by name
 	async chan_by_name(chan_name: string) // or by id
 	{
-		return (this.channelRepo.findOneBy({ room_name: chan_name }));
+		return (await this.channelRepo.findOne({ where: { room_name: chan_name }, relations: ['members'] }));
 	}
 
 	async create_chan(chan_name: string, user: User, pass: string) {
@@ -75,6 +75,7 @@ export class ChatService {
 					chan2.admins.push(user);
 					await this.channelRepo.save(chan2);
 					console.log(`Channel ${chan_name} created successfully`);
+					console.log(chan2.members);
 					return (chan2)
 				}
 
@@ -87,6 +88,8 @@ export class ChatService {
 	async add_chan_mem(user: User, chan_name: string) {
 		// insert or create the user in the channel memeber table
 		const chan = await this.chan_by_name(chan_name);
+		console.log(chan);
+		console.log(chan.members);
 		if (chan) {
 			chan.members.push(user);
 			await this.channelRepo.save(chan);

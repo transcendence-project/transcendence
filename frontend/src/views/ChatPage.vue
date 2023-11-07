@@ -72,7 +72,7 @@
 													class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom px-1 w-full rounded-[5px]">
 													{{ result.name }}
 													<div class="relative">
-														<button class="jpub-btn">Join</button>
+														<button class="jpub-btn" @click="join_pub_chan(result.name)">Join</button>
 													</div>
 												</div>
 											</li>
@@ -189,30 +189,30 @@ export default defineComponent({
 		}
 		if (!chan.value.length)
 			all();
-		const my = async () => {
-			await store.dispatch('fetchMyChan');
-			const my_channel = computed(() => store.getters.getMyChannel);
-			const arrayProxy_m = my_channel.value;
-			arrayProxy_m.forEach((item: any) => {
-				// console.log(item);
-			const my_chan: IChannel = {
-				name: item.room_name,
-				id: item.id,
-				owner: null,
-				messages: null,
-				admins: null,
-				members: null,
-				invites: null,
-				isPrivate: item.is_private,
-				isProtected: item.is_protected,
-				isPublic: item.is_public,
-				password: item.password,
-			}
-			m_chan.value.push(my_chan);
-			});
-		}
-		if (!m_chan.value.length)
-			my();
+		// const my = async () => {
+		// 	await store.dispatch('fetchMyChan');
+		// 	const my_channel = computed(() => store.getters.getMyChannel);
+		// 	const arrayProxy_m = my_channel.value;
+		// 	arrayProxy_m.forEach((item: any) => {
+		// 		// console.log(item);
+		// 	const my_chan: IChannel = {
+		// 		name: item.room_name,
+		// 		id: item.id,
+		// 		owner: null,
+		// 		messages: null,
+		// 		admins: null,
+		// 		members: null,
+		// 		invites: null,
+		// 		isPrivate: item.is_private,
+		// 		isProtected: item.is_protected,
+		// 		isPublic: item.is_public,
+		// 		password: item.password,
+		// 	}
+		// 	m_chan.value.push(my_chan);
+		// 	});
+		// }
+		// if (!m_chan.value.length)
+		// 	my();
 		},
 	components: {
 		ChannelOption,
@@ -244,18 +244,22 @@ export default defineComponent({
 		},
 	},
 	methods: {
-		join_chan() {
+		join_pub_chan(room_name: string) {
+			console.log("reached join chan");
 			if (store.state.chat.socket)
-				store.state.chat.socket.emit("join_room", {
-					room_name: "azrachan",
-					arg: "",
-				});
+				store.state.chat.socket.emit("join_room", {room_name: room_name, arg: ""});
 		},
-		send_chan_msg() {
+		join_prot_chan(room_name: string, pass: string)
+		{
+			console.log("reached join prot chan");
+			if (store.state.chat.socket)
+				store.state.chat.socket.emit("join_room", {room_name: room_name, arg: pass});
+		},
+		send_chan_msg(message: string) {
 			if (store.state.chat.socket)
 				store.state.chat.socket.emit("send_msg_to_chan", {
 					room_name: "azrachan",
-					message: "hello world",
+					message: message,
 				});
 		},
 		send_priv_msg() {
@@ -281,9 +285,11 @@ export default defineComponent({
 			this.isSearchChannelVisible = !this.isSearchChannelVisible;
 		},
 		sendMessage() {
+			console.log(this.message);
 			if (this.message) {
 				this.chatMessage.push(this.message);
 				this.isMessageSent = true;
+				this.send_chan_msg(this.message); // should also retrieve the chan name
 				this.message = "";
 			}
 		},

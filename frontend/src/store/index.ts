@@ -25,7 +25,7 @@ const store = createStore({
 			socket: null as Socket | null,
 			all_channels: [],
 			my_channels: [] as IChannel[],
-			current_channel: null as IChannel | null, // is not any array, just one channel
+			current_channel: "", // is not any array, just one channel
 			test: "inside chat in store.. testingg",
 		},
 	},
@@ -128,7 +128,11 @@ const store = createStore({
 		},
 		async fetchMyChan(conetxt: any) {
 			// console.log('inside fetch my chan')
-			const resp = await axios.get("http://localhost:3000/users/my_channels").then((resp: AxiosResponse<IChannel[]>) => {
+			await axios.get("http://localhost:3000/users/my_channels", {
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem('token')}`,
+				},
+			}).then((resp: AxiosResponse<IChannel[]>) => {
 				const my_channels = resp.data;
 				conetxt.commit('setMyChannel', my_channels);
 			}).catch((error) => {
