@@ -52,7 +52,7 @@
 
 	public viewMembers(): void {
     // Trigger the method to retrieve channel members in the parent component (ChatPage)
-    this.$emit('view-members', this.channel);
+    // this.$emit('view-members', this.channel);
     this.closeDropdownopt();
   }
   }
