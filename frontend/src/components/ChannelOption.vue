@@ -12,8 +12,8 @@
 		@click.stop=""
 	  >
 		<router-link to="/chat" @click.native="closeDropdownopt">Leave channel</router-link>
-		<!-- <router-link to="/chat" @click.native="closeDropdownopt">View Membmers</router-link> -->
-		<a @click="viewMembers">View Members</a>
+		<router-link to="/chat" @click.native="closeDropdownopt">View Membmers</router-link>
+		<!-- <a @click="viewMembers">View Members</a> -->
 	  </div>
 	</div>
   </template>
@@ -50,11 +50,10 @@
 	  document.removeEventListener('click', this.closeDropdownoptOnClickOutside);
 	}
 
-	public viewMembers(): void {
-    // Trigger the method to retrieve channel members in the parent component (ChatPage)
-    this.$emit('view-members', this.channel);
-    this.closeDropdownopt();
-  }
+// 	public viewMembers(): void {
+//     this.$emit('view-members', this.channel);
+//     this.closeDropdownopt();
+//   }
   }
   </script>
   
