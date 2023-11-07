@@ -9,8 +9,9 @@ export interface IChannel{
 	password: string;
 	// state: string;
 	// isGroupChan: boolean;
-	// isPrivate: boolean;
-	// isProtected: boolean;
+	isPrivate: boolean;
+	isProtected: boolean;
+	isPublic: boolean;
 
 	// banned
 	// muted

@@ -79,7 +79,9 @@ async create_prot_room(client: any, payload: any): Promise<void> {
 	if (chan){
 		const data_to_send = {
 			chan_name: channel_name,
-			state: 'protected',
+			isPublic: false,
+			isPrivate: false,
+			isProtected: true,
 			user: user.userName,
 			id: chan.id,
 			pass: password, 
@@ -103,7 +105,9 @@ async create_pub_room(client: any, payload: any): Promise<void> {
 	if (chan){
 		const data_to_send = {
 			chan_name: channel_name,
-			state: 'public',
+			isPublic: true,
+			isPrivate: false,
+			isProtected: false,
 			user: user.userName,
 			id: chan.id,
 			pass: password,
