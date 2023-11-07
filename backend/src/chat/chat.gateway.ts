@@ -66,16 +66,56 @@ send_message_dm(client: any, payload: any): void {
 	client.emit('priv_msg_success');
 }
 
-@SubscribeMessage('create_room')
-async create_room(client: any, payload: any): Promise<void> {
-	console.log("reached create room - backend websockets");
+@SubscribeMessage('create_prot_room')
+async create_prot_room(client: any, payload: any): Promise<void> {
+
+	console.log("reached create prot room - backend websockets");
 	const { channel_name, password } = payload;
 	console.log(`channel name in backend: ${channel_name}`);
 	console.log(`password in backend: ${password}`);
 	const user = this.chatService.find_user_with_id(client.id);
-	await this.chatService.create_chan(channel_name, user, password);
+	const chan = await this.chatService.create_chan(channel_name, user, password);
 	client.join(channel_name);
-	client.emit('create_room_success');
+	if (chan){
+		const data_to_send = {
+			chan_name: channel_name,
+			isPublic: false,
+			isPrivate: false,
+			isProtected: true,
+			user: user.userName,
+			id: chan.id,
+			pass: password, 
+		};
+		client.emit('create_room_success', data_to_send);
+	}
+	else
+		client.emit('create_room_success');
+}
+
+@SubscribeMessage('create_pub_room')
+async create_pub_room(client: any, payload: any): Promise<void> {
+	
+	console.log("reached create pub room - backend websockets");
+	const { channel_name, password } = payload;
+	console.log(`channel name in backend: ${channel_name}`);
+	console.log(`password in backend: ${password}`);
+	const user = this.chatService.find_user_with_id(client.id);
+	const chan = await this.chatService.create_chan(channel_name, user, password);
+	client.join(channel_name);
+	if (chan){
+		const data_to_send = {
+			chan_name: channel_name,
+			isPublic: true,
+			isPrivate: false,
+			isProtected: false,
+			user: user.userName,
+			id: chan.id,
+			pass: password,
+		};
+		client.emit('create_room_success', data_to_send);
+	}
+	else
+		client.emit('create_room_success');
 }
 
 @SubscribeMessage('join_room')

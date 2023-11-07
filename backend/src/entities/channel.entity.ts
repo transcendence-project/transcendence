@@ -38,11 +38,14 @@ export class Channel {
 	@Column({ nullable: true})
 	password: string;
 
-	@Column({nullable: true})
+	@Column({nullable: true, default: false})
 	is_private: boolean;
 
-	@Column({nullable: true})
+	@Column({nullable: true, default: false})
 	is_protected: boolean;
+
+	@Column({nullable: true, default: false})
+	is_public: boolean;
 
 	//   @Column('text', { array: true, nullable: true  })
 //   banned: string[];
