@@ -9,9 +9,7 @@
             >
               {{ result.channel }}
               {{ result.group }}
-			  <div class="chn-btm">
-				<button class="jbtn">Join</button>
-			  </div>
+
             </div>
           </li>
         </div>
@@ -135,6 +133,8 @@ export default defineComponent({
         },
       ] as ChannelList[],
 	  searchQuery: "" as string,
+	  selectedChannel: null as string | null,
+
     };
   },
   computed: {
@@ -146,7 +146,15 @@ export default defineComponent({
       );
     },
   },
-
+  methods: {
+    selectChannel(channel: string) {
+      this.selectedChannel = channel;
+    },
+    getUserList(channel: string): string[] {
+      const selectedChannel = this.channels.find((item) => item.channel === channel);
+      return selectedChannel ? selectedChannel.user : [];
+    },
+  },
 });
 </script>
 <style scoped>
@@ -163,23 +171,6 @@ export default defineComponent({
   z-index: 999;
 }
 
-.jbtn {
-  font-size: .8rem;
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
-  padding-top: 0.3rem;
-  padding-bottom: 0.3rem;
-  border-radius: 10px;
-  cursor: pointer;
-  color: white;
-  background: #451952;
-  border: none;
-}
-
-.jbtn:hover {
-  background: #ae4488;
-  color: #d9d9da;
-}
 
 
 @media screen and (max-width: 768px) {
