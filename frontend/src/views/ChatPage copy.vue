@@ -28,8 +28,6 @@
                   <div
                     class="flex items-center justify-between mb-2 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom px-1 w-full rounded-[10px]"
                   >
-                    <!-- {{ result.name }}
-                    {{ result.state }} -->
                     {{ result.channel }}
                     <ChannelOption class="relative w-9 h-9" />
                   </div>
@@ -138,24 +136,6 @@
           </div>
         </div>
 
-        <!-- <div v-if="selectedItem">
-          <ul>
-            <li
-              class="flex bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom m-2 px-1 py-1 rounded-[10px]"
-              v-for="user in selectedItem.user"
-              :key="user"
-            >
-              <div class="flex items-center justify-between w-full">
-                <div class="flex items-center">
-                  {{ user }}
-                </div>
-                <div class="flex items-center">
-                  <OptionMenu class="relative text-sm w-8 h-8" />
-                </div>
-              </div>
-            </li>
-          </ul>
-        </div> -->
       </div>
     </div>
   </div>
