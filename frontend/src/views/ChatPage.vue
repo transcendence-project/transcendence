@@ -70,7 +70,7 @@
 											<li class="list-none w-full">
 												<div
 													class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom px-1 w-full rounded-[5px]">
-													{{ result.channel }}
+													{{ result.name }}
 													<div class="relative">
 														<button class="jpub-btn">Join</button>
 													</div>
@@ -83,7 +83,7 @@
 						</div>
 					</div>
 					<div class="pri-div">
-						Private Channels
+						Protected Channels
 						<div class="flex justify-between m-0 mt-2 p-0">
 							<div class="h-[250px] overflow-y-auto">
 								<ul>
@@ -91,7 +91,7 @@
 										<li class="list-none w-full">
 											<div
 												class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom px-1 w-full rounded-[5px]">
-												{{ result.channel }}
+												{{ result.name }}
 												<div class="relative">
 													<ButtonComponent btnContent="Join" class="m-2"
 														@click="showPasswordForm" />
@@ -144,11 +144,13 @@ import { IChannel } from "@/models/channel";
 
 
 const chan = ref([] as IChannel[]);
+const m_chan = ref([] as IChannel[]);
 
 export default defineComponent({
 	data() {
 		return {
 			channels: chan,
+			my_chan: m_chan,
 			text: "" as string,
 			message: "" as string,
 			isAddChannelForm: false,
@@ -169,26 +171,49 @@ export default defineComponent({
 			const arrayProxy = channel.value;
 			arrayProxy.forEach((item: any) => {
 				// console.log(item);
-			const new_chan: IChannel = {
+				const new_chan: IChannel = {
+					name: item.room_name,
+					id: item.id,
+					owner: null,
+					messages: null,
+					admins: null,
+					members: null,
+					invites: null,
+					isPrivate: item.is_private,
+					isProtected: item.is_protected,
+					isPublic: item.is_public,
+					password: item.password,
+				}
+				chan.value.push(new_chan);
+			});
+		}
+		if (!chan.value.length)
+			all();
+		const my = async () => {
+			await store.dispatch('fetchMyChan');
+			const my_channel = computed(() => store.getters.getMyChannel);
+			const arrayProxy_m = my_channel.value;
+			arrayProxy_m.forEach((item: any) => {
+				// console.log(item);
+			const my_chan: IChannel = {
 				name: item.room_name,
-				// state: item.state,
 				id: item.id,
 				owner: null,
 				messages: null,
 				admins: null,
 				members: null,
 				invites: null,
-				isPrivate: item.isPrivate,
-				isProtected: item.isProtected,
-				isPublic: item.isPublic,
+				isPrivate: item.is_private,
+				isProtected: item.is_protected,
+				isPublic: item.is_public,
 				password: item.password,
 			}
-			chan.value.push(new_chan);
+			m_chan.value.push(my_chan);
 			});
 		}
-		if (!chan.value.length)
-			all();
-	},
+		if (!m_chan.value.length)
+			my();
+		},
 	components: {
 		ChannelOption,
 		ButtonComponent,
@@ -199,23 +224,22 @@ export default defineComponent({
 	},
 	computed: {
 		filteredMyChannel(): IChannel[] {
-			return this.channels.filter(
-				(item: IChannel) =>
+			return this.channels.filter((item: IChannel) =>
 					item.name/* .toLowerCase().includes(this.searchQuery.toLowerCase()) &&
 					item.member === true */
 			);
 		},
 		filteredPublicChannel(): IChannel[] {
-			return this.channels.filter((item: any) =>
+			return this.channels.filter((item: IChannel) =>
+			// console.log(item)
 					item.name/* .toLowerCase().includes(this.searchQuery.toLowerCase())*/ &&
 					item.isPublic === true 
 			);
 		},
 		filteredPrivateChannel(): IChannel[] {
-			return this.channels.filter((item: any) =>
-			console.log(item)
-					// item.name && item.isProtected === true
-					// item.name/* .toLowerCase().includes(this.searchQuery.toLowerCase())*/ && item.isProtected === true
+			return this.channels.filter((item: IChannel) =>
+					item.name && item.isProtected === true
+					// item.name.toLowerCase().includes(this.searchQuery.toLowerCase()) && item.isProtected === true
 			);
 		},
 	},
@@ -285,7 +309,6 @@ export default defineComponent({
 			if (data) {
 				const newChannel: IChannel = {
 					name: data.chan_name,
-					// state: data.state,
 					id: data.id,
 					owner: null,
 					messages: null,

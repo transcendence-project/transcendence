@@ -126,10 +126,11 @@ const store = createStore({
 			// console.log(get_chan);
 			// console.error("Error fetching all channels:", error);
 		},
-		fetchMyChan(conetxt: any) {
-			axios.get("http://localhost:3000/users/my_channels").then((resp: AxiosResponse<IChannel[]>) => {
+		async fetchMyChan(conetxt: any) {
+			// console.log('inside fetch my chan')
+			const resp = await axios.get("http://localhost:3000/users/my_channels").then((resp: AxiosResponse<IChannel[]>) => {
 				const my_channels = resp.data;
-				conetxt.commit('setMyChannels', my_channels);
+				conetxt.commit('setMyChannel', my_channels);
 			}).catch((error) => {
 				console.error("Error fetching my channels:", error);
 			});

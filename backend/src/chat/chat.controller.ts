@@ -14,8 +14,8 @@ export class ChatController {
 	}
 
 	// could add it in the users service
-	// @Get('mychannels')
-	// async my_channels(){
-	// 	// return all the channels that the user is part of from the repo 
-	// }
+	@Get('my_channels')
+	async my_channels(){
+		// return all the channels that the user is part of from the repo 
+	}
 }

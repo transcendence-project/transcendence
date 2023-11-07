@@ -51,6 +51,7 @@ export class UsersController {
 	@Get('my_channels')
 	@UseGuards(JwtAuthGuard)
 	async my_channels(@Req() req){
+		console.log('------------------------reached heree');
 		return (await this.userService.findUserChan(req.user.id));
 	}
 }
