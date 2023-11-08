@@ -18,13 +18,13 @@
           @click="AddChannelForm"
         />
         <CreateChannel v-if="isAddChannelForm" @close="closeAddChannelForm" />
-        <!-- <div>
+        <div>
           <input
             placeholder="Search channel"
             @click="filteredSearchchanel"
             class="w-9/12 md:w-10/12 h-[1.5rem] border-0 text-black ml-2 rounded-md pl-4 mb-2 focus:border-0 focus:outline-none"
           />
-        </div> -->
+        </div>
         <ChannelMembers v-if="isSearchChannelVisible" />
         <div class="flex justify-between m-0 mt-2 p-0 w-full">
           <div class="w-full h-[350px] overflow-y-auto">
