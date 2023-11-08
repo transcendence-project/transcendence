@@ -109,6 +109,7 @@ const store = createStore({
 					Authorization: `Bearer ${localStorage.getItem('token')}`,
 				},
 			}).then((response) => {
+				console.log('response data: ', response.data);
 				store.commit('setId', response.data.id);
 				store.commit('setDisplayName', response.data.fullname);
 				store.commit('setUserName', response.data.userName);
@@ -126,11 +127,15 @@ const store = createStore({
 			// console.log(get_chan);
 			// console.error("Error fetching all channels:", error);
 		},
-		async fetchMyChan(conetxt: any) {
-			// console.log('inside fetch my chan')
-			const resp = await axios.get("http://localhost:3000/users/my_channels").then((resp: AxiosResponse<IChannel[]>) => {
+		async fetchMyChan(context: any) {
+			console.log('inside fetch my chan')
+			const resp = await axios.get("http://localhost:3000/users/my/channels", {
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem('token')}`,
+				},
+			}).then((resp: AxiosResponse<IChannel[]>) => {
 				const my_channels = resp.data;
-				conetxt.commit('setMyChannel', my_channels);
+				context.commit('setMyChannel', my_channels);
 			}).catch((error) => {
 				console.error("Error fetching my channels:", error);
 			});
