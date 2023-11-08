@@ -12,8 +12,7 @@
 		@click.stop=""
 	  >
 		<router-link to="/chat" @click.native="closeDropdownopt">Leave channel</router-link>
-		<router-link to="/chat" @click.native="closeDropdownopt">View Membmers</router-link>
-		<!-- <a @click="viewMembers">View Members</a> -->
+		<!-- <router-link to="/chat" @click.native="closeDropdownopt">View Membmers</router-link> -->
 	  </div>
 	</div>
   </template>
