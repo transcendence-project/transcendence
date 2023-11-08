@@ -138,6 +138,19 @@ const store = createStore({
 			}).catch((error) => {
 				console.error("Error fetching my channels:", error);
 			});
+		},
+		async fetchChanMemebers(context: any){
+			await axios.get("http://localhost:3000/users/my_channels", {
+				params: {chan_name: localStorage.getItem('currentChan')},
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem('token')}`,
+				},
+			}).then((resp: AxiosResponse<IChannel[]>) => {
+				// const my_channels = resp.data;
+				// context.commit('setMyChannel', my_channels);
+			}).catch((error) => {
+				console.error("Error fetching my channels:", error);
+			});
 		}
 	},
 	modules: { // allow you to organize your store into separate namespaces.

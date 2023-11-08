@@ -4,7 +4,7 @@ export interface IChannel{
 	messages: null; // will be message intergace 
 	owner: null; // will be user interface
 	admins: null; // will be user interface
-	members: null; // will be user interface
+	members: []; // will be user interface
 	invites: null;  // will be user interface
 	password: string;
 	// state: string;

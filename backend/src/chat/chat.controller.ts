@@ -18,4 +18,9 @@ export class ChatController {
 	async my_channels(){
 		// return all the channels that the user is part of from the repo 
 	}
+	@Get('chan_memebers')
+	async chan_memebrs(@Param("chan_name") chan: string){
+		console.log(`chan name in finding chan memebers is ${chan}`);
+		return (await this.chatService.chan_by_name(chan));
+	}
 }
