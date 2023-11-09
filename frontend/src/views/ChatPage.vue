@@ -85,12 +85,12 @@
 			class="bg-white h-[420px] p-1 mb-5 m-1 text-black"
 			style="text-align: right"
 		  >
-			<div v-for="(chatMessage, index) in chatMessage" :key="index">
+			<div v-for="(message, index) in chatMessage" :key="index">
 			  <div
 				class="bg-gray-500 text-black py-2 px-4 inline-block m-1 mx-5 rounded-md"
 				style="max-width: 300px"
 			  >
-				{{ chatMessage }}
+				{{message }}
 			  </div>
 			</div>
 		  </div>
@@ -360,7 +360,17 @@ export default defineComponent({
 		showSearchChannel() {
 			this.isSearchChannelVisible = !this.isSearchChannelVisible;
 		},
+		async displayMessage(){
+			this.chatMessage = [];
+			const chan = computed(() => store.getters.getCurrentCahnnel);
+			const val = chan.value.messages;
+			val.forEach((item: any) => {
+				this.chatMessage.push(item.content);
+			});
+
+		},
 		sendMessage() {
+			const chan = computed(() => store.getters.getCurrentCahnnel);
 			console.log(this.message);
 			if (this.message) {
 				this.chatMessage.push(this.message);
@@ -378,9 +388,9 @@ export default defineComponent({
 			const val = chan.value.members;
 			console.log(val);
 			val.forEach((item: any) => {
-				console.log(item);
 				this.userList.push(item.userName);
 			});
+			await this.displayMessage();
 			},
 		},
 	created() {

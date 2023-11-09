@@ -125,17 +125,10 @@ export class ChatService {
 
 	async save_chan_message(sender: User, chan_name: string, content: string){
 		const chan = await this.chan_by_name(chan_name);
-		console.log(chan);
-		// const message = this.messageRepo.create()
-		// console.log(chan_name);
-		// const new_message = new Message();
-		// new_message.channel = chan;
-		// new_message.content = content;
-		// new_message.createdAt = new Date();
-		// new_message.sender = sender;
-		// new_message.senderID = sender.id;
-		// chan.messages.push(new_message);
-		// await this.channelRepo.save(chan);
+		const message = this.messageRepo.create({senderID: sender.id, sender: sender, channel: chan, content: content, createdAt: null });
+		chan.messages.push(message);
+		await this.messageRepo.save(message);
+		// console.log(chan);
 	}
 
 	//  ----------------------- CHECKS -----------------------------
