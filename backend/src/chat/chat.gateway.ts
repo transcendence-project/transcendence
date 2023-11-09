@@ -7,6 +7,7 @@ import {
 } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
 import { ChatService } from "../chat/chat.service";
+import { bcrypt } from "bcrypt";
 
 @WebSocketGateway({
   cors: { origin: "http://localhost:8080" },
@@ -86,11 +87,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log(`channel name in backend: ${channel_name}`);
     console.log(`password in backend: ${password}`);
     const user = this.chatService.find_user_with_id(client.id);
-
+	const salt = bcrypt.genSalt(10);
+    const hashedPassword = bcrypt.hash(password, salt);
     const chan = await this.chatService.create_chan(
       channel_name,
       user,
-      password,
+      hashedPassword,
     );
     client.join(channel_name);
     if (chan) {
@@ -101,8 +103,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         isProtected: true,
         user: user.userName,
         id: chan.id,
-        pass: password,
-      };
+        pass: hashedPassword,
+      };0
       client.emit("create_room_success", data_to_send);
     } else client.emit("create_room_success");
   }
@@ -114,10 +116,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     console.log(`channel name in backend: ${channel_name}`);
     console.log(`password in backend: ${password}`);
     const user = this.chatService.find_user_with_id(client.id);
+    const hashedPassword = bcrypt.hash(password, 10);
     const chan = await this.chatService.create_chan(
       channel_name,
       user,
-      password,
+      hashedPassword,
     );
     client.join(channel_name);
     if (chan) {
@@ -128,7 +131,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         isProtected: false,
         user: user.userName,
         id: chan.id,
-        pass: password,
+        pass: hashedPassword,
       };
       client.emit("create_room_success", data_to_send);
     } else client.emit("create_room_success");

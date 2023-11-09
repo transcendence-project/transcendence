@@ -13,14 +13,14 @@ export class UsersController {
 		this.userService.create(body.email, body.username, body.fullname, body.image);
 	}
 
-	@Get('/:id')
-	findUser(@Param('id') id: string){
-		return (this.userService.findOne(parseInt(id)))
-	}
+	// @Get('/:id')
+	// findUser(@Param('id') id: string){
+	// 	return (this.userService.findOne(parseInt(id)))
+	// }
 
 	@Get()
 	findAllUsers(@Query('userName') userName: string){
-		return (this.userService.findAll(userName))
+		return (this.userService.findAllUsers(userName))
 	}
 
 	@Delete('/:id')
@@ -29,11 +29,11 @@ export class UsersController {
 	}
 
 	@Delete('/:id/friends/:friendId')
-	deleteFriend(@Param('id') id: string, @Param('friendId') friendId: string){
-		return (this.userService.removeFriend(parseInt(id), parseInt(friendId)))
+	deleteFriend(@Param('id') id: string, @Param('friendId') fId: string){
+		return (this.userService.removeFriend(parseInt(id), parseInt(fId)))
 	}
 
-	@Get('/:id/achievements')
+	@Get('/achievements')
 	@UseGuards(JwtAuthGuard)
 	async getAchievements(@Req() req, @Param('id') id: string): Promise<Achievement[]>{
 		// console.log('test log')

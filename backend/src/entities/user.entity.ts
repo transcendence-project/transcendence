@@ -12,7 +12,7 @@ import { Achievement } from "./achievement.entity";
 import { FriendRequest } from "./friend-request.entity";
 // import { Friend } from "./friend.entity";
 import { Channel } from "./channel.entity";
-import { Invitation } from "./invitations.entity";
+// import { Invitation } from "./invitations.entity";
 
 @Entity()
 export class User {
@@ -31,6 +31,9 @@ export class User {
 
   @Column()
   email: string;
+  
+  @Column()
+  points: number;
 
   @Column({ nullable: true })
   is2FAEnabled: boolean;
@@ -82,12 +85,4 @@ export class User {
 
   @Column({ default: false })
   isOnline: boolean;
-
-  @Column({ nullable: true })
-  @OneToMany(() => User, (user) => user.receivedInvites)
-  receivedInvites: Invitation[];
-
-  @Column({ nullable: true })
-  @OneToMany(() => User, (user) => user.sentInvites)
-  sentInvites: Invitation[];
 }

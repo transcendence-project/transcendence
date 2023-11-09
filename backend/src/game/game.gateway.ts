@@ -9,6 +9,8 @@ import {
 } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
 import { GameService } from "./game.service";
+import { UsersService } from "users/users.service";
+import { User } from "entities/user.entity";
 
 @WebSocketGateway({
   namespace: "game",
@@ -20,7 +22,10 @@ export class GameGateway
   @WebSocketServer()
   server: Server;
   private readonly logger = new Logger("GameGateway");
-  constructor(private readonly gameService: GameService) {}
+  constructor(
+    private readonly gameService: GameService,
+    private readonly userService: UsersService,
+  ) {}
   afterInit(): void {
     this.logger.log("WebSocket Gateay Game created");
   }
@@ -35,6 +40,7 @@ export class GameGateway
   }
 
   inviteUser(client: Socket, receiver: string): void {
-    sender = this.gameService.find_user_with_id(client.id);
+    client.to(receiver).emit("invite", client.id);
   }
+  
 }
