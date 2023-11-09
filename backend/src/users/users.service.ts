@@ -151,8 +151,8 @@ export class UsersService {
 	this.repo.save(loser);
   }
 
-  async findAllUsers(userName: string) {
-	return this.repo.find({ userName });
+  async findAllUsers() {
+	return this.repo.find();
   }
 
   async findAllRankedUser() {
