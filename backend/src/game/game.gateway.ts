@@ -20,7 +20,6 @@ export class GameGateway implements OnGatewayInit , OnGatewayConnection, OnGatew
   }
 
   private clientCount = 0;
-
   async handleConnection(client: Socket, ...args: any[]) {
     // this.clientCount++;
     this.server.emit('connected', this.clientCount);

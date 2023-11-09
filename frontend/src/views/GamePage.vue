@@ -1,23 +1,22 @@
 <template>
-	<div class="game-container">
 	  <canvas ref="game" id="pong"></canvas>
-      <button @click="startGame">Start Game</button>
-	</div>
+      <button @click="startGame">Start Game</button>    
 </template>
   
 <script lang="ts" setup>
-    import { ref, onMounted} from 'vue';
-    import WebSocketPlugin from '@/plugins/websocket-plugin';
-
+    import { ref, onMounted,getCurrentInstance, reactive} from 'vue';
+    const { appContext } = getCurrentInstance();
+    const socket = appContext.config.globalProperties.$socket;
+    const game = ref<HTMLCanvasElement | null>(null);
     const startGame = () => {
-        if (this.$socket) {
-            $socket.emit('start-game', 'This is from the client to the server game');
+        if (socket) {
+            socket.emit('start-game', 'This izs from the client to the server game');
         }
     };
-    const game = ref<HTMLCanvasElement | null>(null);
-    onMounted(() => {   
-            if (this.$socket) {
-                this.$socket?.on('table', (message: any[]) => {
+
+    onMounted(() => {
+            if (socket) {
+                socket.on('table', (message: any[]) => {
             if (game.value)
             {
                 const context = game.value.getContext('2d');
@@ -26,7 +25,7 @@
                 if (context) {
 					context.fillStyle = 'red';
                     // context
-                    context.fillRect(50, 0, 100, 100);
+                    context.fillRect(0,0,game.value.width,game.value.height)
                 }
             }
         });
@@ -36,11 +35,12 @@
 
    
   
-  <style>
+<style>
 
   .game-container {
-
-	width: fit-content;
+	/* width: fit-content; */
+    display: flex;
+    justify-content: center;
 	background: linear-gradient(to right, #451952, #451952, #ae4188);
   	box-shadow: 0 4px 4px rgba(0, 0, 0, 0.5); 
 	margin: 20px;
