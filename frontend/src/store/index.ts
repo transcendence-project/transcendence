@@ -25,7 +25,8 @@ const store = createStore({
 			socket: null as Socket | null,
 			all_channels: [],
 			my_channels: [] as IChannel[],
-			current_channel: "", // is not any array, just one channel
+			current_chan_name: "",
+			current_channel: null,
 			test: "inside chat in store.. testingg",
 		},
 	},
@@ -66,6 +67,10 @@ const store = createStore({
 		},
 		setCurrentChannel(state: any, cur_chan: any) {
 			state.chat.current_channel = cur_chan;
+			console.log("inside set current channel");
+		},
+		setCurrentChanMem(state: any, mem: IChannel[]){
+			state.chat.cur_chan_mem = mem;
 		},
 
 		// SETTERS FOR USER
@@ -109,6 +114,7 @@ const store = createStore({
 					Authorization: `Bearer ${localStorage.getItem('token')}`,
 				},
 			}).then((response) => {
+				console.log('response data: ', response.data);
 				store.commit('setId', response.data.id);
 				store.commit('setDisplayName', response.data.fullname);
 				store.commit('setUserName', response.data.userName);
@@ -126,32 +132,34 @@ const store = createStore({
 			// console.log(get_chan);
 			// console.error("Error fetching all channels:", error);
 		},
-		async fetchMyChan(conetxt: any) {
-			// console.log('inside fetch my chan')
-			await axios.get("http://localhost:3000/users/my_channels", {
+		async fetchMyChan(context: any) {
+			console.log('inside fetch my chan')
+			const resp = await axios.get("http://localhost:3000/users/my/channels", {
 				headers: {
 					Authorization: `Bearer ${localStorage.getItem('token')}`,
 				},
 			}).then((resp: AxiosResponse<IChannel[]>) => {
 				const my_channels = resp.data;
-				conetxt.commit('setMyChannel', my_channels);
+				context.commit('setMyChannel', my_channels);
 			}).catch((error) => {
 				console.error("Error fetching my channels:", error);
 			});
 		},
-		async fetchChanMemebers(context: any){
-			await axios.get("http://localhost:3000/users/my_channels", {
-				params: {chan_name: localStorage.getItem('currentChan')},
+		async fetchCurrentChan(context: any){
+			console.log(localStorage.getItem('currentChanName'));
+			const cur = localStorage.getItem('currentChanName');
+			await axios.get(`http://localhost:3000/chat/current_chan/${cur}`, {
+				params: {chan_name: cur},
 				headers: {
 					Authorization: `Bearer ${localStorage.getItem('token')}`,
 				},
 			}).then((resp: AxiosResponse<IChannel[]>) => {
-				// const my_channels = resp.data;
-				// context.commit('setMyChannel', my_channels);
+				// console.log(resp.data);
+				context.commit('setCurrentChannel', resp.data);
 			}).catch((error) => {
-				console.error("Error fetching my channels:", error);
+				console.error("Error fetching current channel:", error);
 			});
-		}
+		},
 	},
 	modules: { // allow you to organize your store into separate namespaces.
 	}

@@ -13,10 +13,11 @@ export class UsersController {
 		this.userService.create(body.email, body.username, body.fullname, body.image);
 	}
 
-	@Get('/:id')
-	findUser(@Param('id') id: string){
-		return (this.userService.findOne(parseInt(id)))
-	}
+	// @Get('/:id')
+	// findUser(@Param('id') id: number){
+	// 	console.log('in find user, id: ', id);
+	// 	return (this.userService.findOne(id))
+	// }
 
 	@Get()
 	findAllUsers(@Query('userName') userName: string){
@@ -33,11 +34,11 @@ export class UsersController {
 		return (this.userService.removeFriend(parseInt(id), parseInt(friendId)))
 	}
 
-	@Get('/:id/achievements')
+	@Get('/achievements')
 	@UseGuards(JwtAuthGuard)
-	async getAchievements(@Req() req, @Param('id') id: string): Promise<Achievement[]>{
+	async getAchievements(@Req() req): Promise<Achievement[]>{
 		// console.log('test log')
-		// console.log('in get achievements, req.user: ', req.user);
+		console.log('in get achievements, req.user: ', req.user);
 		console.log('in get achievements, req.user.id: ', req.user.id);
 		return (await this.userService.getAchievements(req.user.id))
 	}
@@ -48,7 +49,7 @@ export class UsersController {
 		console.log('in give achievement, req.user.id: ', req.user.id);
 		return (this.userService.addAchievement(req.user.id, achievementTitle))
 	}
-	@Get('my_channels')
+	@Get('my/channels')
 	@UseGuards(JwtAuthGuard)
 	async my_channels(@Req() req){
 		console.log('------------------------reached heree');

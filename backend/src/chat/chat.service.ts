@@ -75,7 +75,7 @@ export class ChatService {
 					chan2.admins.push(user);
 					await this.channelRepo.save(chan2);
 					console.log(`Channel ${chan_name} created successfully`);
-					console.log(chan2.members);
+					// console.log(chan2.members);
 					return (chan2)
 				}
 
@@ -125,7 +125,9 @@ export class ChatService {
 
 	async save_chan_message(sender: User, chan_name: string, content: string){
 		const chan = await this.chan_by_name(chan_name);
-		console.log(chan_name);
+		console.log(chan);
+		// const message = this.messageRepo.create()
+		// console.log(chan_name);
 		// const new_message = new Message();
 		// new_message.channel = chan;
 		// new_message.content = content;
@@ -133,7 +135,6 @@ export class ChatService {
 		// new_message.sender = sender;
 		// new_message.senderID = sender.id;
 		// chan.messages.push(new_message);
-		console.log(chan);
 		// await this.channelRepo.save(chan);
 	}
 

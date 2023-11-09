@@ -58,7 +58,7 @@
 						class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom mx-1 p-2 w-full rounded-[10px] usr-item"
 					  >
 						<router-link to="/home">
-						  <div class="mx-0 px-5">{{ user.userName }}</div></router-link
+						  <div class="mx-0 px-5">{{ user }}</div></router-link
 						>
   
 						<button class="intbtn">Invite</button>
@@ -334,7 +334,7 @@ export default defineComponent({
 		send_chan_msg(message: string) {
 			if (store.state.chat.socket)
 			store.state.chat.socket.emit("send_msg_to_chan", {
-				room_name: "azrachan",
+				room_name: localStorage.getItem('currentChanName'),
 				message: message,
 			});
 		},
@@ -369,41 +369,20 @@ export default defineComponent({
 				this.message = "";
 			}
 		},
-		// showChannelMembers() {
-			// 	this.isMember = true;
-			// },
-			
-			// closeChannelMembers() {
-				// 	this.isMember = false;
-				// },
 				
-				showUserList(channel: string) {
-					store.commit('setCurrentChannel', channel);
-					localStorage.setItem('currentChan', channel);
-					store.dispatch('fetchChanMemebers');
-					// this.selectedChannel = this.filterChannel(channel);
-					// console.log(this.selectedChannel);
-					// this.selectedChannel = channel;
-					// this.userList = this.filterUserList(channel);
-					// this.userList = this.filterUserList(channel);
-				},
-				
-				// filterChannel(chan_to_find: string) {
-				// 	return this.channels.find((item: IChannel) =>
-				// 	item.name && item.name === chan_to_find
-				// 	);
-				// },
-
-				filterUserList(channel: string) {
-					const selectedChannel = this.channels.find(
-						(item: any) => item.channel === channel
-						);
-						if (selectedChannel) {
-							return selectedChannel.members;
-						}
-						return []; // Return an empty array if the channel is not found
-					},
-				},
+		async showUserList(channel: string) {
+			this.userList = [];
+			localStorage.setItem('currentChanName', channel);
+			await store.dispatch('fetchCurrentChan');
+			const chan = computed(() => store.getters.getCurrentCahnnel);
+			const val = chan.value.members;
+			console.log(val);
+			val.forEach((item: any) => {
+				console.log(item);
+				this.userList.push(item.userName);
+			});
+			},
+		},
 	created() {
 		if (!store.state.chat.socket) {
 			console.log("establishing connection again");
