@@ -139,33 +139,14 @@ export default defineComponent({
   border-radius: 10px;
   cursor: pointer;
   color: white;
-  background: #697692;
+  background: #451952;;
   border: none;
 }
 .upbtn:hover,
 .addbtn:hover,
 .closebtn:hover {
-  background: #7c8392;
+  background: #ae4488;
   color: #d9d9da;
-}
-
-input[type="file"]::file-selector-button {
-  margin-right: 10px;
-  border: none;
-  background: #697692;
-  font-size: 1rem;
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-  border-radius: 20px;
-  color: #fff;
-  cursor: pointer;
-  transition: background 0.2s ease-in-out;
-}
-
-input[type="file"]::file-selector-button:hover {
-  background: #7c8392;
 }
 
 @media screen and (max-width: 768px) {
