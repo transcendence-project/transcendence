@@ -45,7 +45,7 @@ export class ChatService {
 	// get channel by name
 	async chan_by_name(chan_name: string) // or by id
 	{
-		return (this.channelRepo.findOneBy({ room_name: chan_name }));
+		return (await this.channelRepo.findOne({ where: { room_name: chan_name }, relations: ['members', 'messages'] }));
 	}
 
 	async create_chan(chan_name: string, user: User, pass: string) {
@@ -60,7 +60,7 @@ export class ChatService {
 			try{
 				if (pass){
 					const chan2 = this.channelRepo.create({ room_name: chan_name, owner: user, password: pass, 
-						members: [], admins: [], description: "", isGroupChannel: true, is_protected: true });
+						members: [], admins: [], messages: [],  description: "", isGroupChannel: true, is_protected: true });
 					chan2.members.push(user);
 					chan2.admins.push(user);
 					await this.channelRepo.save(chan2);
@@ -70,11 +70,12 @@ export class ChatService {
 				else
 				{
 					const chan2 = this.channelRepo.create({ room_name: chan_name, owner: user, password: pass, 
-						members: [], admins: [], description: "", isGroupChannel: true, is_public: true });
+						members: [], admins: [], messages: [], description: "", isGroupChannel: true, is_public: true });
 					chan2.members.push(user);
 					chan2.admins.push(user);
 					await this.channelRepo.save(chan2);
 					console.log(`Channel ${chan_name} created successfully`);
+					// console.log(chan2.members);
 					return (chan2)
 				}
 
@@ -87,6 +88,8 @@ export class ChatService {
 	async add_chan_mem(user: User, chan_name: string) {
 		// insert or create the user in the channel memeber table
 		const chan = await this.chan_by_name(chan_name);
+		console.log(chan);
+		console.log(chan.members);
 		if (chan) {
 			chan.members.push(user);
 			await this.channelRepo.save(chan);
@@ -122,14 +125,10 @@ export class ChatService {
 
 	async save_chan_message(sender: User, chan_name: string, content: string){
 		const chan = await this.chan_by_name(chan_name);
-		const new_message = new Message();
-		new_message.channel = chan;
-		new_message.content = content;
-		new_message.createdAt = new Date();
-		new_message.sender = sender;
-		new_message.senderID = sender.id;
-		chan.messages.push(new_message);
-		await this.channelRepo.save(chan);
+		const message = this.messageRepo.create({senderID: sender.id, sender: sender, channel: chan, content: content, createdAt: null });
+		chan.messages.push(message);
+		await this.messageRepo.save(message);
+		// console.log(chan);
 	}
 
 	//  ----------------------- CHECKS -----------------------------
@@ -238,6 +237,7 @@ export class ChatService {
 		this.connected_users.delete(client.id);
 		// set user as offline
 	}
+
 
 	rem_user_invites(client: any) {
 		const user = this.find_user_with_id(client.id);

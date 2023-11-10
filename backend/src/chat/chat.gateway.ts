@@ -41,7 +41,9 @@ handleDisconnect(client: any) {
 send_message_chan(client: any, payload: any): void {
 	const user = this.chatService.find_user_with_id(client.id);
 	const { room_name, message } = payload;
-	this.server.to(room_name).emit('room_message', { message, sender: client.id });
+	console.log(room_name);
+	console.log(message);
+	// this.server.to(room_name).emit('room_message', { message, sender: client.id });
 	this.chatService.save_chan_message(user, room_name, message);
 	// save the message in the database
 	client.emit('chan_msg_success');
