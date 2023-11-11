@@ -262,20 +262,16 @@ export class ChatService {
 	}
 
 	can_join(user: User, room: Channel, arg: string): boolean {
-		//  IF CHANNEL IS PRIVATE 
-		// maybe not necessary because we wont display the channel in the list if it is private
-		if (room.is_private == false)
-			return true;
-
-		// IF CHANNEL HAS PASSOWRD
-		if (room.password){
-			if (arg === room.password){
-				return true;
-			}
-			else
-				return false;
+		
+		if (room.is_private === true)
+		{
+			// if (room.password){
+				// if (arg === room.password){ // check if the password enterd is correct
+				// 	return true;
+				// else
+				// 	return false;
+			// }
 		}
-		// IF NONE OF THESE, CHANNEL MUST BE PUBLIC
 		return true;
 	}
 

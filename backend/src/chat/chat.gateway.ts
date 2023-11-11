@@ -112,9 +112,9 @@ async create_pub_room(client: any, payload: any): Promise<void> {
 			isProtected: false,
 			user: user.userName,
 			id: chan.id,
-			pass: password,
 		};
 		client.emit('create_room_success', data_to_send);
+		this.server.emit('update_chan_list', data_to_send);
 	}
 	else
 		client.emit('create_room_success');
@@ -129,16 +129,49 @@ async join_room(client: any, payload: any) {
 	{
 		this.chatService.add_chan_mem(user, room_name);
 		client.join(room_name);
-		client.emit('join_room_success');
+		if (arg)
+		{
+			const data_to_send = {
+				chan_name: room_name,
+				isPublic: false,
+				isPrivate: false,
+				isProtected: true,
+				user: user.userName,
+				id: room.id,
+			};
+			client.emit('join_room_success', data_to_send);
+		}
+		else
+		{
+			const data_to_send = {
+				chan_name: room_name,
+				isPublic: true,
+				isPrivate: false,
+				isProtected: false,
+				user: user.userName,
+				id: room.id,
+			};
+			client.emit('join_room_success', data_to_send);
+		}
 	}
+	else
+		client.emit('join_room_failure');
 }
 
-@SubscribeMessage('leave_room')
-leave_room(client: any, room_name: string): void {
+@SubscribeMessage('leave_chan')
+async leave_room(client: any, room_name: string) {
+	console.log('reached leave room in backend');
+	// const room = await this.chatService.chan_by_name(room_name);
+	// console.log("-------BEFOORRREEEEEEEE-------")
+	// console.log(room.members);
 	const user = this.chatService.find_user_with_id(client.id);
+	// console.log(user);
 	this.chatService.rm_chan_mem(user, room_name); // removing from databse
 	client.leave(room_name);
-	client.emit('leave_room_success');
+	// const room_ = await this.chatService.chan_by_name(room_name);
+	// console.log("-------AFTERRRRRRRR-------")
+	// console.log(room_.members);
+	client.emit('leave_room_success', room_name);
 }
 
 @SubscribeMessage('mute_user')

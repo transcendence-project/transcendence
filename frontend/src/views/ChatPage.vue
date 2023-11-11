@@ -35,7 +35,7 @@
                       {{ result.name }}
                     </div>
                   </a>
-                  <ChannelOption class="relative w-9 h-9" />
+                  <ChannelOption class="relative w-9 h-9" @click="leaveChan(result.name)"/>
                 </div>
               </li>
             </div>
@@ -116,7 +116,7 @@
                 >
                   {{ result.name }}
                   <div class="relative">
-                    <button class="jpub-btn">Join</button>
+                    <button class="jpub-btn" @click="join_pub_chan(result.name)">Join</button>
                   </div>
                 </div>
               </li>
@@ -138,7 +138,7 @@
                     <ButtonComponent
                       btnContent="Join"
                       class="m-1"
-                      @click="showPasswordForm"
+                      @click="showPasswordForm(result.name)"
                     />
                   </div>
                 </div>
@@ -200,20 +200,46 @@ export default defineComponent({
           name: item.room_name,
           id: item.id,
           owner: null,
-          messages: null,
+        //   messages: null,
           admins: null,
           members: [],
           invites: null,
           isPrivate: item.is_private,
           isProtected: item.is_protected,
           isPublic: item.is_public,
-          password: item.password,
+        //   password: item.password,
         };
         chan.value.push(new_chan);
       });
     };
-    if (!chan.value.length) all();
-  },
+    if (!chan.value.length)
+		all();
+
+	const my = async () => {
+			await store.dispatch('fetchMyChan');
+			const my_channel = computed(() => store.getters.getMyChannel);
+			const arrayProxy_m = my_channel.value;
+			arrayProxy_m.forEach((item: any) => {
+				// console.log(item);
+			const my_chan: IChannel = {
+				name: item.room_name,
+				id: item.id,
+				owner: null,
+				// messages: null,
+				admins: null,
+				members: [],
+				invites: null,
+				isPrivate: item.is_private,
+				isProtected: item.is_protected,
+				isPublic: item.is_public,
+				// password: item.password,
+			}
+			m_chan.value.push(my_chan);
+			});
+		}
+		if (!m_chan.value.length)
+			my();
+	},
   components: {
     ChannelOption,
     ButtonComponent,
@@ -224,25 +250,25 @@ export default defineComponent({
   },
   computed: {
     filteredMyChannel(): IChannel[] {
-      return this.channels.filter(
+      return this.my_chan.filter(
         (item: IChannel) =>
           item.name /* .toLowerCase().includes(this.searchQuery.toLowerCase()) &&
 					item.member === true */
       );
     },
     filteredPublicChannel(): IChannel[] {
-      return this.channels.filter(
-        (item: IChannel) =>
-          // console.log(item)
-          item.name /* .toLowerCase().includes(this.searchQuery.toLowerCase())*/ &&
-          item.isPublic === true
-      );
+		return this.channels.filter(
+		(item: IChannel) =>
+			item.isPublic === true && 
+			!this.my_chan.some((userChannel: IChannel) => userChannel.name === item.name)
+		);
     },
     filteredPrivateChannel(): IChannel[] {
-      return this.channels.filter(
-        (item: IChannel) => item.name && item.isProtected === true
-        // item.name.toLowerCase().includes(this.searchQuery.toLowerCase()) && item.isProtected === true
-      );
+	return this.channels.filter(
+		(item: IChannel) =>
+			item.isProtected === true && 
+			!this.my_chan.some((userChannel: IChannel) => userChannel.name === item.name)
+		);
     },
   },
   methods: {
@@ -254,14 +280,14 @@ export default defineComponent({
           arg: "",
         });
     },
-    join_prot_chan(room_name: string, pass: string) {
-      console.log("reached join prot chan");
-      if (store.state.chat.socket)
-        store.state.chat.socket.emit("join_room", {
-          room_name: room_name,
-          arg: pass,
-        });
-    },
+    // join_prot_chan(room_name: string, pass: string) {
+    //   console.log("reached join prot chan");
+    //   if (store.state.chat.socket)
+    //     store.state.chat.socket.emit("join_room", {
+    //       room_name: room_name,
+    //       arg: pass,
+    //     });
+    // },
     switch_to_group() {
       localStorage.setItem("chat", "group");
       console.log(localStorage.getItem("chat"));
@@ -271,6 +297,7 @@ export default defineComponent({
       console.log(localStorage.getItem("chat"));
     },
     send_chan_msg(message: string) {
+		console.log(localStorage.getItem("currentChanName"));
       if (store.state.chat.socket)
         store.state.chat.socket.emit("send_msg_to_chan", {
           room_name: localStorage.getItem("currentChanName"),
@@ -281,8 +308,9 @@ export default defineComponent({
       if (store.state.chat.socket)
         store.state.chat.socket.emit("private_message");
     },
-    showPasswordForm() {
+    showPasswordForm(chan: string) {
       this.isPrivate = true;
+	  localStorage.setItem("toJoinChan", chan);
     },
     closePasswordFomr() {
       this.isPrivate = false;
@@ -299,6 +327,9 @@ export default defineComponent({
     showSearchChannel() {
       this.isSearchChannelVisible = !this.isSearchChannelVisible;
     },
+	leaveChan(chan_name: string){
+		localStorage.setItem('chan_to_leave', chan_name);
+	},
     async displayMessage() {
       this.chatMessage = [];
       const chan = computed(() => store.getters.getCurrentCahnnel);
@@ -334,8 +365,7 @@ export default defineComponent({
   },
   created() {
     if (!store.state.chat.socket) {
-      console.log("establishing connection again");
-      store.state.chat.socket = io("http://localhost:3000/chat", {
+      store.state.chat.socket = io("ws://localhost:3000/chat", {
         auth: {
           token: localStorage.getItem("token"),
         },
@@ -349,28 +379,70 @@ export default defineComponent({
           name: data.chan_name,
           id: data.id,
           owner: null,
-          messages: null,
+        //   messages: null,
           admins: null,
           members: [],
           invites: null,
-          password: data.pass,
           isPrivate: data.isPrivate,
           isProtected: data.isProtected,
           isPublic: data.isPublic,
           // user: data.user,
         };
         this.channels.push(newChannel);
+        this.my_chan.push(newChannel);
       }
     });
-    store.state.chat.socket.on("join_room_success", () => {
+    store.state.chat.socket.on("join_room_success", (data: any) => {
       console.log("Joined the channel successfully and back in front end");
+	  if (data){
+        const newChannel: IChannel = {
+          name: data.chan_name,
+          id: data.id,
+          owner: null,
+        //   messages: null,
+          admins: null,
+          members: [],
+          invites: null,
+          isPrivate: data.isPrivate,
+          isProtected: data.isProtected,
+          isPublic: data.isPublic,
+          // user: data.user,
+        };
+		this.my_chan.push(newChannel);
+	  }
     });
+	store.state.chat.socket.on("update_chan_list", (data: any) => {
+		// console.log("reached update_chan_list in front end")
+		if (data){
+        const newChannel: IChannel = {
+          name: data.chan_name,
+          id: data.id,
+          owner: null,
+        //   messages: null,
+          admins: null,
+          members: [],
+          invites: null,
+          isPrivate: data.isPrivate,
+          isProtected: data.isProtected,
+          isPublic: data.isPublic,
+          // user: data.user,
+        };
+		if (data.user != store.getters.getUserName)
+			this.channels.push(newChannel);
+	  }
+
+	});
     store.state.chat.socket.on("chan_msg_success", () => {
       console.log("Send message to channel successfully and back in front end");
     });
     store.state.chat.socket.on("priv_msg_success", () => {
       console.log("Send message to channel successfully and back in front end");
     });
+	store.state.chat.socket.on("leave_room_success", (room_name: string) => {
+		const index = this.my_chan.findIndex((channel: IChannel) => channel.name === room_name);
+		if (index !== -1)
+			this.my_chan.splice(index, 1);
+	});
   },
 });
 </script>
