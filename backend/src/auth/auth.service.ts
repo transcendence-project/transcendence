@@ -15,8 +15,8 @@ export class AuthService{
 		return user1;
 	}
 
-	generate_jwt_token(username: string ){
-		return this.jwtService.sign({ username: username });
+	generate_jwt_token(username: string, id: number ){
+		return this.jwtService.sign({ sub: id, username: username});
 	}
 
 	decode_token(token: string) {
@@ -24,8 +24,9 @@ export class AuthService{
 	}
 	async user_by_token(token: string)
 	{
-		const decodeToken = this.decode_token(token);
-		return (await this.userService.findOneByUserName(decodeToken.username));
+		const decode_token = this.decode_token(token);
+		const user = await this.userService.findOne(decode_token.sub);
+		return user;
 		
 	}
 

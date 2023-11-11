@@ -82,6 +82,10 @@ router.beforeEach((to: any, from: any, next: any) => {
 	if (from.fullPath === '/chat') { // Replace 'chatRoute' with your chat route name
 		// Clear the channels array or perform any other necessary cleanup
 		store.state.chat.socket.off('create_room_success');
+		store.state.chat.socket.off('join_room_success');
+		store.state.chat.socket.off('update_chan_list');
+		store.state.chat.socket.off('chan_msg_success');
+		store.state.chat.socket.off('priv_msg_success');
 	  }
     next();
     if (to.path == '/home' && to.query.code)

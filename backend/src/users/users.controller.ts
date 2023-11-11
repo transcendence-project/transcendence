@@ -35,9 +35,9 @@ export class UsersController {
 
 	@Get('/achievements')
 	@UseGuards(JwtAuthGuard)
-	async getAchievements(@Req() req, @Param('id') id: string): Promise<Achievement[]>{
+	async getAchievements(@Req() req): Promise<Achievement[]>{
 		// console.log('test log')
-		// console.log('in get achievements, req.user: ', req.user);
+		console.log('in get achievements, req.user: ', req.user);
 		console.log('in get achievements, req.user.id: ', req.user.id);
 		return (await this.userService.getAchievements(req.user.id))
 	}
@@ -48,9 +48,10 @@ export class UsersController {
 		console.log('in give achievement, req.user.id: ', req.user.id);
 		return (this.userService.addAchievement(req.user.id, achievementTitle))
 	}
-	@Get('my_channels')
+	@Get('my/channels')
 	@UseGuards(JwtAuthGuard)
 	async my_channels(@Req() req){
+		// console.log(req.user.id);
 		return (await this.userService.findUserChan(req.user.id));
 	}
 }

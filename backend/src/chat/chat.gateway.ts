@@ -49,17 +49,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     client.emit("disconnection_success");
   }
 
-  @SubscribeMessage("send_msg_to_chan")
-  send_message_chan(client: any, payload: any): void {
-    const user = this.chatService.find_user_with_id(client.id);
-    const { room_name, message } = payload;
-    this.server
-      .to(room_name)
-      .emit("room_message", { message, sender: client.id });
-    this.chatService.save_chan_message(user, room_name, message);
-    // save the message in the database
-    client.emit("chan_msg_success");
-  }
+@SubscribeMessage('send_msg_to_chan')
+send_message_chan(client: any, payload: any): void {
+	const user = this.chatService.find_user_with_id(client.id);
+	const { room_name, message } = payload;
+	console.log(room_name);
+	console.log(message);
+	// this.server.to(room_name).emit('room_message', { message, sender: client.id });
+	this.chatService.save_chan_message(user, room_name, message);
+	// save the message in the database
+	client.emit('chan_msg_success');
+}
 
   @SubscribeMessage("private_message")
   send_message_dm(client: any, payload: any): void {
@@ -80,82 +80,114 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     client.emit("priv_msg_success");
   }
 
-  @SubscribeMessage("create_prot_room")
-  async create_prot_room(client: any, payload: any): Promise<void> {
-    console.log("reached create prot room - backend websockets");
-    const { channel_name, password } = payload;
-    console.log(`channel name in backend: ${channel_name}`);
-    console.log(`password in backend: ${password}`);
-    const user = this.chatService.find_user_with_id(client.id);
+@SubscribeMessage('create_prot_room')
+async create_prot_room(client: any, payload: any): Promise<void> {
+
+	console.log("reached create prot room - backend websockets");
+	const { channel_name, password } = payload;
+	console.log(`channel name in backend: ${channel_name}`);
+	console.log(`password in backend: ${password}`);
+	const user = this.chatService.find_user_with_id(client.id);
 	const salt = bcrypt.genSalt(10);
-    const hashedPassword = bcrypt.hash(password, salt);
-    const chan = await this.chatService.create_chan(
-      channel_name,
-      user,
-      hashedPassword,
-    );
-    client.join(channel_name);
-    if (chan) {
-      const data_to_send = {
-        chan_name: channel_name,
-        isPublic: false,
-        isPrivate: false,
-        isProtected: true,
-        user: user.userName,
-        id: chan.id,
-        pass: hashedPassword,
-      };0
-      client.emit("create_room_success", data_to_send);
-    } else client.emit("create_room_success");
-  }
+	const hashedPassword = bcrypt.hash(password, salt);
+	const chan = await this.chatService.create_chan(channel_name, user, hashedPassword);
+	client.join(channel_name);
+	console.log(`hashed password in create_prot_room ${chan.password}`);
+	if (chan){
+		const data_to_send = {
+			chan_name: channel_name,
+			isPublic: false,
+			isPrivate: false,
+			isProtected: true,
+			user: user.userName,
+			id: chan.id,
+		};
+		client.emit('create_room_success', data_to_send);
+		this.server.emit('update_chan_list', data_to_send);
+	}
+	else
+		client.emit('create_room_success');
+}
 
-  @SubscribeMessage("create_pub_room")
-  async create_pub_room(client: any, payload: any): Promise<void> {
-    console.log("reached create pub room - backend websockets");
-    const { channel_name, password } = payload;
-    console.log(`channel name in backend: ${channel_name}`);
-    console.log(`password in backend: ${password}`);
-    const user = this.chatService.find_user_with_id(client.id);
-    const hashedPassword = bcrypt.hash(password, 10);
-    const chan = await this.chatService.create_chan(
-      channel_name,
-      user,
-      hashedPassword,
-    );
-    client.join(channel_name);
-    if (chan) {
-      const data_to_send = {
-        chan_name: channel_name,
-        isPublic: true,
-        isPrivate: false,
-        isProtected: false,
-        user: user.userName,
-        id: chan.id,
-        pass: hashedPassword,
-      };
-      client.emit("create_room_success", data_to_send);
-    } else client.emit("create_room_success");
-  }
+@SubscribeMessage('create_pub_room')
+async create_pub_room(client: any, payload: any): Promise<void> {
+	
+	console.log("reached create pub room - backend websockets");
+	const { channel_name, password } = payload;
+	console.log(`channel name in backend: ${channel_name}`);
+	console.log(`password in backend: ${password}`);
+	const user = this.chatService.find_user_with_id(client.id);
+	const chan = await this.chatService.create_chan(channel_name, user, password);
+	client.join(channel_name);
+	if (chan){
+		const data_to_send = {
+			chan_name: channel_name,
+			isPublic: true,
+			isPrivate: false,
+			isProtected: false,
+			user: user.userName,
+			id: chan.id,
+		};
+		client.emit('create_room_success', data_to_send);
+		this.server.emit('update_chan_list', data_to_send);
+	}
+	else
+		client.emit('create_room_success');
+}
 
-  @SubscribeMessage("join_room")
-  async join_room(client: any, payload: any) {
-    const { room_name, arg } = payload; // args: password
-    const user = this.chatService.find_user_with_id(client.id);
-    const room = await this.chatService.chan_by_name(room_name);
-    if (this.chatService.can_join(user, room, arg)) {
-      this.chatService.add_chan_mem(user, room_name);
-      client.join(room_name);
-      client.emit("join_room_success");
-    }
-  }
+@SubscribeMessage('join_room')
+async join_room(client: any, payload: any) {
+	const { room_name, arg } = payload; // args: password
+	const user = this.chatService.find_user_with_id(client.id);
+	const room = await this.chatService.chan_by_name(room_name);
+;	if (this.chatService.can_join(user, room, arg))
+	{
+		this.chatService.add_chan_mem(user, room_name);
+		client.join(room_name);
+		if (arg)
+		{
+			const data_to_send = {
+				chan_name: room_name,
+				isPublic: false,
+				isPrivate: false,
+				isProtected: true,
+				user: user.userName,
+				id: room.id,
+			};
+			client.emit('join_room_success', data_to_send);
+		}
+		else
+		{
+			const data_to_send = {
+				chan_name: room_name,
+				isPublic: true,
+				isPrivate: false,
+				isProtected: false,
+				user: user.userName,
+				id: room.id,
+			};
+			client.emit('join_room_success', data_to_send);
+		}
+	}
+	else
+		client.emit('join_room_failure');
+}
 
-  @SubscribeMessage("leave_room")
-  leave_room(client: any, room_name: string): void {
-    const user = this.chatService.find_user_with_id(client.id);
-    this.chatService.rm_chan_mem(user, room_name); // removing from databse
-    client.leave(room_name);
-    client.emit("leave_room_success");
-  }
+@SubscribeMessage('leave_chan')
+async leave_room(client: any, room_name: string) {
+	console.log('reached leave room in backend');
+	// const room = await this.chatService.chan_by_name(room_name);
+	// console.log("-------BEFOORRREEEEEEEE-------")
+	// console.log(room.members);
+	const user = this.chatService.find_user_with_id(client.id);
+	// console.log(user);
+	this.chatService.rm_chan_mem(user, room_name); // removing from databse
+	client.leave(room_name);
+	// const room_ = await this.chatService.chan_by_name(room_name);
+	// console.log("-------AFTERRRRRRRR-------")
+	// console.log(room_.members);
+	client.emit('leave_room_success', room_name);
+}
 
   @SubscribeMessage("mute_user")
   mute_user(client: any, payload: any): void {
