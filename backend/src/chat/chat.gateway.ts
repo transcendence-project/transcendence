@@ -1,7 +1,8 @@
 import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect, } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { ChatService } from '../chat/chat.service';
-import { bcrypt } from "bcrypt";
+// import { bcrypt } from "bcrypt";
+import * as bcrypt from 'bcrypt';
 
 @WebSocketGateway({cors:{origin:'http://localhost:8080'},  namespace: 'chat'})
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -77,8 +78,8 @@ async create_prot_room(client: any, payload: any): Promise<void> {
 	console.log(`channel name in backend: ${channel_name}`);
 	console.log(`password in backend: ${password}`);
 	const user = this.chatService.find_user_with_id(client.id);
-	const salt = bcrypt.genSalt(10);
-	const hashedPassword = bcrypt.hash(password, salt);
+	const salt = await bcrypt.genSalt(10);
+	const hashedPassword = await bcrypt.hash(password, salt);
 	const chan = await this.chatService.create_chan(channel_name, user, hashedPassword);
 	client.join(channel_name);
 	console.log(`hashed password in create_prot_room ${chan.password}`);
