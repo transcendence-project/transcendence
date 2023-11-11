@@ -159,4 +159,11 @@ export class UsersService {
 	const user = await this.repo.find({ order: { points: "DESC" } });
 	return user;
   }
+
+  async saveMatch(winnerID: number, winnerScore: number, loserID, loserScore: number) {
+	const winner: User = await this.findOne(winnerID);
+	const loser: User = await this.findOne(loserID);
+	const winnerScoreString: string = winnerScore.toString();
+	const loserScoreString: string = loserScore.toString();
+	
 }

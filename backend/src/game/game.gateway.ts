@@ -42,5 +42,8 @@ export class GameGateway
   inviteUser(client: Socket, receiver: string): void {
     client.to(receiver).emit("invite", client.id);
   }
-  
+
+  updateGame(winnerID: number, winnerScore: number, loserID, loserScore): void {
+	this.userService.saveMatch(winnerID, winnerScore, loserID, loserScore);
+	}
 }
