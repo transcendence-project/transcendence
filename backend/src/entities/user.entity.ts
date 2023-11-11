@@ -62,8 +62,11 @@ export class User {
   @OneToMany(() => User, (user) => user.friendRequestsReceived)
   friendRequestsReceived: FriendRequest[];
 
-  @OneToMany(() => User, (user) => user.matches)
-  matches: Match[];
+  @OneToMany(() => User, (user) => user.matchesAsPlayerOne)
+  matchesAsPlayerOne: Match[];
+
+  @OneToMany(() => User, (user) => user.matchesAsPlayerTwo)
+  matchesAsPlayerTwo: Match[];
 
   @ManyToMany(() => Achievement, (achievement) => achievement.users)
   @JoinTable({

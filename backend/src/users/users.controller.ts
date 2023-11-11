@@ -19,8 +19,8 @@ export class UsersController {
 	// }
 
 	@Get()
-	findAllUsers(@Query('userName') userName: string){
-		return (this.userService.findAllUsers(userName))
+	findAllUsers(){
+		return (this.userService.findAllUsers())
 	}
 
 	@Delete('/:id')

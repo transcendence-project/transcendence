@@ -6,16 +6,19 @@ import {
 } from "@nestjs/common";
 import { Repository } from "typeorm";
 import { User } from "../entities/user.entity";
+import { Match } from "entities/match.entity";
 import { InjectRepository } from "@nestjs/typeorm";
 // import { FriendRequest } from "entities/friend-request.entity";
 // import { FriendRequestService } from "friend-requests/FriendRequests.service";
 import { Achievement } from "entities/achievement.entity";
 import { SeederService } from "../achievements/achievement.seed";
+import { MatchesService } from "game/matches/matches.service";
 
 @Injectable()
 export class UsersService {
   constructor(
     private seederService: SeederService,
+	private matchesService: MatchesService,
     @InjectRepository(User) private repo: Repository<User>,
   ) {}
 
@@ -37,7 +40,8 @@ export class UsersService {
       is2FAEnabled: false,
       friends: [],
       channels: [],
-      matches: [],
+		matchesAsPlayerOne: [],
+		matchesAsPlayerTwo: [],
       achievements: [],
 	  points: 50,
     });
@@ -118,8 +122,8 @@ export class UsersService {
   }
 
   async addAchievement(userId: number, achievementTitle: string) {
-    console.log("in add achievement, userId: ", userId);
-    console.log("in add achievement, achievementTitle: ", achievementTitle);
+    // console.log("in add achievement, userId: ", userId);
+    // console.log("in add achievement, achievementTitle: ", achievementTitle);
     const user = await this.repo.findOne({
       where: { id: userId },
       relations: ["achievements"],
@@ -131,9 +135,9 @@ export class UsersService {
       achievementTitle,
     );
     if (!achievement) throw new NotFoundException("Achievement not found");
-    console.log("in add achievement, achievement: ", achievement);
-    console.log("in add achievement, user.achievements: ", user.achievements);
-    console.log("in add achievement, user: ", user);
+    // console.log("in add achievement, achievement: ", achievement);
+    // console.log("in add achievement, user.achievements: ", user.achievements);
+    // console.log("in add achievement, user: ", user);
     user.achievements.push(achievement);
     return this.repo.save(user);
   }
@@ -160,10 +164,34 @@ export class UsersService {
 	return user;
   }
 
-  async saveMatch(winnerID: number, winnerScore: number, loserID, loserScore: number) {
+  async checkAchievements(userId: number) {
+	const user: User = await this.findOne(userId);
+	const matches: Match[] = await this.matchesService.findMatches(userId);
+	const achievements: Achievement[] = await this.getAchievements(userId);
+
+	if (matches.length >= 1 && !achievements.find((a) => a.title === "First Match")) {
+		this.addAchievement(userId, "First Match");
+
+	}
+}
+
+
+  async saveMatch(winnerID: number, winnerScore: number, loserID: number, loserScore: number) {
 	const winner: User = await this.findOne(winnerID);
 	const loser: User = await this.findOne(loserID);
 	const winnerScoreString: string = winnerScore.toString();
 	const loserScoreString: string = loserScore.toString();
-	
+	const score: string = winnerScoreString + '-' + loserScoreString;
+
+	const match = await this.matchesService.create(winner, loser, score, loserID, winnerID);
+
+	winner.matchesAsPlayerOne.push(match);
+	loser.matchesAsPlayerTwo.push(match);
+
+	this.repo.save(winner);
+	this.repo.save(loser);
+
+	this.updateUserPoints(winnerID, loserID);
+	this.checkAchievements(winnerID);
+  }
 }
