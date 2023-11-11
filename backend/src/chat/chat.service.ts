@@ -264,6 +264,7 @@ export class ChatService {
 		if (room.is_protected === true)
 		{
 			console.log(arg);
+			console.log(room.password);
 			// if (room.password){
 				// if (arg === room.password){ // check if the password enterd is correct
 				// 	return true;
