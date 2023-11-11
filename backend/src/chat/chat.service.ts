@@ -88,8 +88,6 @@ export class ChatService {
 	async add_chan_mem(user: User, chan_name: string) {
 		// insert or create the user in the channel memeber table
 		const chan = await this.chan_by_name(chan_name);
-		console.log(chan);
-		console.log(chan.members);
 		if (chan) {
 			chan.members.push(user);
 			await this.channelRepo.save(chan);
@@ -263,8 +261,9 @@ export class ChatService {
 
 	can_join(user: User, room: Channel, arg: string): boolean {
 		
-		if (room.is_private === true)
+		if (room.is_protected === true)
 		{
+			console.log(arg);
 			// if (room.password){
 				// if (arg === room.password){ // check if the password enterd is correct
 				// 	return true;

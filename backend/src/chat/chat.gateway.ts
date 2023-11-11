@@ -89,6 +89,7 @@ async create_prot_room(client: any, payload: any): Promise<void> {
 			pass: password, 
 		};
 		client.emit('create_room_success', data_to_send);
+		this.server.emit('update_chan_list', data_to_send);
 	}
 	else
 		client.emit('create_room_success');
