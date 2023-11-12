@@ -8,7 +8,8 @@ import { AuthModule } from '../auth/auth.module';
 
 @Module({
   controllers: [GameController],
-  imports: [AuthModule, UsersModule],
+  imports: [AuthModule],
   providers: [GameService, GameGateway],
+  imports: [UsersModule],
 })
 export class GameModule {}
