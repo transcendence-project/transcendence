@@ -6,6 +6,7 @@ import { Repository } from 'typeorm';
 import { Message } from '../entities/message.entity';
 import { Socket } from 'socket.io';
 import { AuthService } from 'auth/auth.service';
+import * as bcrypt from 'bcrypt'
 
 
 @Injectable()
@@ -259,18 +260,26 @@ export class ChatService {
 		return false;
 	}
 
-	can_join(user: User, room: Channel, arg: string): boolean {
+	async can_join(user: User, room: Channel, arg: string): Promise<boolean> {
 		
 		if (room.is_protected === true)
 		{
 			console.log(arg);
 			console.log(room.password);
-			// if (room.password){
-				// if (arg === room.password){ // check if the password enterd is correct
-				// 	return true;
-				// else
-				// 	return false;
-			// }
+			if (room.password)
+			{
+				try{
+					const match = await bcrypt.compare(arg, room.password);
+					if (match)
+						return true;
+					else
+						return false;
+				}
+				catch (error) {
+					console.error('Error while comparing password:', error);
+					return false;
+				}
+			}
 		}
 		return true;
 	}
