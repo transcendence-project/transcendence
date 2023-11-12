@@ -169,9 +169,14 @@ export class UsersService {
 	const matches: Match[] = await this.matchesService.findMatches(userId);
 	const achievements: Achievement[] = await this.getAchievements(userId);
 
-	if (matches.length >= 1 && !achievements.find((a) => a.title === "First Match")) {
+	if (matches.length === 1 && !achievements.find((a) => a.title === "First Match")) {
 		this.addAchievement(userId, "First Match");
-
+	}
+	if (user.matchesAsPlayerOne.length === 1 && !achievements.find((a) => a.title === "First Win")) {
+		this.addAchievement(userId, "First Win");
+	}
+	if (matches.length === 3 && !achievements.find((a) => a.title === "Played 3 Matches")) {
+		this.addAchievement(userId, "Played 3 Matches");
 	}
 }
 
