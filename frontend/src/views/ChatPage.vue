@@ -5,7 +5,7 @@
     <div class="container w-full lg:w-1/6">
       <div class="row">
         <h2>My Channel</h2>
-        <div class="my-2">
+        <div v-if="showGroupList" class="my-2">
           <ButtonComponent
             class=""
             btnContent="Create Channel"
@@ -13,37 +13,61 @@
           />
           <CreateChannel v-if="isAddChannelForm" @close="closeAddChannelForm" />
           <div class="my-2">
-            <input
-              placeholder="Search channel"
-              @click="filteredSearchchanel"
-              class="w-9/12 md:w-10/12 h-[1.5rem] border-0 text-black ml-2 rounded-md pl-4 mb-2 focus:border-0 focus:outline-none"
-            />
+            <!-- <input placeholder="Search channel" @click="filteredSearchchanel" class="w-9/12 md:w-10/12 h-[1.5rem] border-0 text-black ml-2 rounded-md pl-4 mb-2 focus:border-0 focus:outline-none" /> -->
           </div>
           <ChannelMembers v-if="isSearchChannelVisible" />
         </div>
-      </div>
-      <div class="row">
-        <div class="w-full h-[250px] overflow-y-auto overflow-x-hidden">
-          <ul class="w-[95%] p-1 m-1">
-            <div v-for="(result, index) in filteredMyChannel" :key="index">
-              <li class="list-none w-full mb-1">
-                <div
-                  class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom px-1 w-full rounded-[10px] chn-item"
-                >
-                  <a href="#" @click="showUserList(result.name)">
-                    <div class="mx-2 px-5">
-                      {{ result.name }}
-                    </div>
-                  </a>
-                  <ChannelOption class="relative w-9 h-9" />
-                </div>
-              </li>
-            </div>
-          </ul>
-        </div>
+        <input
+          placeholder="Search channel"
+          @click="searchFriends"
+          class="w-9/12 md:w-10/12 h-[1.5rem] border-0 text-black ml-2 rounded-md pl-4 mb-2 focus:border-0 focus:outline-none"
+        />
       </div>
 
       <div class="row">
+        <div v-if="showGroupList">
+          <div class="w-full h-[250px] overflow-y-auto overflow-x-hidden">
+            <ul class="w-[95%] p-1 m-1">
+              <div v-for="(result, index) in filteredMyChannel" :key="index">
+                <li class="list-none w-full mb-1">
+                  <div
+                    class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom px-1 w-full rounded-[10px] chn-item"
+                  >
+                    <a href="#" @click="showUserList(result.name)">
+                      <div class="mx-2 px-5">
+                        {{ result.name }}
+                      </div>
+                    </a>
+                    <ChannelOption class="relative w-9 h-9" />
+                  </div>
+                </li>
+              </div>
+            </ul>
+          </div>
+        </div>
+
+        <div v-else>
+          <div class="w-full h-[800px] overflow-y-auto overflow-x-hidden">
+            <ul class="w-[95%] p-1 m-1">
+              <div v-for="(friend, index) in searchFriends" :key="index">
+                <li class="list-none w-full mb-1">
+                  <div
+                    class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom px-1 w-full rounded-[10px] chn-item"
+                  >
+                    <a href="#">
+                      <div class="m-2 px-5">
+                        {{ friend.user }}
+                      </div>
+                    </a>
+                  </div>
+                </li>
+              </div>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div v-if="showGroupList" class="row">
         Members List
         <div class="w-full h-[250px] overflow-y-auto overflow-x-hidden">
           <ul class="w-[95%] p-1 m-1">
@@ -65,13 +89,15 @@
       </div>
       <div class="row">
         <div class="chn-btm my-3">
-          <button class="grpbtn" @click="switch_to_group">Group</button>
-          <button class="dmbtn" @click="switch_to_dm">DM</button>
+          <button class="grpbtn" @click="showGroup">Group</button>
+          <button class="dmbtn" @click="showDm">DM</button>
+          <!-- <button class="grpbtn" @click="switch_to_group">Group</button>
+          <button class="dmbtn" @click="switch_to_dm">DM</button> -->
         </div>
       </div>
     </div>
 
-    <div class="container1 w-full lg:w-3/6 mx-2">
+    <div class="container1 w-full lg:w-3/6">
       <div class="row1">
         <h1 class="text-2xl">Chat</h1>
       </div>
@@ -91,7 +117,6 @@
         </div>
       </div>
       <div class="row1">
-
         <input
           v-model="message"
           placeholder="message"
@@ -168,6 +193,11 @@ import { IChannel } from "@/models/channel";
 const chan = ref([] as IChannel[]);
 const m_chan = ref([] as IChannel[]);
 
+interface FriendsList {
+  user: string;
+  status: Boolean;
+}
+
 export default defineComponent({
   data() {
     return {
@@ -185,7 +215,31 @@ export default defineComponent({
       searchQuery: "" as string,
       userList: [] as string[],
       selectedChannel: null as IChannel | null,
-	  inputText: '',
+      inputText: "",
+      showGroupList: true,
+
+      friends: [
+        {
+          user: "one",
+          status: true,
+        },
+        {
+          user: "two",
+          status: false,
+        },
+        {
+          user: "three",
+          status: true,
+        },
+        {
+          user: "four",
+          status: false,
+        },
+        {
+          user: "five",
+          status: true,
+        },
+      ] as FriendsList[],
     };
   },
   setup() {
@@ -223,6 +277,11 @@ export default defineComponent({
     ChannelMembers,
   },
   computed: {
+    searchFriends(): FriendsList[] {
+      return this.friends.filter((item) =>
+        item.user.toLowerCase().includes(this.text.toLowerCase())
+      );
+    },
     filteredMyChannel(): IChannel[] {
       return this.channels.filter(
         (item: IChannel) =>
@@ -246,6 +305,12 @@ export default defineComponent({
     },
   },
   methods: {
+    showGroup() {
+      this.showGroupList = true;
+    },
+    showDm() {
+      this.showGroupList = false;
+    },
     join_pub_chan(room_name: string) {
       console.log("reached join chan");
       if (store.state.chat.socket)
@@ -330,7 +395,6 @@ export default defineComponent({
       });
       await this.displayMessage();
     },
-
   },
   created() {
     if (!store.state.chat.socket) {
@@ -375,12 +439,12 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
+<!-- <style scoped>
 .container {
   margin: 1%;
   height: 100vh;
   display: grid;
-  grid-template-rows: 1fr 4fr 4fr 1fr;
+  grid-template-rows: 1fr  4fr 4fr 1fr;
   background-color: #ae4488;
   border-radius: 5px;
 }
@@ -501,4 +565,112 @@ export default defineComponent({
 
 </style>
 
+ -->
+<style scoped>
+.container {
+  margin: 1%;
+  height: 100vh;
+  display: grid;
+  grid-template-rows: 1fr 4fr 4fr 1fr;
+  background-color: #ae4488;
+  border-radius: 5px;
+}
 
+.container1 {
+  margin: 1%;
+  height: 100vh;
+  display: grid;
+  grid-template-rows: 1fr 8fr 1fr;
+  background-color: #ae4488;
+  border-radius: 5px;
+}
+
+.container2 {
+  margin: 1%;
+  height: 100vh;
+  display: grid;
+  grid-template-rows: 1fr 5fr 4fr;
+  background-color: #ae4488;
+  border-radius: 5px;
+}
+
+.row {
+  text-align: center;
+  padding: 10px;
+}
+
+.pub-btm {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 50px;
+  padding-bottom: 50;
+}
+
+.intbtn,
+.grpbtn,
+.dmbtn,
+.jpub-btn {
+  font-size: 0.8rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-radius: 5px;
+  margin-left: 10px;
+  cursor: pointer;
+  color: white;
+  background: #451952;
+  border: none;
+}
+
+.jpub-btn {
+  margin: 3%;
+}
+
+@media screen and (max-width: 768px) {
+  .container {
+    grid-template-rows: 1fr 6fr 3fr 1fr;
+  }
+
+  .container1 {
+    grid-template-rows: 1fr 7fr 2fr;
+  }
+
+  .container2 {
+    grid-template-rows: 1fr 7fr 2fr;
+  }
+
+  .pub-btm {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .intbtn,
+  .grpbtn,
+  .dmbtn,
+  .jpub-btn {
+    margin-top: 10px;
+    margin-left: 0;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .container,
+  .container1,
+  .container2 {
+    margin: 0;
+  }
+
+  .row {
+    padding: 5px;
+  }
+
+  .intbtn,
+  .grpbtn,
+  .dmbtn,
+  .jpub-btn {
+    font-size: 0.7rem;
+  }
+}
+</style>
