@@ -5,6 +5,8 @@ import { Socket } from 'socket.io';
 @Injectable()
 export class GameService {
     private connected_users: Map<string,User> = new Map();
+    private classic_queue: string[] = [];
+    private custom_queue: string[] = [];
     constructor(private readonly authService: AuthService) {}
 
     async set_online_user(client: Socket ,token: any){

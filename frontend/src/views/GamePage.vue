@@ -1,14 +1,17 @@
 <template>
 	<div class="game-container">
 	  <canvas ref="game" id="pong"></canvas>
-      <button @click="startGame">Start Game</button>
+      <!-- <button @click="startGame">Start Game</button> -->
 	</div>
 </template>
-  
-<script lang="ts" setup>
+
+
+
+<!-- <script lang="ts" setup>
     import { ref, onMounted} from 'vue';
     import WebSocketPlugin from '@/plugins/websocket-plugin';
 
+	// WebSocketPlugin.connectWebSocket('http://localhost:3000/game');
     const startGame = () => {
         if (this.$socket) {
             $socket.emit('start-game', 'This is from the client to the server game');
@@ -17,27 +20,29 @@
     const game = ref<HTMLCanvasElement | null>(null);
     onMounted(() => {   
             if (this.$socket) {
-                this.$socket?.on('table', (message: any[]) => {
-            if (game.value)
-            {
-                const context = game.value.getContext('2d');
-                game.value.width = message[0];
-                game.value.height = message[1];
-                if (context) {
-					context.fillStyle = 'red';
-                    // context
-                    context.fillRect(50, 0, 100, 100);
-                }
-            }
-        });
+                this.$socket.on('table', (message: any[]) => {
+				if (game.value)
+				{
+					const context = game.value.getContext('2d');
+					game.value.width = message[0];
+					game.value.height = message[1];
+					if (context) {
+						context.fillStyle = 'red';
+						// context
+						context.fillRect(50, 0, 100, 100);
+					}
+				}
+			});
         }
     }); 
-</script>
+</script> -->
+
+
+
 
    
   
-  <style>
-
+  <style scoped>
   .game-container {
 
 	width: fit-content;

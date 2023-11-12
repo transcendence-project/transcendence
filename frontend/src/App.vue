@@ -8,18 +8,12 @@
 	</div>
 </template>
   
-<script lang="ts">
+<script lang="ts" setup>
   import { defineComponent } from "vue";
   import TopNavBar from "@/components/TopNavBar.vue";
   import SideNavBar from "@/components/SideNavBar.vue";
   
-  export default defineComponent({
-	name: "homePage",
-	components: {
-	  TopNavBar,
-	  SideNavBar,
-	},
-  });
+
 </script>
   
 <style scoped>
