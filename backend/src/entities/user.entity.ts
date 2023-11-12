@@ -32,7 +32,7 @@ export class User {
   @Column()
   email: string;
   
-  @Column()
+  @Column({default: 50})
   points: number;
 
   @Column({ nullable: true })
