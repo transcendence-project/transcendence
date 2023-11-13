@@ -148,6 +148,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					id: room.id,
 				};
 				client.emit('join_room_success', data_to_send);
+				this.server.emit('update_mem_list', data_to_send);
 			}
 			else {
 				const data_to_send = {

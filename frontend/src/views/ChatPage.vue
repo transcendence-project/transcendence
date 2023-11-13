@@ -432,8 +432,6 @@ export default defineComponent({
 	store.state.chat.socket.on("update_chan_message", (data: any) => {
 		if (data)
 		{
-			console.log(localStorage.getItem("currentChanName"));
-			console.log(data.chan);
 			if (data.user != store.getters.getUserName && localStorage.getItem("currentChanName") == data.chan){
 				this.chatMessage.push(data.content);
 				this.isMessageSent = true;
@@ -447,6 +445,14 @@ export default defineComponent({
 		const index = this.my_chan.findIndex((channel: IChannel) => channel.name === room_name);
 		if (index !== -1)
 			this.my_chan.splice(index, 1);
+	});
+	store.state.chat.socket.on("update_mem_list", (data: any) => {
+		if (data)
+		{
+			if (data.user != store.getters.getUserName && localStorage.getItem("currentChanName") == data.chan_name){
+				this.userList.push(data.user);
+			}
+		}
 	});
   },
 });
