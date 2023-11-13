@@ -1,17 +1,29 @@
 <template>
-  <!-- <div class="flex flex-wrap justify-between shadow-custom text-white m-5 rounded-md p-2.5 text-center" > -->
-  <div
-    class="flex flex-wrap justify-between bg-gradient-to-r from-[#451952] via-[#451952] to-[#ae4188] shadow-custom text-white w-full h-full m-5 rounded-md p-2.5 text-center"
-  >
-    <!-- <div class="flex flex-wrap justify-between bg-gradient-to-r from-[#451952] via-[#451952] to-[#ae4188] shadow-custom text-white w-full  min-h-[85.9vh] m-5 rounded-md p-2.5 text-center"> -->
+  <!-- <div class="flex flex-col justify-between bg-gradient-to-r from-[#451952] via-[#451952] to-[#ae4188] shadow-custom text-white w-full min-h-[60vh] m-5 rounded-md p-2.5 text-center" > -->
+    <div class="flex flex-wrap justify-between bg-gradient-to-r from-[#451952] via-[#451952] to-[#ae4188] shadow-custom text-white w-full  min-h-[85.9vh] m-5 rounded-md p-2.5 text-center">
 
 
-    <div class="container flex flex-col min-h-[85.9vh] lg:w-1/6 h-full" >
-      <div class="row flex-grow max-w-full">
-        <h2>My Channel</h2>
+    <!-- <div class="container flex flex-col lg:w-1/6 min-h-[60vh]" > -->
+    <div class="container flex flex-col min-h-[50vh]" >
+
+		<h2 class="chn-head">My Channel</h2>
+		<div class="row flex-grow max-w-full ">
+		<!-- <div class="dm-grp"> -->
+
+			<div class="chn-btm">
+				<button class="grpbtn" @click="showGroup">Group</button>
+				<button class="dmbtn" @click="showDm">DM</button>
+				<!-- <button class="grpbtn" @click="switch_to_group">Group</button>
+					<button class="dmbtn" @click="switch_to_dm">DM</button> -->
+				</div>
+			<!-- </div> -->
+      </div>
+
+		<div class="row flex-grow max-w-full">
+		  <!-- <h2 class="mb-2 chn-head">My Channel</h2> -->
         <div v-if="showGroupList" class="my-2 max-w-full">
           <ButtonComponent
-            class=""
+            class="adbtn"
             btnContent="Create Channel"
             @click="AddChannelForm"
           />
@@ -21,6 +33,9 @@
         </div>
       </div>
 
+
+
+	  
       <div class="row flex-grow max-w-full">
         <div v-if="showGroupList">
           <input
@@ -54,19 +69,13 @@
 
           <div v-else>
 			<div   class="row flex-grow max-w-full" >
-            <input
-              placeholder="Search friend"
-              v-model="src_friend"
-			  class="w-[80%] h-[2rem] border-0 text-black ml-2 mr-1 rounded-full pl-4 mb-2 focus:border-0 focus:outline-none"
-
-			  />
-              <!-- class="w-9/12 md:w-10/12 h-[1.5rem] border-0 text-black ml-2 rounded-md pl-4 mb-2 focus:border-0 focus:outline-none" -->
+            <input placeholder="Search friend" v-model="src_friend" class="w-[80%] h-[2rem] border-0 text-black ml-2 mr-1 rounded-full pl-4 mb-2 focus:border-0 focus:outline-none" />
 			  <div
-              class="w-full min-h-[85.9vh] overflow-y-auto overflow-x-hidden flex-grow max-w-full"
+              class="w-full h-[250px] overflow-y-auto overflow-x-hidden flex-grow max-w-full"
             >
-              <ul class="w-[95%] p-1 m-1">
+              <ul class="w-[95%] p-2 m-2">
                 <div v-for="(friend, index) in searchFriends" :key="index">
-                  <li class="list-none w-full mb-1">
+                  <li class="list-none w-full mb-1" @click="showChatPage">
                     <div
                       class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom px-1 w-full rounded-[10px] chn-item"
                     >
@@ -89,7 +98,7 @@
         <div class="w-full h-[250px] overflow-y-auto overflow-x-hidden">
           <ul class="w-[95%] p-1 m-1">
             <div v-for="(user, index) in userList" :key="index">
-              <li class="list-none w-full mb-1">
+              <li class="list-none w-full mb-1" @click="showChatPage">
                 <div
                   class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom mx-1 p-1 w-full rounded-[10px] usr-item"
                 >
@@ -104,19 +113,25 @@
           </ul>
         </div>
       </div>
-      <div class="row flex-grow max-w-full">
-        <div class="chn-btm my-3">
-          <button class="grpbtn" @click="showGroup">Group</button>
-          <button class="dmbtn" @click="showDm">DM</button>
-          <!-- <button class="grpbtn" @click="switch_to_group">Group</button>
-			<button class="dmbtn" @click="switch_to_dm">DM</button> -->
-        </div>
-      </div>
-    </div>
 
-    <div class="container1 w-full lg:w-3/6 min-h-[85.9vh]">
+      <!-- <div class="row flex flex-grow max-w-full mb-3"> -->
+		<!-- <div class="dm-grp">
+
+			<div class="chn-btm my-3">
+				<button class="grpbtn" @click="showGroup">Group</button>
+				<button class="dmbtn" @click="showDm">DM</button>
+				</div>
+			</div> -->
+      <!-- </div> -->
+
+    </div>
+    <div class="container1 min-h-[50vh]">
+    <!-- <div class="container1 w-full lg:w-3/6 min-h-[60vh]"> -->
+		<div v-if="msgField" >
+
+		
       <div class="row1">
-        <h1 class="text-2xl">Chat</h1>
+        <h1 class="cht">Chat</h1>
       </div>
       <div class="row1">
         <div
@@ -141,12 +156,22 @@
 />
         <ButtonComponent btnContent="Send" @click="sendMessage" />
       </div>
+	  </div>
+	  <div v-else>
+		<div
+              class="bg-blue-500 text-grey-500 py-2 px-4 inline-block m-1 mx-5 rounded-md"
+              style="max-width: 300px"
+            >
+			Select a channle or a friend to chat
+		</div>
+	  </div>
     </div>
 
-    <div class="container2 w-full lg:w-1/6 min-h-[85.9vh]">
+    <div class="container2   min-h-[50vh]">
+    <!-- <div class="container2 w-full lg:w-1/6 min-h-[60vh]"> -->
       <div class="row2">
-        <h2>All Channel</h2>
-      </div>
+		  <h2 class="my-5 chn-head">All Channel</h2>
+	</div>
       <div class="row2">
         Public Channels
         <div class="h-[250px] overflow-y-auto overflow-x-hidden">
@@ -240,7 +265,48 @@ export default defineComponent({
       selectedChannel: null as IChannel | null,
       inputText: "",
       showGroupList: true,
+	  msgField:false,
       friends: [
+        {
+          user: "one",
+          status: true,
+        },
+        {
+          user: "two",
+          status: false,
+        },
+        {
+          user: "three",
+          status: true,
+        },
+        {
+          user: "four",
+          status: false,
+        },
+        {
+          user: "five",
+          status: true,
+        },
+        {
+          user: "one",
+          status: true,
+        },
+        {
+          user: "two",
+          status: false,
+        },
+        {
+          user: "three",
+          status: true,
+        },
+        {
+          user: "four",
+          status: false,
+        },
+        {
+          user: "five",
+          status: true,
+        },
         {
           user: "one",
           status: true,
@@ -335,6 +401,12 @@ export default defineComponent({
     showGroup() {
       this.showGroupList = true;
     },
+	showChatPage() {
+		this.msgField = true;
+	},
+	HideChatPage() {
+		this.msgField = false;
+	},
     showDm() {
       this.showGroupList = false;
     },
@@ -466,34 +538,37 @@ export default defineComponent({
 });
 </script>
 <style scoped>
-.container {
+.main-cont{
+	display: flex;
+	flex-direction: column;
+}
+.container,
+.container2 {
   margin: 1%;
-  /* width: 20%; */
+  flex:1;
+  /* width: 22%; */
   /* height: 100vh; */
   display: grid;
-  grid-template-rows: 1fr 4fr 4fr 1fr;
-  background-color: #ae4488;
+  grid-template-rows: 1fr fr 4fr 1fr;
+  background: linear-gradient(to bottom, #451952, #AE445A, #F39F5A);
   border-radius: 5px;
 }
 .container1 {
-  margin: 1%;
-  /* width: 50%; */
-  /* height: 100vh; */
-  display: grid;
-  grid-template-rows: 1fr 8fr 1fr;
-  background-color: #ae4488;
-  border-radius: 5px;
-}
-.container2 {
-  margin: 1%;
-  /* width: 20%; */
-  /* height: 100vh; */
-  display: grid;
-  grid-template-rows: 1fr 5fr 4fr;
-  background-color: #ae4488;
-  border-radius: 5px;
+	margin: 1%;
+	/* flex:2; */
+	width: 50%;
+	/* height: 100vh; */
+	display: grid;
+	grid-template-rows: 1fr 8fr 1fr;
+	background: linear-gradient(to bottom, #451952, #AE445A, #F39F5A);
+	border-radius: 5px;
 }
 
+.cht{
+	font-size: 3rem;
+	font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+	font-style:Bold;
+}
 .row {
   text-align: center;
   padding: 10px;
@@ -506,11 +581,15 @@ export default defineComponent({
   height: 50px;
   padding-bottom: 50;
 }
-
+.adbtn{
+	background: #F39F5A;
+	/* color: #F39F5A;; */
+}
 .intbtn,
 .grpbtn,
 .dmbtn {
   font-size: 0.8rem;
+  background: #F39F5A;
   padding-left: 0.5rem;
   padding-right: 0.5rem;
   padding-top: 0.5rem;
@@ -519,10 +598,15 @@ export default defineComponent({
   margin-left: 10px;
   cursor: pointer;
   color: white;
-  background: #451952;
+  /* background: #451952; */
   border: none;
 }
 
+.chn-head{
+	font-size: 1.2rem;
+	font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+	font-style:initial;
+}
 .jpub-btn {
   font-size: 0.8rem;
   margin: 3%;
@@ -562,7 +646,16 @@ export default defineComponent({
   flex-direction: column;
   justify-content: flex-start;
 }
-
+/* .dm-grp{
+	position: relative;
+	width: 100%;
+	height: 100%;
+}
+.chn-btm{
+	position:sticky;
+	bottom:5%;
+	left: 20%;
+} */
 .pri-div {
   display: flex;
   flex-direction: column;
