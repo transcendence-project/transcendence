@@ -125,6 +125,7 @@ export class ChatService {
 	async save_chan_message(sender: User, chan_name: string, content: string){
 		const chan = await this.chan_by_name(chan_name);
 		const message = this.messageRepo.create({senderID: sender.id, sender: sender, channel: chan, content: content, createdAt: null });
+		// console.log(message);
 		chan.messages.push(message);
 		await this.messageRepo.save(message);
 		// console.log(chan);
