@@ -12,7 +12,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 // import { FriendRequestService } from "friend-requests/FriendRequests.service";
 import { Achievement } from "entities/achievement.entity";
 import { SeederService } from "../achievements/achievement.seed";
-import { MatchesService } from "game/matches/matches.service";
+import { MatchesService } from "matches/matches.service";
 
 @Injectable()
 export class UsersService {
@@ -198,5 +198,11 @@ export class UsersService {
 
 	this.updateUserPoints(winnerID, loserID);
 	this.checkAchievements(winnerID);
+  }
+
+  async getMatches(userId: number) {
+	const user = await this.findOne(userId);
+	const matches = await this.matchesService.findMatches(userId);
+	return matches;
   }
 }
