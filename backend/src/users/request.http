@@ -1,5 +1,5 @@
 @Host=http://localhost:3000
-@myToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoib2FidXNoYXIiLCJpYXQiOjE2OTkzNzUyOTJ9.eOAVuB3KFdnfM8Wd2qdTHXRMAQNxoYabVIntl7uizyA
+@myToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsInVzZXJuYW1lIjoib2FidXNoYXIiLCJpYXQiOjE2OTk5NTg1Njh9.EyY1tKq8gERXpKTOh7vpNpH66_CGVJYEj2hpoZLtD28
 @amhusseiToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFtaHVzc2VpIiwiaWF0IjoxNjk4MDQ3MjY1fQ.tXVcsCmlUBDTmmFnrq29XY90AfhWe-C7tLGph3L7bHo
 ###Get my user
 GET http://localhost:3000/auth/me
@@ -67,3 +67,19 @@ Authorization: Bearer {{myToken}}
 ### Give oabushar achievement
 PATCH http://localhost:3000/users/3/giveAchievement/First%20Win
 Authorization: Bearer {{myToken}}
+
+### Get oabushar matches
+GET http://localhost:3000/matches/my/matches
+Authorization: Bearer {{myToken}}
+
+### save oabushar match
+POST http://localhost:3000/users/save/match
+Authorization: Bearer {{myToken}}
+
+Content-Type: application/json
+{
+	"winnerId": 1,
+	"winnerScore": 10,
+	"loserId": 2,
+	"loserScore": 5,
+}

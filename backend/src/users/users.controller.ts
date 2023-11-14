@@ -3,6 +3,7 @@ import { createUserDTO } from '../dtos/createUser.dto'
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../auth/jwt.guard';
 import { Achievement } from 'entities/achievement.entity';
+import { MatchDTO } from 'dtos/match.dto';
 
 @Controller('users')
 export class UsersController {
@@ -51,7 +52,30 @@ export class UsersController {
 	@Get('my/channels')
 	@UseGuards(JwtAuthGuard)
 	async my_channels(@Req() req){
+		console.log('in my channels, req.user.id: ', req.user.id);
 		// console.log(req.user.id);
 		return (await this.userService.findUserChan(req.user.id));
+	}
+
+	// @Get('my/matches')
+	// @UseGuards(JwtAuthGuard)
+	// async my_matches(@Req() req){
+	// 	// console.log(req.user.id);
+	// 	return (await this.userService.getMatches(req.user.id));
+	// }
+
+	@Post('save/match')
+	@UseGuards(JwtAuthGuard)
+	async save_match(@Body() body: MatchDTO){
+		// console.log(req.user.id);
+		console.log('in save match, body: ', body);
+		return (await this.userService.saveMatch(body.winnerID, body.winnerScore, body.loserID, body.loserScore));
+	}
+
+	@Get('my/friends')
+	@UseGuards(JwtAuthGuard)
+	async my_friends(@Req() req){
+		// console.log(req.user.id);
+		return (await this.userService.getFriends(req.user.id));
 	}
 }

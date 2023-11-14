@@ -111,6 +111,15 @@ export class UsersService {
     return this.repo.save(user);
   }
 
+  async getFriends(userId: number): Promise<User[]> {
+	const user = await this.repo.findOne({
+	  where: { id: userId },
+	  relations: ["friends"],
+	});
+	if (!user) throw new NotFoundException("User not found");
+	return user.friends;
+  }
+
   async getAchievements(userId: number): Promise<Achievement[]> {
     const user = await this.repo.findOne({
       where: { id: userId },
@@ -184,6 +193,7 @@ export class UsersService {
   async saveMatch(winnerID: number, winnerScore: number, loserID: number, loserScore: number) {
 	const winner: User = await this.findOne(winnerID);
 	const loser: User = await this.findOne(loserID);
+	console.log('in save match, winnerScore: ', winnerScore);
 	const winnerScoreString: string = winnerScore.toString();
 	const loserScoreString: string = loserScore.toString();
 	const score: string = winnerScoreString + '-' + loserScoreString;
@@ -201,7 +211,6 @@ export class UsersService {
   }
 
   async getMatches(userId: number) {
-	const user = await this.findOne(userId);
 	const matches = await this.matchesService.findMatches(userId);
 	return matches;
   }

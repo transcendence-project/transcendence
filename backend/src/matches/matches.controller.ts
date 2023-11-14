@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseGuards, Req } from '@nestjs/common';
 import { MatchesService } from './matches.service';
 import { UsersService } from 'users/users.service';
 import { MatchDTO } from 'dtos/match.dto';
+import { JwtAuthGuard } from 'auth/jwt.guard';
 
 @Controller('matches')
 export class MatchController {
@@ -21,4 +22,11 @@ export class MatchController {
   async findOne(@Param('id') id: string) {
     return this.matchesService.findOne(+id);
   }
+  
+  @Get('my/matches')
+  @UseGuards(JwtAuthGuard)
+  async findMatches(@Req() req) {
+	return this.matchesService.findMatches(req.user.id);
+  }
+
 }
