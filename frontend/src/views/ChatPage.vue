@@ -138,7 +138,7 @@
           class="bg-white h-[90%] p-1 mb-5 m-3 text-black"
           style="text-align: right"
         >
-          <div v-for="(message, index) in chatMessage" :key="index">
+          <div v-for="(message, index) in allMessage" :key="index">
             <div
               class="bg-blue-500 text-grey-500 py-2 px-4 inline-block m-1 mx-5 rounded-md"
               style="max-width: 300px"
@@ -396,6 +396,10 @@ export default defineComponent({
         // item.name.toLowerCase().includes(this.searchQuery.toLowerCase()) && item.isProtected === true
       );
     },
+	allMessage(): string[]{
+		return this.chatMessage;
+	},
+
   },
   methods: {
     showGroup() {
@@ -416,14 +420,6 @@ export default defineComponent({
         store.state.chat.socket.emit("join_room", {
           room_name: room_name,
           arg: "",
-        });
-    },
-    join_prot_chan(room_name: string, pass: string) {
-      console.log("reached join prot chan");
-      if (store.state.chat.socket)
-        store.state.chat.socket.emit("join_room", {
-          room_name: room_name,
-          arg: pass,
         });
     },
     switch_to_group() {
@@ -472,7 +468,7 @@ export default defineComponent({
       });
     },
     sendMessage() {
-      const chan = computed(() => store.getters.getCurrentCahnnel);
+    //   const chan = computed(() => store.getters.getCurrentCahnnel);
       console.log(this.message);
       if (this.message) {
         this.chatMessage.push(this.message);
@@ -494,6 +490,8 @@ export default defineComponent({
       });
       await this.displayMessage();
     },
+	
+
   },
   created() {
     if (!store.state.chat.socket) {
@@ -527,13 +525,69 @@ export default defineComponent({
     });
     store.state.chat.socket.on("join_room_success", () => {
       console.log("Joined the channel successfully and back in front end");
+	  if (data){
+        const newChannel: IChannel = {
+          name: data.chan_name,
+          id: data.id,
+          owner: null,
+        //   messages: null,
+          admins: null,
+          members: [],
+          invites: null,
+          isPrivate: data.isPrivate,
+          isProtected: data.isProtected,
+          isPublic: data.isPublic,
+          // user: data.user,
+        };
+		this.my_chan.push(newChannel);
+	  }
     });
-    store.state.chat.socket.on("chan_msg_success", () => {
-      console.log("Send message to channel successfully and back in front end");
-    });
+	store.state.chat.socket.on("update_chan_list", (data: any) => {
+		// console.log("reached update_chan_list in front end")
+		if (data){
+        const newChannel: IChannel = {
+          name: data.chan_name,
+          id: data.id,
+          owner: null,
+        //   messages: null,
+          admins: null,
+          members: [],
+          invites: null,
+          isPrivate: data.isPrivate,
+          isProtected: data.isProtected,
+          isPublic: data.isPublic,
+          // user: data.user,
+        };
+		if (data.user != store.getters.getUserName)
+			this.channels.push(newChannel);
+	  }
+
+	});
+	store.state.chat.socket.on("update_chan_message", (data: any) => {
+		if (data)
+		{
+			if (data.user != store.getters.getUserName && localStorage.getItem("currentChanName") == data.chan){
+				this.chatMessage.push(data.content);
+				this.isMessageSent = true;
+			}
+		}
+	});
     store.state.chat.socket.on("priv_msg_success", () => {
       console.log("Send message to channel successfully and back in front end");
     });
+	store.state.chat.socket.on("leave_room_success", (room_name: string) => {
+		const index = this.my_chan.findIndex((channel: IChannel) => channel.name === room_name);
+		if (index !== -1)
+			this.my_chan.splice(index, 1);
+	});
+	store.state.chat.socket.on("update_mem_list", (data: any) => {
+		if (data)
+		{
+			if (data.user != store.getters.getUserName && localStorage.getItem("currentChanName") == data.chan_name){
+				this.userList.push(data.user);
+			}
+		}
+	});
   },
 });
 </script>

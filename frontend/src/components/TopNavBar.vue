@@ -23,9 +23,14 @@ import DropdownMenu from "./DropdownMenu.vue";
 import { computed } from 'vue';
 import store from '@/store';
 
+onMounted(() => {
+	store.dispatch('fetchUserData');
+	});
+
 const username = computed(() => store.getters.getUserName);
 
-</script>
+
+</script >
 <style scoped>
 .top-nav-bar {
   background: #212327;
