@@ -13,6 +13,7 @@
 	  >
 		<router-link to="/chat" @click.native="closeDropdownopt">Leave channel</router-link>
 		<!-- <router-link to="/chat" @click.native="closeDropdownopt">View Membmers</router-link> -->
+		<a href="#" @click="showMembers">View Membmers</a>
 	  </div>
 	</div>
   </template>
@@ -20,6 +21,7 @@
   <script lang="ts">
   import { Options, Vue } from 'vue-class-component';
   import { defineComponent, } from "vue";
+  import ChannelMembers from "@/components/ChannelMembers.vue";
 
   @Options({
 	name: 'DropdownoptComponent',
