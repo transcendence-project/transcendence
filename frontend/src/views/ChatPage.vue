@@ -1,179 +1,159 @@
 <template>
-  <!-- <div class="flex flex-col justify-between bg-gradient-to-r from-[#451952] via-[#451952] to-[#ae4188] shadow-custom text-white w-full min-h-[60vh] m-5 rounded-md p-2.5 text-center" > -->
     <div class="flex flex-wrap justify-between bg-gradient-to-r from-[#451952] via-[#451952] to-[#ae4188] shadow-custom text-white w-full  min-h-[85.9vh] m-5 rounded-md p-2.5 text-center">
 
 
-    <!-- <div class="container flex flex-col lg:w-1/6 min-h-[60vh]" > -->
     <div class="container flex flex-col min-h-[50vh]" >
+		<div class="row mt-3">
 
-		<h2 class="chn-head">My Channel</h2>
-		<div class="row flex-grow max-w-full ">
-		<!-- <div class="dm-grp"> -->
-
-			<div class="chn-btm">
-				<button class="grpbtn" @click="showGroup">Group</button>
-				<button class="dmbtn" @click="showDm">DM</button>
-				<!-- <button class="grpbtn" @click="switch_to_group">Group</button>
-					<button class="dmbtn" @click="switch_to_dm">DM</button> -->
+			<h2 class="chn-head">My Channel</h2>
+			<div class=" flex-grow max-w-full ">
+				
+				<div class="chn-btm">
+					<button class="grpbtn" @click="showGroup">Group</button>
+					<button class="dmbtn" @click="showDm">DM</button>
+					
 				</div>
-			<!-- </div> -->
-      </div>
-
-		<div class="row flex-grow max-w-full">
-		  <!-- <h2 class="mb-2 chn-head">My Channel</h2> -->
-        <div v-if="showGroupList" class="my-2 max-w-full">
-          <ButtonComponent
-            class="adbtn"
-            btnContent="Create Channel"
-            @click="AddChannelForm"
-          />
-          <CreateChannel v-if="isAddChannelForm" @close="closeAddChannelForm" />
-
-          <ChannelMembers v-if="isSearchChannelVisible" />
-        </div>
-      </div>
+			</div>
+		</div>
 
 
 
 	  
       <div class="row flex-grow max-w-full">
+
         <div v-if="showGroupList">
-          <input
-            placeholder="Search channel"
-            v-model="src_channel"
-			class="w-[80%] h-[2rem] border-0 text-black ml-2 mr-1 rounded-full pl-4 mb-2 focus:border-0 focus:outline-none"
 
-			/>
-            <!-- class="w-9/12 md:w-10/12 h-[1.5rem] border-0 text-black ml-2 rounded-md pl-4 mb-2 focus:border-0 focus:outline-none" -->
-          <div
-            class="w-full h-[250px] overflow-y-auto overflow-x-hidden flex-grow max-w-full"
-          >
-            <ul class="w-[95%] p-1 m-1">
-              <div v-for="(result, index) in filteredMyChannel" :key="index">
-                <li class="list-none w-full mb-1">
-                  <div
-                    class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom px-1 w-full rounded-[10px] chn-item"
-                  >
-                    <a href="#" @click="showUserList(result.name)">
-                      <div class="mx-2 px-5">
-                        {{ result.name }}
-                      </div>
-                    </a>
-                    <ChannelOption class="relative w-9 h-9" />
-                  </div>
-                </li>
-              </div>
-            </ul>
-          </div>
+		<div class=" max-w-full mb-2">
+          <ButtonComponent class="adbtn" btnContent="Create Channel" @click="AddChannelForm" />
+          <CreateChannel v-if="isAddChannelForm" @close="closeAddChannelForm" />
+
+          <ChannelMembers v-if="isSearchChannelVisible" />
         </div>
+		<div   class="flex-grow max-w-full" >
+          <input placeholder="Search channel" v-model="src_channel" class="w-[80%] h-[2rem] border-0 text-black ml-2 mr-1 rounded-full pl-4 mb-2 focus:border-0 focus:outline-none" />
+		  
+		  
+		  <div class="w-full h-[250px] overflow-y-auto overflow-x-hidden flex-grow max-w-full" >
+			  <ul class="w-[95%] p-2 m-2">
+				  <div v-for="(result, index) in filteredMyChannel" :key="index">
+					<li class="list-none w-full mb-1">
+						<div class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom px-1 w-full rounded-[10px] chn-item">
+								<a href="#"  @click="showChatPage">
+									<div class="mx-2 px-2">
+										{{ result.name }}
+							
+									</div>
+								</a>
+								<button class="optbtn p-1" @click="showSelectedFriend(index)">Options</button>
 
-          <div v-else>
-			<div   class="row flex-grow max-w-full" >
-            <input placeholder="Search friend" v-model="src_friend" class="w-[80%] h-[2rem] border-0 text-black ml-2 mr-1 rounded-full pl-4 mb-2 focus:border-0 focus:outline-none" />
-			  <div
-              class="w-full h-[250px] overflow-y-auto overflow-x-hidden flex-grow max-w-full"
-            >
-              <ul class="w-[95%] p-2 m-2">
-                <div v-for="(friend, index) in searchFriends" :key="index">
-                  <li class="list-none w-full mb-1" @click="showChatPage">
-                    <div
-                      class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom px-1 w-full rounded-[10px] chn-item"
-                    >
-                      <a href="#">
-                        <div class="m-2 px-5">
-                          {{ friend.user }}
-                        </div>
-                      </a>
-                    </div>
+								<!-- <ChannelOption class="relative w-9 h-9" /> -->
+							</div>
+							<!-- <div v-if="isOptions" class="my-2"> -->
+							<div v-if="selectedFriendIndex === index" class="my-2 opt">
+								<button class="intbtn p-2" @click="showMemberList">members</button>
+								<button class="intbtn p-2" >leave</button>
+
+							</div>
+							<ChannelMembers v-if="isMembersList" @close="showMemberList"/>
+
+						</li>
+					</div>
+				</ul>
+			</div>
+		</div>
+		
+		
+	</div>
+	
+	
+	
+	<div v-else>
+		
+		<div   class="flex-grow max-w-full" >
+			<input placeholder="Search friend" v-model="src_friend" class="w-[80%] h-[2rem] border-0 text-black ml-2 mr-1 rounded-full pl-4 mb-2 focus:border-0 focus:outline-none" />
+			
+			
+			<div  class="w-full h-[250px] overflow-y-auto overflow-x-hidden flex-grow max-w-full">
+				<ul class="w-[95%] p-2 m-2">
+					<div v-for="(friend, index) in searchFriends" :key="index">
+						<li class="list-none w-full mb-1">
+
+
+							<div
+                  class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom mx-1 p-1 w-full rounded-[10px] usr-item"
+                >
+				<a href="#"  @click="showChatPage()">
+                    <div class="mx-0 px-5">{{ friend.user }}</div></a>
+                
+
+                  <button class="intbtn p-1" @click="showOptionButtons">Invite</button>
+				  <!-- <ChannelMembers v-if="isOptions"/> -->
+                </div>
+
                   </li>
                 </div>
               </ul>
             </div>
-			</div>
+			
+		</div>
           </div>
 
       </div>
-      <div v-if="showGroupList" class="row flex-grow max-w-full" >
-        Members List
-        <div class="w-full h-[250px] overflow-y-auto overflow-x-hidden">
-          <ul class="w-[95%] p-1 m-1">
-            <div v-for="(user, index) in userList" :key="index">
-              <li class="list-none w-full mb-1" @click="showChatPage">
-                <div
-                  class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom mx-1 p-1 w-full rounded-[10px] usr-item"
-                >
-                  <router-link to="/home">
-                    <div class="mx-0 px-5">{{ user }}</div></router-link
-                  >
 
-                  <button class="intbtn">Invite</button>
-                </div>
-              </li>
-            </div>
-          </ul>
-        </div>
-      </div>
 
-      <!-- <div class="row flex flex-grow max-w-full mb-3"> -->
-		<!-- <div class="dm-grp">
 
-			<div class="chn-btm my-3">
-				<button class="grpbtn" @click="showGroup">Group</button>
-				<button class="dmbtn" @click="showDm">DM</button>
-				</div>
-			</div> -->
-      <!-- </div> -->
+
 
     </div>
-    <div class="container1 min-h-[50vh]">
-    <!-- <div class="container1 w-full lg:w-3/6 min-h-[60vh]"> -->
-		<div v-if="msgField" >
 
-		
-      <div class="row1">
-        <h1 class="cht">Chat</h1>
-      </div>
-      <div class="row1">
-        <div
-          class="bg-white h-[90%] p-1 mb-5 m-3 text-black"
-          style="text-align: right"
-        >
-          <div v-for="(message, index) in allMessage" :key="index">
-            <div
-              class="bg-blue-500 text-grey-500 py-2 px-4 inline-block m-1 mx-5 rounded-md"
-              style="max-width: 300px"
-            >
-              {{ message }}
-            </div>
-          </div>
+
+    <div class="container1 flex flex-col-reverse min-h-[50vh]">
+		<div v-if="msgField"  >
+	
+		  <h1 class="cht">Chat</h1>
+  
+		  <div  class="row1 flex-grow max-w-full" >
+
+        <div class="flex flex-col bg-white h-[60vh] p-1 mb-10 m-3 text-black " style="text-align: right">
+			<div class="overflow-y-auto overflow-x-hidden h-[55vh]">
+
+				<div v-for="(message, index) in chatMessage" :key="index" >
+					<div
+					class="bg-blue-400 text-grey-500 py-2 px-4 inline-block m-1 mx-5 rounded-md"
+					>
+					{{ message }}
+				</div>
+			</div>
         </div>
-      </div>
-      <div class="row1">
-        <input
-          v-model="message"
-          placeholder="message"
-          class="w-[80%] h-[2rem] border-0 text-black ml-2 mr-1 rounded-full pl-4 mb-2 focus:border-0 focus:outline-none"
-/>
-        <ButtonComponent btnContent="Send" @click="sendMessage" />
-      </div>
-	  </div>
+	</div>
+
+		<div  class="flex-grow max-w-full" >
+
+			<input
+			v-model="message"
+			placeholder="message"
+			class="w-[80%] h-[2rem] border-0 text-black ml-2 mr-1 rounded-full pl-4 mb-2 focus:border-0 focus:outline-none"
+			style="min-width: 300px" />
+			<ButtonComponent btnContent="Send" @click="sendMessage" />
+		</div>
+	</div>
+</div>
 	  <div v-else>
-		<div
-              class="bg-blue-500 text-grey-500 py-2 px-4 inline-block m-1 mx-5 rounded-md"
-              style="max-width: 300px"
-            >
+		<div  class="row1 flex-grow max-w-full" >
 			Select a channle or a friend to chat
 		</div>
 	  </div>
     </div>
 
+
+
     <div class="container2   min-h-[50vh]">
-    <!-- <div class="container2 w-full lg:w-1/6 min-h-[60vh]"> -->
-      <div class="row2">
-		  <h2 class="my-5 chn-head">All Channel</h2>
-	</div>
-      <div class="row2">
-        Public Channels
+		<div  class="row2 " >
+			<h2 class=" chn-head my-5">All Channel</h2>
+			<div class="my-2">
+
+				Public Channels
+			</div>
         <div class="h-[250px] overflow-y-auto overflow-x-hidden">
           <ul class="w-[95%] p-1 mx-3">
             <div v-for="(result, index) in filteredPublicChannel" :key="index">
@@ -195,9 +175,11 @@
             </div>
           </ul>
         </div>
-      </div>
-      <div class="row2">
-        Private Channels
+		
+			<div class="my-2">
+
+				Private Channels
+			</div>
         <div class="h-[250px] overflow-y-auto overflow-x-hidden prv-chn">
           <ul class="w-[95%] p-1 mx-3">
             <div v-for="(result, index) in filteredPrivateChannel" :key="index">
@@ -221,10 +203,13 @@
             </div>
           </ul>
         </div>
-      </div>
+      <!-- </div> -->
 
       <ChannelPassword v-if="isPrivate" @close="closePasswordFomr" />
     </div>
+
+
+</div>
   </div>
 </template>
 
@@ -600,8 +585,9 @@ export default defineComponent({
       console.log("Send message to channel successfully and back in front end");
     });
 	store.state.chat.socket.on("leave_room_success", (room_name: string) => {
-		console.log("leave_room_success");
+		console.log(room_name);
 		const index = this.my_chan.findIndex((channel: IChannel) => channel.name === room_name);
+		console.log(index);
 		if (index !== -1)
 			this.my_chan.splice(index, 1);
 	});
@@ -616,18 +602,19 @@ export default defineComponent({
   },
 });
 </script>
+
 <style scoped>
 .main-cont{
 	display: flex;
 	flex-direction: column;
 }
-.container,
-.container2 {
-  margin: 1%;
+.container
+{
+	margin: 1%;
   flex:1;
 
   display: grid;
-  grid-template-rows: 1fr fr 4fr 1fr;
+  grid-template-rows: 2fr 8fr;
   background: linear-gradient(to bottom, #451952, #AE445A, #F39F5A);
   border-radius: 5px;
 }
@@ -651,6 +638,7 @@ export default defineComponent({
   background: linear-gradient(to bottom, #451952, #AE445A, #F39F5A);
   border-radius: 5px;
 }
+
 
 .cht{
 	font-size: 3rem;
@@ -697,6 +685,7 @@ export default defineComponent({
   padding-bottom: 0.5rem;
   border-radius: 5px;
   margin-left: 10px;
+  width: 25%;
   cursor: pointer;
   color: white;
   /* background: #451952; */
@@ -708,6 +697,8 @@ export default defineComponent({
 	font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
 	font-style:initial;
 }
+
+
 .jpub-btn {
   font-size: 0.8rem;
   margin: 3%;
@@ -743,28 +734,15 @@ export default defineComponent({
   align-items: center;
   justify-content: flex-start;
   height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  height: 100%;
 }
 
 .pub-div {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
 }
 
 .pri-div {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -790,4 +768,5 @@ export default defineComponent({
   writing-mode: vertical-rl;
   white-space: nowrap;
 }
+
 </style>

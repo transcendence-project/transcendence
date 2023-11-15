@@ -1,5 +1,5 @@
 <template>
-  <div class="src-chn flex flex-col">
+<div class="src-chn flex flex-col">
     <div class="lst-cont py-5">
       <div class="h-[65%] overflow-y-auto overflow-x-hidden">
         <ul class="w-[65%] p-5 flex-grow max-w-full">

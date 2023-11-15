@@ -14,7 +14,6 @@
 		<router-link to="/chat" @click.native="closeDropdownopt" @click="leave_room">Leave channel</router-link>
 		<router-link to="/chat" @click.native="closeDropdownopt">View Membmers</router-link>
 		<!-- <router-link to="/chat" @click.native="closeDropdownopt">View Membmers</router-link> -->
-		<a href="#" @click="showChatPage">Message</a>
 	  </div>
 	</div>
   </template>
@@ -22,8 +21,8 @@
   <script lang="ts">
   import { Options, Vue } from 'vue-class-component';
   import { defineComponent, } from "vue";
+  import ChannelMembers from "@/components/ChannelPassword.vue";
   import store from '@/store';
-  import ChannelMembers from "@/components/ChannelMembers.vue";
 
   @Options({
 	name: 'DropdownoptComponent',
@@ -64,7 +63,7 @@
 		store.state.chat.socket.emit('leave_chan', localStorage.getItem('chan_to_leave'));
 		}
   	}
-}
+  }
   </script>
   
   <style scoped>
@@ -98,4 +97,3 @@
 	background-color: #f1f1f1;
   }
   </style>
-  
