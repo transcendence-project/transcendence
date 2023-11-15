@@ -58,11 +58,6 @@
     this.closeDropdownopt();
   }
 
-  leave_room(){
-	if (store.state.chat.socket){
-		store.state.chat.socket.emit('leave_chan', localStorage.getItem('chan_to_leave'));
-		}
-  	}
   }
   </script>
   

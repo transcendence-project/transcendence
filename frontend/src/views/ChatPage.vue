@@ -51,7 +51,7 @@
 							<!-- <div v-if="isOptions" class="my-2"> -->
 							<div v-if="selectedFriendIndex === index" class="my-2 opt">
 								<button class="intbtn p-2" @click="showMemberList">members</button>
-								<button class="intbtn p-2" >leave</button>
+								<button class="intbtn p-2" @click="leave_room(result.name)" >leave</button>
 
 							</div>
 							<ChannelMembers v-if="isMembersList" @close="showMemberList"/>
@@ -498,7 +498,12 @@ export default defineComponent({
 		});
 		await this.displayMessage();
 		},
-		
+		leave_room(chan_name: string){
+			localStorage.setItem('chan_to_leave', chan_name);
+		if (store.state.chat.socket){
+			store.state.chat.socket.emit('leave_chan', localStorage.getItem('chan_to_leave'));
+			}
+		}
 	
 	},
 
