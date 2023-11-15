@@ -40,8 +40,8 @@ export class UsersService {
       is2FAEnabled: false,
       friends: [],
       channels: [],
-		matchesAsPlayerOne: [],
-		matchesAsPlayerTwo: [],
+	matchesAsPlayerOne: [],
+	matchesAsPlayerTwo: [],
       achievements: [],
 	  points: 50,
     });
@@ -191,15 +191,21 @@ export class UsersService {
 
 
   async saveMatch(winnerID: number, winnerScore: number, loserID: number, loserScore: number) {
-	const winner: User = await this.findOne(winnerID);
-	const loser: User = await this.findOne(loserID);
-	console.log('in save match, winnerScore: ', winnerScore);
+
+	const winner: User = await this.repo.findOne({ where: { id: winnerID}, relations: { matchesAsPlayerOne: true} });
+	const loser: User = await this.repo.findOne({ where: { id: loserID}, relations: { matchesAsPlayerTwo: true} });
+
+	// console.log('in save match, winner: ', winner);
+	// console.log('in save match, loser: ', loser);
 	const winnerScoreString: string = winnerScore.toString();
 	const loserScoreString: string = loserScore.toString();
 	const score: string = winnerScoreString + '-' + loserScoreString;
 
 	const match = await this.matchesService.create(winner, loser, score, loserID, winnerID);
 
+	console.log('in save match, match: ', match);
+	console.log('in save match, winner matches as player one: ', winner.matchesAsPlayerOne);
+	console.log('in save match, loser matches as player two: ', loser.matchesAsPlayerTwo);
 	winner.matchesAsPlayerOne.push(match);
 	loser.matchesAsPlayerTwo.push(match);
 

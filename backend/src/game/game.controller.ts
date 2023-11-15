@@ -19,9 +19,9 @@ export class GameController {
 		return await this.matchesService.findOne(req.user.id);
 	}
 
-	@Post('/giveMatch')
-	async giveMatch(@Body() match: MatchDTO) {
-	this.userService.saveMatch(match.winnerId, match.loserId, match.winnerScore, match.loserScore);
-	}
+	// @Post('/giveMatch')
+	// async giveMatch(@Body() match: MatchDTO) {
+	// this.userService.saveMatch(match.winnerId, match.loserId, match.winnerScore, match.loserScore);
+	// }
 
 }
