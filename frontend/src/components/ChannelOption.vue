@@ -11,7 +11,7 @@
 		:class="{ active: showDropdownopt }"
 		@click.stop=""
 	  >
-		<router-link to="/chat" @click.native="closeDropdownopt">Leave channel</router-link>
+		<router-link to="/chat" @click.native="closeDropdownopt" @click="leave_room">Leave channel</router-link>
 		<router-link to="/chat" @click.native="closeDropdownopt">View Membmers</router-link>
 		<!-- <router-link to="/chat" @click.native="closeDropdownopt">View Membmers</router-link> -->
 		<a href="#" @click="showChatPage">Message</a>

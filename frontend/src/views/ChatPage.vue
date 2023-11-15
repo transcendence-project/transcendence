@@ -600,6 +600,7 @@ export default defineComponent({
       console.log("Send message to channel successfully and back in front end");
     });
 	store.state.chat.socket.on("leave_room_success", (room_name: string) => {
+		console.log("leave_room_success");
 		const index = this.my_chan.findIndex((channel: IChannel) => channel.name === room_name);
 		if (index !== -1)
 			this.my_chan.splice(index, 1);
