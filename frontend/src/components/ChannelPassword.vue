@@ -1,6 +1,6 @@
 <template>
   <div class="chn-pass">
-    <div class="pass-cont">
+    <div class="pass-cont flex flex-col ">
     
       <div class="passform">
         <input v-model="password" placeholder="Password" class="pass" />

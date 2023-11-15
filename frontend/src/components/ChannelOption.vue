@@ -11,9 +11,10 @@
 		:class="{ active: showDropdownopt }"
 		@click.stop=""
 	  >
-		<router-link to="/chat" @click.native="closeDropdownopt"  @click="leave_room">Leave channel</router-link>
+		<router-link to="/chat" @click.native="closeDropdownopt">Leave channel</router-link>
+		<router-link to="/chat" @click.native="closeDropdownopt">View Membmers</router-link>
 		<!-- <router-link to="/chat" @click.native="closeDropdownopt">View Membmers</router-link> -->
-		<!-- <a @click="viewMembers">View Members</a> -->
+		<a href="#" @click="showChatPage">Message</a>
 	  </div>
 	</div>
   </template>
@@ -22,6 +23,7 @@
   import { Options, Vue } from 'vue-class-component';
   import { defineComponent, } from "vue";
   import store from '@/store';
+  import ChannelMembers from "@/components/ChannelMembers.vue";
 
   @Options({
 	name: 'DropdownoptComponent',

@@ -1,157 +1,130 @@
 <template>
-  <div class="src-chn">
-    <div class="flex justify-center m-0 mt-2 p-0 w-full h-[350px]">
-      <ul class="w-[100%] p-1 m-1">
-        <div v-for="(result, index) in filteredSearch" :key="index">
-          <li class="list-none w-full m-2">
-            <div
-              class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom mx-1 p-2 w-full rounded-[10px]"
-            >
-              {{ result.channel }}
-              {{ result.group }}
-
-            </div>
-          </li>
-        </div>
-      </ul>
+  <div class="src-chn flex flex-col">
+    <div class="lst-cont py-5">
+      <div class="h-[65%] overflow-y-auto overflow-x-hidden">
+        <ul class="w-[65%] p-5 flex-grow max-w-full">
+          <div v-for="(friend, index) in searchFriends" :key="index">
+            <li class="list-none w-full mb-1">
+              <div
+                class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom mx-1 p-1 w-full rounded-[10px] usr-item"
+              >
+                <div class="mx-0 px-3">{{ friend.user }}</div>
+                <button class="intbtn p-1">Invite</button>
+              </div>
+            </li>
+          </div>
+        </ul>
+      </div>
+    </div>
+    <div class="cls-bt mb-5">
+      <button class="clsbtn" @click="closePage">Close</button>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent} from "vue";
+import { defineComponent, ref } from "vue";
 
-export interface ChannelList {
-  channel: string;
-  group: string;
-  user: string[];
-  friend: boolean;
+interface FriendsList {
+  user: string;
+  status: Boolean;
 }
 
 export default defineComponent({
   data() {
     return {
-      channels: [
+      friends: [
         {
-          channel: "fruits",
-          group: "private",
-          user: ["orange", "banana", "apple", "lemon", "peach"],
-          friend: false,
+          user: "one",
+          status: true,
         },
         {
-          channel: "computer",
-          group: "private",
-          user: ["monitor", "window", "cpu", "mouse", "keybord"],
-          friend: false,
+          user: "two",
+          status: false,
         },
         {
-          channel: "laptop",
-          group: "private",
-          user: ["monitor", "window", "cpu", "mouse", "keybord"],
-          friend: false,
+          user: "three",
+          status: true,
         },
         {
-          channel: "systems",
-          group: "private",
-          user: ["monitor", "window", "cpu", "mouse", "keybord"],
-          friend: false,
+          user: "four",
+          status: false,
         },
         {
-          channel: "techonogy",
-          group: "private",
-          user: ["monitor", "window", "cpu", "mouse", "keybord"],
-          friend: false,
+          user: "five",
+          status: true,
         },
         {
-          channel: "robotic",
-          group: "private",
-          user: ["monitor", "window", "cpu", "mouse", "keybord"],
-          friend: false,
+          user: "one",
+          status: true,
         },
         {
-          channel: "furniture",
-          group: "public",
-          user: ["door", "chair", "bed", "table", "tv", "gate"],
-          friend: false,
+          user: "two",
+          status: false,
         },
         {
-          channel: "cars",
-          group: "public",
-          user: ["mercedes", "volvo", "BMW", "Ferrari"],
-          friend: true,
+          user: "four",
+          status: false,
         },
         {
-          channel: "plants",
-          group: "public",
-          user: ["tree", "grass", "bush", "leaf"],
-          friend: true,
+          user: "five",
+          status: true,
         },
         {
-          channel: "mamamls",
-          group: "public",
-          user: [
-            "dog",
-            "cat",
-            "cow",
-            "lion",
-            "tiger",
-            "elephant",
-            "fish",
-            "donkey",
-          ],
-          friend: false,
+          user: "one",
+          status: true,
         },
         {
-          channel: "domestci",
-          group: "public",
-          user: [
-            "dog",
-            "cat",
-            "cow",
-            "lion",
-            "tiger",
-            "elephant",
-            "fish",
-            "donkey",
-          ],
-          friend: false,
+          user: "two",
+          status: false,
         },
         {
-          channel: "species",
-          group: "public",
-          user: [
-            "dog",
-            "cat",
-            "cow",
-            "lion",
-            "tiger",
-            "elephant",
-            "fish",
-            "donkey",
-          ],
-          friend: false,
+          user: "one",
+          status: true,
         },
-      ] as ChannelList[],
-	  searchQuery: "" as string,
-	  selectedChannel: null as string | null,
-
+        {
+          user: "two",
+          status: false,
+        },
+        {
+          user: "four",
+          status: false,
+        },
+        {
+          user: "five",
+          status: true,
+        },
+        {
+          user: "one",
+          status: true,
+        },
+        {
+          user: "two",
+          status: false,
+        },
+      ] as FriendsList[],
+      searchQuery: "" as string,
+      selectedChannel: null as string | null,
     };
   },
   computed: {
-    filteredSearch(): ChannelList[] {
-      return this.channels.filter(
-        (item) =>
-          item.channel.toLowerCase().includes(this.searchQuery.toLowerCase()) &&
-          item.group === "private"
+    searchFriends(): FriendsList[] {
+      return this.friends.filter((item) =>
+        item.user.toLowerCase().includes(this.searchQuery.toLowerCase())
       );
     },
   },
   methods: {
+    closePage(): void {
+      this.$emit("close");
+    },
     selectChannel(channel: string) {
       this.selectedChannel = channel;
     },
     getUserList(channel: string): string[] {
-      const selectedChannel = this.channels.find((item) => item.channel === channel);
+      const selectedChannel = this.channels.find(
+        (item) => item.channel === channel
+      );
       return selectedChannel ? selectedChannel.user : [];
     },
   },
@@ -159,19 +132,57 @@ export default defineComponent({
 </script>
 <style scoped>
 .src-chn {
-  position: fixed;
-
+  position: absolute;
+  top: 30%;
   width: 40%;
-  height: 40%;
-  padding: 10%;
-  background: rgba(0, 0, 0, 0.6);
+  height: 50%;
+  border-radius: 2%;
+  background: rgba(0, 0, 0, 0.5);
+
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 999;
 }
+.lst-cont {
+  width: 90%;
+  height: 90%;
+  color: white;
+  border-radius: 2%;
+  /* padding-left: 20%; */
+}
 
+.intbtn {
+  font-size: 0.8rem;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  padding-top: 0.3rem;
+  padding-bottom: 0.3rem;
+  border-radius: 10px;
+  cursor: pointer;
+  color: white;
+  background: #451952;
+  border: none;
+}
 
+.clsbtn {
+  font-size: 0.8rem;
+  margin: 3%;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 0.3rem;
+  padding-bottom: 0.3rem;
+  border-radius: 10px;
+  cursor: pointer;
+  color: white;
+  background: #451952;
+  border: none;
+}
+.intbtn:hover,
+.clsbtn:hover {
+  background: #ae4488;
+  color: #d9d9da;
+}
 
 @media screen and (max-width: 768px) {
   .channel {
@@ -180,6 +191,4 @@ export default defineComponent({
     padding: 5%;
   }
 }
-
-
 </style>
