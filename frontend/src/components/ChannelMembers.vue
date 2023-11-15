@@ -121,12 +121,12 @@ export default defineComponent({
     selectChannel(channel: string) {
       this.selectedChannel = channel;
     },
-    getUserList(channel: string): string[] {
-      const selectedChannel = this.channels.find(
-        (item) => item.channel === channel
-      );
-      return selectedChannel ? selectedChannel.user : [];
-    },
+    // getUserList(channel: string): /* string[] */ {
+    //   const selectedChannel = this.channels.find(
+    //     (item: any) => item.channel === channel
+    //   );
+    //   return selectedChannel ? selectedChannel.user : [];
+    // },
   },
 });
 </script>

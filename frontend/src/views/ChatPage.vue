@@ -308,30 +308,6 @@ export default defineComponent({
           user: "four",
           status: false,
         },
-        {
-          user: "five",
-          status: true,
-        },
-        {
-          user: "one",
-          status: true,
-        },
-        {
-          user: "two",
-          status: false,
-        },
-        {
-          user: "three",
-          status: true,
-        },
-        {
-          user: "four",
-          status: false,
-        },
-        {
-          user: "five",
-          status: true,
-        },
       ] as FriendsList[],
     };
   },
@@ -360,6 +336,30 @@ export default defineComponent({
       });
     };
     if (!chan.value.length) all();
+	const my = async () => {
+			await store.dispatch('fetchMyChan');
+			const my_channel = computed(() => store.getters.getMyChannel);
+			const arrayProxy_m = my_channel.value;
+			arrayProxy_m.forEach((item: any) => {
+				// console.log(item);
+			const my_chan: IChannel = {
+				name: item.room_name,
+				id: item.id,
+				owner: null,
+				// messages: null,
+				admins: null,
+				members: [],
+				invites: null,
+				isPrivate: item.is_private,
+				isProtected: item.is_protected,
+				isPublic: item.is_public,
+				// password: item.password,
+			}
+			m_chan.value.push(my_chan);
+			});
+		}
+		if (!m_chan.value.length)
+			my();
   },
   components: {
     ChannelOption,
@@ -376,23 +376,25 @@ export default defineComponent({
       );
     },
     filteredMyChannel(): IChannel[] {
-      return this.channels.filter((item: IChannel) =>
-        item.name.toLowerCase().includes(this.src_channel.toLowerCase())
+      return this.my_chan.filter(
+        (item: IChannel) =>
+          item.name /* .toLowerCase().includes(this.searchQuery.toLowerCase()) &&
+					item.member === true */
       );
     },
     filteredPublicChannel(): IChannel[] {
-      return this.channels.filter(
-        (item: IChannel) =>
-          // console.log(item)
-          item.name /* .toLowerCase().includes(this.searchQuery.toLowerCase())*/ &&
-          item.isPublic === true
-      );
+		return this.channels.filter(
+		(item: IChannel) =>
+			item.isPublic === true && 
+			!this.my_chan.some((userChannel: IChannel) => userChannel.name === item.name)
+		);
     },
     filteredPrivateChannel(): IChannel[] {
-      return this.channels.filter(
-        (item: IChannel) => item.name && item.isProtected === true
-        // item.name.toLowerCase().includes(this.searchQuery.toLowerCase()) && item.isProtected === true
-      );
+	return this.channels.filter(
+		(item: IChannel) =>
+			item.isProtected === true && 
+			!this.my_chan.some((userChannel: IChannel) => userChannel.name === item.name)
+		);
     },
 	allMessage(): string[]{
 		return this.chatMessage;
@@ -400,7 +402,7 @@ export default defineComponent({
 
   },
   methods: {
-	showSelectedFriend(index) {
+	showSelectedFriend(index: any) {
 		if (this.selectedFriendIndex === index)
 		{
 			this.selectedFriendIndex = null;
@@ -496,27 +498,25 @@ export default defineComponent({
         this.message = "";
       }
     },
-	methods: {
     closeChannelPage(): void {
       this.$emit('close');
     },
-  },
-
-    async showUserList(channel: string) {
-      this.userList = [];
-      localStorage.setItem("currentChanName", channel);
-      await store.dispatch("fetchCurrentChan");
-      const chan = computed(() => store.getters.getCurrentCahnnel);
-      const val = chan.value.members;
-      console.log(val);
-      val.forEach((item: any) => {
-        this.userList.push(item.userName);
-      });
-      await this.displayMessage();
-    },
+		async showUserList(channel: string) {
+		this.userList = [];
+		localStorage.setItem("currentChanName", channel);
+		await store.dispatch("fetchCurrentChan");
+		const chan = computed(() => store.getters.getCurrentCahnnel);
+		const val = chan.value.members;
+		console.log(val);
+		val.forEach((item: any) => {
+			this.userList.push(item.userName);
+		});
+		await this.displayMessage();
+		},
+		
 	
+	},
 
-  },
   created() {
     if (!store.state.chat.socket) {
       console.log("establishing connection again");
@@ -544,10 +544,10 @@ export default defineComponent({
           isPublic: data.isPublic,
           // user: data.user,
         };
-        this.channels.push(newChannel);
+        this.my_chan.push(newChannel);
       }
     });
-    store.state.chat.socket.on("join_room_success", () => {
+    store.state.chat.socket.on("join_room_success", (data: any) => {
       console.log("Joined the channel successfully and back in front end");
 	  if (data){
         const newChannel: IChannel = {
