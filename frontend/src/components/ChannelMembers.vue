@@ -3,12 +3,12 @@
     <div class="lst-cont py-5">
       <div class="h-[65%] overflow-y-auto overflow-x-hidden">
         <ul class="w-[65%] p-5 flex-grow max-w-full">
-          <div v-for="(friend, index) in searchFriends" :key="index">
+          <div v-for="(friend, index) in userList" :key="index">
             <li class="list-none w-full mb-1">
               <div
                 class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom mx-1 p-1 w-full rounded-[10px] usr-item"
               >
-                <div class="mx-0 px-3">{{ friend.user }}</div>
+                <div class="mx-0 px-3">{{ friend }}</div>
                 <button class="intbtn p-1">Invite</button>
               </div>
             </li>
@@ -23,19 +23,23 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref, computed } from "vue";
+import store from "@/store";
 
 interface FriendsList {
   user: string;
   status: Boolean;
 }
 
+const mem_list = ref([] as string[]);
+
 export default defineComponent({
   data() {
     return {
+		userList: mem_list,
       friends: [
         {
-          user: "one",
+          user: "testvalue",
           status: true,
         },
         {
@@ -107,11 +111,27 @@ export default defineComponent({
       selectedChannel: null as string | null,
     };
   },
+  setup() {
+	const mem = async () => {
+		await store.dispatch("fetchCurrentChan");
+		const chan = computed(() => store.getters.getCurrentCahnnel);
+		const val = chan.value.members;
+		console.log(val);
+		mem_list.value = [];
+		val.forEach((item: any) => {
+			mem_list.value.push(item.userName);
+		  });
+		  console.log(mem_list);
+	};
+	mem();
+  },
   computed: {
-    searchFriends(): FriendsList[] {
-      return this.friends.filter((item) =>
-        item.user.toLowerCase().includes(this.searchQuery.toLowerCase())
-      );
+    searchFriends(): string[] {
+      return this.userList;
+	//  .filter((item: string) =>
+	//   item
+        // item.user.toLowerCase().includes(this.searchQuery.toLowerCase())
+    //   );
     },
   },
   methods: {
@@ -121,6 +141,17 @@ export default defineComponent({
     selectChannel(channel: string) {
       this.selectedChannel = channel;
     },
+	// async showUserList() {
+    //   this.userList = [];
+    //   await store.dispatch("fetchCurrentChan");
+    //   const chan = computed(() => store.getters.getCurrentCahnnel);
+    //   const val = chan.value.members;
+    //   console.log(val);
+    //   val.forEach((item: any) => {
+    //     this.userList.push(item.userName);
+    //   });
+    // //   await this.displayMessage();
+    // },
     // getUserList(channel: string): /* string[] */ {
     //   const selectedChannel = this.channels.find(
     //     (item: any) => item.channel === channel

@@ -146,15 +146,16 @@ const store = createStore({
 			});
 		},
 		async fetchCurrentChan(context: any){
-			console.log(localStorage.getItem('currentChanName'));
+			// console.log(localStorage.getItem('currentChanName'));
 			const cur = localStorage.getItem('currentChanName');
+			// console.log(`cur is ${cur}`);
 			await axios.get(`http://localhost:3000/chat/current_chan/${cur}`, {
 				params: {chan_name: cur},
 				headers: {
 					Authorization: `Bearer ${localStorage.getItem('token')}`,
 				},
 			}).then((resp: AxiosResponse<IChannel[]>) => {
-				// console.log(resp.data);
+				console.log(resp.data);
 				context.commit('setCurrentChannel', resp.data);
 			}).catch((error) => {
 				console.error("Error fetching current channel:", error);

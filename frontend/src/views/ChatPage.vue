@@ -38,7 +38,7 @@
 				  <div v-for="(result, index) in filteredMyChannel" :key="index">
 					<li class="list-none w-full mb-1">
 						<div class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom px-1 w-full rounded-[10px] chn-item">
-								<a href="#"  @click="showChatPage">
+								<a href="#"  @click="showChatPage(result.name)">
 									<div class="mx-2 px-2">
 										{{ result.name }}
 							
@@ -50,7 +50,7 @@
 							</div>
 							<!-- <div v-if="isOptions" class="my-2"> -->
 							<div v-if="selectedFriendIndex === index" class="my-2 opt">
-								<button class="intbtn p-2" @click="showMemberList">members</button>
+								<button class="intbtn p-2" @click="showMemberList(result.name)">members</button>
 								<button class="intbtn p-2" @click="leave_room(result.name)" >leave</button>
 
 							</div>
@@ -117,7 +117,7 @@
         <div class="flex flex-col bg-white h-[60vh] p-1 mb-10 m-3 text-black " style="text-align: right">
 			<div class="overflow-y-auto overflow-x-hidden h-[55vh]">
 
-				<div v-for="(message, index) in chatMessage" :key="index" >
+				<div v-for="(message, index) in allMessage" :key="index" >
 					<div
 					class="bg-blue-400 text-grey-500 py-2 px-4 inline-block m-1 mx-5 rounded-md"
 					>
@@ -398,8 +398,9 @@ export default defineComponent({
 
 		}
 	},
-	showMemberList(){
+	showMemberList(channel: string){
 		this.isMembersList = !this.isMembersList;
+		localStorage.setItem("currentChanName", channel);
 	},
 	showOptionButtons(){
 		this.isOptions = !this.isOptions;
@@ -411,8 +412,10 @@ export default defineComponent({
     showGroup() {
       this.showGroupList = true;
     },
-	showChatPage() {
+	async showChatPage(channel: string) {
 		this.msgField = true;
+		localStorage.setItem("currentChanName", channel);
+		await this.displayMessage();
 	},
 	HideChatPage() {
 		this.msgField = false;
@@ -467,7 +470,10 @@ export default defineComponent({
     },
     async displayMessage() {
       this.chatMessage = [];
+	//   console.log("HELLLLOOOOO");
+      await store.dispatch("fetchCurrentChan");
       const chan = computed(() => store.getters.getCurrentCahnnel);
+	//   console.log(chan.value.messages);
       const val = chan.value.messages;
       val.forEach((item: any) => {
         this.chatMessage.push(item.content);
@@ -486,24 +492,24 @@ export default defineComponent({
     closeChannelPage(): void {
       this.$emit('close');
     },
-		async showUserList(channel: string) {
-		this.userList = [];
-		localStorage.setItem("currentChanName", channel);
-		await store.dispatch("fetchCurrentChan");
-		const chan = computed(() => store.getters.getCurrentCahnnel);
-		const val = chan.value.members;
-		console.log(val);
-		val.forEach((item: any) => {
-			this.userList.push(item.userName);
-		});
-		await this.displayMessage();
-		},
-		leave_room(chan_name: string){
-			localStorage.setItem('chan_to_leave', chan_name);
-		if (store.state.chat.socket){
-			store.state.chat.socket.emit('leave_chan', localStorage.getItem('chan_to_leave'));
-			}
+	// async showUserList(channel: string) {
+	// this.userList = [];
+	// localStorage.setItem("currentChanName", channel);
+	// await store.dispatch("fetchCurrentChan");
+	// const chan = computed(() => store.getters.getCurrentCahnnel);
+	// const val = chan.value.members;
+	// console.log(val);
+	// val.forEach((item: any) => {
+	// 	this.userList.push(item.userName);
+	// });
+	// // await this.displayMessage();
+	// },
+	leave_room(chan_name: string){
+		localStorage.setItem('chan_to_leave', chan_name);
+	if (store.state.chat.socket){
+		store.state.chat.socket.emit('leave_chan', localStorage.getItem('chan_to_leave'));
 		}
+	}
 	
 	},
 
@@ -578,9 +584,16 @@ export default defineComponent({
 
 	});
 	store.state.chat.socket.on("update_chan_message", (data: any) => {
+		console.log(localStorage.getItem("currentChanName"));
+		console.log("reached update msg event listener");
 		if (data)
 		{
+			console.log(store.getters.getUserName);
+			console.log(data.user);
+			console.log(localStorage.getItem("currentChanName"));
+			console.log(data.chan);
 			if (data.user != store.getters.getUserName && localStorage.getItem("currentChanName") == data.chan){
+				console.log("pushing message");
 				this.chatMessage.push(data.content);
 				this.isMessageSent = true;
 			}
@@ -597,6 +610,7 @@ export default defineComponent({
 			this.my_chan.splice(index, 1);
 	});
 	store.state.chat.socket.on("update_mem_list", (data: any) => {
+		
 		if (data)
 		{
 			if (data.user != store.getters.getUserName && localStorage.getItem("currentChanName") == data.chan_name){
