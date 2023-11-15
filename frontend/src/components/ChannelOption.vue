@@ -22,6 +22,7 @@
   import { Options, Vue } from 'vue-class-component';
   import { defineComponent, } from "vue";
   import store from '@/store';
+  import ChannelMembers from "@/components/ChannelMembers.vue";
 
   @Options({
 	name: 'DropdownoptComponent',

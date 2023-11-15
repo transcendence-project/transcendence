@@ -141,8 +141,7 @@ export default defineComponent({
     filteredSearch(): ChannelList[] {
       return this.channels.filter(
         (item) =>
-          item.channel.toLowerCase().includes(this.searchQuery.toLowerCase()) &&
-          item.group === "private"
+          item.channel.toLowerCase().includes(this.searchQuery.toLowerCase())
       );
     },
   },

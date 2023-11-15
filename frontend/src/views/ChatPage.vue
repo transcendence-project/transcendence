@@ -661,6 +661,11 @@ export default defineComponent({
 	font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
 	font-style:initial;
 }
+.chn-head{
+	font-size: 1.2rem;
+	font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+	font-style:initial;
+}
 .jpub-btn {
   font-size: 0.8rem;
   margin: 3%;
@@ -687,7 +692,16 @@ export default defineComponent({
   background: #6c4a5f;
   color: #d9d9da;
 }
+.usr-item:hover {
+  background: #6c4a5f;
+  color: #d9d9da;
+}
 .all-chn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  height: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -699,7 +713,20 @@ export default defineComponent({
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
 }
+/* .dm-grp{
+	position: relative;
+	width: 100%;
+	height: 100%;
+}
+.chn-btm{
+	position:sticky;
+	bottom:5%;
+	left: 20%;
+} */
 /* .dm-grp{
 	position: relative;
 	width: 100%;
@@ -716,6 +743,87 @@ export default defineComponent({
   justify-content: center;
   align-items: center;
   height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+.prv-chn {
+  position: relative;
+}
+.add-pass {
+  position: relative;
+  top: 20px;
+}
+.bottomToTopInput {
+  width: 200px;
+  height: 100px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  resize: none;
+  font-size: 16px;
+  line-height: 1.5;
+  padding: 10px;
+  writing-mode: vertical-rl;
+  white-space: nowrap;
+}
+.prv-chn {
+  position: relative;
+}
+.add-pass {
+  position: relative;
+  top: 20px;
+}
+.bottomToTopInput {
+  width: 200px;
+  height: 100px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  resize: none;
+  font-size: 16px;
+  line-height: 1.5;
+  padding: 10px;
+  writing-mode: vertical-rl;
+  white-space: nowrap;
+}
+.prv-chn {
+  position: relative;
+}
+.add-pass {
+  position: relative;
+  top: 20px;
+}
+.bottomToTopInput {
+  width: 200px;
+  height: 100px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  resize: none;
+  font-size: 16px;
+  line-height: 1.5;
+  padding: 10px;
+  writing-mode: vertical-rl;
+  white-space: nowrap;
+}
+.prv-chn {
+  position: relative;
+}
+.add-pass {
+  position: relative;
+  top: 20px;
+}
+.bottomToTopInput {
+  width: 200px;
+  height: 100px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  resize: none;
+  font-size: 16px;
+  line-height: 1.5;
+  padding: 10px;
+  writing-mode: vertical-rl;
+  white-space: nowrap;
 }
 .prv-chn {
   position: relative;
