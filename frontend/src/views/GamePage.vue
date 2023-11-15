@@ -1,26 +1,29 @@
 <template>
-	  <canvas ref="pongCanvas" id="pong" :width="canvasWidth" :height="canvasHeight"></canvas>
-      <!-- <button @click="startGame">Start Game</button> -->
-	<!-- </div> -->
+	  <canvas ref="pongCanvas" id="pong" width="canvasWidth" height="canvasHeight"></canvas>
+      <div>
+          <button @click="startGame">Start Game</button>
+      </div>
 </template>
 
 
-<script>
-import { ref, onMounted } from 'vue';
+<script lang="ts" setup>
+import { ref, onMounted , getCurrentInstance, } from 'vue';
+import WebSocketPlugin from '@/plugins/websocket-plugin';
+const { appContext } = getCurrentInstance();
 
-export default {
-  setup() {
-    const canvasWidth = ref(800); // Default width, can be dynamically adjusted
-    const canvasHeight = ref(600); // Default height, can be dynamically adjusted
+// export default {
+//   setup() {
+    const socket = appContext.config.globalProperties.$socket;
+    const canvasWidth = ref(900); // Default width, can be dynamically adjusted
+    const canvasHeight = ref(400); // Default height, can be dynamically adjusted
     const pongCanvas = ref(null);
 
     const drawGame = () => {
       const canvas = pongCanvas.value;
       if (!canvas) return;
       const ctx = canvas.getContext('2d');
-	  ctx.fillStyle = 'red';
-						// context
-	ctx.fillRect(500, 0, 500, 300);
+	  ctx.fillStyle = '#F6F1F1';
+      ctx.fillRect(500, 200, canvasWidth.value, canvasHeight.value);
       // Clear previous frame
     //   ctx.clearRect(0, 0, canvasWidth.value, canvasHeight.value);
 
@@ -29,27 +32,39 @@ export default {
       // ... game drawing logic ...
     };
 
-    const updateGameStateFromServer = (data) => {
+    const updateGameStateFromServer = () => {
       // Update game state based on data received from the server
       // Example: playerPosition.value = data.playerPosition;
 
       // Redraw the game
       drawGame();
     };
+    const startGame = () => {
+        if (socket) {
+            socket.emit('start-game', 'This izs from the client to the server game');
+        }
+    };
 
     onMounted(() => {
     //   setupWebSocket();
+    if (socket)
+    {
+        socket.on('table', (message: any[]) => {
+            console.log(message[0]);
+        });
+    }
+    startGame();
 	updateGameStateFromServer();
       drawGame();
     });
 
-    return {
-      canvasWidth,
-      canvasHeight,
-      pongCanvas,
-    };
-  },
-};
+    // return {
+    //   canvasWidth,
+    //   canvasHeight,
+    //   pongCanvas,
+    // };
+//   },
+// };
 </script>
 <!-- <script lang="ts" setup>
     import { ref, onMounted} from 'vue';
@@ -103,7 +118,6 @@ export default {
    
   
 <style>
-
   .game-container {
 	/* width: fit-content; */
     display: flex;

@@ -1,12 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { AuthService } from 'auth/auth.service';
 import { User } from '../entities/user.entity';
+import {Paddle, Ball, net} from './interface/game.interface';
 import { Socket } from 'socket.io';
 @Injectable()
 export class GameService {
     private connected_users: Map<string,User> = new Map();
     private classic_queue: string[] = [];
     private custom_queue: string[] = [];
+    private paddle: Paddle;
+    private ball: Ball;
     constructor(private readonly authService: AuthService) {}
 
     async set_online_user(client: Socket ,token: any){
