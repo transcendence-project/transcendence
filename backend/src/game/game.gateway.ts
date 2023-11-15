@@ -20,7 +20,6 @@ export class GameGateway implements OnGatewayInit , OnGatewayConnection, OnGatew
   }
 
   private clientCount = 0;
-
   async handleConnection(client: Socket, ...args: any[]) {
     // this.clientCount++;
     this.server.emit('connected', this.clientCount);
@@ -29,6 +28,7 @@ export class GameGateway implements OnGatewayInit , OnGatewayConnection, OnGatew
     const token = header.token;
     await this.gameService.set_online_user(client,token);
     const user = this.gameService.find_user_with_id(client.id);
+    
     console.log("from websocket user output ", user);
     console.log("from the client ", client.id);
   }

@@ -1,20 +1,64 @@
 <template>
-	<div class="game-container">
-	  <canvas ref="game" id="pong"></canvas>
+	  <canvas ref="pongCanvas" id="pong" :width="canvasWidth" :height="canvasHeight"></canvas>
       <!-- <button @click="startGame">Start Game</button> -->
-	</div>
+	<!-- </div> -->
 </template>
 
 
+<script>
+import { ref, onMounted } from 'vue';
 
+export default {
+  setup() {
+    const canvasWidth = ref(800); // Default width, can be dynamically adjusted
+    const canvasHeight = ref(600); // Default height, can be dynamically adjusted
+    const pongCanvas = ref(null);
+
+    const drawGame = () => {
+      const canvas = pongCanvas.value;
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+	  ctx.fillStyle = 'red';
+						// context
+	ctx.fillRect(500, 0, 500, 300);
+      // Clear previous frame
+    //   ctx.clearRect(0, 0, canvasWidth.value, canvasHeight.value);
+
+      // Draw paddles, ball, and other game elements
+      // Example: ctx.fillRect(x, y, width, height);
+      // ... game drawing logic ...
+    };
+
+    const updateGameStateFromServer = (data) => {
+      // Update game state based on data received from the server
+      // Example: playerPosition.value = data.playerPosition;
+
+      // Redraw the game
+      drawGame();
+    };
+
+    onMounted(() => {
+    //   setupWebSocket();
+	updateGameStateFromServer();
+      drawGame();
+    });
+
+    return {
+      canvasWidth,
+      canvasHeight,
+      pongCanvas,
+    };
+  },
+};
+</script>
 <!-- <script lang="ts" setup>
     import { ref, onMounted} from 'vue';
     import WebSocketPlugin from '@/plugins/websocket-plugin';
 
 	// WebSocketPlugin.connectWebSocket('http://localhost:3000/game');
     const startGame = () => {
-        if (this.$socket) {
-            $socket.emit('start-game', 'This is from the client to the server game');
+        if (socket) {
+            socket.emit('start-game', 'This izs from the client to the server game');
         }
     };
     const game = ref<HTMLCanvasElement | null>(null);
@@ -33,6 +77,22 @@
 					}
 				}
 			});
+
+    onMounted(() => {
+            if (socket) {
+                socket.on('table', (message: any[]) => {
+            if (game.value)
+            {
+                const context = game.value.getContext('2d');
+                game.value.width = message[0];
+                game.value.height = message[1];
+                if (context) {
+					context.fillStyle = 'red';
+                    // context
+                    context.fillRect(0,0,game.value.width,game.value.height)
+                }
+            }
+        });
         }
     }); 
 </script> -->
@@ -42,10 +102,12 @@
 
    
   
-  <style scoped>
-  .game-container {
+<style>
 
-	width: fit-content;
+  .game-container {
+	/* width: fit-content; */
+    display: flex;
+    justify-content: center;
 	background: linear-gradient(to right, #451952, #451952, #ae4188);
   	box-shadow: 0 4px 4px rgba(0, 0, 0, 0.5); 
 	margin: 20px;

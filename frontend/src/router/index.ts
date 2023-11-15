@@ -50,10 +50,16 @@ const router = createRouter({
 });
 
 router.beforeEach((to: any, from: any, next: any) => {
-    if (to.path === '/login') {
-    //   document.body.style.backgroundColor = '#F39F5A !important';
-    }else {
-    //   document.body.style.backgroundColor = '#5E6367';
+    if(to.path === '/game')
+    {
+        document.body.style.background = '#AE445A';
+    }
+    else if (to.path === '/')
+    {
+        document.body.style.background = '#AE445A';
+    }
+    else {
+        document.body.style.background = 'linear-gradient(to bottom, #F39F5A, #451952)';
       console.log(`Navigating from ${from.fullPath} to ${to.fullPath}`);
     }
     next();
