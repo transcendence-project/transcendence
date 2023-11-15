@@ -21,7 +21,7 @@ export class GameController {
 
 	@Post('/giveMatch')
 	async giveMatch(@Body() match: MatchDTO) {
-	this.userService.saveMatch(match.winnerID, match.loserID, match.winnerScore, match.loserScore);
+	this.userService.saveMatch(match.winnerId, match.loserId, match.winnerScore, match.loserScore);
 	}
 
 }

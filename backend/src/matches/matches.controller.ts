@@ -10,7 +10,7 @@ export class MatchController {
 
   @Post()
   async create(@Body() matchData: MatchDTO) {
-	this.userService.saveMatch(matchData.winnerID, matchData.loserID, matchData.winnerScore, matchData.loserScore);
+	this.userService.saveMatch(matchData.winnerId, matchData.loserId, matchData.winnerScore, matchData.loserScore);
   }
 
   @Get()

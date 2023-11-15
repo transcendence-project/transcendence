@@ -65,11 +65,11 @@ export class UsersController {
 	// }
 
 	@Post('save/match')
-	@UseGuards(JwtAuthGuard)
+	// @UseGuards(JwtAuthGuard)
 	async save_match(@Body() body: MatchDTO){
 		// console.log(req.user.id);
 		console.log('in save match, body: ', body);
-		return (await this.userService.saveMatch(body.winnerID, body.winnerScore, body.loserID, body.loserScore));
+		return (await this.userService.saveMatch(body.winnerId, body.winnerScore, body.loserId, body.loserScore));
 	}
 
 	@Get('my/friends')

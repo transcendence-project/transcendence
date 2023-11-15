@@ -7,7 +7,7 @@
 } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
 import { ChatService } from "../chat/chat.service";
-import { bcrypt } from "bcrypt";
+import * as bcrypt from 'bcrypt';
 
 @WebSocketGateway({
   cors: { origin: "http://localhost:8080" },
