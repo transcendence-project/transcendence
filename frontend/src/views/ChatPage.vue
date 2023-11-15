@@ -179,7 +179,7 @@
             <div v-for="(result, index) in filteredPublicChannel" :key="index">
               <li class="list-none w-full mb-1">
                 <div
-                  class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom px-1 w-full rounded-[5px]"
+                  class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom px-4 w-full rounded-[5px]"
                 >
                   {{ result.name }}
                   <div class="relative">
@@ -203,15 +203,18 @@
             <div v-for="(result, index) in filteredPrivateChannel" :key="index">
               <li class="list-none w-full mb-1">
                 <div
-                  class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom px-1 w-full rounded-[5px]"
+                  class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom px-4 w-full rounded-[5px]"
                 >
                   {{ result.name }}
                   <div class="relative">
-                    <ButtonComponent
-                      btnContent="Join"
-                      class="m-1"
+
+					<button
+                      class="jpub-btn"
                       @click="showPasswordForm(result.name)"
-                    />
+                    >
+                      Join
+                    </button>
+      
                   </div>
                 </div>
               </li>
@@ -259,13 +262,15 @@ export default defineComponent({
       isMessageSent: false,
       chatMessage: [] as string[],
       isPrivate: false,
-      isMember: false,
+      isOptions: false,
       searchQuery: "" as string,
       userList: [] as string[],
       selectedChannel: null as IChannel | null,
       inputText: "",
       showGroupList: true,
 	  msgField:false,
+	  isMembersList: false,
+	  selectedFriendIndex: null,
       friends: [
         {
           user: "one",
@@ -363,7 +368,7 @@ export default defineComponent({
     OptionMenu,
     ChannelPassword,
     ChannelMembers,
-  },
+},
   computed: {
     searchFriends(): FriendsList[] {
       return this.friends.filter((item) =>
@@ -375,13 +380,6 @@ export default defineComponent({
         item.name.toLowerCase().includes(this.src_channel.toLowerCase())
       );
     },
-    //   filteredMyChannel(): IChannel[] {
-    // 	return this.channels.filter(
-    // 	  (item: IChannel) =>
-    // 		item.name /* .toLowerCase().includes(this.searchQuery.toLowerCase()) &&
-    // 				  item.member === true */
-    // 	);
-    //   },
     filteredPublicChannel(): IChannel[] {
       return this.channels.filter(
         (item: IChannel) =>
@@ -402,6 +400,27 @@ export default defineComponent({
 
   },
   methods: {
+	showSelectedFriend(index) {
+		if (this.selectedFriendIndex === index)
+		{
+			this.selectedFriendIndex = null;
+		}
+		else
+		{
+			this.selectedFriendIndex = index;
+
+		}
+	},
+	showMemberList(){
+		this.isMembersList = !this.isMembersList;
+	},
+	showOptionButtons(){
+		this.isOptions = !this.isOptions;
+	},
+	// hideOptionButtons() {
+	// 	this.isOptions = false;
+	// },
+	
     showGroup() {
       this.showGroupList = true;
     },
@@ -477,6 +496,11 @@ export default defineComponent({
         this.message = "";
       }
     },
+	methods: {
+    closeChannelPage(): void {
+      this.$emit('close');
+    },
+  },
 
     async showUserList(channel: string) {
       this.userList = [];
@@ -600,8 +624,7 @@ export default defineComponent({
 .container2 {
   margin: 1%;
   flex:1;
-  /* width: 22%; */
-  /* height: 100vh; */
+
   display: grid;
   grid-template-rows: 1fr fr 4fr 1fr;
   background: linear-gradient(to bottom, #451952, #AE445A, #F39F5A);
@@ -609,13 +632,23 @@ export default defineComponent({
 }
 .container1 {
 	margin: 1%;
-	/* flex:2; */
-	width: 50%;
-	/* height: 100vh; */
+	flex:2;
+	/* overflow-y: auto; */
+	/* height: 55vh; */
+
 	display: grid;
-	grid-template-rows: 1fr 8fr 1fr;
+	grid-template-rows: 10fr;
 	background: linear-gradient(to bottom, #451952, #AE445A, #F39F5A);
 	border-radius: 5px;
+}
+.container2 {
+  margin: 1%;
+  flex:1;
+
+  display: grid;
+  grid-template-rows: 10fr;
+  background: linear-gradient(to bottom, #451952, #AE445A, #F39F5A);
+  border-radius: 5px;
 }
 
 .cht{
@@ -639,7 +672,20 @@ export default defineComponent({
 	background: #F39F5A;
 	/* color: #F39F5A;; */
 }
-.intbtn,
+.optbtn,
+.intbtn{
+	font-size: 0.8rem;
+	color: white;
+	padding-top: 0.6rem;
+  padding-bottom: 0.6rem;
+  background: #451952;
+  border-radius: 5px;
+  margin-left: 10px;
+  cursor: pointer;
+  color: white;
+
+  border: none;
+}
 .grpbtn,
 .dmbtn {
   font-size: 0.8rem;
@@ -661,11 +707,6 @@ export default defineComponent({
 	font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
 	font-style:initial;
 }
-.chn-head{
-	font-size: 1.2rem;
-	font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
-	font-style:initial;
-}
 .jpub-btn {
   font-size: 0.8rem;
   margin: 3%;
@@ -680,6 +721,7 @@ export default defineComponent({
   border: none;
 }
 
+.adbtn:hover,
 .intbtn:hover,
 .jpub-btn:hover,
 .chn-item:hover,
@@ -688,10 +730,8 @@ export default defineComponent({
   background: #ae4488;
   color: #d9d9da;
 }
-.usr-item:hover {
-  background: #6c4a5f;
-  color: #d9d9da;
-}
+
+.optbtn:hover,
 .usr-item:hover {
   background: #6c4a5f;
   color: #d9d9da;
@@ -717,26 +757,7 @@ export default defineComponent({
   flex-direction: column;
   justify-content: flex-start;
 }
-/* .dm-grp{
-	position: relative;
-	width: 100%;
-	height: 100%;
-}
-.chn-btm{
-	position:sticky;
-	bottom:5%;
-	left: 20%;
-} */
-/* .dm-grp{
-	position: relative;
-	width: 100%;
-	height: 100%;
-}
-.chn-btm{
-	position:sticky;
-	bottom:5%;
-	left: 20%;
-} */
+
 .pri-div {
   display: flex;
   flex-direction: column;
@@ -748,82 +769,6 @@ export default defineComponent({
   justify-content: center;
   align-items: center;
   height: 100%;
-}
-.prv-chn {
-  position: relative;
-}
-.add-pass {
-  position: relative;
-  top: 20px;
-}
-.bottomToTopInput {
-  width: 200px;
-  height: 100px;
-  overflow-y: auto;
-  border: 1px solid #ccc;
-  resize: none;
-  font-size: 16px;
-  line-height: 1.5;
-  padding: 10px;
-  writing-mode: vertical-rl;
-  white-space: nowrap;
-}
-.prv-chn {
-  position: relative;
-}
-.add-pass {
-  position: relative;
-  top: 20px;
-}
-.bottomToTopInput {
-  width: 200px;
-  height: 100px;
-  overflow-y: auto;
-  border: 1px solid #ccc;
-  resize: none;
-  font-size: 16px;
-  line-height: 1.5;
-  padding: 10px;
-  writing-mode: vertical-rl;
-  white-space: nowrap;
-}
-.prv-chn {
-  position: relative;
-}
-.add-pass {
-  position: relative;
-  top: 20px;
-}
-.bottomToTopInput {
-  width: 200px;
-  height: 100px;
-  overflow-y: auto;
-  border: 1px solid #ccc;
-  resize: none;
-  font-size: 16px;
-  line-height: 1.5;
-  padding: 10px;
-  writing-mode: vertical-rl;
-  white-space: nowrap;
-}
-.prv-chn {
-  position: relative;
-}
-.add-pass {
-  position: relative;
-  top: 20px;
-}
-.bottomToTopInput {
-  width: 200px;
-  height: 100px;
-  overflow-y: auto;
-  border: 1px solid #ccc;
-  resize: none;
-  font-size: 16px;
-  line-height: 1.5;
-  padding: 10px;
-  writing-mode: vertical-rl;
-  white-space: nowrap;
 }
 .prv-chn {
   position: relative;
