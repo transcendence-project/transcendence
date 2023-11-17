@@ -3,7 +3,7 @@
     <div class="pass-cont flex flex-col ">
     
       <div class="passform">
-        <input v-model="password" placeholder="Password" class="pass" />
+        <input v-model="password" placeholder="Password" class="pass" type="password"/>
         <!-- <input placeholder="Password" class="pass text-left" /> -->
           <div class="jn-div">
 			<div class="pas-btn">
@@ -40,6 +40,7 @@ export default defineComponent({
           room_name: localStorage.getItem('toJoinChan'),
           arg: this.password,
         });
+		this.closePrivatePage()
     },
   },
 });

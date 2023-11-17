@@ -1,16 +1,55 @@
 <template>
 <div class="src-chn flex flex-col">
     <div class="lst-cont py-5">
-      <div class="h-[65%] overflow-y-auto overflow-x-hidden">
+      <div class="h-[40vh] overflow-y-auto overflow-x-hidden">
         <ul class="w-[65%] p-5 flex-grow max-w-full">
-          <div v-for="(friend, index) in userList" :key="index">
+          <!-- <div v-for="(friend, index) in userList" :key="index"> -->
+          <div v-for="(friend, index) in searchMember" :key="index">
             <li class="list-none w-full mb-1">
+
               <div
                 class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom mx-1 p-1 w-full rounded-[10px] usr-item"
               >
-                <div class="mx-0 px-3">{{ friend }}</div>
-                <button class="intbtn p-1">Invite</button>
+
+                <!-- <div class="mx-0 px-3">{{ friend }}</div> -->
+                <div  v-if="friend.owner === true" class="mx-0 px-3">{{ friend.user }}
+					<span class="text-sm text-red-700"> owner</span>
+
+				</div>
+                <div  v-else-if="friend.admins === true" class="mx-0 px-3">{{ friend.user }}
+					<span class="text-sm text-green-700"> admin</span>
+
+				</div>
+                <div  v-else class="mx-0 px-3">{{ friend.user }}
+					<span class="text-sm text-yellow-700"> member</span>
+
+				</div>
+
+				<div class="relative">
+					<button class="optbtn px-1" @click="showSelectedMember(index)">Options</button>
+
+                  </div>
+                <!-- <button class="intbtn p-1">Invite</button> -->
               </div>
+			
+
+				  <div v-if="selectedMemberIndex === index" class="my-2 opt">
+				  	<div v-if="friend.owner === true">
+					<button class="intbtn p-2 mx- 2" >Invite</button>
+			
+					</div>
+				  <div v-else-if="friend.admins === true">
+					<button class="intbtn p-2 mx- 2" >Invite</button>
+					<button class="intbtn p-2 mx-2" >Kick</button>
+			
+				</div>
+				  <div v-else>
+					<button class="intbtn p-2 mx- 2" >Invite</button>
+					<button class="intbtn p-2 mx-2" >Kick</button>
+					<button class="intbtn p-2 mx-2" >Make Admin</button>		
+				</div>
+
+			</div>
             </li>
           </div>
         </ul>
@@ -28,6 +67,8 @@ import store from "@/store";
 
 interface FriendsList {
   user: string;
+  owner: boolean;
+  admins: boolean;
   status: Boolean;
 }
 
@@ -37,6 +78,66 @@ export default defineComponent({
   data() {
     return {
 		userList: mem_list,
+		src_friend: "" as string,
+		selectedMemberIndex: null,
+
+      friends: [
+        {
+          user: "testvalue",
+		  owner: true,
+		  admins: true,
+          status: true,
+        },
+        {
+          user: "one",
+		  owner: false,
+		  admins: true,
+          status: false,
+        },
+        {
+          user: "two",
+		  owner: false,
+		  admins: true,
+          status: true,
+        },
+        {
+          user: "nine",
+		  owner: false,
+		  admins: false,
+          status: false,
+        },
+        {
+          user: "eleven",
+		  owner: false,
+		  admins: false,
+          status: true,
+        },
+        {
+          user: "urtyu",
+		  owner: false,
+		  admins: true,
+          status: false,
+        },
+        {
+          user: "gsdfgdsa",
+		  owner: false,
+		  admins: true,
+          status: false,
+        },
+        {
+          user: "uet",
+		  owner: false,
+		  admins: false,
+          status: true,
+        },
+        {
+          user: "tweleve",
+		  owner: false,
+		  admins: true,
+          status: true,
+        },
+
+      ] as FriendsList[],
       searchQuery: "" as string,
       selectedChannel: null as string | null,
     };
@@ -88,6 +189,17 @@ methods: {
     selectChannel(channel: string) {
       this.selectedChannel = channel;
     },
+	showSelectedMember(index: any) {
+		if (this.selectedMemberIndex === index)
+		{
+			this.selectedMemberIndex = null;
+		}
+		else
+		{
+			this.selectedMemberIndex = index;
+
+		}
+	},
 	// async showUserList() {
     //   this.userList = [];
     //   await store.dispatch("fetchCurrentChan");
@@ -116,7 +228,7 @@ methods: {
   width: 40%;
   height: 50%;
   border-radius: 2%;
-  background: rgba(0, 0, 0, 0.5);
+  background: black;
 
   display: flex;
   justify-content: center;
@@ -143,7 +255,7 @@ methods: {
   background: #451952;
   border: none;
 }
-
+.optbtn,
 .clsbtn {
   font-size: 0.8rem;
   margin: 3%;
@@ -157,6 +269,7 @@ methods: {
   background: #451952;
   border: none;
 }
+.optbtn:hover,
 .intbtn:hover,
 .clsbtn:hover {
   background: #ae4488;
