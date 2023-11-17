@@ -8,7 +8,7 @@
           placeholder="Channel name"
           class="input text-left"
         />
-        <input v-model="password" placeholder="Password" class="input text-left" />
+        <input v-model="password" placeholder="Password" class="input text-left" type="password"/>
         <div class="psopt">
           <p>* password is optional</p>
         </div>
@@ -50,6 +50,8 @@ export default defineComponent({
 			else
 				store.state.chat.socket.emit( 'create_pub_room', {channel_name: this.channel_name, password: this.password});
 		}
+		this.channel_name = "";
+		this.password = "";
 	},
   },
 });
