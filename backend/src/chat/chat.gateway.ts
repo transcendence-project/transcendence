@@ -135,7 +135,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		const { room_name, arg } = payload; // args: password
 		const user = this.chatService.find_user_with_id(client.id);
 		const room = await this.chatService.chan_by_name(room_name);
-		; if (await this.chatService.can_join(user, room, arg)) {
+		if (await this.chatService.can_join(user, room, arg)) {
 			this.chatService.add_chan_mem(user, room_name);
 			client.join(room_name);
 			if (arg) {
@@ -160,6 +160,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					id: room.id,
 				};
 				client.emit('join_room_success', data_to_send);
+				this.server.emit('update_mem_list', data_to_send);
 			}
 		}
 		else

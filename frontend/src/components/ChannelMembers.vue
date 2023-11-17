@@ -37,106 +37,53 @@ export default defineComponent({
   data() {
     return {
 		userList: mem_list,
-      friends: [
-        {
-          user: "testvalue",
-          status: true,
-        },
-        {
-          user: "two",
-          status: false,
-        },
-        {
-          user: "three",
-          status: true,
-        },
-        {
-          user: "four",
-          status: false,
-        },
-        {
-          user: "five",
-          status: true,
-        },
-        {
-          user: "one",
-          status: true,
-        },
-        {
-          user: "two",
-          status: false,
-        },
-        {
-          user: "four",
-          status: false,
-        },
-        {
-          user: "five",
-          status: true,
-        },
-        {
-          user: "one",
-          status: true,
-        },
-        {
-          user: "two",
-          status: false,
-        },
-        {
-          user: "one",
-          status: true,
-        },
-        {
-          user: "two",
-          status: false,
-        },
-        {
-          user: "four",
-          status: false,
-        },
-        {
-          user: "five",
-          status: true,
-        },
-        {
-          user: "one",
-          status: true,
-        },
-        {
-          user: "two",
-          status: false,
-        },
-      ] as FriendsList[],
       searchQuery: "" as string,
       selectedChannel: null as string | null,
     };
   },
   setup() {
-	const mem = async () => {
-		await store.dispatch("fetchCurrentChan");
-		const chan = computed(() => store.getters.getCurrentCahnnel);
-		const val = chan.value.members;
-		console.log(val);
-		mem_list.value = [];
-		val.forEach((item: any) => {
-			mem_list.value.push(item.userName);
-		  });
-		  console.log(mem_list);
-	};
-	mem();
+	  const mem = async () => {
+		  await store.dispatch("fetchCurrentChan");
+		  const chan = computed(() => store.getters.getCurrentCahnnel);
+		  const val = chan.value.members;
+		  // console.log(val);
+		  mem_list.value = [];
+		  val.forEach((item: any) => {
+			  mem_list.value.push(item.userName);
+			});
+		  //   console.log(mem_list);
+	  };
+	  mem();
   },
-  computed: {
-    searchFriends(): string[] {
-      return this.userList;
-	//  .filter((item: string) =>
-	//   item
+  created(){
+	store.state.chat.socket.on("update_mem_list", (data: any) => {
+		console.log("helllloooooo");
+		if (data)
+		{
+			if (data.user != store.getters.getUserName && localStorage.getItem("currentChanName") == data.chan_name){
+				console.log(data);
+				this.userList.push(data.user);
+			}
+		}
+	});
+  },
+  beforeDestroy() {
+	console.log("comes here--------");
+	// store.state.chat.socket.off("update_mem_list");
+},
+computed: {
+	searchFriends(): string[] {
+		return this.userList;
+		//  .filter((item: string) =>
+		//   item
         // item.user.toLowerCase().includes(this.searchQuery.toLowerCase())
-    //   );
+		//   );
     },
-  },
-  methods: {
-    closePage(): void {
-      this.$emit("close");
+},
+methods: {
+	closePage(): void {
+		this.$emit("close");
+		store.state.chat.socket.off("update_mem_list");
     },
     selectChannel(channel: string) {
       this.selectedChannel = channel;
@@ -159,6 +106,7 @@ export default defineComponent({
     //   return selectedChannel ? selectedChannel.user : [];
     // },
   },
+
 });
 </script>
 <style scoped>

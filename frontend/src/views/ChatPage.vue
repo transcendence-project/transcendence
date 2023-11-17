@@ -609,15 +609,15 @@ export default defineComponent({
 		if (index !== -1)
 			this.my_chan.splice(index, 1);
 	});
-	store.state.chat.socket.on("update_mem_list", (data: any) => {
+	// store.state.chat.socket.on("update_mem_list", (data: any) => {
 		
-		if (data)
-		{
-			if (data.user != store.getters.getUserName && localStorage.getItem("currentChanName") == data.chan_name){
-				this.userList.push(data.user);
-			}
-		}
-	});
+	// 	if (data)
+	// 	{
+	// 		if (data.user != store.getters.getUserName && localStorage.getItem("currentChanName") == data.chan_name){
+	// 			this.userList.push(data.user);
+	// 		}
+	// 	}
+	// });
   },
 });
 </script>

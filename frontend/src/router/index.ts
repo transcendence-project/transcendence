@@ -87,6 +87,7 @@ router.beforeEach((to: any, from: any, next: any) => {
 		store.state.chat.socket.off('chan_msg_success');
 		store.state.chat.socket.off('priv_msg_success');
 		store.state.chat.socket.off('update_chan_message');
+		store.state.chat.socket.off("update_mem_list");
 	  }
     next();
     if (to.path == '/home' && to.query.code)
