@@ -33,22 +33,42 @@
           <input placeholder="Search channel" v-model="src_channel" class="w-[80%] h-[2rem] border-0 text-black ml-2 mr-1 rounded-full pl-4 mb-2 focus:border-0 focus:outline-none" />
 		  
 		  
-		  <div class="w-full h-[250px] overflow-y-auto overflow-x-hidden flex-grow max-w-full" >
+		  <div class="w-full h-[55vh] overflow-y-auto overflow-x-hidden flex-grow max-w-full" >
 			  <ul class="w-[95%] p-2 m-2">
 				  <div v-for="(result, index) in filteredMyChannel" :key="index">
 					<li class="list-none w-full mb-1">
-						<div class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom px-1 w-full rounded-[10px] chn-item">
-								<a href="#"  @click="showChatPage(result.name)">
-									<div class="mx-2 px-2">
-										{{ result.name }}
-							
-									</div>
-								</a>
-								<button class="optbtn p-1" @click="showSelectedFriend(index)">Options</button>
 
-								<!-- <ChannelOption class="relative w-9 h-9" /> -->
-							</div>
-							<!-- <div v-if="isOptions" class="my-2"> -->
+
+
+
+							<div v-if="result.isPublic === false" class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom px-4 w-full rounded-[5px]">
+				  
+				  <a href="#"  @click="showChatPage(result.name)">
+										{{ result.name }}<span class="text-sm text-red-700"> private</span>
+								</a>
+
+                  <div class="relative">
+					<button class="optbtn px-1 my-1" @click="showSelectedFriend(index)">Options</button>
+
+                  </div>
+                </div>
+							<div v-else class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom px-4 w-full rounded-[5px]">
+				  
+				  <a href="#"  @click="showChatPage(result.name)">
+										{{ result.name }}<span class="text-sm text-green-700"> public</span>
+								</a>
+
+                  <div class="relative">
+					<button class="optbtn px-1 my-1" @click="showSelectedFriend(index)">Options</button>
+
+                  </div>
+                </div>
+
+
+
+
+
+
 							<div v-if="selectedFriendIndex === index" class="my-2 opt">
 								<button class="intbtn p-2" @click="showMemberList(result.name)">members</button>
 								<button class="intbtn p-2" @click="leave_room(result.name)" >leave</button>
@@ -73,7 +93,7 @@
 			<input placeholder="Search friend" v-model="src_friend" class="w-[80%] h-[2rem] border-0 text-black ml-2 mr-1 rounded-full pl-4 mb-2 focus:border-0 focus:outline-none" />
 			
 			
-			<div  class="w-full h-[250px] overflow-y-auto overflow-x-hidden flex-grow max-w-full">
+			<div  class="w-full h-[60vh] overflow-y-auto overflow-x-hidden flex-grow max-w-full">
 				<ul class="w-[95%] p-2 m-2">
 					<div v-for="(friend, index) in searchFriends" :key="index">
 						<li class="list-none w-full mb-1">
@@ -83,11 +103,10 @@
                   class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom mx-1 p-1 w-full rounded-[10px] usr-item"
                 >
 				<a href="#"  @click="showChatPage()">
-                    <div class="mx-0 px-5">{{ friend.user }}</div></a>
+                    <div class="mx-2 px-5">{{ friend.user }}</div></a>
                 
 
-                  <button class="intbtn p-1" @click="showOptionButtons">Invite</button>
-				  <!-- <ChannelMembers v-if="isOptions"/> -->
+                  <button class="intbtn py-1 px-2 mx-2" @click="showOptionButtons">Invite</button>
                 </div>
 
                   </li>
@@ -132,15 +151,15 @@
 			<input
 			v-model="message"
 			placeholder="message"
-			class="w-[80%] h-[2rem] border-0 text-black ml-2 mr-1 rounded-full pl-4 mb-2 focus:border-0 focus:outline-none"
+			class="w-[80%] h-[2.5rem] border-0 text-black ml-2 mr-1 rounded-full pl-4 mb-2 focus:border-0 focus:outline-none"
 			style="min-width: 300px" />
-			<ButtonComponent btnContent="Send" @click="sendMessage" />
+			<ButtonComponent btnContent="Send" @click="sendMessage" class="text"/>
 		</div>
 	</div>
 </div>
 	  <div v-else>
 		<div  class="row1 flex-grow max-w-full" >
-			Select a channle or a friend to chat
+			<span class="text-xl">Select a channle or a friend to chat</span>
 		</div>
 	  </div>
     </div>
@@ -154,7 +173,7 @@
 
 				Public Channels
 			</div>
-        <div class="h-[250px] overflow-y-auto overflow-x-hidden">
+        <div class="h-[40vh] overflow-y-auto overflow-x-hidden">
           <ul class="w-[95%] p-1 mx-3">
             <div v-for="(result, index) in filteredPublicChannel" :key="index">
               <li class="list-none w-full mb-1">
@@ -180,7 +199,7 @@
 
 				Private Channels
 			</div>
-        <div class="h-[250px] overflow-y-auto overflow-x-hidden prv-chn">
+        <div class="h-[30vh] overflow-y-auto overflow-x-hidden prv-chn">
           <ul class="w-[95%] p-1 mx-3">
             <div v-for="(result, index) in filteredPrivateChannel" :key="index">
               <li class="list-none w-full mb-1">
@@ -293,6 +312,34 @@ export default defineComponent({
           user: "four",
           status: false,
         },
+        {
+          user: "two",
+          status: false,
+        },
+        {
+          user: "three",
+          status: true,
+        },
+        {
+          user: "four",
+          status: false,
+        },
+        {
+          user: "four",
+          status: false,
+        },
+        {
+          user: "four",
+          status: false,
+        },
+        {
+          user: "four",
+          status: false,
+        },
+        {
+          user: "four",
+          status: false,
+        },
       ] as FriendsList[],
     };
   },
@@ -363,10 +410,16 @@ export default defineComponent({
     filteredMyChannel(): IChannel[] {
       return this.my_chan.filter(
         (item: IChannel) =>
-          item.name /* .toLowerCase().includes(this.searchQuery.toLowerCase()) &&
-					item.member === true */
+          item.name.toLowerCase().includes(this.src_channel.toLowerCase())
       );
     },
+    // filteredMyChannel(): IChannel[] {
+    //   return this.my_chan.filter(
+        // (item: IChannel) =>
+        //   item.name /* .toLowerCase().includes(this.searchQuery.toLowerCase()) &&
+					// item.member === true */
+    //   );
+    // },
     filteredPublicChannel(): IChannel[] {
 		return this.channels.filter(
 		(item: IChannel) =>
