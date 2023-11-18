@@ -1,5 +1,5 @@
 <template>
-	  <canvas ref="pongCanvas" id="pong" width="canvasWidth" height="canvasHeight"></canvas>
+	  <canvas ref="pongCanvas" id="pong" :width="canvasWidth" :height="canvasHeight"></canvas>
       <div>
           <button @click="startGame">Start Game</button>
       </div>
@@ -18,46 +18,80 @@ const { appContext } = getCurrentInstance();
     const canvasHeight = ref(400); // Default height, can be dynamically adjusted
     const pongCanvas = ref(null);
 
-    const drawGame = () => {
-      const canvas = pongCanvas.value;
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-	  ctx.fillStyle = '#F6F1F1';
-      ctx.fillRect(500, 200, canvasWidth.value, canvasHeight.value);
-      // Clear previous frame
-    //   ctx.clearRect(0, 0, canvasWidth.value, canvasHeight.value);
+    // const drawGame = () => {
+    //   const canvas = pongCanvas.value;
+    //   if (!canvas) return;
+    //   const ctx = canvas.getContext('2d');
+	//   ctx.fillStyle = '#F6F1F1';
+    //   ctx.fillRect(500, 200, canvasWidth.value, canvasHeight.value);
+    //   // Clear previous frame
+    // //   ctx.clearRect(0, 0, canvasWidth.value, canvasHeight.value);
 
-      // Draw paddles, ball, and other game elements
-      // Example: ctx.fillRect(x, y, width, height);
-      // ... game drawing logic ...
-    };
+    //   // Draw paddles, ball, and other game elements
+    //   // Example: ctx.fillRect(x, y, width, height);
+    //   // ... game drawing logic ...
+    // };
 
-    const updateGameStateFromServer = () => {
-      // Update game state based on data received from the server
-      // Example: playerPosition.value = data.playerPosition;
+    // const updateGameStateFromServer = () => {
+    //   // Update game state based on data received from the server
+    //   // Example: playerPosition.value = data.playerPosition;
 
-      // Redraw the game
-      drawGame();
-    };
-    const startGame = () => {
-        if (socket) {
-            socket.emit('start-game', 'This izs from the client to the server game');
-        }
-    };
+    //   // Redraw the game
+    //   drawGame();
+    // };
+    // const startGame = () => {
+    //     if (socket) {
+    //         // console.log(canvas.value);
+    //         const canvasDimensions = {
+    //             width: pongCanvas.offsetWidth,
+    //             height: pongCanvas.offsetHeight,
+    //         };
+    //         socket.emit('start-game', canvasDimensions);
+    //     }
+    // };
 
+    // const resize_window = () => {
+    //     window.addEventListener('resize', startGame);
+    // };
     onMounted(() => {
+        // console.log("try")
+    //     if (pongCanvas.value) {
+    //     console.log('Mounted - Canvas dimensions:', pongCanvas.value.offsetWidth, pongCanvas.value.offsetHeight);
+    // } else {
+    //     console.log('Mounted - Canvas element not found');
+    // }
     //   setupWebSocket();
-    if (socket)
-    {
-        socket.on('table', (message: any[]) => {
-            console.log(message[0]);
-        });
-    }
-    startGame();
-	updateGameStateFromServer();
-      drawGame();
+    // if (socket)
+    // {
+    //     socket.on('table', (message: any[]) => {
+    //         console.log(message[0]);
+    //     });
+    // }
+    // startGame();
+	// updateGameStateFromServer();
+    //   drawGame();
     });
-
+    const startGame = () => {
+        // if (socket) {
+        //     console.log(canvas.value.offsetWidth);
+        //     const canvasDimensions = {
+        //         width: canvas.value.offsetWidth,
+        //         height: canvas.offsetHeight,
+        //     };
+        //     socket.emit('start-game', canvasDimensions);
+        // }
+        if (pongCanvas.value) {
+        const canvasDimensions = {
+            width: pongCanvas.value.offsetWidth,
+            height: pongCanvas.value.offsetHeight
+        };
+        socket.emit('start-game', canvasDimensions);
+        // console.log('Starting game with canvas dimensions:', canvasDimensions);
+        // Your code to start the game
+    } else {
+        console.log('Canvas element not found in startGame');
+    }
+    };
     // return {
     //   canvasWidth,
     //   canvasHeight,

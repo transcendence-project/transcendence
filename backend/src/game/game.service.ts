@@ -31,5 +31,19 @@ export class GameService {
         const table_size : number[] = [width,height];
         return table_size;
     }
+    initializeGame(canvasWidth: number, canvasHeight: number) 
+    {
+        this.paddle.width
+    }
+    draw_table(canvasWidth: number, canvasHeight: number)
+    {
+        const paddleWidth = 20 / canvasWidth;
+        const paddleHeight = 100 / canvasHeight;
+
+
+        this.paddle.width = paddleWidth;
+        this.paddle.height = paddleHeight;
+
+    }
 }
 

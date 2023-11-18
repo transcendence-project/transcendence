@@ -3,7 +3,6 @@ export interface Paddle {
     y: number;
     width: number;
     height: number;
-    color: string;
     score: number;
 }
 
@@ -14,7 +13,6 @@ export interface Ball {
     speed: number;
     dirx: number;
     diry: number;
-    color: string;
 }
 
 export interface net {
@@ -22,6 +20,5 @@ export interface net {
     y: number;
     width: number;
     height: number;
-    color: string;
 }
 
