@@ -96,7 +96,7 @@ export class ChatService {
 		// else channel doesnot exist
 	}
 
-	async rm_chan_mem(user: User, chan_name: string) {
+	async rem_chan_mem(user: User, chan_name: string) {
 		const userIdToRemove = user.id;
 		const chan = await this.chan_by_name(chan_name);
 		if (chan) {

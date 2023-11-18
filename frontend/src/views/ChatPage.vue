@@ -498,14 +498,13 @@ export default defineComponent({
     },
     async displayMessage() {
       this.chatMessage = [];
-	//   console.log("HELLLLOOOOO");
       await store.dispatch("fetchCurrentChan");
       const chan = computed(() => store.getters.getCurrentCahnnel);
-	//   console.log(chan.value.messages);
+	  console.log(chan.value.messages);
       const val = chan.value.messages;
-    //   val.forEach((item: any) => {
-    //     this.chatMessage.push(item.content);
-    //   });
+      val.forEach((item: any) => {
+        this.chatMessage.push(item.content);
+      });
     },
     sendMessage() {
     //   const chan = computed(() => store.getters.getCurrentCahnnel);
@@ -618,11 +617,19 @@ export default defineComponent({
       console.log("Send message to channel successfully and back in front end");
     });
 	store.state.chat.socket.on("leave_room_success", (room_name: string) => {
-		console.log(room_name);
+		// console.log(room_name);
 		const index = this.my_chan.findIndex((channel: IChannel) => channel.name === room_name);
 		console.log(index);
 		if (index !== -1)
 			this.my_chan.splice(index, 1);
+	});
+	store.state.chat.socket.on("kicked", (room_name: string) => {
+		// if (data.user1 == store.getters.getUserName)
+		// {
+			const index = this.my_chan.findIndex((channel: IChannel) => channel.name === room_name);
+			if (index !== -1)
+			this.my_chan.splice(index, 1);
+		// }
 	});
 	// store.state.chat.socket.on("update_mem_list", (data: any) => {
 		

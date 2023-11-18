@@ -39,12 +39,12 @@
 								</div>
 								<div v-else-if="friend.admins === true">
 									<button class="intbtn p-2 mx- 2">Invite</button>
-									<button class="intbtn p-2 mx-2">Kick</button>
+									<button class="intbtn p-2 mx-2" @click="kick_mem(friend.user)">Kick</button>
 
 								</div>
 								<div v-else>
 									<button class="intbtn p-2 mx- 2">Invite</button>
-									<button class="intbtn p-2 mx-2">Kick</button>
+									<button class="intbtn p-2 mx-2" @click="kick_mem(friend.user)">Kick</button>
 									<button class="intbtn p-2 mx-2" @click="make_admin(friend.user)">Make Admin</button>
 								</div>
 
@@ -158,15 +158,15 @@ export default defineComponent({
 			}
 		});
 		store.state.chat.socket.on("leave_room_update", (data: any) => {
-			console.log("leave update frontend");
 			if (data){
-				if (data.user != store.getters.getUserName && localStorage.getItem("currentChanName") == data.chan_name){
-					const index = this.userList.findIndex((mems: FriendsList) => mems.user === data.user);
+				if (data.user1 != store.getters.getUserName && localStorage.getItem("currentChanName") == data.chan_name){
+					const index = this.userList.findIndex((mems: FriendsList) => mems.user === data.user1);
 					if (index !== -1)
 						this.userList.splice(index, 1);
 				}
 			}
-		})
+		});
+		// store
 	},
 	computed: {
 		searchMember(): FriendsList[] {
@@ -199,6 +199,12 @@ export default defineComponent({
 			// console.log(localStorage.getItem('currentChanName'));
 			store.state.chat.socket.emit('set_admin', {
 				admin_to_add: member,
+				room_name: localStorage.getItem('currentChanName'),
+			});
+		},
+		kick_mem(member: string) {
+			store.state.chat.socket.emit('kick_user', {
+				user_to_rem: member,
 				room_name: localStorage.getItem('currentChanName'),
 			});
 		}
