@@ -21,9 +21,9 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		await this.chatService.set_user(client); // after login page fix
 		const user = this.chatService.find_user_with_id(client.id);
 		// console.log(user);
-		// if (user.channels)
-		// 	for (const channel of user.channels) // rejoin
-		// 		client.join(channel.room_name);
+		if (user.channels)
+			for (const channel of user.channels)
+				client.join(channel.room_name);
 		// 	client.emit('connection_success');
 		// In case of error
 		/*  client.on('error', (error) => { // to handle websocket errors
@@ -170,16 +170,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('leave_chan')
 	async leave_room(client: any, room_name: string) {
 		console.log('reached leave room in backend');
-		// const room = await this.chatService.chan_by_name(room_name);
-		// console.log("-------BEFOORRREEEEEEEE-------")
-		// console.log(room.members);
 		const user = this.chatService.find_user_with_id(client.id);
 		// console.log(user);
-		this.chatService.rm_chan_mem(user, room_name); // removing from databse
+		await this.chatService.rm_chan_mem(user, room_name); // removing from databse
 		client.leave(room_name);
-		// const room_ = await this.chatService.chan_by_name(room_name);
-		// console.log("-------AFTERRRRRRRR-------")
-		// console.log(room_.members);
+		const data_to_send = {
+			chan_name: room_name,
+			user: user.userName,
+		};
+		this.server.to(room_name).emit('leave_room_update', data_to_send);
 		client.emit('leave_room_success', room_name);
 	}
 
@@ -192,13 +191,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		// send to user_to_mute is mute
 	}
 
-	@SubscribeMessage('invite_to_game')
-	invite_user(client: any, invitee_: string): void {
-		const inviter = this.chatService.find_user_with_id(client.id);
-		const invitee = this.chatService.find_user_with_name(invitee_);
-		this.chatService.invite_user_to_game(inviter, invitee);
-		// send message to invitee that he has been invited
-	}
+	// @SubscribeMessage('invite_to_game')
+	// invite_user(client: any, invitee_: string): void {
+	// 	const inviter = this.chatService.find_user_with_id(client.id);
+	// 	const invitee = this.chatService.find_user_with_name(invitee_);
+	// 	this.chatService.invite_user_to_game(inviter, invitee);
+	// 	// send message to invitee that he has been invited
+	// }
 
 	@SubscribeMessage('add_user_to_priv')
 	add_priv_user(client: any, payload: any) {
@@ -215,12 +214,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 	@SubscribeMessage('set_admin')
-	set_admin(client: any, payload: any) {
+	async set_admin(client: any, payload: any) {
 		const { admin_to_add, room_name } = payload;
 		const user = this.chatService.find_user_with_id(client.id);
-		if (this.chatService.is_admin(user.userName, room_name) || this.chatService.is_owner(user.userName, room_name)) {
-			this.chatService.add_chan_admin(admin_to_add, room_name);
-			// send to admin_to_add that they are an admin
+		if (await this.chatService.is_admin(user.userName, room_name) || await this.chatService.is_owner(user.userName, room_name)) {
+			await this.chatService.add_chan_admin(admin_to_add, room_name);
+			const data_to_send = {
+				chan_name: room_name,
+				admin: admin_to_add,
+			};
+			this.server.emit('update_admin', data_to_send);
+			this.server.to(room_name).emit('update_admin', data_to_send)
 		}
 		// else
 		// send to user that they are not an admin or owner

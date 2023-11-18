@@ -155,7 +155,7 @@ const store = createStore({
 					Authorization: `Bearer ${localStorage.getItem('token')}`,
 				},
 			}).then((resp: AxiosResponse<IChannel[]>) => {
-				console.log(resp.data);
+				// console.log(resp.data);
 				context.commit('setCurrentChannel', resp.data);
 			}).catch((error) => {
 				console.error("Error fetching current channel:", error);

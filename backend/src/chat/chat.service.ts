@@ -46,7 +46,7 @@ export class ChatService {
 	// get channel by name
 	async chan_by_name(chan_name: string) // or by id
 	{
-		return (await this.channelRepo.findOne({ where: { room_name: chan_name }, relations: ['members', 'messages'] }));
+		return (await this.channelRepo.findOne({ where: { room_name: chan_name }, relations: ['members', 'admins', 'owner', 'messages'] }));
 	}
 
 	async create_chan(chan_name: string, user: User, pass: string) {
@@ -63,7 +63,7 @@ export class ChatService {
 					const chan2 = this.channelRepo.create({ room_name: chan_name, owner: user, password: pass, 
 						members: [], admins: [], messages: [],  description: "", isGroupChannel: true, is_protected: true });
 					chan2.members.push(user);
-					chan2.admins.push(user);
+					// chan2.admins.push(user);
 					await this.channelRepo.save(chan2);
 					console.log(`Channel ${chan_name} created successfully`);
 					return (chan2)
@@ -73,7 +73,7 @@ export class ChatService {
 					const chan2 = this.channelRepo.create({ room_name: chan_name, owner: user, password: pass, 
 						members: [], admins: [], messages: [], description: "", isGroupChannel: true, is_public: true });
 					chan2.members.push(user);
-					chan2.admins.push(user);
+					// chan2.admins.push(user);
 					await this.channelRepo.save(chan2);
 					console.log(`Channel ${chan_name} created successfully`);
 					// console.log(chan2.members);
@@ -100,13 +100,15 @@ export class ChatService {
 		const userIdToRemove = user.id;
 		const chan = await this.chan_by_name(chan_name);
 		if (chan) {
-			chan.members = chan.members.filter(member => member.id !== userIdToRemove); // Remove the user
+			chan.members = chan.members.filter(member => member.id !== userIdToRemove);
+			chan.admins = chan.members.filter(admin => admin.id !== userIdToRemove);
 			await this.channelRepo.save(chan);
 		}
 	}
 
-	async add_chan_admin(user: User, chan_name: string) {
+	async add_chan_admin(user_to_add: string, chan_name: string) {
 		const chan = await this.chan_by_name(chan_name);
+		const user = await this.find_user_with_name(user_to_add);
 		if (chan) {
 			chan.admins.push(user);
 			await this.channelRepo.save(chan);
@@ -133,15 +135,18 @@ export class ChatService {
 
 	//  ----------------------- CHECKS -----------------------------
 	async is_admin(user_name: string, chan_name: string) {
-		const user = this.channelRepo.findOneBy({/* user_name */ }); // from the admin table/array
-		if (user)
+		const chan = await this.chan_by_name(chan_name);
+		// console.log(chan);
+		const isAdmin = chan.admins.some((admin: User) => admin.userName === user_name);
+		// const user = this.channelRepo.findOneBy({/* user_name */ }); // from the admin table/array
+		if (isAdmin)
 			return true;
 		else
 			return false;
 	}
 	async is_owner(user_name: string, chan_name: string) {
-		const user = this.channelRepo.findOneBy({/* user_name */ }); // from the owner table/array
-		if (user)
+		const chan = await this.chan_by_name(chan_name);
+		if (chan.owner.userName === user_name)
 			return true;
 		else
 			return false;

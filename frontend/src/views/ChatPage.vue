@@ -102,7 +102,7 @@
 							<div
                   class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom mx-1 p-1 w-full rounded-[10px] usr-item"
                 >
-				<a href="#"  @click="showChatPage()">
+				<a href="#"  @click="showChatPageFriend()">
                     <div class="mx-2 px-5">{{ friend.user }}</div></a>
                 
 
@@ -308,38 +308,6 @@ export default defineComponent({
           user: "three",
           status: true,
         },
-        {
-          user: "four",
-          status: false,
-        },
-        {
-          user: "two",
-          status: false,
-        },
-        {
-          user: "three",
-          status: true,
-        },
-        {
-          user: "four",
-          status: false,
-        },
-        {
-          user: "four",
-          status: false,
-        },
-        {
-          user: "four",
-          status: false,
-        },
-        {
-          user: "four",
-          status: false,
-        },
-        {
-          user: "four",
-          status: false,
-        },
       ] as FriendsList[],
     };
   },
@@ -403,14 +371,15 @@ export default defineComponent({
 },
   computed: {
     searchFriends(): FriendsList[] {
-      return this.friends.filter((item) =>
+      return this.friends.filter((item: any) =>
         item.user.toLowerCase().includes(this.src_friend.toLowerCase())
       );
     },
     filteredMyChannel(): IChannel[] {
       return this.my_chan.filter(
         (item: IChannel) =>
-          item.name.toLowerCase().includes(this.src_channel.toLowerCase())
+          item.name
+        //   item.name.toLowerCase().includes(this.src_channel.toLowerCase())
       );
     },
     // filteredMyChannel(): IChannel[] {
@@ -470,6 +439,11 @@ export default defineComponent({
 		localStorage.setItem("currentChanName", channel);
 		await this.displayMessage();
 	},
+	async showChatPageFriend(friend: string) {
+		this.msgField = true;
+		localStorage.setItem("currentFriend", friend);
+		// await this.displayMessage();
+	},
 	HideChatPage() {
 		this.msgField = false;
 	},
@@ -503,8 +477,9 @@ export default defineComponent({
       if (store.state.chat.socket)
         store.state.chat.socket.emit("private_message");
     },
-    showPasswordForm() {
+    showPasswordForm(chan_name: string) {
       this.isPrivate = true;
+	  localStorage.setItem('toJoinChan', chan_name);
     },
     closePasswordFomr() {
       this.isPrivate = false;
@@ -528,9 +503,9 @@ export default defineComponent({
       const chan = computed(() => store.getters.getCurrentCahnnel);
 	//   console.log(chan.value.messages);
       const val = chan.value.messages;
-      val.forEach((item: any) => {
-        this.chatMessage.push(item.content);
-      });
+    //   val.forEach((item: any) => {
+    //     this.chatMessage.push(item.content);
+    //   });
     },
     sendMessage() {
     //   const chan = computed(() => store.getters.getCurrentCahnnel);
@@ -545,25 +520,12 @@ export default defineComponent({
     closeChannelPage(): void {
       this.$emit('close');
     },
-	// async showUserList(channel: string) {
-	// this.userList = [];
-	// localStorage.setItem("currentChanName", channel);
-	// await store.dispatch("fetchCurrentChan");
-	// const chan = computed(() => store.getters.getCurrentCahnnel);
-	// const val = chan.value.members;
-	// console.log(val);
-	// val.forEach((item: any) => {
-	// 	this.userList.push(item.userName);
-	// });
-	// // await this.displayMessage();
-	// },
 	leave_room(chan_name: string){
 		localStorage.setItem('chan_to_leave', chan_name);
 	if (store.state.chat.socket){
 		store.state.chat.socket.emit('leave_chan', localStorage.getItem('chan_to_leave'));
 		}
 	}
-	
 	},
 
   created() {

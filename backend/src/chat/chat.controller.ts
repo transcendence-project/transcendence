@@ -29,4 +29,5 @@ export class ChatController {
 		// return (chan_.members);
 		return (chan_)
 	}
+
 }
