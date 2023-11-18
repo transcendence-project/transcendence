@@ -16,7 +16,7 @@ export class SeederService implements OnModuleInit {
 
   private async seedAchievements() {
     const achievements = [
-      { title: 'First Login' },
+      { title: 'First Match' },
       { title: 'First Win' },
       { title: 'Played 3 Matches' },
     ];

@@ -132,7 +132,7 @@ export class UsersService {
 
   async addAchievement(userId: number, achievementTitle: string) {
     // console.log("in add achievement, userId: ", userId);
-    // console.log("in add achievement, achievementTitle: ", achievementTitle);
+    console.log("in add achievement, achievementTitle: (", achievementTitle, ")");
     const user = await this.repo.findOne({
       where: { id: userId },
       relations: ["achievements"],
@@ -147,6 +147,7 @@ export class UsersService {
     // console.log("in add achievement, achievement: ", achievement);
     // console.log("in add achievement, user.achievements: ", user.achievements);
     // console.log("in add achievement, user: ", user);
+	console.log('in add achievement: ', achievement);
     user.achievements.push(achievement);
     return this.repo.save(user);
   }
@@ -173,27 +174,37 @@ export class UsersService {
 	return user;
   }
 
-  async checkAchievements(userId: number) {
-	const user: User = await this.findOne(userId);
-	const matches: Match[] = await this.matchesService.findMatches(userId);
-	const achievements: Achievement[] = await this.getAchievements(userId);
+  async checkAchievements(winner: User, loser: User) {
+	const matches: Match[] = await this.matchesService.findMatches(winner.id);
+	const achievements: Achievement[] = await this.getAchievements(winner.id);
 
+	// console.log('in check achievements, matches: ', matches);
 	if (matches.length === 1 && !achievements.find((a) => a.title === "First Match")) {
-		this.addAchievement(userId, "First Match");
+		this.addAchievement(winner.id, "First Match");
 	}
-	if (user.matchesAsPlayerOne.length === 1 && !achievements.find((a) => a.title === "First Win")) {
-		this.addAchievement(userId, "First Win");
+	if (winner.matchesAsPlayerOne.length === 1 && !achievements.find((a) => a.title === "First Win")) {
+		this.addAchievement(winner.id, "First Win");
 	}
 	if (matches.length === 3 && !achievements.find((a) => a.title === "Played 3 Matches")) {
-		this.addAchievement(userId, "Played 3 Matches");
+		this.addAchievement(winner.id, "Played 3 Matches");
+	}
+
+	const loserMatches: Match[] = await this.matchesService.findMatches(loser.id);
+	const loserAchievements: Achievement[] = await this.getAchievements(loser.id);
+
+	if (loserMatches.length === 1 && !loserAchievements.find((a) => a.title === "First Match")) {
+		this.addAchievement(loser.id, "First Match");
+	}
+	if (loserMatches.length === 3 && !loserAchievements.find((a) => a.title === "Played 3 Matches")) {
+		this.addAchievement(loser.id, "Played 3 Matches");
 	}
 }
 
 
   async saveMatch(winnerID: number, winnerScore: number, loserID: number, loserScore: number) {
 
-	const winner: User = await this.repo.findOne({ where: { id: winnerID}, relations: { matchesAsPlayerOne: true} });
-	const loser: User = await this.repo.findOne({ where: { id: loserID}, relations: { matchesAsPlayerTwo: true} });
+	const winner: User = await this.repo.findOne({ where: { id: winnerID}, relations: ["matchesAsPlayerOne"] });
+	const loser: User = await this.repo.findOne({ where: { id: loserID}, relations:  ["matchesAsPlayerTwo"]});
 
 	// console.log('in save match, winner: ', winner);
 	// console.log('in save match, loser: ', loser);
@@ -202,10 +213,11 @@ export class UsersService {
 	const score: string = winnerScoreString + '-' + loserScoreString;
 
 	const match = await this.matchesService.create(winner, loser, score, loserID, winnerID);
-
+	console.log('in save match, winner: ', winner);
+	console.log('in save match, loser: ', loser);
 	console.log('in save match, match: ', match);
-	console.log('in save match, winner matches as player one: ', winner.matchesAsPlayerOne);
-	console.log('in save match, loser matches as player two: ', loser.matchesAsPlayerTwo);
+	// console.log('in save match, winner matches as player one: ', winner.matchesAsPlayerOne);
+	// console.log('in save match, loser matches as player two: ', loser.matchesAsPlayerTwo);
 	winner.matchesAsPlayerOne.push(match);
 	loser.matchesAsPlayerTwo.push(match);
 
@@ -213,7 +225,7 @@ export class UsersService {
 	this.repo.save(loser);
 
 	this.updateUserPoints(winnerID, loserID);
-	this.checkAchievements(winnerID);
+	this.checkAchievements(winner, loser);
   }
 
   async getMatches(userId: number) {

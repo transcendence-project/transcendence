@@ -43,6 +43,7 @@ async findMatches(userId: number) {
     ],
     relations: ["playerOne", "playerTwo"]
   });
+  matches.sort((a, b) => b.id - a.id)
   return matches;
 }
 
