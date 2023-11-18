@@ -198,7 +198,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 		const data_to_send = {
 			chan_name: room_name,
-			user1: user1.userName,
+			user: user1.userName,
 		};
 		this.server.to(room_name).emit('leave_room_update', data_to_send);
 		this.server.to(id_rem).emit('kicked', room_name);

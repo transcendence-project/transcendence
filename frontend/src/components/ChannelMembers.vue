@@ -159,8 +159,8 @@ export default defineComponent({
 		});
 		store.state.chat.socket.on("leave_room_update", (data: any) => {
 			if (data){
-				if (data.user1 != store.getters.getUserName && localStorage.getItem("currentChanName") == data.chan_name){
-					const index = this.userList.findIndex((mems: FriendsList) => mems.user === data.user1);
+				if (data.user != store.getters.getUserName && localStorage.getItem("currentChanName") == data.chan_name){
+					const index = this.userList.findIndex((mems: FriendsList) => mems.user === data.user);
 					if (index !== -1)
 						this.userList.splice(index, 1);
 				}
