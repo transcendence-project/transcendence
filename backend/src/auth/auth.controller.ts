@@ -38,18 +38,18 @@ export class AuthController {
 	}
 
 	@Get('2fa/generate') // GET just for testing, will later be POST
-	// @UseGuards(JwtAuthGuard) // will get the user which is linked to the sent Bearer token
+	@UseGuards(JwtAuthGuard) // will get the user which is linked to the sent Bearer token
 	async generateQr(@Req() req, @Res() res) {
-		const user = { // for testing purposes
-			id: 4,
-			userName: 'arafeeq',
-			email: 'arafeeq@student.42abudhabi.ae',
-			twoFactorSecret: 'helloworld'
+		try {
+			const otp = this.authService.generateTwoFactorAuthenticationSecret(req.user);
+			// console.log(`user 2fa secret = ${user.twoFactorAuthenticationSecret}`);
+			const code = await this.authService.generateQrCodeDataURL((await otp).otpauthUrl);
+			res.json({ qrCodeDataURL: code });
+
+		} catch (error) {
+			console.error('Error generating QR code:', error.message);
+			res.status(500).json({ error: 'Internal Server Error' });
 		}
-		const otp = this.authService.generateTwoFactorAuthenticationSecret(user); // will be req.user later
-		// console.log(`user 2fa secret = ${user.twoFactorAuthenticationSecret}`);
-		const code = await this.authService.generateQrCodeDataURL((await otp).otpauthUrl);
-		return res.redirect(code);
 	}
 
 	@Post('2fa/authenticate')

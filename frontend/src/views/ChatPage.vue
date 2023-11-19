@@ -1,258 +1,196 @@
 <template>
-  <div
-    class="flex flex-wrap justify-between bg-gradient-to-r from-[#451952] via-[#451952] to-[#ae4188] shadow-custom text-white w-full min-h-[85.9vh] m-5 rounded-md p-2.5 text-center"
-  >
-    <div class="container flex flex-col min-h-[50vh] ">
-      <div class="row mt-3">
-        <h2 class="chn-head">My Channel</h2>
-        <div class="flex-grow max-w-full">
-          <div class="chn-btm">
-            <button class="grpbtn px-2 mx-2" @click="showGroup">Group</button>
-            <button class="dmbtn " @click="showDm">DM</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="row flex-grow max-w-full">
-        <div v-if="showGroupList">
-          <div class="max-w-full mb-2">
-            <ButtonComponent
-              class="adbtn"
-              btnContent="Create Channel"
-              @click="AddChannelForm"
-            />
-            <CreateChannel
-              v-if="isAddChannelForm"
-              @close="closeAddChannelForm"
-            />
-
-            <ChannelMembers v-if="isSearchChannelVisible" />
-          </div>
-          <div class="flex-grow max-w-full">
-            <input
-              placeholder="Search channel"
-              v-model="src_channel"
-              class="w-[80%] h-[2rem] border-0 text-black ml-2 mr-1 rounded-full pl-4 mb-2 focus:border-0 focus:outline-none"
-            />
-
-            <div
-              class="w-full h-[55vh] overflow-y-auto overflow-x-hidden flex-grow max-w-full"
-            >
-              <ul class="w-[95%] p-2 m-2">
-                <div v-for="(result, index) in filteredMyChannel" :key="index">
-                  <li class="list-none w-full mb-1">
-                    <div
-                      v-if="result.isPublic === false"
-                      class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom px-4 w-full rounded-[5px]"
-                    >
-                      <a href="#" @click="showChatPage(result.name)">
-                        {{ result.name
-                        }}<span class="text-sm text-red-700"> private</span>
-                      </a>
-
-                      <div class="relative">
-                        <button
-                          class="optbtn px-1 my-1"
-                          @click="showSelectedFriend(index)"
-                        >
-                          Options
-                        </button>
-                      </div>
-                    </div>
-                    <div
-                      v-else
-                      class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom px-4 w-full rounded-[5px]"
-                    >
-                      <a href="#" @click="showChatPage(result.name)">
-                        {{ result.name
-                        }}<span class="text-sm text-green-700"> public</span>
-                      </a>
-
-                      <div class="relative">
-                        <button
-                          class="optbtn px-1 my-1"
-                          @click="showSelectedFriend(index)"
-                        >
-                          Options
-                        </button>
-                      </div>
-                    </div>
-
-                    <div v-if="selectedFriendIndex === index" class="my-2 opt">
-                      <button
-                        class="intbtn p-2"
-                        @click="showMemberList(result.name)"
-                      >
-                        members
-                      </button>
-                      <button
-                        class="intbtn p-2"
-                        @click="leave_room(result.name)"
-                      >
-                        leave
-                      </button>
-                    </div>
-                    <ChannelMembers
-                      v-if="isMembersList"
-                      @close="showMemberList"
-                    />
-                  </li>
-                </div>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <div v-else>
-          <div class="flex-grow max-w-full">
-            <input
-              placeholder="Search friend"
-              v-model="src_friend"
-              class="w-[80%] h-[2rem] border-0 text-black ml-2 mr-1 rounded-full pl-4 mb-2 focus:border-0 focus:outline-none"
-            />
-
-            <div
-              class="w-full h-[60vh] overflow-y-auto overflow-x-hidden flex-grow max-w-full"
-            >
-              <ul class="w-[95%] p-2 m-2">
-                <div v-for="(friend, index) in searchFriends" :key="index">
-                  <li class="list-none w-full mb-1">
-                    <div
-                      class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom mx-1 p-1 w-full rounded-[10px] usr-item"
-                    >
-                      <a href="#" @click="showChatPageFriend()">
-                        <div class="mx-2 px-3">{{ friend.user }}</div></a
-                      >
-
-                      <div>
-                        <button class="intbtn p-1">Invite</button>
-                        <button class="intbtn p-1">Block</button>
-                      </div>
-                    </div>
-                  </li>
-                </div>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="container1 flex flex-col-reverse min-h-[50vh]">
-      <div v-if="msgField">
-        <h1 class="cht">Chat</h1>
-
-        <div class="row1 flex-grow max-w-full">
-          <div
-            class="flex flex-col bg-white h-[60vh] p-1 mb-10 m-3 text-black"
-            style="text-align: right"
-          >
-            <div class="overflow-y-auto overflow-x-hidden h-[55vh]">
-
-	
-				<div class="aa mx-5 text-green-600 text-xl text-center"> {{ selectedRoom }} Room</div>
-				<div v-for="(message, index) in allMessage" :key="index">
-					<div class="bg-blue-400 text-grey-500 py-2 px-4 inline-block m-1 mx-5 rounded-md" >{{ message }}</div>
+	<div
+		class="flex flex-wrap justify-between bg-gradient-to-r from-[#451952] via-[#451952] to-[#ae4188] shadow-custom text-white w-full min-h-[85.9vh] m-5 rounded-md p-2.5 text-center">
+		<div class="container flex flex-col min-h-[50vh] ">
+			<div class="row mt-3">
+				<h2 class="chn-head">My Channel</h2>
+				<div class="flex-grow max-w-full">
+					<div class="chn-btm">
+						<button class="grpbtn px-2 mx-2" @click="showGroup">Group</button>
+						<button class="dmbtn " @click="showDm">DM</button>
+					</div>
 				</div>
-				
-	
-			<div class="m-1 mx-5 " style="text-align: left;">
-			<span class="bg-blue-200 text-grey-500 py-2 px-4 inline rounded-md">
-				{{ testMessage }}
-			</span>
-            </div>
 			</div>
-          </div>
 
-          <div class="flex-grow max-w-full">
-            <input
-              v-model="message"
-              placeholder="message"
-              class="w-[80%] h-[2.5rem] border-0 text-black ml-2 mr-1 rounded-full pl-4 mb-2 focus:border-0 focus:outline-none"
-              style="min-width: 300px"
-            />
-            <ButtonComponent
-              btnContent="Send"
-              @click="sendMessage"
-              class="text"
-            />
-          </div>
-          <div class="flex-grow max-w-full">
-            <input
-              v-model="message1"
-              placeholder="message"
-              class="w-[80%] h-[2.5rem] border-0 text-black ml-2 mr-1 rounded-full pl-4 mb-2 focus:border-0 focus:outline-none"
-              style="min-width: 300px"
-            />
-            <ButtonComponent
-              btnContent="Send1"
-              @click="secondMessage"
-              class="text"
-            />
-          </div>
-        </div>
-      </div>
-      <div v-else>
-        <div class="row1 flex-grow max-w-full">
-          <span class="text-xl">Select a channle or a friend to chat</span>
-        </div>
-      </div>
-    </div>
+			<div class="row flex-grow max-w-full">
+				<div v-if="showGroupList">
+					<div class="max-w-full mb-2">
+						<ButtonComponent class="adbtn" btnContent="Create Channel" @click="AddChannelForm" />
+						<CreateChannel v-if="isAddChannelForm" @close="closeAddChannelForm" />
 
-    <div class="container2 min-h-[50vh]">
-      <div class="row2">
-        <h2 class="chn-head my-5">All Channel</h2>
-        <div class="my-2">Public Channels</div>
-        <div class="h-[40vh] overflow-y-auto overflow-x-hidden">
-          <ul class="w-[95%] p-1 mx-3">
-            <div v-for="(result, index) in filteredPublicChannel" :key="index">
-              <li class="list-none w-full mb-1">
-                <div
-                  class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom px-4 w-full rounded-[5px]"
-                >
-                  {{ result.name }}
-                  <div class="relative">
-                    <button
-                      class="jpub-btn"
-                      @click="join_pub_chan(result.name)"
-                    >
-                      Join
-                    </button>
-                  </div>
-                </div>
-              </li>
-            </div>
-          </ul>
-        </div>
+						<ChannelMembers v-if="isSearchChannelVisible" />
+					</div>
+					<div class="flex-grow max-w-full">
+						<input placeholder="Search channel" v-model="src_channel"
+							class="w-[80%] h-[2rem] border-0 text-black ml-2 mr-1 rounded-full pl-4 mb-2 focus:border-0 focus:outline-none" />
 
-        <div class="my-2">Protected Channels</div>
-        <div class="h-[30vh] overflow-y-auto overflow-x-hidden prv-chn">
-          <ul class="w-[95%] p-1 mx-3">
-            <div v-for="(result, index) in filteredPrivateChannel" :key="index">
-              <li class="list-none w-full mb-1">
-                <div
-                  class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom px-4 w-full rounded-[5px]"
-                >
-                  {{ result.name }}
-                  <div class="relative">
-                    <button
-                      class="jpub-btn"
-                      @click="showPasswordForm(result.name)"
-                    >
-                      Join
-                    </button>
-                  </div>
-                </div>
-              </li>
-            </div>
-          </ul>
-        </div>
-        <!-- </div> -->
+						<div class="w-full h-[55vh] overflow-y-auto overflow-x-hidden flex-grow max-w-full">
+							<ul class="w-[95%] p-2 m-2">
+								<div v-for="(result, index) in filteredMyChannel" :key="index">
+									<li class="list-none w-full mb-1">
+										<div v-if="result.isPublic === false"
+											class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom px-4 w-full rounded-[5px]">
+											<a href="#" @click="showChatPage(result.name)">
+												{{ result.name
+												}}<span class="text-sm text-red-700"> private</span>
+											</a>
 
-        <ChannelPassword v-if="isPrivate" @close="closePasswordFomr" />
-      </div>
-    </div>
-  </div>
+											<div class="relative">
+												<button class="optbtn px-1 my-1" @click="showSelectedFriend(index)">
+													Options
+												</button>
+											</div>
+										</div>
+										<div v-else
+											class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom px-4 w-full rounded-[5px]">
+											<a href="#" @click="showChatPage(result.name)">
+												{{ result.name
+												}}<span class="text-sm text-green-700"> public</span>
+											</a>
+
+											<div class="relative">
+												<button class="optbtn px-1 my-1" @click="showSelectedFriend(index)">
+													Options
+												</button>
+											</div>
+										</div>
+
+										<div v-if="selectedFriendIndex === index" class="my-2 opt">
+											<button class="intbtn p-2" @click="showMemberList(result.name)">
+												members
+											</button>
+											<button class="intbtn p-2" @click="leave_room(result.name)">
+												leave
+											</button>
+										</div>
+										<ChannelMembers v-if="isMembersList" @close="showMemberList" />
+									</li>
+								</div>
+							</ul>
+						</div>
+					</div>
+				</div>
+
+				<div v-else>
+					<div class="flex-grow max-w-full">
+						<input placeholder="Search friend" v-model="src_friend"
+							class="w-[80%] h-[2rem] border-0 text-black ml-2 mr-1 rounded-full pl-4 mb-2 focus:border-0 focus:outline-none" />
+
+						<div class="w-full h-[60vh] overflow-y-auto overflow-x-hidden flex-grow max-w-full">
+							<ul class="w-[95%] p-2 m-2">
+								<div v-for="(friend, index) in searchFriends" :key="index">
+									<li class="list-none w-full mb-1">
+										<div
+											class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom mx-1 p-1 w-full rounded-[10px] usr-item">
+											<a href="#" @click="showChatPageFriend(friend.user)">
+												<div class="mx-2 px-3">{{ friend.user }}</div>
+											</a>
+
+											<div>
+												<button class="intbtn p-1">Invite</button>
+												<button class="intbtn p-1">Block</button>
+											</div>
+										</div>
+									</li>
+								</div>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="container1 flex flex-col-reverse min-h-[50vh]">
+			<div v-if="msgField">
+				<h1 class="cht">Chat</h1>
+
+				<div class="row1 flex-grow max-w-full">
+					<div class="flex flex-col bg-white h-[60vh] p-1 mb-10 m-3 text-black" style="text-align: right">
+						<div class="overflow-y-auto overflow-x-hidden h-[55vh]">
+
+
+							<div class="aa mx-5 text-black-600 text-xl text-center"> {{ selectedRoom }} </div>
+							<div v-for="(message, index) in allMessage" :key="index">
+								<div class="bg-blue-400 text-grey-500 py-2 px-4 inline-block m-1 mx-5 rounded-md">{{ message
+								}}</div>
+							</div>
+
+
+							<div class="m-1 mx-5 " style="text-align: left;">
+								<span class="bg-blue-200 text-grey-500 py-2 px-4 inline rounded-md">
+									{{ testMessage }}
+								</span>
+							</div>
+						</div>
+					</div>
+
+					<div class="flex-grow max-w-full">
+						<input v-model="message" placeholder="message"
+							class="w-[80%] h-[2.5rem] border-0 text-black ml-2 mr-1 rounded-full pl-4 mb-2 focus:border-0 focus:outline-none"
+							style="min-width: 300px" />
+						<ButtonComponent btnContent="Send" @click="sendMessage" class="text" />
+					</div>
+					<div class="flex-grow max-w-full">
+						<input v-model="message1" placeholder="message"
+							class="w-[80%] h-[2.5rem] border-0 text-black ml-2 mr-1 rounded-full pl-4 mb-2 focus:border-0 focus:outline-none"
+							style="min-width: 300px" />
+						<ButtonComponent btnContent="Send1" @click="secondMessage" class="text" />
+					</div>
+				</div>
+			</div>
+			<div v-else>
+				<div class="row1 flex-grow max-w-full">
+					<span class="text-xl">Select a channel or a friend to chat</span>
+				</div>
+			</div>
+		</div>
+
+		<div class="container2 min-h-[50vh]">
+			<div class="row2">
+				<h2 class="chn-head my-5">All Channel</h2>
+				<div class="my-2">Public Channels</div>
+				<div class="h-[40vh] overflow-y-auto overflow-x-hidden">
+					<ul class="w-[95%] p-1 mx-3">
+						<div v-for="(result, index) in filteredPublicChannel" :key="index">
+							<li class="list-none w-full mb-1">
+								<div
+									class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom px-4 w-full rounded-[5px]">
+									{{ result.name }}
+									<div class="relative">
+										<button class="jpub-btn" @click="join_pub_chan(result.name)">
+											Join
+										</button>
+									</div>
+								</div>
+							</li>
+						</div>
+					</ul>
+				</div>
+
+				<div class="my-2">Protected Channels</div>
+				<div class="h-[30vh] overflow-y-auto overflow-x-hidden prv-chn">
+					<ul class="w-[95%] p-1 mx-3">
+						<div v-for="(result, index) in filteredPrivateChannel" :key="index">
+							<li class="list-none w-full mb-1">
+								<div
+									class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom px-4 w-full rounded-[5px]">
+									{{ result.name }}
+									<div class="relative">
+										<button class="jpub-btn" @click="showPasswordForm(result.name)">
+											Join
+										</button>
+									</div>
+								</div>
+							</li>
+						</div>
+					</ul>
+				</div>
+				<!-- </div> -->
+
+				<ChannelPassword v-if="isPrivate" @close="closePasswordFomr" />
+			</div>
+		</div>
+	</div>
 </template>
 
 <script lang="ts">
@@ -387,6 +325,10 @@ export default defineComponent({
         };
         m_chan.value.push(my_chan);
       });
+	  const fr = async () => {
+		await store.dispatch("fetchMyFriends");
+		const my_friends = computed(() => store.getters.getMyFriends);
+	  }
     };
     if (!m_chan.value.length) my();
   },
@@ -401,7 +343,7 @@ export default defineComponent({
   computed: {
     searchFriends(): FriendsList[] {
       return this.friends.filter((item: any) =>
-        item.user.toLowerCase().includes(this.src_friend.toLowerCase())
+        item.user/* .toLowerCase().includes(this.src_friend.toLowerCase()) */
       );
     },
     filteredMyChannel(): IChannel[] {
@@ -447,7 +389,7 @@ methods: {
 		this.testMessage = this.message1;
 		this.testMessages.push(this.message1);
 		this.message1 = "";
-		// return this.testMessages;
+		return this.testMessages;
 	},
 	
     showSelectedFriend(index: any) {
@@ -481,6 +423,8 @@ methods: {
     async showChatPageFriend(friend: string) {
       this.msgField = true;
       localStorage.setItem("currentFriend", friend);
+	//   console.log(localStorage.getItem("currentFriend"));
+	  await this.displayFriendMessage();
 	  this.selectedRoom = friend;
     },
 
@@ -539,6 +483,16 @@ methods: {
     async displayMessage() {
       this.chatMessage = [];
       await store.dispatch("fetchCurrentChan");
+      const chan = computed(() => store.getters.getCurrentCahnnel);
+      console.log(chan.value.messages);
+      const val = chan.value.messages;
+      val.forEach((item: any) => {
+        this.chatMessage.push(item.content);
+      });
+    },
+	async displayFriendMessage() {
+      this.chatMessage = [];
+      await store.dispatch("fetchCurrentFriend");
       const chan = computed(() => store.getters.getCurrentCahnnel);
       console.log(chan.value.messages);
       const val = chan.value.messages;
@@ -692,109 +646,116 @@ methods: {
 
 <style scoped>
 .main-cont {
-  display: flex;
-  flex-direction: column;
+	display: flex;
+	flex-direction: column;
 }
+
 .container {
-  margin: 1%;
-  flex: 1;
+	margin: 1%;
+	flex: 1;
 
-  display: grid;
-  grid-template-rows: 2fr 8fr;
-  background: linear-gradient(to bottom, #451952, #ae445a, #f39f5a);
-  border-radius: 5px;
+	display: grid;
+	grid-template-rows: 2fr 8fr;
+	background: linear-gradient(to bottom, #451952, #ae445a, #f39f5a);
+	border-radius: 5px;
 }
+
 .container1 {
-  margin: 1%;
-  flex: 2;
-  /* overflow-y: auto; */
-  /* height: 55vh; */
+	margin: 1%;
+	flex: 2;
+	/* overflow-y: auto; */
+	/* height: 55vh; */
 
-  display: grid;
-  grid-template-rows: 10fr;
-  background: linear-gradient(to bottom, #451952, #ae445a, #f39f5a);
-  border-radius: 5px;
+	display: grid;
+	grid-template-rows: 10fr;
+	background: linear-gradient(to bottom, #451952, #ae445a, #f39f5a);
+	border-radius: 5px;
 }
-.container2 {
-  margin: 1%;
-  flex: 1;
 
-  display: grid;
-  grid-template-rows: 10fr;
-  background: linear-gradient(to bottom, #451952, #ae445a, #f39f5a);
-  border-radius: 5px;
+.container2 {
+	margin: 1%;
+	flex: 1;
+
+	display: grid;
+	grid-template-rows: 10fr;
+	background: linear-gradient(to bottom, #451952, #ae445a, #f39f5a);
+	border-radius: 5px;
 }
 
 .cht {
-  font-size: 3rem;
-  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
-  font-style: Bold;
+	font-size: 3rem;
+	font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+	font-style: Bold;
 }
+
 .row {
-  text-align: center;
-  padding: 10px;
+	text-align: center;
+	padding: 10px;
 }
 
 .pub-btm {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 50px;
-  padding-bottom: 50;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 50px;
+	padding-bottom: 50;
 }
+
 .adbtn {
-  background: #f39f5a;
-  /* color: #F39F5A;; */
+	background: #f39f5a;
+	/* color: #F39F5A;; */
 }
+
 .optbtn,
 .intbtn {
-  font-size: 0.8rem;
-  color: white;
-  padding-top: 0.6rem;
-  padding-bottom: 0.6rem;
-  background: #451952;
-  border-radius: 5px;
-  margin-left: 10px;
-  cursor: pointer;
-  color: white;
+	font-size: 0.8rem;
+	color: white;
+	padding-top: 0.6rem;
+	padding-bottom: 0.6rem;
+	background: #451952;
+	border-radius: 5px;
+	margin-left: 10px;
+	cursor: pointer;
+	color: white;
 
-  border: none;
+	border: none;
 }
+
 .grpbtn,
 .dmbtn {
-  font-size: 0.8rem;
-  background: #f39f5a;
-  padding-left: 0.5rem;
-  padding-right: 0.5rem;
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-  border-radius: 5px;
-  margin-left: 10px;
-  width: 25%;
-  cursor: pointer;
-  color: white;
-  /* background: #451952; */
-  border: none;
+	font-size: 0.8rem;
+	background: #f39f5a;
+	padding-left: 0.5rem;
+	padding-right: 0.5rem;
+	padding-top: 0.5rem;
+	padding-bottom: 0.5rem;
+	border-radius: 5px;
+	margin-left: 10px;
+	width: 25%;
+	cursor: pointer;
+	color: white;
+	/* background: #451952; */
+	border: none;
 }
 
 .chn-head {
-  font-size: 1.2rem;
-  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
-  font-style: initial;
+	font-size: 1.2rem;
+	font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+	font-style: initial;
 }
 
 .jpub-btn {
-  font-size: 0.8rem;
-  margin: 3%;
-  padding-left: 1rem;
-  padding-right: 1rem;
-  padding-top: 0.3rem;
-  padding-bottom: 0.3rem;
-  border-radius: 10px;
-  cursor: pointer;
-  color: white;
-  background: #451952;
-  border: none;
+	font-size: 0.8rem;
+	margin: 3%;
+	padding-left: 1rem;
+	padding-right: 1rem;
+	padding-top: 0.3rem;
+	padding-bottom: 0.3rem;
+	border-radius: 10px;
+	cursor: pointer;
+	color: white;
+	background: #451952;
+	border: none;
 }
 
 .adbtn:hover,
@@ -803,53 +764,57 @@ methods: {
 .chn-item:hover,
 .grpbtn:hover,
 .dmbtn:hover {
-  background: #ae4488;
-  color: #d9d9da;
+	background: #ae4488;
+	color: #d9d9da;
 }
 
 .optbtn:hover,
 .usr-item:hover {
-  background: #6c4a5f;
-  color: #d9d9da;
+	background: #6c4a5f;
+	color: #d9d9da;
 }
+
 .all-chn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
-  height: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: flex-start;
+	height: 100%;
 }
 
 .pub-div {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
 }
 
 .pri-div {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	height: 100%;
 }
+
 .prv-chn {
-  position: relative;
+	position: relative;
 }
+
 .add-pass {
-  position: relative;
-  top: 20px;
+	position: relative;
+	top: 20px;
 }
+
 .bottomToTopInput {
-  width: 200px;
-  height: 100px;
-  overflow-y: auto;
-  border: 1px solid #ccc;
-  resize: none;
-  font-size: 16px;
-  line-height: 1.5;
-  padding: 10px;
-  writing-mode: vertical-rl;
-  white-space: nowrap;
+	width: 200px;
+	height: 100px;
+	overflow-y: auto;
+	border: 1px solid #ccc;
+	resize: none;
+	font-size: 16px;
+	line-height: 1.5;
+	padding: 10px;
+	writing-mode: vertical-rl;
+	white-space: nowrap;
 }
 </style>

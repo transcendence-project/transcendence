@@ -1,7 +1,6 @@
 import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect, } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { ChatService } from '../chat/chat.service';
-// import { bcrypt } from "bcrypt";
 import * as bcrypt from 'bcrypt';
 
 @WebSocketGateway({ cors: { origin: 'http://localhost:8080' }, namespace: 'chat' })
@@ -33,7 +32,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	handleDisconnect(client: any) {
 		this.chatService.delete_user(client);
-		this.chatService.rem_user_invites(client);
+		// this.chatService.rem_user_invites(client);
 		console.log(`Client disconnected: ${client.id}`);
 		//  remove from connected_users
 		client.emit('disconnection_success');
@@ -75,17 +74,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('create_prot_room')
 	async create_prot_room(client: any, payload: any): Promise<void> {
-
-		console.log("reached create prot room - backend websockets");
 		const { channel_name, password } = payload;
-		console.log(`channel name in backend: ${channel_name}`);
-		console.log(`password in backend: ${password}`);
 		const user = this.chatService.find_user_with_id(client.id);
 		const salt = await bcrypt.genSalt(10);
 		const hashedPassword = await bcrypt.hash(password, salt);
 		const chan = await this.chatService.create_chan(channel_name, user, hashedPassword);
 		client.join(channel_name);
-		console.log(`hashed password in create_prot_room ${chan.password}`);
 		if (chan) {
 			const data_to_send = {
 				chan_name: channel_name,
@@ -98,8 +92,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			client.emit('create_room_success', data_to_send);
 			this.server.emit('update_chan_list', data_to_send);
 		}
-		else
-			client.emit('create_room_success');
 	}
 
 	@SubscribeMessage('create_pub_room')
@@ -107,8 +99,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 		console.log("reached create pub room - backend websockets");
 		const { channel_name, password } = payload;
-		console.log(`channel name in backend: ${channel_name}`);
-		console.log(`password in backend: ${password}`);
 		const user = this.chatService.find_user_with_id(client.id);
 		const chan = await this.chatService.create_chan(channel_name, user, password);
 		client.join(channel_name);
@@ -124,13 +114,11 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			client.emit('create_room_success', data_to_send);
 			this.server.emit('update_chan_list', data_to_send);
 		}
-		else
-			client.emit('create_room_success');
 	}
 
 	@SubscribeMessage('join_room')
 	async join_room(client: any, payload: any) {
-		const { room_name, arg } = payload; // args: password
+		const { room_name, arg } = payload;
 		const user = this.chatService.find_user_with_id(client.id);
 		const room = await this.chatService.chan_by_name(room_name);
 		if (await this.chatService.can_join(user, room, arg)) {
@@ -161,15 +149,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				this.server.emit('update_mem_list', data_to_send);
 			}
 		}
-		else
-			client.emit('join_room_failure');
+		// else
+		// 	client.emit('join_room_failure');
 	}
 
 	@SubscribeMessage('leave_chan')
 	async leave_room(client: any, room_name: string) {
 		console.log('reached leave room in backend');
 		const user = this.chatService.find_user_with_id(client.id);
-		await this.chatService.rem_chan_mem(user, room_name); // removing from databse
+		await this.chatService.rem_chan_mem(user, room_name);
 		client.leave(room_name);
 		const data_to_send = {
 			chan_name: room_name,
@@ -182,26 +170,28 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('mute_user')
 	mute_user(client: any, payload: any): void {
 		const { user_to_mute, room_name } = payload;
-		const user = this.chatService.find_user_with_id(client.id);
-		// mute user
-		// send to user_to_mute is mute
+		const user = this.chatService.find_user_with_id(client.id); // the one who id muting the other person
+		const user1 = this.chatService.find_user_with_name(user_to_mute); // the one being muted
+		const id_to_mute = this.chatService.find_id(user1.userName); // id of the one being muted
+		const chan = this.chatService.chan_by_name(room_name); // the channel
+
 	}
-	
+
 	@SubscribeMessage('kick_user')
-	async kick_user(client: any, payload: any){
+	async kick_user(client: any, payload: any) {
 		const { user_to_rem, room_name } = payload;
 		const user = this.chatService.find_user_with_id(client.id);
 		const user1 = this.chatService.find_user_with_name(user_to_rem);
-		const id_rem = this.chatService.find_id(user1.userName);
-		if (await this.chatService.is_admin(user.userName, room_name) || await this.chatService.is_owner(user.userName, room_name)){
+		const id_to_rem = this.chatService.find_id(user1.userName);
+		if (await this.chatService.is_admin(user.userName, room_name) || await this.chatService.is_owner(user.userName, room_name)) {
 			this.chatService.rem_chan_mem(user1, room_name)
+			const data_to_send = {
+				chan_name: room_name,
+				user: user1.userName,
+			};
+			this.server.to(room_name).emit('leave_room_update', data_to_send);
+			this.server.to(id_to_rem).emit('kicked', room_name);
 		}
-		const data_to_send = {
-			chan_name: room_name,
-			user: user1.userName,
-		};
-		this.server.to(room_name).emit('leave_room_update', data_to_send);
-		this.server.to(id_rem).emit('kicked', room_name);
 	}
 
 	// @SubscribeMessage('invite_to_game')
@@ -225,7 +215,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		//else
 		// send error message to user: user not owner or admin
 	}
-	
+
 	@SubscribeMessage('set_admin')
 	async set_admin(client: any, payload: any) {
 		const { admin_to_add, room_name } = payload;
@@ -242,7 +232,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		// else
 		// send to user that they are not an admin or owner
 	}
-	
+
 	@SubscribeMessage('rem_admin')
 	rem_admin(client: any, payload) {
 		const { admin_to_rem, room_name } = payload;
@@ -254,5 +244,5 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		// else
 		// send to user that they are not an admin or owner
 	}
-	
+
 }

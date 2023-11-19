@@ -35,19 +35,18 @@
 							<div v-if="selectedMemberIndex === index" class="my-2 opt">
 								<div v-if="friend.owner === true">
 									<button class="intbtn p-2 mx-2">Invite</button>
-									<button class="intbtn p-2 mx-2">Mute</button>
-									
 								</div>
 								<div v-else-if="friend.admins === true">
 									<button class="intbtn p-2 mx-2">Invite</button>
-									<button class="intbtn p-2 mx-2">Mute</button>
+									<button class="intbtn p-2 mx-2" @click="mute_mem(friend.user)">Mute</button>
 									<button class="intbtn p-2 mx-2" @click="kick_mem(friend.user)">Kick</button>
 
 								</div>
 								<div v-else>
 									<button class="intbtn p-2 mx- 2">Invite</button>
-									<button class="intbtn p-2 mx-2" @click="kick_mem(friend.user)">Kick</button>
 									<button class="intbtn p-2 mx-2" @click="make_admin(friend.user)">Make Admin</button>
+									<button class="intbtn p-2 mx-2" @click="mute_mem(friend.user)">Mute</button>
+									<button class="intbtn p-2 mx-2" @click="kick_mem(friend.user)">Kick</button>
 								</div>
 
 							</div>
@@ -94,13 +93,15 @@ export default defineComponent({
 			const val_mem = chan.value.members;
 			console.log(chan.value);
 			mem_list.value = [];
-			const new_own: FriendsList = {
-				user: val_own.userName,
-				owner: true,
-				admins: false,
-				status: false,
+			if (val_own) {
+				const new_own: FriendsList = {
+					user: val_own.userName,
+					owner: true,
+					admins: false,
+					status: false,
+				}
+				mem_list.value.push(new_own);
 			}
-			mem_list.value.push(new_own);
 			val_ad.forEach((item: any) => {
 				const new_ad: FriendsList = {
 					user: item.userName,
@@ -207,6 +208,12 @@ export default defineComponent({
 		kick_mem(member: string) {
 			store.state.chat.socket.emit('kick_user', {
 				user_to_rem: member,
+				room_name: localStorage.getItem('currentChanName'),
+			});
+		},
+		mute_mem(member: string) {
+			store.state.chat.socket.emit('kick_user', {
+				user_to_mute: member,
 				room_name: localStorage.getItem('currentChanName'),
 			});
 		}

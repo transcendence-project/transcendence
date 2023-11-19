@@ -1,8 +1,8 @@
 <template>
 	<div class="game-container">
-	  <canvas ref="game" id="pong" width="900" height="400"></canvas>
+		<canvas ref="game" id="pong" width="900" height="400"></canvas>
 	</div>
-  </template>
+</template>
   
 <script lang="ts" setup>
 import { ref, onMounted} from 'vue';
@@ -32,29 +32,29 @@ onMounted(() => {
   
   
   
-  <style>
-
-  .game-container {
+<style>
+.game-container {
 
 	width: fit-content;
 	background: linear-gradient(to right, #451952, #451952, #ae4188);
-  	box-shadow: 0 4px 4px rgba(0, 0, 0, 0.5); 
+	box-shadow: 0 4px 4px rgba(0, 0, 0, 0.5);
 	margin: 20px;
 	padding: 20px;
 	border-radius: 5px;
 	width: 100%;
 	height: 100%;
 	color: white;
-  }
-  .game-canvas {
+}
+
+.game-canvas {
 	display: flex;
 	justify-content: center;
 	padding: 0;
 	width: 100%;
 	margin: 0;
 	text-align: center;
-  }
-  </style>
+}
+</style>
   
   
   

@@ -12,7 +12,7 @@ import * as bcrypt from 'bcrypt'
 @Injectable()
 export class ChatService {
 	private connected_users: Map<string, User> = new Map();
-	private game_invites: Map<string, string[]> = new Map(); // store only user names?
+	// private game_invites: Map<string, string[]> = new Map(); // store only user names?
 	private direct_msg: Map<string, {to: string, from: string, content: string, created: Date }[]> = new Map();
 
 	constructor(@InjectRepository(Channel) private channelRepo: Repository<Channel>,
@@ -51,10 +51,11 @@ export class ChatService {
 
 	async create_chan(chan_name: string, user: User, pass: string) {
 		const chan = await this.chan_by_name(chan_name);
-		if (chan){
-			// const all_chan = await this.get_all_chan();
-			// console.log(all_chan);
-			console.log(`Channel ${chan_name} already exists`);
+		if (chan || chan_name === ""){
+			if (chan)
+				console.log(`Channel ${chan_name} already exists`);
+			else
+				console.log("Channel name cannot be empty");
 			return null;
 		}
 		else {
@@ -101,7 +102,11 @@ export class ChatService {
 		const chan = await this.chan_by_name(chan_name);
 		if (chan) {
 			chan.members = chan.members.filter(member => member.id !== userIdToRemove);
-			chan.admins = chan.members.filter(admin => admin.id !== userIdToRemove);
+			chan.admins = chan.admins.filter(admin => admin.id !== userIdToRemove);
+			if (chan.owner)
+				if (chan.owner.id === userIdToRemove)
+					chan.owner = null;
+
 			await this.channelRepo.save(chan);
 		}
 	}
@@ -146,10 +151,10 @@ export class ChatService {
 	}
 	async is_owner(user_name: string, chan_name: string) {
 		const chan = await this.chan_by_name(chan_name);
-		if (chan.owner.userName === user_name)
-			return true;
-		else
-			return false;
+		if (chan.owner)
+			if (chan.owner.userName === user_name)
+				return true;
+		return false;
 	}
 	async is_chan_mem(user_name: string, chan_name: string) {
 		const memebers = await this.mem_by_chan(chan_name);
@@ -244,20 +249,20 @@ export class ChatService {
 	}
 
 
-	rem_user_invites(client: any) {
-		const user = this.find_user_with_id(client.id);
-		for (const [recipient, senders] of this.game_invites.entries()) {
-		  if (recipient === user.userName)
-			this.game_invites.delete(recipient);
-		}
-	}
+	// rem_user_invites(client: any) {
+	// 	const user = this.find_user_with_id(client.id);
+	// 	for (const [recipient, senders] of this.game_invites.entries()) {
+	// 	  if (recipient === user.userName)
+	// 		this.game_invites.delete(recipient);
+	// 	}
+	// }
 
-	invite_user_to_game(inviter: User, invitee: User)
-	{
-		const senders = this.game_invites.get(invitee.userName) || [];
-		senders.push(inviter.userName);
-		this.game_invites.set(inviter.userName, senders);
-	}
+	// invite_user_to_game(inviter: User, invitee: User)
+	// {
+	// 	const senders = this.game_invites.get(invitee.userName) || [];
+	// 	senders.push(inviter.userName);
+	// 	this.game_invites.set(inviter.userName, senders);
+	// }
 	
 	is_online(client: any): boolean{ // or set user as online in databse ??
 		for (const [userID, user] of this.connected_users.entries())
@@ -270,8 +275,6 @@ export class ChatService {
 		
 		if (room.is_protected === true)
 		{
-			console.log(arg);
-			console.log(room.password);
 			if (room.password)
 			{
 				try{

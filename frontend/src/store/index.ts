@@ -16,6 +16,7 @@ const store = createStore({
 			email: "",
 			image: "",
 			status: "",
+			qr: "",
 			win: 0,
 			lose: 0,
 			draw: 0,
@@ -25,6 +26,7 @@ const store = createStore({
 			socket: null as Socket | null,
 			all_channels: [],
 			my_channels: [] as IChannel[],
+			my_friends: [],
 			current_chan_name: "",
 			current_channel: null,
 			test: "inside chat in store.. testingg",
@@ -33,10 +35,10 @@ const store = createStore({
 	getters: { // used to retrieve computed properties or derived state from the store.
 
 		// GETTERS FOR CHAT
-		getTest: (state: any) => state.chat.test,
 		getAllChannel: (state: any) => state.chat.all_channels,
 		getMyChannel: (state: any) => state.chat.my_channels,
 		getCurrentCahnnel: (state: any) => state.chat.current_channel,
+		getMyFriends: (state: any) => state.chat.my_friends,
 
 		// GETTERS FOR USER
 		getId: (state: any) => state.user.id,
@@ -54,11 +56,7 @@ const store = createStore({
 	mutations: { //used to modify the state. synchronous functions, take current state as argument & make changes to it. (i.e setters)
 
 		// SETTERS FOR CHAT
-		setTest(state: any, new_test: string) {
-			state.chat.test = "this is a changes test";
-		},
 		setAllChannel(state: any, all_chan: any) {
-			console.log('inside setAllChannel');
 			state.chat.all_channels = all_chan; // or push?
 			// state.chat.all_channels.push(all_chan);
 		},
@@ -67,10 +65,9 @@ const store = createStore({
 		},
 		setCurrentChannel(state: any, cur_chan: any) {
 			state.chat.current_channel = cur_chan;
-			console.log("inside set current channel");
 		},
-		setCurrentChanMem(state: any, mem: IChannel[]){
-			state.chat.cur_chan_mem = mem;
+		setMyFriends(state: any, my_frnds: any) {
+			state.chat.my_friends = my_frnds;
 		},
 
 		// SETTERS FOR USER
@@ -145,12 +142,10 @@ const store = createStore({
 				console.error("Error fetching my channels:", error);
 			});
 		},
-		async fetchCurrentChan(context: any){
-			// console.log(localStorage.getItem('currentChanName'));
+		async fetchCurrentChan(context: any) {
 			const cur = localStorage.getItem('currentChanName');
-			// console.log(`cur is ${cur}`);
 			await axios.get(`http://localhost:3000/chat/current_chan/${cur}`, {
-				params: {chan_name: cur},
+				params: { chan_name: cur },
 				headers: {
 					Authorization: `Bearer ${localStorage.getItem('token')}`,
 				},
@@ -160,6 +155,42 @@ const store = createStore({
 			}).catch((error) => {
 				console.error("Error fetching current channel:", error);
 			});
+		},
+		async fetchMyFriends(context: any) {
+			await axios.get("", {
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem('token')}`,
+				},
+			}).then((resp: AxiosResponse<IChannel[]>) => {
+				// console.log(resp.data);
+				context.commit('setMyFriends', resp.data);
+			}).catch((error) => {
+				console.error("Error fetching my friends:", error);
+			});
+		},
+		// async fetchFriendChan(context: any){
+		// 	const cur = localStorage.getItem('fetchCurrentFriend');
+		// 	await axios.get("", {
+		// 		headers: {
+		// 			Authorization: `Bearer ${localStorage.getItem('token')}`,
+		// 		},
+		// 	}).then((resp: AxiosResponse<IChannel[]>) => {
+		// 		// console.log(resp.data);
+		// 		context.commit('setCurrentFriend', resp.data);
+		// 	}).catch((error) => {
+		// 		console.error("Error fetching current channel:", error);
+		// 	});
+		// },
+		async TwoFA(context: any) {
+			console.log('herree???');
+			try {
+				const response = await axios.get("http://localhost:3000/auth/2fa/generate", {
+					headers: {
+						Authorization: `Bearer ${localStorage.getItem('token')}`,
+					},
+				});
+				console.log(response.data.qrCodeDataURL);
+			} catch
 		},
 	},
 	modules: { // allow you to organize your store into separate namespaces.
