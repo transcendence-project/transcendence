@@ -3,6 +3,7 @@ import { createUserDTO } from '../dtos/createUser.dto'
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../auth/jwt.guard';
 import { Achievement } from 'entities/achievement.entity';
+import { MatchDTO } from 'dtos/match.dto';
 
 @Controller('users')
 export class UsersController {
@@ -14,14 +15,13 @@ export class UsersController {
 	}
 
 	// @Get('/:id')
-	// findUser(@Param('id') id: number){
-	// 	console.log('in find user, id: ', id);
-	// 	return (this.userService.findOne(id))
+	// findUser(@Param('id') id: string){
+	// 	return (this.userService.findOne(parseInt(id)))
 	// }
 
 	@Get()
-	findAllUsers(@Query('userName') userName: string){
-		return (this.userService.findAll(userName))
+	findAllUsers(){
+		return (this.userService.findAllUsers())
 	}
 
 	@Delete('/:id')
@@ -30,8 +30,8 @@ export class UsersController {
 	}
 
 	@Delete('/:id/friends/:friendId')
-	deleteFriend(@Param('id') id: string, @Param('friendId') friendId: string){
-		return (this.userService.removeFriend(parseInt(id), parseInt(friendId)))
+	deleteFriend(@Param('id') id: string, @Param('friendId') fId: string){
+		return (this.userService.removeFriend(parseInt(id), parseInt(fId)))
 	}
 
 	@Get('/achievements')
@@ -52,6 +52,30 @@ export class UsersController {
 	@Get('my/channels')
 	@UseGuards(JwtAuthGuard)
 	async my_channels(@Req() req){
+		console.log('in my channels, req.user.id: ', req.user.id);
+		// console.log(req.user.id);
 		return (await this.userService.findUserChan(req.user.id));
+	}
+
+	// @Get('my/matches')
+	// @UseGuards(JwtAuthGuard)
+	// async my_matches(@Req() req){
+	// 	// console.log(req.user.id);
+	// 	return (await this.userService.getMatches(req.user.id));
+	// }
+
+	@Post('save/match')
+	// @UseGuards(JwtAuthGuard)
+	async save_match(@Body() body: MatchDTO){
+		// console.log(req.user.id);
+		console.log('in save match, body: ', body);
+		return (await this.userService.saveMatch(body.winnerId, body.winnerScore, body.loserId, body.loserScore));
+	}
+
+	@Get('my/friends')
+	@UseGuards(JwtAuthGuard)
+	async my_friends(@Req() req){
+		// console.log(req.user.id);
+		return (await this.userService.getFriends(req.user.id));
 	}
 }

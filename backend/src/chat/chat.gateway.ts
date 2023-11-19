@@ -1,19 +1,29 @@
-import { SubscribeMessage, WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect, } from '@nestjs/websockets';
-import { Server, Socket } from 'socket.io';
-import { ChatService } from '../chat/chat.service';
+ import {
+  SubscribeMessage,
+  WebSocketGateway,
+  WebSocketServer,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
+} from "@nestjs/websockets";
+import { Server, Socket } from "socket.io";
+import { ChatService } from "../chat/chat.service";
 import * as bcrypt from 'bcrypt';
 
-@WebSocketGateway({ cors: { origin: 'http://localhost:8080' }, namespace: 'chat' })
+@WebSocketGateway({
+  cors: { origin: "http://localhost:8080" },
+  namespace: "chat",
+})
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
-	constructor(private chatService: ChatService,
-		/* , @InjectRepository(Channel) private roomRepo: Repository<Channel> */) { }
-	@WebSocketServer()
-	server: Server;
+  constructor(
+    private chatService: ChatService,
+  ) /* , @InjectRepository(Channel) private roomRepo: Repository<Channel> */ {}
+  @WebSocketServer()
+  server: Server;
 
-	@SubscribeMessage('message')
-	handleMessage(client: any, payload: any): string {
-		return 'Hello world!';
-	}
+  @SubscribeMessage("message")
+  handleMessage(client: any, payload: any): string {
+    return "Hello world!";
+  }
 
 	async handleConnection(client: Socket) { // called automatically when frontend establish websocket connection
 		console.log(`Client connected in chat: ${client.id}`);

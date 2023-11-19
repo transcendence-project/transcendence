@@ -1,10 +1,10 @@
-import Vue from 'vue'
-import { createStore } from 'vuex'
-import { IChannel } from '@/models/channel';
+import Vue from "vue";
+import { createStore } from "vuex";
+import { IChannel } from "@/models/channel";
 import axios, { AxiosResponse } from "axios";
-import { Socket } from 'socket.io-client';
-import { IStudent } from '../models/student';
-import { computed } from 'vue';
+import { Socket } from "socket.io-client";
+import { IStudent } from "../models/student";
+import { computed } from "vue";
 
 
 const store = createStore({
@@ -196,5 +196,3 @@ const store = createStore({
 	modules: { // allow you to organize your store into separate namespaces.
 	}
 });
-
-export default store;

@@ -14,7 +14,6 @@ export class AuthService{
 		console.log(user1.userName);
 		return user1;
 	}
-
 	generate_jwt_token(username: string, id: number ){
 		return this.jwtService.sign({ sub: id, username: username});
 	}
@@ -27,7 +26,6 @@ export class AuthService{
 		const decode_token = this.decode_token(token);
 		const user = await this.userService.findOne(decode_token.sub);
 		return user;
-		
 	}
 
 	async generateTwoFactorAuthenticationSecret(user: Partial<User>) {

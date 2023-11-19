@@ -1,41 +1,46 @@
 <template>
-	<div class="game-container">
-		<canvas ref="game" id="pong" width="900" height="400"></canvas>
-	</div>
+	  <canvas ref="game" id="pong"></canvas>
+      <button @click="startGame">Start Game</button>    
 </template>
   
 <script lang="ts" setup>
-import { ref, onMounted} from 'vue';
-import { connectWebSocket, getSocket } from '@/socket/gameServices';
-//   const game = ref(null);
+    import { ref, onMounted,getCurrentInstance, reactive} from 'vue';
+    const { appContext } = getCurrentInstance();
+    const socket = appContext.config.globalProperties.$socket;
+    const game = ref<HTMLCanvasElement | null>(null);
+    const startGame = () => {
+        if (socket) {
+            socket.emit('start-game', 'This izs from the client to the server game');
+        }
+    };
 
-const game = ref<HTMLCanvasElement | null>(null);
-onMounted(() => {
-	connectWebSocket('ws://localhost:3000/game', 'your-auth-token');
-
-	const socket = getSocket();
-		if (socket) {
-		socket.on('connected', (message) => {
-		console.log(`Server says: ${message}`);
-		if (game.value)
-		{
-			const context = game.value.getContext('2d');
-			if (context) {
-				context.fillStyle = 'red';
-				context.fillRect(50, 0, 100, 100);
-			}
-		}
-	});
-	}
-});
+    onMounted(() => {
+            if (socket) {
+                socket.on('table', (message: any[]) => {
+            if (game.value)
+            {
+                const context = game.value.getContext('2d');
+                game.value.width = message[0];
+                game.value.height = message[1];
+                if (context) {
+					context.fillStyle = 'red';
+                    // context
+                    context.fillRect(0,0,game.value.width,game.value.height)
+                }
+            }
+        });
+        }
+    }); 
 </script>
-  
-  
+
+   
   
 <style>
-.game-container {
 
-	width: fit-content;
+  .game-container {
+	/* width: fit-content; */
+    display: flex;
+    justify-content: center;
 	background: linear-gradient(to right, #451952, #451952, #ae4188);
 	box-shadow: 0 4px 4px rgba(0, 0, 0, 0.5);
 	margin: 20px;
