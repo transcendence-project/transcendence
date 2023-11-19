@@ -1,178 +1,208 @@
 <template>
-    <div class="flex flex-wrap justify-between bg-gradient-to-r from-[#451952] via-[#451952] to-[#ae4188] shadow-custom text-white w-full  min-h-[85.9vh] m-5 rounded-md p-2.5 text-center">
-
-
-    <div class="container flex flex-col min-h-[50vh]" >
-		<div class="row mt-3">
-
-			<h2 class="chn-head">My Channel</h2>
-			<div class=" flex-grow max-w-full ">
-				
-				<div class="chn-btm">
-					<button class="grpbtn" @click="showGroup">Group</button>
-					<button class="dmbtn" @click="showDm">DM</button>
-					
-				</div>
-			</div>
-		</div>
-
-
-
-	  
-      <div class="row flex-grow max-w-full">
-
-        <div v-if="showGroupList">
-
-		<div class=" max-w-full mb-2">
-          <ButtonComponent class="adbtn" btnContent="Create Channel" @click="AddChannelForm" />
-          <CreateChannel v-if="isAddChannelForm" @close="closeAddChannelForm" />
-
-          <ChannelMembers v-if="isSearchChannelVisible" />
+  <div
+    class="flex flex-wrap justify-between bg-gradient-to-r from-[#451952] via-[#451952] to-[#ae4188] shadow-custom text-white w-full min-h-[85.9vh] m-5 rounded-md p-2.5 text-center"
+  >
+    <div class="container flex flex-col min-h-[50vh] ">
+      <div class="row mt-3">
+        <h2 class="chn-head">My Channel</h2>
+        <div class="flex-grow max-w-full">
+          <div class="chn-btm">
+            <button class="grpbtn px-2 mx-2" @click="showGroup">Group</button>
+            <button class="dmbtn " @click="showDm">DM</button>
+          </div>
         </div>
-		<div   class="flex-grow max-w-full" >
-          <input placeholder="Search channel" v-model="src_channel" class="w-[80%] h-[2rem] border-0 text-black ml-2 mr-1 rounded-full pl-4 mb-2 focus:border-0 focus:outline-none" />
-		  
-		  
-		  <div class="w-full h-[55vh] overflow-y-auto overflow-x-hidden flex-grow max-w-full" >
-			  <ul class="w-[95%] p-2 m-2">
-				  <div v-for="(result, index) in filteredMyChannel" :key="index">
-					<li class="list-none w-full mb-1">
+      </div>
 
+      <div class="row flex-grow max-w-full">
+        <div v-if="showGroupList">
+          <div class="max-w-full mb-2">
+            <ButtonComponent
+              class="adbtn"
+              btnContent="Create Channel"
+              @click="AddChannelForm"
+            />
+            <CreateChannel
+              v-if="isAddChannelForm"
+              @close="closeAddChannelForm"
+            />
 
+            <ChannelMembers v-if="isSearchChannelVisible" />
+          </div>
+          <div class="flex-grow max-w-full">
+            <input
+              placeholder="Search channel"
+              v-model="src_channel"
+              class="w-[80%] h-[2rem] border-0 text-black ml-2 mr-1 rounded-full pl-4 mb-2 focus:border-0 focus:outline-none"
+            />
 
+            <div
+              class="w-full h-[55vh] overflow-y-auto overflow-x-hidden flex-grow max-w-full"
+            >
+              <ul class="w-[95%] p-2 m-2">
+                <div v-for="(result, index) in filteredMyChannel" :key="index">
+                  <li class="list-none w-full mb-1">
+                    <div
+                      v-if="result.isPublic === false"
+                      class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom px-4 w-full rounded-[5px]"
+                    >
+                      <a href="#" @click="showChatPage(result.name)">
+                        {{ result.name
+                        }}<span class="text-sm text-red-700"> private</span>
+                      </a>
 
-							<div v-if="result.isPublic === false" class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom px-4 w-full rounded-[5px]">
-				  
-				  <a href="#"  @click="showChatPage(result.name)">
-										{{ result.name }}<span class="text-sm text-red-700"> private</span>
-								</a>
+                      <div class="relative">
+                        <button
+                          class="optbtn px-1 my-1"
+                          @click="showSelectedFriend(index)"
+                        >
+                          Options
+                        </button>
+                      </div>
+                    </div>
+                    <div
+                      v-else
+                      class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom px-4 w-full rounded-[5px]"
+                    >
+                      <a href="#" @click="showChatPage(result.name)">
+                        {{ result.name
+                        }}<span class="text-sm text-green-700"> public</span>
+                      </a>
 
-                  <div class="relative">
-					<button class="optbtn px-1 my-1" @click="showSelectedFriend(index)">Options</button>
+                      <div class="relative">
+                        <button
+                          class="optbtn px-1 my-1"
+                          @click="showSelectedFriend(index)"
+                        >
+                          Options
+                        </button>
+                      </div>
+                    </div>
 
-                  </div>
-                </div>
-							<div v-else class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom px-4 w-full rounded-[5px]">
-				  
-				  <a href="#"  @click="showChatPage(result.name)">
-										{{ result.name }}<span class="text-sm text-green-700"> public</span>
-								</a>
-
-                  <div class="relative">
-					<button class="optbtn px-1 my-1" @click="showSelectedFriend(index)">Options</button>
-
-                  </div>
-                </div>
-
-
-
-
-
-
-							<div v-if="selectedFriendIndex === index" class="my-2 opt">
-								<button class="intbtn p-2" @click="showMemberList(result.name)">members</button>
-								<button class="intbtn p-2" @click="leave_room(result.name)" >leave</button>
-
-							</div>
-							<ChannelMembers v-if="isMembersList" @close="showMemberList"/>
-
-						</li>
-					</div>
-				</ul>
-			</div>
-		</div>
-		
-		
-	</div>
-	
-	
-	
-	<div v-else>
-		
-		<div   class="flex-grow max-w-full" >
-			<input placeholder="Search friend" v-model="src_friend" class="w-[80%] h-[2rem] border-0 text-black ml-2 mr-1 rounded-full pl-4 mb-2 focus:border-0 focus:outline-none" />
-			
-			
-			<div  class="w-full h-[60vh] overflow-y-auto overflow-x-hidden flex-grow max-w-full">
-				<ul class="w-[95%] p-2 m-2">
-					<div v-for="(friend, index) in searchFriends" :key="index">
-						<li class="list-none w-full mb-1">
-
-
-							<div
-                  class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom mx-1 p-1 w-full rounded-[10px] usr-item"
-                >
-				<a href="#"  @click="showChatPageFriend()">
-                    <div class="mx-2 px-5">{{ friend.user }}</div></a>
-                
-
-                  <button class="intbtn py-1 px-2 mx-2" @click="showOptionButtons">Invite</button>
-                </div>
-
+                    <div v-if="selectedFriendIndex === index" class="my-2 opt">
+                      <button
+                        class="intbtn p-2"
+                        @click="showMemberList(result.name)"
+                      >
+                        members
+                      </button>
+                      <button
+                        class="intbtn p-2"
+                        @click="leave_room(result.name)"
+                      >
+                        leave
+                      </button>
+                    </div>
+                    <ChannelMembers
+                      v-if="isMembersList"
+                      @close="showMemberList"
+                    />
                   </li>
                 </div>
               </ul>
             </div>
-			
-		</div>
           </div>
+        </div>
 
+        <div v-else>
+          <div class="flex-grow max-w-full">
+            <input
+              placeholder="Search friend"
+              v-model="src_friend"
+              class="w-[80%] h-[2rem] border-0 text-black ml-2 mr-1 rounded-full pl-4 mb-2 focus:border-0 focus:outline-none"
+            />
+
+            <div
+              class="w-full h-[60vh] overflow-y-auto overflow-x-hidden flex-grow max-w-full"
+            >
+              <ul class="w-[95%] p-2 m-2">
+                <div v-for="(friend, index) in searchFriends" :key="index">
+                  <li class="list-none w-full mb-1">
+                    <div
+                      class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom mx-1 p-1 w-full rounded-[10px] usr-item"
+                    >
+                      <a href="#" @click="showChatPageFriend()">
+                        <div class="mx-2 px-3">{{ friend.user }}</div></a
+                      >
+
+                      <div>
+                        <button class="intbtn p-1">Invite</button>
+                        <button class="intbtn p-1">Block</button>
+                      </div>
+                    </div>
+                  </li>
+                </div>
+              </ul>
+            </div>
+          </div>
+        </div>
       </div>
-
-
-
-
-
     </div>
-
 
     <div class="container1 flex flex-col-reverse min-h-[50vh]">
-		<div v-if="msgField"  >
+      <div v-if="msgField">
+        <h1 class="cht">Chat</h1>
+
+        <div class="row1 flex-grow max-w-full">
+          <div
+            class="flex flex-col bg-white h-[60vh] p-1 mb-10 m-3 text-black"
+            style="text-align: right"
+          >
+            <div class="overflow-y-auto overflow-x-hidden h-[55vh]">
+
 	
-		  <h1 class="cht">Chat</h1>
-  
-		  <div  class="row1 flex-grow max-w-full" >
-
-        <div class="flex flex-col bg-white h-[60vh] p-1 mb-10 m-3 text-black " style="text-align: right">
-			<div class="overflow-y-auto overflow-x-hidden h-[55vh]">
-
-				<div v-for="(message, index) in allMessage" :key="index" >
-					<div
-					class="bg-blue-400 text-grey-500 py-2 px-4 inline-block m-1 mx-5 rounded-md"
-					>
-					{{ message }}
+				<div class="aa mx-5 text-green-600 text-xl text-center"> {{ selectedRoom }} Room</div>
+				<div v-for="(message, index) in allMessage" :key="index">
+					<div class="bg-blue-400 text-grey-500 py-2 px-4 inline-block m-1 mx-5 rounded-md" >{{ message }}</div>
 				</div>
+				
+	
+			<div class="m-1 mx-5 " style="text-align: left;">
+			<span class="bg-blue-200 text-grey-500 py-2 px-4 inline rounded-md">
+				{{ testMessage }}
+			</span>
+            </div>
 			</div>
+          </div>
+
+          <div class="flex-grow max-w-full">
+            <input
+              v-model="message"
+              placeholder="message"
+              class="w-[80%] h-[2.5rem] border-0 text-black ml-2 mr-1 rounded-full pl-4 mb-2 focus:border-0 focus:outline-none"
+              style="min-width: 300px"
+            />
+            <ButtonComponent
+              btnContent="Send"
+              @click="sendMessage"
+              class="text"
+            />
+          </div>
+          <div class="flex-grow max-w-full">
+            <input
+              v-model="message1"
+              placeholder="message"
+              class="w-[80%] h-[2.5rem] border-0 text-black ml-2 mr-1 rounded-full pl-4 mb-2 focus:border-0 focus:outline-none"
+              style="min-width: 300px"
+            />
+            <ButtonComponent
+              btnContent="Send1"
+              @click="secondMessage"
+              class="text"
+            />
+          </div>
         </div>
-	</div>
-
-		<div  class="flex-grow max-w-full" >
-
-			<input
-			v-model="message"
-			placeholder="message"
-			class="w-[80%] h-[2.5rem] border-0 text-black ml-2 mr-1 rounded-full pl-4 mb-2 focus:border-0 focus:outline-none"
-			style="min-width: 300px" />
-			<ButtonComponent btnContent="Send" @click="sendMessage" class="text"/>
-		</div>
-	</div>
-</div>
-	  <div v-else>
-		<div  class="row1 flex-grow max-w-full" >
-			<span class="text-xl">Select a channle or a friend to chat</span>
-		</div>
-	  </div>
+      </div>
+      <div v-else>
+        <div class="row1 flex-grow max-w-full">
+          <span class="text-xl">Select a channle or a friend to chat</span>
+        </div>
+      </div>
     </div>
 
-
-
-    <div class="container2   min-h-[50vh]">
-		<div  class="row2 " >
-			<h2 class=" chn-head my-5">All Channel</h2>
-			<div class="my-2">
-
-				Public Channels
-			</div>
+    <div class="container2 min-h-[50vh]">
+      <div class="row2">
+        <h2 class="chn-head my-5">All Channel</h2>
+        <div class="my-2">Public Channels</div>
         <div class="h-[40vh] overflow-y-auto overflow-x-hidden">
           <ul class="w-[95%] p-1 mx-3">
             <div v-for="(result, index) in filteredPublicChannel" :key="index">
@@ -194,11 +224,8 @@
             </div>
           </ul>
         </div>
-		
-			<div class="my-2">
 
-				Private Channels
-			</div>
+        <div class="my-2">Protected Channels</div>
         <div class="h-[30vh] overflow-y-auto overflow-x-hidden prv-chn">
           <ul class="w-[95%] p-1 mx-3">
             <div v-for="(result, index) in filteredPrivateChannel" :key="index">
@@ -208,27 +235,23 @@
                 >
                   {{ result.name }}
                   <div class="relative">
-
-					<button
+                    <button
                       class="jpub-btn"
                       @click="showPasswordForm(result.name)"
                     >
                       Join
                     </button>
-      
                   </div>
                 </div>
               </li>
             </div>
           </ul>
         </div>
-      <!-- </div> -->
+        <!-- </div> -->
 
-      <ChannelPassword v-if="isPrivate" @close="closePasswordFomr" />
+        <ChannelPassword v-if="isPrivate" @close="closePasswordFomr" />
+      </div>
     </div>
-
-
-</div>
   </div>
 </template>
 
@@ -272,9 +295,16 @@ export default defineComponent({
       selectedChannel: null as IChannel | null,
       inputText: "",
       showGroupList: true,
-	  msgField:false,
-	  isMembersList: false,
-	  selectedFriendIndex: null,
+      msgField: false,
+      isMembersList: false,
+	  selectedRoom: "" as string,
+      selectedFriendIndex: null,
+	  
+	  // for testing
+      message1: "" as string,
+	  testMessage: "" as String,
+	  testMessages: [] as string [],
+	allMessages: [] as string [],
       friends: [
         {
           user: "one",
@@ -336,30 +366,29 @@ export default defineComponent({
       });
     };
     if (!chan.value.length) all();
-	const my = async () => {
-			await store.dispatch('fetchMyChan');
-			const my_channel = computed(() => store.getters.getMyChannel);
-			const arrayProxy_m = my_channel.value;
-			arrayProxy_m.forEach((item: any) => {
-				// console.log(item);
-			const my_chan: IChannel = {
-				name: item.room_name,
-				id: item.id,
-				owner: null,
-				// messages: null,
-				admins: null,
-				members: [],
-				invites: null,
-				isPrivate: item.is_private,
-				isProtected: item.is_protected,
-				isPublic: item.is_public,
-				// password: item.password,
-			}
-			m_chan.value.push(my_chan);
-			});
-		}
-		if (!m_chan.value.length)
-			my();
+    const my = async () => {
+      await store.dispatch("fetchMyChan");
+      const my_channel = computed(() => store.getters.getMyChannel);
+      const arrayProxy_m = my_channel.value;
+      arrayProxy_m.forEach((item: any) => {
+        // console.log(item);
+        const my_chan: IChannel = {
+          name: item.room_name,
+          id: item.id,
+          owner: null,
+          // messages: null,
+          admins: null,
+          members: [],
+          invites: null,
+          isPrivate: item.is_private,
+          isProtected: item.is_protected,
+          isPublic: item.is_public,
+          // password: item.password,
+        };
+        m_chan.value.push(my_chan);
+      });
+    };
+    if (!m_chan.value.length) my();
   },
   components: {
     ChannelOption,
@@ -368,7 +397,7 @@ export default defineComponent({
     OptionMenu,
     ChannelPassword,
     ChannelMembers,
-},
+  },
   computed: {
     searchFriends(): FriendsList[] {
       return this.friends.filter((item: any) =>
@@ -377,76 +406,87 @@ export default defineComponent({
     },
     filteredMyChannel(): IChannel[] {
       return this.my_chan.filter(
-        (item: IChannel) =>
-          item.name
+        (item: IChannel) => item.name
         //   item.name.toLowerCase().includes(this.src_channel.toLowerCase())
       );
     },
     // filteredMyChannel(): IChannel[] {
     //   return this.my_chan.filter(
-        // (item: IChannel) =>
-        //   item.name /* .toLowerCase().includes(this.searchQuery.toLowerCase()) &&
-					// item.member === true */
+    // (item: IChannel) =>
+    //   item.name /* .toLowerCase().includes(this.searchQuery.toLowerCase()) &&
+    // item.member === true */
     //   );
     // },
     filteredPublicChannel(): IChannel[] {
-		return this.channels.filter(
-		(item: IChannel) =>
-			item.isPublic === true && 
-			!this.my_chan.some((userChannel: IChannel) => userChannel.name === item.name)
-		);
+      return this.channels.filter(
+        (item: IChannel) =>
+          item.isPublic === true &&
+          !this.my_chan.some(
+            (userChannel: IChannel) => userChannel.name === item.name
+          )
+      );
     },
     filteredPrivateChannel(): IChannel[] {
-	return this.channels.filter(
-		(item: IChannel) =>
-			item.isProtected === true && 
-			!this.my_chan.some((userChannel: IChannel) => userChannel.name === item.name)
-		);
+      return this.channels.filter(
+        (item: IChannel) =>
+          item.isProtected === true &&
+          !this.my_chan.some(
+            (userChannel: IChannel) => userChannel.name === item.name
+          )
+      );
     },
-	allMessage(): string[]{
-		return this.chatMessage;
-	},
+    allMessage(): string[] {
+      return this.chatMessage;
+    },
 
-  },
-  methods: {
-	showSelectedFriend(index: any) {
-		if (this.selectedFriendIndex === index)
-		{
-			this.selectedFriendIndex = null;
-		}
-		else
-		{
-			this.selectedFriendIndex = index;
-
-		}
-	},
-	showMemberList(channel: string){
-		this.isMembersList = !this.isMembersList;
-		localStorage.setItem("currentChanName", channel);
-	},
-	showOptionButtons(){
-		this.isOptions = !this.isOptions;
-	},
-	// hideOptionButtons() {
-	// 	this.isOptions = false;
-	// },
 	
+},
+methods: {
+	
+	secondMessage(): string[]{
+		this.testMessage = this.message1;
+		this.testMessages.push(this.message1);
+		this.message1 = "";
+		// return this.testMessages;
+	},
+	
+    showSelectedFriend(index: any) {
+      if (this.selectedFriendIndex === index) {
+        this.selectedFriendIndex = null;
+      } else {
+        this.selectedFriendIndex = index;
+      }
+    },
+    showMemberList(channel: string) {
+      this.isMembersList = !this.isMembersList;
+      localStorage.setItem("currentChanName", channel);
+    },
+    showOptionButtons() {
+      this.isOptions = !this.isOptions;
+    },
+    // hideOptionButtons() {
+    // 	this.isOptions = false;
+    // },
+
     showGroup() {
       this.showGroupList = true;
     },
+	
 	async showChatPage(channel: string) {
-		this.msgField = true;
-		localStorage.setItem("currentChanName", channel);
-		await this.displayMessage();
-	},
-	async showChatPageFriend(friend: string) {
-		this.msgField = true;
-		localStorage.setItem("currentFriend", friend);
-		// await this.displayMessage();
-	},
-	HideChatPage() {
-		this.msgField = false;
-	},
+      this.msgField = true;
+      localStorage.setItem("currentChanName", channel);
+      await this.displayMessage();
+	  this.selectedRoom = channel;
+    },
+    async showChatPageFriend(friend: string) {
+      this.msgField = true;
+      localStorage.setItem("currentFriend", friend);
+	  this.selectedRoom = friend;
+    },
+
+    HideChatPage() {
+      this.msgField = false;
+    },
     showDm() {
       this.showGroupList = false;
     },
@@ -479,7 +519,7 @@ export default defineComponent({
     },
     showPasswordForm(chan_name: string) {
       this.isPrivate = true;
-	  localStorage.setItem('toJoinChan', chan_name);
+      localStorage.setItem("toJoinChan", chan_name);
     },
     closePasswordFomr() {
       this.isPrivate = false;
@@ -500,14 +540,14 @@ export default defineComponent({
       this.chatMessage = [];
       await store.dispatch("fetchCurrentChan");
       const chan = computed(() => store.getters.getCurrentCahnnel);
-	  console.log(chan.value.messages);
+      console.log(chan.value.messages);
       const val = chan.value.messages;
       val.forEach((item: any) => {
         this.chatMessage.push(item.content);
       });
     },
     sendMessage() {
-    //   const chan = computed(() => store.getters.getCurrentCahnnel);
+      //   const chan = computed(() => store.getters.getCurrentCahnnel);
       console.log(this.message);
       if (this.message) {
         this.chatMessage.push(this.message);
@@ -517,15 +557,18 @@ export default defineComponent({
       }
     },
     closeChannelPage(): void {
-      this.$emit('close');
+      this.$emit("close");
     },
-	leave_room(chan_name: string){
-		localStorage.setItem('chan_to_leave', chan_name);
-	if (store.state.chat.socket){
-		store.state.chat.socket.emit('leave_chan', localStorage.getItem('chan_to_leave'));
-		}
-	}
-	},
+    leave_room(chan_name: string) {
+      localStorage.setItem("chan_to_leave", chan_name);
+      if (store.state.chat.socket) {
+        store.state.chat.socket.emit(
+          "leave_chan",
+          localStorage.getItem("chan_to_leave")
+        );
+      }
+    },
+  },
 
   created() {
     if (!store.state.chat.socket) {
@@ -559,12 +602,12 @@ export default defineComponent({
     });
     store.state.chat.socket.on("join_room_success", (data: any) => {
       console.log("Joined the channel successfully and back in front end");
-	  if (data){
+      if (data) {
         const newChannel: IChannel = {
           name: data.chan_name,
           id: data.id,
           owner: null,
-        //   messages: null,
+          //   messages: null,
           admins: null,
           members: [],
           invites: null,
@@ -573,17 +616,17 @@ export default defineComponent({
           isPublic: data.isPublic,
           // user: data.user,
         };
-		this.my_chan.push(newChannel);
-	  }
+        this.my_chan.push(newChannel);
+      }
     });
-	store.state.chat.socket.on("update_chan_list", (data: any) => {
-		// console.log("reached update_chan_list in front end")
-		if (data){
+    store.state.chat.socket.on("update_chan_list", (data: any) => {
+      // console.log("reached update_chan_list in front end")
+      if (data) {
         const newChannel: IChannel = {
           name: data.chan_name,
           id: data.id,
           owner: null,
-        //   messages: null,
+          //   messages: null,
           admins: null,
           members: [],
           invites: null,
@@ -592,99 +635,100 @@ export default defineComponent({
           isPublic: data.isPublic,
           // user: data.user,
         };
-		if (data.user != store.getters.getUserName)
-			this.channels.push(newChannel);
-	  }
-
-	});
-	store.state.chat.socket.on("update_chan_message", (data: any) => {
-		console.log(localStorage.getItem("currentChanName"));
-		console.log("reached update msg event listener");
-		if (data)
-		{
-			console.log(store.getters.getUserName);
-			console.log(data.user);
-			console.log(localStorage.getItem("currentChanName"));
-			console.log(data.chan);
-			if (data.user != store.getters.getUserName && localStorage.getItem("currentChanName") == data.chan){
-				console.log("pushing message");
-				this.chatMessage.push(data.content);
-				this.isMessageSent = true;
-			}
-		}
-	});
+        if (data.user != store.getters.getUserName)
+          this.channels.push(newChannel);
+      }
+    });
+    store.state.chat.socket.on("update_chan_message", (data: any) => {
+      console.log(localStorage.getItem("currentChanName"));
+      console.log("reached update msg event listener");
+      if (data) {
+        console.log(store.getters.getUserName);
+        console.log(data.user);
+        console.log(localStorage.getItem("currentChanName"));
+        console.log(data.chan);
+        if (
+          data.user != store.getters.getUserName &&
+          localStorage.getItem("currentChanName") == data.chan
+        ) {
+          console.log("pushing message");
+          this.chatMessage.push(data.content);
+          this.isMessageSent = true;
+        }
+      }
+    });
     store.state.chat.socket.on("priv_msg_success", () => {
       console.log("Send message to channel successfully and back in front end");
     });
-	store.state.chat.socket.on("leave_room_success", (room_name: string) => {
-		// console.log(room_name);
-		const index = this.my_chan.findIndex((channel: IChannel) => channel.name === room_name);
-		console.log(index);
-		if (index !== -1)
-			this.my_chan.splice(index, 1);
-	});
-	store.state.chat.socket.on("kicked", (room_name: string) => {
-		// if (data.user1 == store.getters.getUserName)
-		// {
-			const index = this.my_chan.findIndex((channel: IChannel) => channel.name === room_name);
-			if (index !== -1)
-			this.my_chan.splice(index, 1);
-		// }
-	});
-	// store.state.chat.socket.on("update_mem_list", (data: any) => {
-		
-	// 	if (data)
-	// 	{
-	// 		if (data.user != store.getters.getUserName && localStorage.getItem("currentChanName") == data.chan_name){
-	// 			this.userList.push(data.user);
-	// 		}
-	// 	}
-	// });
+    store.state.chat.socket.on("leave_room_success", (room_name: string) => {
+      // console.log(room_name);
+      const index = this.my_chan.findIndex(
+        (channel: IChannel) => channel.name === room_name
+      );
+      console.log(index);
+      if (index !== -1) this.my_chan.splice(index, 1);
+    });
+    store.state.chat.socket.on("kicked", (room_name: string) => {
+      // if (data.user1 == store.getters.getUserName)
+      // {
+      const index = this.my_chan.findIndex(
+        (channel: IChannel) => channel.name === room_name
+      );
+      if (index !== -1) this.my_chan.splice(index, 1);
+      // }
+    });
+    // store.state.chat.socket.on("update_mem_list", (data: any) => {
+
+    // 	if (data)
+    // 	{
+    // 		if (data.user != store.getters.getUserName && localStorage.getItem("currentChanName") == data.chan_name){
+    // 			this.userList.push(data.user);
+    // 		}
+    // 	}
+    // });
   },
 });
 </script>
 
 <style scoped>
-.main-cont{
-	display: flex;
-	flex-direction: column;
+.main-cont {
+  display: flex;
+  flex-direction: column;
 }
-.container
-{
-	margin: 1%;
-  flex:1;
+.container {
+  margin: 1%;
+  flex: 1;
 
   display: grid;
   grid-template-rows: 2fr 8fr;
-  background: linear-gradient(to bottom, #451952, #AE445A, #F39F5A);
+  background: linear-gradient(to bottom, #451952, #ae445a, #f39f5a);
   border-radius: 5px;
 }
 .container1 {
-	margin: 1%;
-	flex:2;
-	/* overflow-y: auto; */
-	/* height: 55vh; */
-
-	display: grid;
-	grid-template-rows: 10fr;
-	background: linear-gradient(to bottom, #451952, #AE445A, #F39F5A);
-	border-radius: 5px;
-}
-.container2 {
   margin: 1%;
-  flex:1;
+  flex: 2;
+  /* overflow-y: auto; */
+  /* height: 55vh; */
 
   display: grid;
   grid-template-rows: 10fr;
-  background: linear-gradient(to bottom, #451952, #AE445A, #F39F5A);
+  background: linear-gradient(to bottom, #451952, #ae445a, #f39f5a);
+  border-radius: 5px;
+}
+.container2 {
+  margin: 1%;
+  flex: 1;
+
+  display: grid;
+  grid-template-rows: 10fr;
+  background: linear-gradient(to bottom, #451952, #ae445a, #f39f5a);
   border-radius: 5px;
 }
 
-
-.cht{
-	font-size: 3rem;
-	font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
-	font-style:Bold;
+.cht {
+  font-size: 3rem;
+  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+  font-style: Bold;
 }
 .row {
   text-align: center;
@@ -698,15 +742,15 @@ export default defineComponent({
   height: 50px;
   padding-bottom: 50;
 }
-.adbtn{
-	background: #F39F5A;
-	/* color: #F39F5A;; */
+.adbtn {
+  background: #f39f5a;
+  /* color: #F39F5A;; */
 }
 .optbtn,
-.intbtn{
-	font-size: 0.8rem;
-	color: white;
-	padding-top: 0.6rem;
+.intbtn {
+  font-size: 0.8rem;
+  color: white;
+  padding-top: 0.6rem;
   padding-bottom: 0.6rem;
   background: #451952;
   border-radius: 5px;
@@ -719,7 +763,7 @@ export default defineComponent({
 .grpbtn,
 .dmbtn {
   font-size: 0.8rem;
-  background: #F39F5A;
+  background: #f39f5a;
   padding-left: 0.5rem;
   padding-right: 0.5rem;
   padding-top: 0.5rem;
@@ -733,12 +777,11 @@ export default defineComponent({
   border: none;
 }
 
-.chn-head{
-	font-size: 1.2rem;
-	font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
-	font-style:initial;
+.chn-head {
+  font-size: 1.2rem;
+  font-family: Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif;
+  font-style: initial;
 }
-
 
 .jpub-btn {
   font-size: 0.8rem;
@@ -809,5 +852,4 @@ export default defineComponent({
   writing-mode: vertical-rl;
   white-space: nowrap;
 }
-
 </style>
