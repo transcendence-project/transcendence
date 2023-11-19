@@ -12,7 +12,7 @@
 		@click.stop=""
 	  >
 		<router-link to="/profile" @click.native="closeDropdown">Edit Profile</router-link>
-		<router-link to="/twofactor" @click.native="closeDropdown" @click="two_fa">Two-factor-AUTH</router-link>
+		<router-link to="/twofactor" @click.native="closeDropdown" >Two-factor-AUTH</router-link>
 		<router-link to="/login" @click.native="closeDropdown">Logout</router-link>
 	  </div>
 	</div>
@@ -42,10 +42,10 @@
 	document.removeEventListener('click', closeDropdownOnClickOutside);
 	};
 
-	const two_fa = async () => {
-		console.log("inside 2 FA function ");
-		await store.dispatch("TwoFA")
-	};
+	// const two_fa = async () => {
+	// 	console.log("inside 2 FA function ");
+	// 	await store.dispatch("TwoFA")
+	// };
 
 	onMounted(() => {
 	document.addEventListener('click', closeDropdownOnClickOutside);

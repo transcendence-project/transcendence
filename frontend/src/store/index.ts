@@ -16,7 +16,6 @@ const store = createStore({
 			email: "",
 			image: "",
 			status: "",
-			qr: "",
 			win: 0,
 			lose: 0,
 			draw: 0,
@@ -149,20 +148,18 @@ const store = createStore({
 				headers: {
 					Authorization: `Bearer ${localStorage.getItem('token')}`,
 				},
-			}).then((resp: AxiosResponse<IChannel[]>) => {
-				// console.log(resp.data);
+			}).then((resp: AxiosResponse) => {
 				context.commit('setCurrentChannel', resp.data);
 			}).catch((error) => {
 				console.error("Error fetching current channel:", error);
 			});
 		},
 		async fetchMyFriends(context: any) {
-			await axios.get("", {
+			await axios.get("http://localhost:3000/users/my/friends", {
 				headers: {
 					Authorization: `Bearer ${localStorage.getItem('token')}`,
 				},
-			}).then((resp: AxiosResponse<IChannel[]>) => {
-				// console.log(resp.data);
+			}).then((resp: AxiosResponse) => {
 				context.commit('setMyFriends', resp.data);
 			}).catch((error) => {
 				console.error("Error fetching my friends:", error);
@@ -182,17 +179,35 @@ const store = createStore({
 		// 	});
 		// },
 		async TwoFA(context: any) {
-			console.log('herree???');
 			try {
 				const response = await axios.get("http://localhost:3000/auth/2fa/generate", {
 					headers: {
 						Authorization: `Bearer ${localStorage.getItem('token')}`,
 					},
 				});
-				console.log(response.data.qrCodeDataURL);
-			} catch
+				// console.log(response.data.qrCodeDataURL);
+				localStorage.setItem("qr", response.data.qrCodeDataURL);
+			} catch(error) {
+				// Handle errors here
+				console.error('Error:', error);
+			  }
 		},
+		async ValidateTwoFA(context: any) {
+			const code = localStorage.getItem('2FACode');
+			await axios.get(`http://localhost:3000/auth2fa/authenticate/${code}`, {
+				params: { chan_name: code },
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem('token')}`,
+				},
+			}).then((resp: AxiosResponse) => {
+				context.commit('setCurrentChannel', resp.data);
+			}).catch((error) => {
+				console.error("Error fetching current channel:", error);
+			});
+		}
 	},
 	modules: { // allow you to organize your store into separate namespaces.
 	}
 });
+
+export default store;

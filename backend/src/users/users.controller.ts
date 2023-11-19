@@ -54,6 +54,7 @@ export class UsersController {
 	async my_channels(@Req() req){
 		console.log('in my channels, req.user.id: ', req.user.id);
 		// console.log(req.user.id);
+		// console.log(await this.userService.findUserChan(req.user.id))
 		return (await this.userService.findUserChan(req.user.id));
 	}
 

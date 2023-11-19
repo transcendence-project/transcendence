@@ -4,6 +4,19 @@
 </template>
 
 <script lang="ts" setup>
+import { ref, onMounted, computed } from 'vue';
+import store from '@/store';
+
+await store.dispatch("TwoFA")
+
+// onMounted(async () => {
+// });
+console.log(localStorage.getItem("qr"));
+const qrcode = ref(localStorage.getItem("qr"));
+console.log(qrcode.value);
+
+// set the code sent by the user in the localStorage
+// store.dispatch("ValidateTwoFA"); 
 
 </script>
 

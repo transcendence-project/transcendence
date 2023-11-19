@@ -207,6 +207,7 @@ import { IChannel } from "@/models/channel";
 
 const chan = ref([] as IChannel[]);
 const m_chan = ref([] as IChannel[]);
+const m_frnd = ref([] as FriendsList[]);
 interface FriendsList {
   user: string;
   status: Boolean;
@@ -243,62 +244,55 @@ export default defineComponent({
 	  testMessage: "" as String,
 	  testMessages: [] as string [],
 	allMessages: [] as string [],
-      friends: [
-        {
-          user: "one",
-          status: true,
-        },
-        {
-          user: "two",
-          status: false,
-        },
-        {
-          user: "three",
-          status: true,
-        },
-        {
-          user: "four",
-          status: false,
-        },
-        {
-          user: "five",
-          status: true,
-        },
-        {
-          user: "one",
-          status: true,
-        },
-        {
-          user: "two",
-          status: false,
-        },
-        {
-          user: "three",
-          status: true,
-        },
-      ] as FriendsList[],
+	friends: m_frnd,
+    //   friends: [
+    //     {
+    //       user: "one",
+    //       status: true,
+    //     },
+    //     {
+    //       user: "two",
+    //       status: false,
+    //     },
+    //     {
+    //       user: "three",
+    //       status: true,
+    //     },
+    //     {
+    //       user: "four",
+    //       status: false,
+    //     },
+    //     {
+    //       user: "five",
+    //       status: true,
+    //     },
+    //     {
+    //       user: "one",
+    //       status: true,
+    //     },
+    //     {
+    //       user: "two",
+    //       status: false,
+    //     },
+    //     {
+    //       user: "three",
+    //       status: true,
+    //     },
+    //   ] as FriendsList[],
     };
   },
   setup() {
     const all = async () => {
       await store.dispatch("fetchAllChan");
       const channel = computed(() => store.getters.getAllChannel);
-      // console.log(channel.value);
       const arrayProxy = channel.value;
       arrayProxy.forEach((item: any) => {
-        // console.log(item);
         const new_chan: IChannel = {
           name: item.room_name,
           id: item.id,
-          owner: null,
-          // messages: null,
-          admins: null,
-          members: [],
-          invites: null,
           isPrivate: item.is_private,
           isProtected: item.is_protected,
           isPublic: item.is_public,
-          // password: item.password,
         };
         chan.value.push(new_chan);
       });
@@ -309,28 +303,31 @@ export default defineComponent({
       const my_channel = computed(() => store.getters.getMyChannel);
       const arrayProxy_m = my_channel.value;
       arrayProxy_m.forEach((item: any) => {
-        // console.log(item);
         const my_chan: IChannel = {
           name: item.room_name,
           id: item.id,
-          owner: null,
-          // messages: null,
-          admins: null,
-          members: [],
-          invites: null,
           isPrivate: item.is_private,
           isProtected: item.is_protected,
           isPublic: item.is_public,
-          // password: item.password,
         };
         m_chan.value.push(my_chan);
       });
-	  const fr = async () => {
-		await store.dispatch("fetchMyFriends");
-		const my_friends = computed(() => store.getters.getMyFriends);
-	  }
     };
     if (!m_chan.value.length) my();
+	const fr = async ()=> {
+		await store.dispatch("fetchMyFriends");
+		const my_friends = computed(() => store.getters.getMyFriends);
+		// console.log(my_friends);
+		const arrayProxy_f = my_friends.value;
+		arrayProxy_f.forEach((item: any) => {
+			const my_frnds: FriendsList = {
+				user: item.userName,
+				status: false,
+			}
+			m_frnd.value.push(my_frnds);
+		});
+	};
+	if (!m_frnd.value.length) fr();
   },
   components: {
     ChannelOption,
@@ -540,16 +537,9 @@ methods: {
         const newChannel: IChannel = {
           name: data.chan_name,
           id: data.id,
-          owner: null,
-          // messages: null,
-          admins: null,
-          members: [],
-          invites: null,
-          // password: data.pass,
           isPrivate: data.isPrivate,
           isProtected: data.isProtected,
           isPublic: data.isPublic,
-          // user: data.user,
         };
         this.my_chan.push(newChannel);
       }
@@ -560,11 +550,6 @@ methods: {
         const newChannel: IChannel = {
           name: data.chan_name,
           id: data.id,
-          owner: null,
-          //   messages: null,
-          admins: null,
-          members: [],
-          invites: null,
           isPrivate: data.isPrivate,
           isProtected: data.isProtected,
           isPublic: data.isPublic,
@@ -579,11 +564,6 @@ methods: {
         const newChannel: IChannel = {
           name: data.chan_name,
           id: data.id,
-          owner: null,
-          //   messages: null,
-          admins: null,
-          members: [],
-          invites: null,
           isPrivate: data.isPrivate,
           isProtected: data.isProtected,
           isPublic: data.isPublic,
@@ -597,15 +577,10 @@ methods: {
       console.log(localStorage.getItem("currentChanName"));
       console.log("reached update msg event listener");
       if (data) {
-        console.log(store.getters.getUserName);
-        console.log(data.user);
-        console.log(localStorage.getItem("currentChanName"));
-        console.log(data.chan);
         if (
           data.user != store.getters.getUserName &&
           localStorage.getItem("currentChanName") == data.chan
         ) {
-          console.log("pushing message");
           this.chatMessage.push(data.content);
           this.isMessageSent = true;
         }
@@ -615,7 +590,6 @@ methods: {
       console.log("Send message to channel successfully and back in front end");
     });
     store.state.chat.socket.on("leave_room_success", (room_name: string) => {
-      // console.log(room_name);
       const index = this.my_chan.findIndex(
         (channel: IChannel) => channel.name === room_name
       );
@@ -623,23 +597,11 @@ methods: {
       if (index !== -1) this.my_chan.splice(index, 1);
     });
     store.state.chat.socket.on("kicked", (room_name: string) => {
-      // if (data.user1 == store.getters.getUserName)
-      // {
       const index = this.my_chan.findIndex(
         (channel: IChannel) => channel.name === room_name
       );
       if (index !== -1) this.my_chan.splice(index, 1);
-      // }
     });
-    // store.state.chat.socket.on("update_mem_list", (data: any) => {
-
-    // 	if (data)
-    // 	{
-    // 		if (data.user != store.getters.getUserName && localStorage.getItem("currentChanName") == data.chan_name){
-    // 			this.userList.push(data.user);
-    // 		}
-    // 	}
-    // });
   },
 });
 </script>

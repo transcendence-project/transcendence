@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards, Req, Res, Post, HttpCode, Body, UnauthorizedException } from '@nestjs/common';
+import { Controller, Get, UseGuards, Req, Res, Param, Post, HttpCode, Body, UnauthorizedException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { ConfigService } from '@nestjs/config';
@@ -52,26 +52,22 @@ export class AuthController {
 		}
 	}
 
-	@Post('2fa/authenticate')
+	@Post('2fa/authenticate/:code')
 	@HttpCode(200)
 	@UseGuards(JwtAuthGuard)
-	async authenticate2fa(@Req() req, @Body() body) {
-		const user = { // for testing purposes
-			id: 4,
-			username: 'arafeeq',
-			email: 'arafeeq@student.42abudhabi.ae',
-			twoFactorAuthenticationSecret: 'EIRE46D7NJOEQ53O',
-			is2fa: false
-		}
+	async authenticate2fa(@Param("code") code: string, @Req() req, ) {
+		// console.log(req.user);
 		const isCodeValid = this.authService.is2faCodeValid(
-			"129140",// will later be body.twoFactorAuthenticationCode
-			user, // will later be req.user
+			code,
+			req.user,
 		);
+		if (!isCodeValid) {
+			console.log("INCORRECT 2 FA CODE !!!!!!!!!!!!");
+		}
 		// if (!isCodeValid) {
 		// 	throw new UnauthorizedException('Wrong authentication code');
 		// }
+		// redirect to homepage??
 		// else login to game, display user profile
-		const token = this.authService.generate_jwt_token(user.username, user.id); // will later be req.user.username
-		return (token) // will store it local storage front end
 	}
 }
