@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -9,8 +9,11 @@ import { FriendRequestService } from 'friend-requests/FriendRequests.service';
 import { FriendRequest } from 'entities/friend-request.entity';
 import { Achievement } from 'entities/achievement.entity';
 import { SeederService } from '../achievements/achievement.seed';
+// import { MatchesService } from 'matches/matches.service';
+// import { Match } from 'entities/match.entity';
+import { MatchModule } from 'matches/matches.module';
 @Module({
-	imports: [TypeOrmModule.forFeature([User, FriendRequest, Achievement])],
+	imports: [TypeOrmModule.forFeature([User, FriendRequest, Achievement]), forwardRef(() => MatchModule)],
 	providers: [UsersService, FriendRequestService, SeederService],
 	controllers: [UsersController, FriendRequestController],
 	exports: [UsersService, SeederService]

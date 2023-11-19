@@ -73,16 +73,23 @@ scrollBehavior (to, from , savedPosition){
 });
 
 router.beforeEach((to: any, from: any, next: any) => {
-    if (to.path === '/login') {
-    //   document.body.style.backgroundColor = '#F39F5A !important';
-    }else {
-    //   document.body.style.backgroundColor = '#5E6367';
+    if(to.path === '/game')
+    {
+        document.body.style.background = '#AE445A';
+    }
+    else if (to.path === '/')
+    {
+        document.body.style.background = '#AE445A';
+    }
+    else {
+        document.body.style.background = 'linear-gradient(to bottom, #F39F5A, #451952)';
       console.log(`Navigating from ${from.fullPath} to ${to.fullPath}`);
     }
 	if (from.fullPath === '/chat') { // Replace 'chatRoute' with your chat route name
 		// Clear the channels array or perform any other necessary cleanup
 		store.state.chat.socket.off('create_room_success');
 		store.state.chat.socket.off('join_room_success');
+		store.state.chat.socket.off('update_chan_list');
 		store.state.chat.socket.off('chan_msg_success');
 		store.state.chat.socket.off('priv_msg_success');
 	  }

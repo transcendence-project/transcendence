@@ -8,7 +8,7 @@
           <div class="jn-div">
 			<div class="pas-btn">
 
-				<button class="jnbtn" >Join</button>
+				<button class="jnbtn" @click="join_prot_chan">Join</button>
 			</div>
 			<div class="cls-bt">
 				<button class="clsbtn" @click="closePrivatePage">Close</button>
@@ -20,6 +20,7 @@
 </template>
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
+import store from "@/store";
 // import store from "@/store";
 
 export default defineComponent({
@@ -31,6 +32,14 @@ export default defineComponent({
   methods: {
     closePrivatePage(): void {
       this.$emit('close');
+    },
+	join_prot_chan() {
+      console.log("reached join prot chan");
+      if (store.state.chat.socket)
+        store.state.chat.socket.emit("join_room", {
+          room_name: localStorage.getItem('toJoinChan'),
+          arg: this.password,
+        });
     },
   },
 });

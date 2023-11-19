@@ -4,6 +4,9 @@ FROM node:19
 # Set the working directory
 WORKDIR /app/backend
 
+# Install build tools (required for bcrypt)
+RUN apt-get update && apt-get install -y build-essential
+
 # Copy package.json and package-lock.json before other files
 COPY package*.json ./
 
