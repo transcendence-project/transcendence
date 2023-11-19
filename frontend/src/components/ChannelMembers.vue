@@ -34,11 +34,13 @@
 
 							<div v-if="selectedMemberIndex === index" class="my-2 opt">
 								<div v-if="friend.owner === true">
-									<button class="intbtn p-2 mx- 2">Invite</button>
-
+									<button class="intbtn p-2 mx-2">Invite</button>
+									<button class="intbtn p-2 mx-2">Mute</button>
+									
 								</div>
 								<div v-else-if="friend.admins === true">
-									<button class="intbtn p-2 mx- 2">Invite</button>
+									<button class="intbtn p-2 mx-2">Invite</button>
+									<button class="intbtn p-2 mx-2">Mute</button>
 									<button class="intbtn p-2 mx-2" @click="kick_mem(friend.user)">Kick</button>
 
 								</div>
