@@ -105,37 +105,41 @@
 				<h1 class="cht">Chat</h1>
 
 				<div class="row1 flex-grow max-w-full">
-					<div class="flex flex-col bg-white h-[60vh] p-1 mb-10 m-3 text-black" style="text-align: right">
-						<div class="overflow-y-auto overflow-x-hidden h-[55vh]">
 
 
-							<div class="aa mx-5 text-black-600 text-xl text-center"> {{ selectedRoom }} </div>
-							<div v-for="(message, index) in allMessage" :key="index">
-								<div class="bg-blue-400 text-grey-500 py-2 px-4 inline-block m-1 mx-5 rounded-md">{{ message
-								}}</div>
-							</div>
+
+					 <div class="flex flex-col bg-white h-[60vh] p-2 mb-10 m-3 text-black" style="text-align: right">
+    <div class="overflow-y-auto overflow-x-hidden h-[55vh]">
+        <div class="aa mx-3 text-black-600 text-xl text-center">{{ selectedRoom }}</div>
+        <div v-for="(message, index) in allMessage" :key="index">
+            <div v-if="message.send === true" class="bg-blue-400 text-grey-500 py-2 px-4 inline-block mx-5 my-1 rounded-md"> 
+                {{ message.chat }}
+            </div>
+            <div v-else class="my-5 mx-5" style="text-align: left;">
+                <span class="bg-blue-200 text-grey-500 py-2 px-3 inline rounded-md">
+                    {{ message.chat }} 
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
 
 
-							<div class="m-1 mx-5 " style="text-align: left;">
-								<span class="bg-blue-200 text-grey-500 py-2 px-4 inline rounded-md">
-									{{ testMessage }}
-								</span>
-							</div>
-						</div>
-					</div>
+
 
 					<div class="flex-grow max-w-full">
 						<input v-model="message" placeholder="message"
-							class="w-[80%] h-[2.5rem] border-0 text-black ml-2 mr-1 rounded-full pl-4 mb-2 focus:border-0 focus:outline-none"
-							style="min-width: 300px" />
+						class="w-[80%] h-[2.5rem] border-0 text-black ml-2 mr-1 rounded-full pl-4 mb-2 focus:border-0 focus:outline-none"
+						style="min-width: 300px" />
 						<ButtonComponent btnContent="Send" @click="sendMessage" class="text" />
 					</div>
 					<div class="flex-grow max-w-full">
 						<input v-model="message1" placeholder="message"
-							class="w-[80%] h-[2.5rem] border-0 text-black ml-2 mr-1 rounded-full pl-4 mb-2 focus:border-0 focus:outline-none"
-							style="min-width: 300px" />
+						class="w-[80%] h-[2.5rem] border-0 text-black ml-2 mr-1 rounded-full pl-4 mb-2 focus:border-0 focus:outline-none"
+						style="min-width: 300px" />
 						<ButtonComponent btnContent="Send1" @click="secondMessage" class="text" />
 					</div>
+
 				</div>
 			</div>
 			<div v-else>
@@ -213,6 +217,7 @@ interface FriendsList {
   status: Boolean;
 }
 
+
 export default defineComponent({
   data() {
     return {
@@ -226,7 +231,9 @@ export default defineComponent({
       isSearchChannelVisible: false,
       selectedItem: null as IChannel | null,
       isMessageSent: false,
-      chatMessage: [] as string[],
+    //   chatMessage: [] as string[],
+      chatMessage: [] as {send: false; chat: string} [],
+    //   chatMessage: [] as {status: string; chat: string} [],
       isPrivate: false,
       isOptions: false,
       searchQuery: "" as string,
@@ -244,6 +251,9 @@ export default defineComponent({
 	  testMessage: "" as String,
 	  testMessages: [] as string [],
 	allMessages: [] as string [],
+	userInput1: "" as string,
+	userInput2: "" as string,
+	sndrcvmsg: [] as string[],
 	friends: m_frnd,
     //   friends: [
     //     {
@@ -381,12 +391,15 @@ export default defineComponent({
 	
 },
 methods: {
+
 	
 	secondMessage(): string[]{
 		this.testMessage = this.message1;
-		this.testMessages.push(this.message1);
+
+		this.chatMessage.push({send: false, chat: this.message1});
+
 		this.message1 = "";
-		return this.testMessages;
+
 	},
 	
     showSelectedFriend(index: any) {
@@ -484,29 +497,33 @@ methods: {
       console.log(chan.value.messages);
       const val = chan.value.messages;
       val.forEach((item: any) => {
-        this.chatMessage.push(item.content);
+        // this.chatMessage.push(item.content);
+		this.chatMessage.push({send: true, chat: item.content});
       });
     },
 	async displayFriendMessage() {
-      this.chatMessage = [];
-      await store.dispatch("fetchCurrentFriend");
-      const chan = computed(() => store.getters.getCurrentCahnnel);
-      console.log(chan.value.messages);
-      const val = chan.value.messages;
-      val.forEach((item: any) => {
-        this.chatMessage.push(item.content);
-      });
+		this.chatMessage = [];
+		await store.dispatch("fetchCurrentFriend");
+		const chan = computed(() => store.getters.getCurrentCahnnel);
+		console.log(chan.value.messages);
+		const val = chan.value.messages;
+		val.forEach((item: any) => {
+			//   this.chatMessage.push(item.content);
+			this.chatMessage.push({send: true, chat: item.content});
+		});
     },
     sendMessage() {
-      //   const chan = computed(() => store.getters.getCurrentCahnnel);
-      console.log(this.message);
-      if (this.message) {
-        this.chatMessage.push(this.message);
-        this.isMessageSent = true;
-        this.send_chan_msg(this.message); // should also retrieve the chan name
-        this.message = "";
-      }
+		//   const chan = computed(() => store.getters.getCurrentCahnnel);
+		console.log(this.message);
+		if (this.message) {
+			this.chatMessage.push({send: true, chat: this.message});
+			this.isMessageSent = true;
+			this.send_chan_msg(this.message); // should also retrieve the chan name
+			this.message = "";
+			
+		}
     },
+
     closeChannelPage(): void {
       this.$emit("close");
     },
@@ -778,5 +795,11 @@ methods: {
 	padding: 10px;
 	writing-mode: vertical-rl;
 	white-space: nowrap;
+}
+.right{
+	text-align: right;
+}
+.left{
+	text-align: left;
 }
 </style>
