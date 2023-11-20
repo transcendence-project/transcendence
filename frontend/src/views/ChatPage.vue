@@ -133,12 +133,6 @@
 						style="min-width: 300px" />
 						<ButtonComponent btnContent="Send" @click="sendMessage" class="text" />
 					</div>
-					<div class="flex-grow max-w-full">
-						<input v-model="message1" placeholder="message"
-						class="w-[80%] h-[2.5rem] border-0 text-black ml-2 mr-1 rounded-full pl-4 mb-2 focus:border-0 focus:outline-none"
-						style="min-width: 300px" />
-						<ButtonComponent btnContent="Send1" @click="secondMessage" class="text" />
-					</div>
 
 				</div>
 			</div>
@@ -223,7 +217,6 @@ export default defineComponent({
     return {
       channels: chan,
       my_chan: m_chan,
-      // text: "" as string,
       src_friend: "" as string,
       src_channel: "" as string,
       message: "" as string,
@@ -231,9 +224,7 @@ export default defineComponent({
       isSearchChannelVisible: false,
       selectedItem: null as IChannel | null,
       isMessageSent: false,
-    //   chatMessage: [] as string[],
-      chatMessage: [] as {send: false; chat: string} [],
-    //   chatMessage: [] as {status: string; chat: string} [],
+      chatMessage: [] as {send: boolean; chat: string} [],
       isPrivate: false,
       isOptions: false,
       searchQuery: "" as string,
@@ -384,24 +375,13 @@ export default defineComponent({
           )
       );
     },
-    allMessage(): string[] {
+    allMessage(): any{
       return this.chatMessage;
     },
 
 	
 },
 methods: {
-
-	
-	secondMessage(): string[]{
-		this.testMessage = this.message1;
-
-		this.chatMessage.push({send: false, chat: this.message1});
-
-		this.message1 = "";
-
-	},
-	
     showSelectedFriend(index: any) {
       if (this.selectedFriendIndex === index) {
         this.selectedFriendIndex = null;
@@ -416,9 +396,6 @@ methods: {
     showOptionButtons() {
       this.isOptions = !this.isOptions;
     },
-    // hideOptionButtons() {
-    // 	this.isOptions = false;
-    // },
 
     showGroup() {
       this.showGroupList = true;
@@ -497,8 +474,10 @@ methods: {
       console.log(chan.value.messages);
       const val = chan.value.messages;
       val.forEach((item: any) => {
-        // this.chatMessage.push(item.content);
-		this.chatMessage.push({send: true, chat: item.content});
+		if (item.senderID === store.getters.getId)
+			this.chatMessage.push({send: true, chat: item.content});
+		else
+			this.chatMessage.push({send: false, chat: item.content});
       });
     },
 	async displayFriendMessage() {
@@ -507,18 +486,15 @@ methods: {
 		const chan = computed(() => store.getters.getCurrentCahnnel);
 		console.log(chan.value.messages);
 		const val = chan.value.messages;
-		val.forEach((item: any) => {
-			//   this.chatMessage.push(item.content);
+		val.forEach((item: any) => { // will change later similar to chat
 			this.chatMessage.push({send: true, chat: item.content});
 		});
     },
     sendMessage() {
-		//   const chan = computed(() => store.getters.getCurrentCahnnel);
-		console.log(this.message);
 		if (this.message) {
 			this.chatMessage.push({send: true, chat: this.message});
 			this.isMessageSent = true;
-			this.send_chan_msg(this.message); // should also retrieve the chan name
+			this.send_chan_msg(this.message);
 			this.message = "";
 			
 		}
@@ -548,7 +524,6 @@ methods: {
       });
     }
     store.state.chat.socket.on("create_room_success", (data: any) => {
-      // event listener
       console.log("Room created successfully and back in front end", data);
       if (data) {
         const newChannel: IChannel = {
@@ -576,7 +551,6 @@ methods: {
       }
     });
     store.state.chat.socket.on("update_chan_list", (data: any) => {
-      // console.log("reached update_chan_list in front end")
       if (data) {
         const newChannel: IChannel = {
           name: data.chan_name,
@@ -584,7 +558,6 @@ methods: {
           isPrivate: data.isPrivate,
           isProtected: data.isProtected,
           isPublic: data.isPublic,
-          // user: data.user,
         };
         if (data.user != store.getters.getUserName)
           this.channels.push(newChannel);
@@ -598,7 +571,7 @@ methods: {
           data.user != store.getters.getUserName &&
           localStorage.getItem("currentChanName") == data.chan
         ) {
-          this.chatMessage.push(data.content);
+          this.chatMessage.push({send: false, chat: data.content});
           this.isMessageSent = true;
         }
       }
