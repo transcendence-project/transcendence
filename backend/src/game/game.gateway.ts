@@ -36,7 +36,6 @@ export class GameGateway
     console.log("from websocket user output ", user);
     console.log("from the client ", client.id);
   }
-
   handleDisconnect(client: any) {
     this.clientCount--;
     console.log("Client disconnected");
@@ -46,7 +45,11 @@ export class GameGateway
   @SubscribeMessage('start-game')
   start_game(@ConnectedSocket() client: Socket,@MessageBody() payload: any)
   {
-      console.log("start-game working");
-    return {event:'table' ,data: this.gameService.init_table(client)};
+    //   console.log(payload);
+    const tableData = this.gameService.draw_table(payload.width, payload.height);
+    console.log(tableData);
+    client.emit('table', tableData);
+    //   this.gameService.draw_table(payload.width,payload.height);
+    // return {event:'table' ,data: this.gameService.init_table(client)};
   }
 }

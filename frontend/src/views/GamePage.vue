@@ -1,5 +1,7 @@
 <template>
-	  <canvas ref="pongCanvas" id="pong" :width="canvasWidth" :height="canvasHeight"></canvas>
+    <div class="game-container">
+         <canvas ref="pongCanvas" id="pong" :width="canvasWidth" :height="canvasHeight"></canvas>
+    </div>
       <div>
           <button @click="startGame">Start Game</button>
       </div>
@@ -54,6 +56,15 @@ const { appContext } = getCurrentInstance();
     //     window.addEventListener('resize', startGame);
     // };
     onMounted(() => {
+        // if (pongCanvas.value)
+        // {
+        //     const ctx = pongCanvas.value.getContext("2d");
+        //     if (ctx)
+        //     {
+        //         ctx.fillStyle = '#F6F1F1',
+        //         ctx.fillRect(0, 0, pongCanvas.value.width, pongCanvas.value.height);
+        //     }
+        // }
         // console.log("try")
     //     if (pongCanvas.value) {
     //     console.log('Mounted - Canvas dimensions:', pongCanvas.value.offsetWidth, pongCanvas.value.offsetHeight);
@@ -61,12 +72,54 @@ const { appContext } = getCurrentInstance();
     //     console.log('Mounted - Canvas element not found');
     // }
     //   setupWebSocket();
-    // if (socket)
-    // {
-    //     socket.on('table', (message: any[]) => {
-    //         console.log(message[0]);
-    //     });
-    // }
+    if (socket)
+    {
+        socket.on('table', (message: any[]) => {
+            console.log(message.paddleRe.x);
+        if (pongCanvas.value)
+        {
+            const ctx = pongCanvas.value.getContext("2d");
+            if (ctx)
+            {
+                const drawRect = (
+                    x: number,
+                    y: number,
+                    w: number,
+                    h: number,
+                    color: string
+                    ) => {
+                    ctx.fillStyle = color;
+                    ctx.fillRect(x, y, w, h);
+                };
+                const drawCircle = (x: number, y: number, r: number, color: string) => {
+                    ctx.fillStyle = color;
+                    ctx.beginPath();
+                    ctx.arc(x, y, r, 0, Math.PI * 2, false);
+                    ctx.closePath();
+                    ctx.fill();
+                };
+                const drawText = (text: string, x: number, y: number, color: string) => {
+                    ctx.fillStyle = color;
+                    ctx.font = "45px fantasy";
+                    ctx.fillText(text, x, y);
+                };
+                const render = () => {
+                    drawRect(0, 0, pongCanvas.value.width, pongCanvas.value.height, "#F6F1F1");
+                    drawRect(0, pongCanvas.value.height / 2 - message.paddleRe.height / 2,message.paddleRe.width, message.paddleRe.height,"#9336B4");
+                    // console.log(pongCanvas.value.height / 2 - message.paddleRe.height / 2)
+                }
+                // ctx.fillStyle = '#F6F1F1',
+                // ctx.fillRect(0, 0, pongCanvas.value.width, pongCanvas.value.height);
+                const game = () => {
+                    // update();
+                    render();
+                    requestAnimationFrame(game);
+                };
+                requestAnimationFrame(game);
+            }
+        }
+        });
+    }
     // startGame();
 	// updateGameStateFromServer();
     //   drawGame();
@@ -84,7 +137,7 @@ const { appContext } = getCurrentInstance();
 			console.log(pongCanvas.value.offsetWidth);
         const canvasDimensions = {
             width: pongCanvas.value.offsetWidth,
-            height: pongCanvas.value.offsetHeight
+            height: pongCanvas.value.offsetHeight,
         };
         socket.emit('start-game', canvasDimensions);
     } else {

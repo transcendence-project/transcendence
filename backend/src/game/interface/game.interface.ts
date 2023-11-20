@@ -15,10 +15,18 @@ export interface Ball {
     diry: number;
 }
 
-export interface net {
+// export interface net {
+//     x: number;
+//     y: number;
+//     width: number;
+//     height: number;
+// }
+
+
+export interface Computer {
     x: number;
     y: number;
     width: number;
     height: number;
+    score: number;
 }
-
