@@ -26,7 +26,7 @@ export class ChatService {
 
 	async chan_by_name(chan_name: string) // or by id
 	{
-		return (await this.channelRepo.findOne({ where: { room_name: chan_name }, relations: ['members', 'admins', 'owner', 'messages'] }));
+		return (await this.channelRepo.findOne({ where: { room_name: chan_name }, relations: ['members', 'admins', 'owner', 'messages', 'banned'] }));
 	}
 
 	async mem_by_chan(chan_name: string): Promise<User[] | undefined> {
@@ -62,18 +62,20 @@ export class ChatService {
 		//  ----------------------- CREATE / UPDATE -----------------------------
 	async create_chan(chan_name: string, user: User, pass: string, type: string) {
 		const chan = await this.chan_by_name(chan_name);
-		if (chan || chan_name === ""){
+		if (chan || chan_name === "" || chan_name.length > 20){
 			if (chan)
 				console.log(`Channel ${chan_name} already exists`);
-			else
+			else if (chan_name === "" || !chan_name)
 				console.log("Channel name cannot be empty");
+			else
+				console.log("Channel name too long");
 			return null;
 		}
 		else {
 			try{
 				if (type === "prot"){
 					const chan2 = this.channelRepo.create({ room_name: chan_name, owner: user, password: pass, 
-						members: [], admins: [], messages: [], banned: [], description: "", isGroupChannel: true, is_protected: true });
+						members: [], admins: [], messages: [], banned: [], isGroupChannel: true, is_protected: true });
 					chan2.members.push(user);
 					await this.channelRepo.save(chan2);
 					console.log(`Channel ${chan_name} created successfully`);
