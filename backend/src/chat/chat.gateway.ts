@@ -86,7 +86,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	// 	client.emit('priv_msg_success');
 	// }
 
-// ----------------------------------- CREATE / JOIN / LEAVE ---------------------------------
+// ----------------------------------- CREATE CHANNEL ---------------------------------
 
 @SubscribeMessage('create_pub_room')
 	async create_pub_room(client: any, payload: any): Promise<void> {
@@ -149,6 +149,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 	}
 
+	// ----------------------------------- JOIN / LEAVE ---------------------------------
 	@SubscribeMessage('join_room')
 	async join_room(client: any, payload: any) {
 		const { room_name, arg } = payload;
@@ -292,7 +293,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			this.server.to(room_name).emit('leave_room_update', data_to_send);
 			this.server.to(id_to_rem).emit('kicked', room_name);
 		}
-		// else notify accordingly
+		// else user does not have the priviledge
 	}
 
 	// -------------------------------------------------------------------------------

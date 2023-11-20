@@ -19,14 +19,14 @@ export class ChatService {
 	@InjectRepository(Message) private messageRepo: Repository<Message>,
 	private authService: AuthService ){}
 
-		//  ----------------------- GET CHANNEL / CONTENT -----------------------------
+		//  ----------------------- CHANNEL GETTERS -----------------------------
 	async get_all_chan() {
 		return this.channelRepo.find();
 	}
 
 	async chan_by_name(chan_name: string) // or by id
 	{
-		return (await this.channelRepo.findOne({ where: { room_name: chan_name }, relations: ['members', 'admins', 'owner', 'messages', 'banned'] }));
+		return (await this.channelRepo.findOne({ where: { room_name: chan_name }, relations: ['members', 'admins', 'owner', 'messages'] }));
 	}
 
 	async mem_by_chan(chan_name: string): Promise<User[] | undefined> {
@@ -47,7 +47,19 @@ export class ChatService {
 			return channel.owner;
 	}
 
-		//  ----------------------- CREATING / ADDING / SAVE -----------------------------
+	async banned_by_chan(chan_name: string): Promise<User[] | undefined> {
+		const channel = await this.channelRepo.findOne({ where: { room_name: chan_name }, relations: ['banned'] });
+		if (channel)
+			return channel.banned;
+	}
+
+	async muted_by_chan(chan_name: string): Promise<User[] | undefined> {
+		const channel = await this.channelRepo.findOne({ where: { room_name: chan_name }, relations: ['muted'] });
+		if (channel)
+			return channel.muted;
+	}
+
+		//  ----------------------- CREATE / UPDATE -----------------------------
 	async create_chan(chan_name: string, user: User, pass: string, type: string) {
 		const chan = await this.chan_by_name(chan_name);
 		if (chan || chan_name === ""){
@@ -70,7 +82,7 @@ export class ChatService {
 				else if (type === "pub")
 				{
 					const chan2 = this.channelRepo.create({ room_name: chan_name, owner: user, password: pass, 
-						members: [], admins: [], messages: [], banned: [], description: "", isGroupChannel: true, is_public: true });
+						members: [], admins: [], messages: [], banned: [], muted: [], isGroupChannel: true, is_public: true });
 					chan2.members.push(user);
 					await this.channelRepo.save(chan2);
 					console.log(`Channel ${chan_name} created successfully`);
@@ -79,7 +91,7 @@ export class ChatService {
 				else if (type === "priv")
 				{
 					const chan2 = this.channelRepo.create({ room_name: chan_name, owner: user, password: pass, 
-					members: [], admins: [], messages: [], banned: [], description: "", isGroupChannel: true, is_private: true });
+					members: [], admins: [], messages: [], banned: [], muted: [], isGroupChannel: true, is_private: true });
 					chan2.members.push(user);
 					await this.channelRepo.save(chan2);
 					console.log(`Channel ${chan_name} created successfully`);
@@ -122,10 +134,8 @@ export class ChatService {
 	async save_chan_message(sender: User, chan_name: string, content: string){
 		const chan = await this.chan_by_name(chan_name);
 		const message = this.messageRepo.create({senderID: sender.id, sender: sender, channel: chan, content: content, createdAt: null });
-		// console.log(message);
 		chan.messages.push(message);
 		await this.messageRepo.save(message);
-		// console.log(chan);
 	}
 
 
@@ -165,6 +175,7 @@ export class ChatService {
 
 
 	//  ----------------------- CHECKS -----------------------------
+
 	async is_admin(user_name: string, chan_name: string) {
 		const chan = await this.chan_by_name(chan_name);
 		const isAdmin = chan.admins.some((admin: User) => admin.userName === user_name);
@@ -190,8 +201,8 @@ export class ChatService {
 	}
 
 	async is_ban(user_name: string, chan_name: string) {
-		const chan = await this.chan_by_name(chan_name);
-		const isBanned = chan.banned.some((ban: User) => ban.userName === user_name);
+		const banned = await this.banned_by_chan(chan_name);
+		const isBanned = banned.some((ban: User) => ban.userName === user_name);
 		if (isBanned)
 			return true;
 		else
@@ -199,10 +210,35 @@ export class ChatService {
 	}
 
 	async is_mute(user_name: string, chan_name: string) {
-		// if in mute table of repo
-		// return true
-		// else
-		// return false;
+		const muted = await this.muted_by_chan(chan_name);
+		const isBanned = muted.some((mute: User) => mute.userName === user_name);
+		if (isBanned)
+			return true;
+		else
+			return false;
+	}
+
+	async can_join(user: User, room: Channel, arg: string): Promise<boolean> {
+		if (await this.is_ban(user.userName, room.room_name) === true)
+			return false;
+		if (room.is_protected === true)
+		{
+			if (room.password)
+			{
+				try{
+					const match = await bcrypt.compare(arg, room.password);
+					if (match)
+						return true;
+					else
+						return false;
+				}
+				catch (error) {
+					console.error('Error while comparing password:', error);
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 
 // -----------------------------------SPECIFIC TO OWNERS---------------------------------
@@ -212,6 +248,8 @@ export class ChatService {
 
 
 	// ----------------------------------WEBSOCKET SERVICES------------------------------
+	
+	
 	find_user_with_id(client_id: string){
 		const user = this.connected_users.get(client_id);
 		return user;
@@ -267,28 +305,7 @@ export class ChatService {
 		return false;
 	}
 
-	async can_join(user: User, room: Channel, arg: string): Promise<boolean> {
-		if (await this.is_ban(user.userName, room.room_name) === true)
-			return false;
-		if (room.is_protected === true)
-		{
-			if (room.password)
-			{
-				try{
-					const match = await bcrypt.compare(arg, room.password);
-					if (match)
-						return true;
-					else
-						return false;
-				}
-				catch (error) {
-					console.error('Error while comparing password:', error);
-					return false;
-				}
-			}
-		}
-		return true;
-	}
+	
 
 	// find_priv_msg_room(to: User, from: User){
 	// 	for (const [room_name, messages] of this.direct_msg.entries()){
