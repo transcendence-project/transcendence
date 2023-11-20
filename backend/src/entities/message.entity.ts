@@ -21,7 +21,7 @@ export class Message {
 	@Column()
 	content: string
 
-	@Column()
+	@Column({nullable: true})
 	createdAt: Date
 
 }

@@ -50,33 +50,41 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import StatusUser from "@/components/StatusUser.vue";
+import store from '@/store';
+
 interface Match {
-  date: string;
-  opponent: string;
-  result: string;
+	date: string;
+	opponent: string;
+	result: string;
 }
 
-const match = ref<Match[]>([
-  { date: "2023-08-15", opponent: "Player A", result: "Win" },
-  { date: "2023-08-10", opponent: "Player B", result: "Loss" },
-  { date: "2023-08-05", opponent: "Player C", result: "Draw" },
-  { date: "2023-08-15", opponent: "Player A", result: "Win" },
-  { date: "2023-08-10", opponent: "Player B", result: "Loss" },
-  { date: "2023-08-05", opponent: "Player C", result: "Draw" },
-  { date: "2023-08-15", opponent: "Player A", result: "Win" },
-  { date: "2023-08-10", opponent: "Player B", result: "Loss" },
-  { date: "2023-08-05", opponent: "Player C", result: "Draw" },
+onMounted(() => {
+	store.dispatch('fetchUserData');
+	});
 
+const match = ref<Match[]>([
+	{ date: "2023-08-15", opponent: "Player A", result: "Win" },
+	{ date: "2023-08-10", opponent: "Player B", result: "Loss" },
+	{ date: "2023-08-05", opponent: "Player C", result: "Draw" },
+	{ date: "2023-08-15", opponent: "Player A", result: "Win" },
+	{ date: "2023-08-10", opponent: "Player B", result: "Loss" },
+	{ date: "2023-08-05", opponent: "Player C", result: "Draw" },
+	{ date: "2023-08-15", opponent: "Player A", result: "Win" },
+	{ date: "2023-08-10", opponent: "Player B", result: "Loss" },
+	{ date: "2023-08-05", opponent: "Player C", result: "Draw" },
+	
 ]);
 
-const fullname = ref("Yonas Yohannes");
+const data = ref(null);
+const fullname = computed(() => store.getters.getDisplayName);
 const imgname = ref("head.svg");
-const win = ref(65);
-const lose = ref(5);
-const draw = ref(9);
-const rank = ref(3);
+// const imgname = computed(() => store.getters.getImage);
+const win = computed(() => store.getters.getWin);
+const lose = computed(() => store.getters.getLose);
+const draw = computed(() => store.getters.getDraw);
+const rank = computed(() => store.getters.getRank);
 const avail = ref(true);
 
 </script>

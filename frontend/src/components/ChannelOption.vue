@@ -11,14 +11,18 @@
 		:class="{ active: showDropdownopt }"
 		@click.stop=""
 	  >
-		<router-link to="/chat" @click.native="closeDropdownopt">Leave channel</router-link>
+		<router-link to="/chat" @click.native="closeDropdownopt"  @click="leave_room">Leave channel</router-link>
+		<!-- <router-link to="/chat" @click.native="closeDropdownopt">View Membmers</router-link> -->
+		<!-- <a @click="viewMembers">View Members</a> -->
 	  </div>
 	</div>
   </template>
   
   <script lang="ts">
   import { Options, Vue } from 'vue-class-component';
-  
+  import { defineComponent, } from "vue";
+  import store from '@/store';
+
   @Options({
 	name: 'DropdownoptComponent',
   })
@@ -46,7 +50,19 @@
 	  this.showDropdownopt = false;
 	  document.removeEventListener('click', this.closeDropdownoptOnClickOutside);
 	}
+
+	public viewMembers(): void {
+    // Trigger the method to retrieve channel members in the parent component (ChatPage)
+    // this.$emit('view-members', this.channel);
+    this.closeDropdownopt();
   }
+
+  leave_room(){
+	if (store.state.chat.socket){
+		store.state.chat.socket.emit('leave_chan', localStorage.getItem('chan_to_leave'));
+		}
+  	}
+}
   </script>
   
   <style scoped>

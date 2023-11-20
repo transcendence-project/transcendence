@@ -20,7 +20,7 @@ export class AuthController {
 	@Get('/me')
 	@UseGuards(JwtAuthGuard)
 	getProfile(@Req() req) {
-		// console.log('in get profile, req.user: ', req.user);
+		console.log('in get profile, req.user: ', req.user);
 		return req.user;
 	}
 
@@ -28,10 +28,10 @@ export class AuthController {
 	@UseGuards(AuthGuard('42'))
 	async callback(@Req() req, @Res() res) {
 		const user = req.user; // the authenticated user
-		const token = this.authService.generate_jwt_token(user.userName);
+		const token = this.authService.generate_jwt_token(user.userName, user.id);
 		// const decodeToken = this.authService.decode_token(token);
 		// console.log('back in controller');
-		// console.log("Token: ", token);
+		console.log("Token: ", token);
 		const url = new URL('http://localhost:8080/home');
 		url.searchParams.set('code', token);
 		res.status(200).redirect(url.href);
@@ -71,7 +71,7 @@ export class AuthController {
 		// 	throw new UnauthorizedException('Wrong authentication code');
 		// }
 		// else login to game, display user profile
-		const token = this.authService.generate_jwt_token(user.username); // will later be req.user.username
+		const token = this.authService.generate_jwt_token(user.username, user.id); // will later be req.user.username
 		return (token) // will store it local storage front end
 	}
 }

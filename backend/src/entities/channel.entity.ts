@@ -1,4 +1,3 @@
-
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany, ManyToMany, ManyToOne, JoinTable } from "typeorm";
 import { Message } from "./message.entity";
 import { User } from "./user.entity";
@@ -12,7 +11,7 @@ export class Channel {
     room_name: string;
 
     @Column()
-    description: string;
+    description: string; // ??
 
     @OneToMany(() => Message, message => message.channel)
     messages: Message[];
@@ -26,7 +25,7 @@ export class Channel {
 	admins: User[];
 
     @ManyToMany(() => User, user => user.channels,)
-	@JoinTable()
+	// @JoinTable()
     members: User[];
 
 	@ManyToMany(type => User)
@@ -39,11 +38,14 @@ export class Channel {
 	@Column({ nullable: true})
 	password: string;
 
-	@Column({nullable: true})
+	@Column({nullable: true, default: false})
 	is_private: boolean;
 
-	@Column({nullable: true})
+	@Column({nullable: true, default: false})
 	is_protected: boolean;
+
+	@Column({nullable: true, default: false})
+	is_public: boolean;
 
 	//   @Column('text', { array: true, nullable: true  })
 //   banned: string[];

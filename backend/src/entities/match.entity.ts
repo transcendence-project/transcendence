@@ -6,8 +6,11 @@ export class Match {
 	@PrimaryGeneratedColumn()
 	id: number
 
-	@ManyToOne(() => User, user => user.matches)
-	user: User
+	@ManyToOne(() => User, user => user.matchesAsPlayerOne)
+	playerOne: User
+
+	@ManyToOne(() => User, user => user.matchesAsPlayerTwo)
+	playerTwo: User
 
 	@Column()
 	score: string

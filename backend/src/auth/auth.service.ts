@@ -10,13 +10,12 @@ import { JwtService } from '@nestjs/jwt';
 export class AuthService{
 	constructor(private userService: UsersService, private jwtService: JwtService) {}
 	async validate(user: createUserDTO): Promise<User> {
-		const user1 = await this.userService.create(user.email, user.username);
+		const user1 = await this.userService.create(user.email, user.username, user.fullname, user.image);
 		console.log(user1.userName);
 		return user1;
 	}
-
-	generate_jwt_token(username: string ){
-		return this.jwtService.sign({ username: username });
+	generate_jwt_token(username: string, id: number ){
+		return this.jwtService.sign({ sub: id, username: username});
 	}
 
 	decode_token(token: string) {
@@ -24,9 +23,9 @@ export class AuthService{
 	}
 	async user_by_token(token: string)
 	{
-		const decodeToken = this.decode_token(token);
-		return (await this.userService.findOneByUserName(decodeToken.username));
-		
+		const decode_token = this.decode_token(token);
+		const user = await this.userService.findOne(decode_token.sub);
+		return user;
 	}
 
 	async generateTwoFactorAuthenticationSecret(user: Partial<User>) {
