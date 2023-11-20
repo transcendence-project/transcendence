@@ -10,7 +10,9 @@ export class GameService {
     private custom_queue: string[] = [];
     private paddle: Paddle;
     private ball: Ball;
-    constructor(private readonly authService: AuthService) {}
+    constructor(private readonly authService: AuthService) {
+
+    }
 
     async set_online_user(client: Socket ,token: any){
 		const _token = token;
@@ -30,6 +32,20 @@ export class GameService {
         const height : number = 400;
         const table_size : number[] = [width,height];
         return table_size;
+    }
+    // initializeGame(canvasWidth: number, canvasHeight: number) 
+    // {
+    //     this.paddle.width
+    // }
+    draw_table(canvasWidth: number, canvasHeight: number)
+    {
+        // const paddleWidth = 20 / canvasWidth;
+        // const paddleHeight = 100 / canvasHeight;
+
+
+        // this.paddle.width = paddleWidth;
+        // this.paddle.height = paddleHeight;
+        
     }
 }
 
