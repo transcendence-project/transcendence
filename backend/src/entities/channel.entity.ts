@@ -24,7 +24,7 @@ export class Channel {
 	@JoinTable()
 	admins: User[];
 
-    @ManyToMany(() => User, user => user.channels,)
+    @ManyToMany(() => User, user => user.channels)
 	// @JoinTable()
     members: User[];
 
@@ -47,8 +47,9 @@ export class Channel {
 	@Column({nullable: true, default: false})
 	is_public: boolean;
 
-	//   @Column('text', { array: true, nullable: true  })
-//   banned: string[];
+	@ManyToMany(type => User)
+	@JoinTable()
+  	banned: User[];
 
 //   @Column('text', { array: true , nullable: true})
 //   muted: string[];

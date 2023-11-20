@@ -13,18 +13,22 @@ import * as bcrypt from 'bcrypt'
 export class ChatService {
 	private connected_users: Map<string, User> = new Map();
 	// private game_invites: Map<string, string[]> = new Map(); // store only user names?
-	private direct_msg: Map<string, {to: string, from: string, content: string, created: Date }[]> = new Map();
+	// private direct_msg: Map<string, {to: string, from: string, content: string, created: Date }[]> = new Map();
 
 	constructor(@InjectRepository(Channel) private channelRepo: Repository<Channel>,
 	@InjectRepository(Message) private messageRepo: Repository<Message>,
 	private authService: AuthService ){}
 
-	// view all channels
+		//  ----------------------- GET CHANNEL / CONTENT -----------------------------
 	async get_all_chan() {
 		return this.channelRepo.find();
 	}
 
-	// view all channel members
+	async chan_by_name(chan_name: string) // or by id
+	{
+		return (await this.channelRepo.findOne({ where: { room_name: chan_name }, relations: ['members', 'admins', 'owner', 'messages', 'banned'] }));
+	}
+
 	async mem_by_chan(chan_name: string): Promise<User[] | undefined> {
 		const channel = await this.channelRepo.findOne({ where: { room_name: chan_name }, relations: ['members'] });
 		if (channel)
@@ -43,12 +47,7 @@ export class ChatService {
 			return channel.owner;
 	}
 
-	// get channel by name
-	async chan_by_name(chan_name: string) // or by id
-	{
-		return (await this.channelRepo.findOne({ where: { room_name: chan_name }, relations: ['members', 'admins', 'owner', 'messages'] }));
-	}
-
+		//  ----------------------- CREATING / ADDING / SAVE -----------------------------
 	async create_chan(chan_name: string, user: User, pass: string) {
 		const chan = await this.chan_by_name(chan_name);
 		if (chan || chan_name === ""){
@@ -62,9 +61,8 @@ export class ChatService {
 			try{
 				if (pass){
 					const chan2 = this.channelRepo.create({ room_name: chan_name, owner: user, password: pass, 
-						members: [], admins: [], messages: [],  description: "", isGroupChannel: true, is_protected: true });
+						members: [], admins: [], messages: [], banned: [], description: "", isGroupChannel: true, is_protected: true });
 					chan2.members.push(user);
-					// chan2.admins.push(user);
 					await this.channelRepo.save(chan2);
 					console.log(`Channel ${chan_name} created successfully`);
 					return (chan2)
@@ -72,12 +70,10 @@ export class ChatService {
 				else
 				{
 					const chan2 = this.channelRepo.create({ room_name: chan_name, owner: user, password: pass, 
-						members: [], admins: [], messages: [], description: "", isGroupChannel: true, is_public: true });
+						members: [], admins: [], messages: [], banned: [], description: "", isGroupChannel: true, is_public: true });
 					chan2.members.push(user);
-					// chan2.admins.push(user);
 					await this.channelRepo.save(chan2);
 					console.log(`Channel ${chan_name} created successfully`);
-					// console.log(chan2.members);
 					return (chan2)
 				}
 
@@ -88,27 +84,12 @@ export class ChatService {
 	}
 
 	async add_chan_mem(user: User, chan_name: string) {
-		// insert or create the user in the channel memeber table
 		const chan = await this.chan_by_name(chan_name);
 		if (chan) {
 			chan.members.push(user);
 			await this.channelRepo.save(chan);
 		}
 		// else channel doesnot exist
-	}
-
-	async rem_chan_mem(user: User, chan_name: string) {
-		const userIdToRemove = user.id;
-		const chan = await this.chan_by_name(chan_name);
-		if (chan) {
-			chan.members = chan.members.filter(member => member.id !== userIdToRemove);
-			chan.admins = chan.admins.filter(admin => admin.id !== userIdToRemove);
-			if (chan.owner)
-				if (chan.owner.id === userIdToRemove)
-					chan.owner = null;
-
-			await this.channelRepo.save(chan);
-		}
 	}
 
 	async add_chan_admin(user_to_add: string, chan_name: string) {
@@ -120,11 +101,10 @@ export class ChatService {
 		}
 	}
 
-	async rem_chan_admin(user: User, chan_name: string) {
-		const admin_to_rem = user.userName;
+	async add_chan_ban(user: User, chan_name: string) {
 		const chan = await this.chan_by_name(chan_name);
 		if (chan) {
-			chan.admins = chan.admins.filter(admin => admin.userName !== admin_to_rem);
+			chan.banned.push(user);
 			await this.channelRepo.save(chan);
 		}
 	}
@@ -138,12 +118,46 @@ export class ChatService {
 		// console.log(chan);
 	}
 
+
+		//  ----------------------- REMOVE -----------------------------
+
+	async rem_chan_mem(user: User, chan_name: string) {
+		const userIdToRemove = user.id;
+		const chan = await this.chan_by_name(chan_name);
+		if (chan) {
+			chan.members = chan.members.filter(member => member.id !== userIdToRemove);
+			chan.admins = chan.admins.filter(admin => admin.id !== userIdToRemove);
+			if (chan.owner)
+				if (chan.owner.id === userIdToRemove)
+					chan.owner = null;
+			// if (!chan.members.length && !chan.admins.length && !chan.owner)
+			// {
+			// 	try {
+			// 		await this.channelRepo.remove(chan);
+			// 		console.log('Channel deleted successfully.');
+			// 	  } catch (error) {
+			// 		console.error('Error deleting channel:', error.message);
+			// 	  }
+			// }
+			await this.channelRepo.save(chan);
+		}
+	}
+
+	async rem_chan_admin(user: User, chan_name: string) {
+		const admin_to_rem = user.userName;
+		const chan = await this.chan_by_name(chan_name);
+		if (chan) {
+			chan.admins = chan.admins.filter(admin => admin.userName !== admin_to_rem);
+			await this.channelRepo.save(chan);
+		}
+	}
+
+
+
 	//  ----------------------- CHECKS -----------------------------
 	async is_admin(user_name: string, chan_name: string) {
 		const chan = await this.chan_by_name(chan_name);
-		// console.log(chan);
 		const isAdmin = chan.admins.some((admin: User) => admin.userName === user_name);
-		// const user = this.channelRepo.findOneBy({/* user_name */ }); // from the admin table/array
 		if (isAdmin)
 			return true;
 		else
@@ -166,10 +180,12 @@ export class ChatService {
 	}
 
 	async is_ban(user_name: string, chan_name: string) {
-		// if in banned table of repo
-		// return true
-		// else
-		// return false;
+		const chan = await this.chan_by_name(chan_name);
+		const isBanned = chan.banned.some((ban: User) => ban.userName === user_name);
+		if (isBanned)
+			return true;
+		else
+			return false;
 	}
 
 	async is_mute(user_name: string, chan_name: string) {
@@ -184,24 +200,7 @@ export class ChatService {
 		// update/set password of the channel (from repo or local storage?)
 	}
 
-// --------------------------------SPECIFIC TO OWNERS/ADMINISTRATORS-------------------------
 
-	async kick_user(user_to_kick: string, chan_name: string) {
-		// rm chan_mem
-	}
-	// ban user
-	async ban_user(user_to_ban: string, chan_name: string) {
-		// add user to the banned table of the 
-	}
-	// mute user
-	async mute_user(req_user: string, user_to_mute: string, chan_name: string) {
-		// if (this.is_owner(req_user) || this.is_admin(req_user))
-		// add user to the mute table?
-	}
-	async unmute_user(req_user: string, user_to_mute: string, chan_name: string) {
-		// if (this.is_owner(req_user) || this.is_admin(req_user))
-		// delete user to the mute table?
-	}
 	// ----------------------------------WEBSOCKET SERVICES------------------------------
 	find_user_with_id(client_id: string){
 		const user = this.connected_users.get(client_id);
@@ -225,21 +224,8 @@ export class ChatService {
 
 	async set_user(client: Socket){
 		const token = client.handshake.auth.token;
-		// console.log(token);
 		const user = await this.authService.user_by_token(token);
-		// console.log('user from set_user below');
-		// console.log(user);
 		this.connected_users.set(client.id, user);
-		// for (const [userID, user] of this.connected_users.entries())
-		// {
-		// 	console.log('comes here?????');
-		// 	console.log(userID);
-		// 	console.log(user);
-			// if (userID === client_id){
-			// 	console.log("USER FOUNDDD!!!!!");
-				// return user;
-			// }
-		// }
 		// set user as online
 	}
 
@@ -272,7 +258,8 @@ export class ChatService {
 	}
 
 	async can_join(user: User, room: Channel, arg: string): Promise<boolean> {
-		
+		if (await this.is_ban(user.userName, room.room_name) === true)
+			return false;
 		if (room.is_protected === true)
 		{
 			if (room.password)
@@ -293,24 +280,24 @@ export class ChatService {
 		return true;
 	}
 
-	find_priv_msg_room(to: User, from: User){
-		for (const [room_name, messages] of this.direct_msg.entries()){
-			for (const msg_contents of messages){
-				if (msg_contents.to === to.userName && msg_contents.from === from.userName || 
-					msg_contents.to === from.userName && msg_contents.to === from.userName){
-					return room_name;
-				}
-			}
-		}
-	}
-	set_direct_msg(to: User, from: User, room_name: string, content: string)
-	{
-		const message = {to: to.userName, from: from.userName, content: content, created: new Date()};
-		// Retrieve the existing array of messages for the room or create a new one if it doesn't exist
-		const dms = this.direct_msg.get(room_name) || [];
-		dms.push(message);
-		this.direct_msg.set(room_name, dms);
-	}
+	// find_priv_msg_room(to: User, from: User){
+	// 	for (const [room_name, messages] of this.direct_msg.entries()){
+	// 		for (const msg_contents of messages){
+	// 			if (msg_contents.to === to.userName && msg_contents.from === from.userName || 
+	// 				msg_contents.to === from.userName && msg_contents.to === from.userName){
+	// 				return room_name;
+	// 			}
+	// 		}
+	// 	}
+	// }
+	// set_direct_msg(to: User, from: User, room_name: string, content: string)
+	// {
+	// 	const message = {to: to.userName, from: from.userName, content: content, created: new Date()};
+	// 	// Retrieve the existing array of messages for the room or create a new one if it doesn't exist
+	// 	const dms = this.direct_msg.get(room_name) || [];
+	// 	dms.push(message);
+	// 	this.direct_msg.set(room_name, dms);
+	// }
 }
 
 // -------------------------------------------------------------------------------

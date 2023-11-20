@@ -25,6 +25,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     return "Hello world!";
   }
 
+  // ----------------------------------- CONNECTION ---------------------------------
+
 	async handleConnection(client: Socket) { // called automatically when frontend establish websocket connection
 		console.log(`Client connected in chat: ${client.id}`);
 		await this.chatService.set_user(client); // after login page fix
@@ -48,6 +50,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		client.emit('disconnection_success');
 	}
 
+	// ----------------------------------- MESSAGE ---------------------------------
+
 	@SubscribeMessage('send_msg_to_chan')
 	async send_message_chan(client: any, payload: any) {
 		const user = this.chatService.find_user_with_id(client.id);
@@ -64,23 +68,25 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		this.server.emit('update_chan_message', data_to_send);
 	}
 
-	@SubscribeMessage('private_message')
-	send_message_dm(client: any, payload: any): void {
-		const { username, message } = payload;
-		const user = this.chatService.find_user_with_id(client.id);
-		const reciever = this.chatService.find_user_with_id(username);
-		// check if user and reciever are friends, if no, error mesage
-		const dm_name = this.chatService.find_priv_msg_room(reciever, user);
-		if (dm_name) {
-			this.server.to(this.chatService.find_id(username)).emit('priv_message', { message, sender: client.id });
-			this.chatService.set_direct_msg(reciever, user, dm_name, message);
-		}
-		else {
-			const new_dm_name = user.userName + "_" + reciever.userName;
-			this.chatService.set_direct_msg(reciever, user, new_dm_name, message);
-		}
-		client.emit('priv_msg_success');
-	}
+	// @SubscribeMessage('private_message')
+	// send_message_dm(client: any, payload: any): void {
+	// 	const { username, message } = payload;
+	// 	const user = this.chatService.find_user_with_id(client.id);
+	// 	const reciever = this.chatService.find_user_with_id(username);
+	// 	// check if user and reciever are friends, if no, error mesage
+	// 	const dm_name = this.chatService.find_priv_msg_room(reciever, user);
+	// 	if (dm_name) {
+	// 		this.server.to(this.chatService.find_id(username)).emit('priv_message', { message, sender: client.id });
+	// 		this.chatService.set_direct_msg(reciever, user, dm_name, message);
+	// 	}
+	// 	else {
+	// 		const new_dm_name = user.userName + "_" + reciever.userName;
+	// 		this.chatService.set_direct_msg(reciever, user, new_dm_name, message);
+	// 	}
+	// 	client.emit('priv_msg_success');
+	// }
+
+// ----------------------------------- CREATE / JOIN / LEAVE ---------------------------------
 
 	@SubscribeMessage('create_prot_room')
 	async create_prot_room(client: any, payload: any): Promise<void> {
@@ -177,6 +183,25 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		client.emit('leave_room_success', room_name);
 	}
 
+	// ----------------------------------- ACTIONS ---------------------------------
+
+	@SubscribeMessage('set_admin')
+	async set_admin(client: any, payload: any) {
+		const { admin_to_add, room_name } = payload;
+		const user = this.chatService.find_user_with_id(client.id);
+		if (await this.chatService.is_admin(user.userName, room_name) || await this.chatService.is_owner(user.userName, room_name)) {
+			await this.chatService.add_chan_admin(admin_to_add, room_name);
+			const data_to_send = {
+				chan_name: room_name,
+				admin: admin_to_add,
+			};
+			this.server.emit('update_admin', data_to_send);
+			this.server.to(room_name).emit('update_admin', data_to_send)
+		}
+		// else
+		// send to user that they are not an admin or owner
+	}
+
 	@SubscribeMessage('mute_user')
 	mute_user(client: any, payload: any): void {
 		const { user_to_mute, room_name } = payload;
@@ -194,7 +219,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		const user1 = this.chatService.find_user_with_name(user_to_rem);
 		const id_to_rem = this.chatService.find_id(user1.userName);
 		if (await this.chatService.is_admin(user.userName, room_name) || await this.chatService.is_owner(user.userName, room_name)) {
-			this.chatService.rem_chan_mem(user1, room_name)
+			await this.chatService.rem_chan_mem(user1, room_name)
 			const data_to_send = {
 				chan_name: room_name,
 				user: user1.userName,
@@ -203,6 +228,27 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			this.server.to(id_to_rem).emit('kicked', room_name);
 		}
 	}
+
+	@SubscribeMessage('ban_user')
+	async ban_user(client: any, payload: any) {
+		const { user_to_ban, room_name } = payload;
+		const user = this.chatService.find_user_with_id(client.id);
+		const user1 = this.chatService.find_user_with_name(user_to_ban);
+		const id_to_rem = this.chatService.find_id(user1.userName);
+		if (await this.chatService.is_admin(user.userName, room_name) || await this.chatService.is_owner(user.userName, room_name)) {
+			await this.chatService.rem_chan_mem(user1, room_name);
+			await this.chatService.add_chan_ban(user1, room_name);
+			const data_to_send = {
+				chan_name: room_name,
+				user: user1.userName,
+			};
+			this.server.to(room_name).emit('leave_room_update', data_to_send);
+			this.server.to(id_to_rem).emit('kicked', room_name);
+		}
+		// else notify accordingly
+	}
+
+	// -------------------------------------------------------------------------------
 
 	// @SubscribeMessage('invite_to_game')
 	// invite_user(client: any, invitee_: string): void {
@@ -226,22 +272,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		// send error message to user: user not owner or admin
 	}
 
-	@SubscribeMessage('set_admin')
-	async set_admin(client: any, payload: any) {
-		const { admin_to_add, room_name } = payload;
-		const user = this.chatService.find_user_with_id(client.id);
-		if (await this.chatService.is_admin(user.userName, room_name) || await this.chatService.is_owner(user.userName, room_name)) {
-			await this.chatService.add_chan_admin(admin_to_add, room_name);
-			const data_to_send = {
-				chan_name: room_name,
-				admin: admin_to_add,
-			};
-			this.server.emit('update_admin', data_to_send);
-			this.server.to(room_name).emit('update_admin', data_to_send)
-		}
-		// else
-		// send to user that they are not an admin or owner
-	}
+	
 
 	@SubscribeMessage('rem_admin')
 	rem_admin(client: any, payload) {

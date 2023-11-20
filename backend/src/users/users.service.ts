@@ -62,7 +62,6 @@ export class UsersService {
 
   async findUserChan(user_id: number) {
     const user = await this.findOne(user_id);
-	console.log(user)
     return user.channels;
   }
 

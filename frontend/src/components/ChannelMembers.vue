@@ -47,6 +47,7 @@
 									<button class="intbtn p-2 mx-2" @click="make_admin(friend.user)">Make Admin</button>
 									<button class="intbtn p-2 mx-2" @click="mute_mem(friend.user)">Mute</button>
 									<button class="intbtn p-2 mx-2" @click="kick_mem(friend.user)">Kick</button>
+									<button class="intbtn p-2 mx-2" @click="ban_mem(friend.user)">Ban</button>
 								</div>
 
 							</div>
@@ -212,10 +213,16 @@ export default defineComponent({
 			});
 		},
 		mute_mem(member: string) {
-			store.state.chat.socket.emit('kick_user', {
+			store.state.chat.socket.emit('mute_user', {
 				user_to_mute: member,
 				room_name: localStorage.getItem('currentChanName'),
 			});
+		},
+		ban_mem(member: string) {
+			store.state.chat.socket.emit('ban_user', {
+				user_to_ban: member,
+				room_name: localStorage.getItem('currentChanName'),
+			})
 		}
 		// async showUserList() {
 		//   this.userList = [];
