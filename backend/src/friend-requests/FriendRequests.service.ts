@@ -27,7 +27,6 @@ export class FriendRequestService {
 		// add sender to receiver's friends
 		await this.userService.addFriend(request.sender.id, request.receiver);
 		await this.userService.addFriend(request.receiver.id, request.sender);
-
 		this.friendRequestRepository.delete(requestId);
     }
 

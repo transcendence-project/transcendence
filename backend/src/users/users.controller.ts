@@ -43,12 +43,12 @@ export class UsersController {
 		return (await this.userService.getAchievements(req.user.id))
 	}
 
-	@Patch(':id/giveAchievement/:achievementTitle')
-	@UseGuards(JwtAuthGuard)
-	giveAchievement(@Req() req, @Param('id') id: string, @Param('achievementTitle') achievementTitle: string){
-		console.log('in give achievement, req.user.id: ', req.user.id);
-		return (this.userService.addAchievement(req.user.id, achievementTitle))
-	}
+	// @Patch(':id/giveAchievement/:achievementTitle')
+	// @UseGuards(JwtAuthGuard)
+	// giveAchievement(@Req() req, @Param('id') id: string, @Param('achievementTitle') achievementTitle: string){
+	// 	console.log('in give achievement, req.user.id: ', req.user.id);
+	// 	return (this.userService.addAchievement(req.user.id, achievementTitle))
+	// }
 	@Get('my/channels')
 	@UseGuards(JwtAuthGuard)
 	async my_channels(@Req() req){
@@ -75,6 +75,7 @@ export class UsersController {
 	@Get('my/friends')
 	@UseGuards(JwtAuthGuard)
 	async my_friends(@Req() req){
+		console.log('in my friends, req.user.id: ', req.user.id);
 		// console.log(req.user.id);
 		return (await this.userService.getFriends(req.user.id));
 	}

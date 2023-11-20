@@ -213,9 +213,9 @@ export class UsersService {
 	const score: string = winnerScoreString + '-' + loserScoreString;
 
 	const match = await this.matchesService.create(winner, loser, score, loserID, winnerID);
-	console.log('in save match, winner: ', winner);
-	console.log('in save match, loser: ', loser);
-	console.log('in save match, match: ', match);
+	// console.log('in save match, winner: ', winner);
+	// console.log('in save match, loser: ', loser);
+	// console.log('in save match, match: ', match);
 	// console.log('in save match, winner matches as player one: ', winner.matchesAsPlayerOne);
 	// console.log('in save match, loser matches as player two: ', loser.matchesAsPlayerTwo);
 	winner.matchesAsPlayerOne.push(match);
