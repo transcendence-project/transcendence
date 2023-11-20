@@ -48,7 +48,7 @@ export class ChatService {
 	}
 
 		//  ----------------------- CREATING / ADDING / SAVE -----------------------------
-	async create_chan(chan_name: string, user: User, pass: string) {
+	async create_chan(chan_name: string, user: User, pass: string, type: string) {
 		const chan = await this.chan_by_name(chan_name);
 		if (chan || chan_name === ""){
 			if (chan)
@@ -59,7 +59,7 @@ export class ChatService {
 		}
 		else {
 			try{
-				if (pass){
+				if (type === "prot"){
 					const chan2 = this.channelRepo.create({ room_name: chan_name, owner: user, password: pass, 
 						members: [], admins: [], messages: [], banned: [], description: "", isGroupChannel: true, is_protected: true });
 					chan2.members.push(user);
@@ -67,7 +67,7 @@ export class ChatService {
 					console.log(`Channel ${chan_name} created successfully`);
 					return (chan2)
 				}
-				else
+				else if (type === "pub")
 				{
 					const chan2 = this.channelRepo.create({ room_name: chan_name, owner: user, password: pass, 
 						members: [], admins: [], messages: [], banned: [], description: "", isGroupChannel: true, is_public: true });
@@ -75,6 +75,16 @@ export class ChatService {
 					await this.channelRepo.save(chan2);
 					console.log(`Channel ${chan_name} created successfully`);
 					return (chan2)
+				}
+				else if (type === "priv")
+				{
+					const chan2 = this.channelRepo.create({ room_name: chan_name, owner: user, password: pass, 
+					members: [], admins: [], messages: [], banned: [], description: "", isGroupChannel: true, is_private: true });
+					chan2.members.push(user);
+					await this.channelRepo.save(chan2);
+					console.log(`Channel ${chan_name} created successfully`);
+					return (chan2)
+
 				}
 
 			}catch (error) {

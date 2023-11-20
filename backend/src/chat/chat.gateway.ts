@@ -88,35 +88,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 // ----------------------------------- CREATE / JOIN / LEAVE ---------------------------------
 
-	@SubscribeMessage('create_prot_room')
-	async create_prot_room(client: any, payload: any): Promise<void> {
-		const { channel_name, password } = payload;
-		const user = this.chatService.find_user_with_id(client.id);
-		const salt = await bcrypt.genSalt(10);
-		const hashedPassword = await bcrypt.hash(password, salt);
-		const chan = await this.chatService.create_chan(channel_name, user, hashedPassword);
-		client.join(channel_name);
-		if (chan) {
-			const data_to_send = {
-				chan_name: channel_name,
-				isPublic: false,
-				isPrivate: false,
-				isProtected: true,
-				user: user.userName,
-				id: chan.id,
-			};
-			client.emit('create_room_success', data_to_send);
-			this.server.emit('update_chan_list', data_to_send);
-		}
-	}
-
-	@SubscribeMessage('create_pub_room')
+@SubscribeMessage('create_pub_room')
 	async create_pub_room(client: any, payload: any): Promise<void> {
 
 		console.log("reached create pub room - backend websockets");
 		const { channel_name, password } = payload;
 		const user = this.chatService.find_user_with_id(client.id);
-		const chan = await this.chatService.create_chan(channel_name, user, password);
+		const chan = await this.chatService.create_chan(channel_name, user, password, "pub");
 		client.join(channel_name);
 		if (chan) {
 			const data_to_send = {
@@ -132,6 +110,45 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		}
 	}
 
+	@SubscribeMessage('create_prot_room')
+	async create_prot_room(client: any, payload: any): Promise<void> {
+		const { channel_name, password } = payload;
+		const user = this.chatService.find_user_with_id(client.id);
+		const salt = await bcrypt.genSalt(10);
+		const hashedPassword = await bcrypt.hash(password, salt);
+		const chan = await this.chatService.create_chan(channel_name, user, hashedPassword, "prot");
+		client.join(channel_name);
+		if (chan) {
+			const data_to_send = {
+				chan_name: channel_name,
+				isPublic: false,
+				isPrivate: false,
+				isProtected: true,
+				user: user.userName,
+				id: chan.id,
+			};
+			client.emit('create_room_success', data_to_send);
+			this.server.emit('update_chan_list', data_to_send);
+		}
+	}
+
+	@SubscribeMessage('create_priv_room')
+	async create_priv_room(client: any, chan_name: string): Promise<void> {
+		const user = this.chatService.find_user_with_id(client.id);
+		const chan = await this.chatService.create_chan(chan_name, user, "", "priv");
+		client.join(chan_name);
+		if (chan) {
+			const data_to_send = {
+				chan_name: chan_name,
+				isPublic: false,
+				isPrivate: true,
+				isProtected: false,
+				user: user.userName,
+				id: chan.id,
+			};
+		}
+	}
+
 	@SubscribeMessage('join_room')
 	async join_room(client: any, payload: any) {
 		const { room_name, arg } = payload;
@@ -140,7 +157,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		if (await this.chatService.can_join(user, room, arg)) {
 			this.chatService.add_chan_mem(user, room_name);
 			client.join(room_name);
-			if (arg) {
+			if (room.is_protected === true) {
 				const data_to_send = {
 					chan_name: room_name,
 					isPublic: false,
@@ -152,7 +169,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				client.emit('join_room_success', data_to_send);
 				this.server.emit('update_mem_list', data_to_send);
 			}
-			else {
+			else if(room.is_public === true) {
 				const data_to_send = {
 					chan_name: room_name,
 					isPublic: true,
@@ -165,8 +182,38 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				this.server.emit('update_mem_list', data_to_send);
 			}
 		}
+		else if (room.is_private === true) {
+			const data_to_send = {
+				chan_name: room_name,
+				isPublic: false,
+				isPrivate: true,
+				isProtected: false,
+				user: user.userName,
+				id: room.id,
+			};
+			client.emit('join_room_success', data_to_send);
+			this.server.emit('update_mem_list', data_to_send);
+		}
 		// else
 		// 	client.emit('join_room_failure');
+	}
+
+	@SubscribeMessage('add_user_to_priv')
+	add_priv_user(client: any, payload: any) {
+		const { user_to_add, room_name } = payload;
+		const user = this.chatService.find_user_with_id(client.id);
+		if (this.chatService.is_admin(user.userName, room_name) || this.chatService.is_owner(user.userName, room_name)) {
+			const add_user = this.chatService.find_user_with_name(user_to_add);
+			if (add_user)
+			{
+				const user_id = this.chatService.find_id(add_user.userName);
+				this.server.to(user_id).emit('join_priv_room', room_name);
+			}
+			// else
+			// client does not exist
+		}
+		//else
+		// send error message to user: user not owner or admin
 	}
 
 	@SubscribeMessage('leave_chan')
@@ -257,20 +304,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	// 	this.chatService.invite_user_to_game(inviter, invitee);
 	// 	// send message to invitee that he has been invited
 	// }
-
-	@SubscribeMessage('add_user_to_priv')
-	add_priv_user(client: any, payload: any) {
-		const { user_to_add, room_name } = payload;
-		const user = this.chatService.find_user_with_id(client.id);
-		if (this.chatService.is_admin(user.userName, room_name) || this.chatService.is_owner(user.userName, room_name)) {
-			const add_user = this.chatService.find_user_with_name(user_to_add);
-			this.chatService.add_chan_mem(user, room_name);
-			client.join(room_name);
-			client.emit('add_user_success',);
-		}
-		//else
-		// send error message to user: user not owner or admin
-	}
 
 	
 

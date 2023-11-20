@@ -422,13 +422,19 @@ methods: {
       this.showGroupList = false;
     },
     join_pub_chan(room_name: string) {
-      console.log("reached join chan");
       if (store.state.chat.socket)
         store.state.chat.socket.emit("join_room", {
           room_name: room_name,
           arg: "",
         });
     },
+	add_priv_mem(room_name: string) {
+		if (store.state.chat.socket)
+        store.state.chat.socket.emit("add_user_to_priv", {
+		  user_to_add: "",
+          room_name: room_name,
+        });
+	},
     switch_to_group() {
       localStorage.setItem("chat", "group");
       console.log(localStorage.getItem("chat"));
@@ -550,6 +556,14 @@ methods: {
         this.my_chan.push(newChannel);
       }
     });
+	store.state.chat.socket.on("join_priv_room", (chan_name: string) => {
+		if (chan_name){
+			store.state.chat.socket.emit("join_room", {
+			room_name: chan_name,
+			arg: "",
+        });
+	}
+	});
     store.state.chat.socket.on("update_chan_list", (data: any) => {
       if (data) {
         const newChannel: IChannel = {
