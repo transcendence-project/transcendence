@@ -289,41 +289,41 @@ export default defineComponent({
 	userInput1: "" as string,
 	userInput2: "" as string,
 	sndrcvmsg: [] as string[],
-	friends: m_frnd,
-    //   friends: [
-    //     {
-    //       user: "one",
-    //       status: true,
-    //     },
-    //     {
-    //       user: "two",
-    //       status: false,
-    //     },
-    //     {
-    //       user: "three",
-    //       status: true,
-    //     },
-    //     {
-    //       user: "four",
-    //       status: false,
-    //     },
-    //     {
-    //       user: "five",
-    //       status: true,
-    //     },
-    //     {
-    //       user: "one",
-    //       status: true,
-    //     },
-    //     {
-    //       user: "two",
-    //       status: false,
-    //     },
-    //     {
-    //       user: "three",
-    //       status: true,
-    //     },
-    //   ] as FriendsList[],
+	// friends: m_frnd,
+      friends: [
+        {
+          user: "one",
+          status: true,
+        },
+        {
+          user: "two",
+          status: false,
+        },
+        {
+          user: "three",
+          status: true,
+        },
+        {
+          user: "four",
+          status: false,
+        },
+        {
+          user: "five",
+          status: true,
+        },
+        {
+          user: "one",
+          status: true,
+        },
+        {
+          user: "two",
+          status: false,
+        },
+        {
+          user: "three",
+          status: true,
+        },
+      ] as FriendsList[],
     };
   },
   setup() {
@@ -497,6 +497,13 @@ methods: {
       if (store.state.chat.socket)
         store.state.chat.socket.emit("private_message");
     },
+	change_password() {
+		if (store.state.chat.socket)
+			store.state.chat.socket.emit("change_pass", {
+				new_pass: "",
+				room_name: localStorage.getItem("currentChanName"),
+			});
+	},
     showPasswordForm(chan_name: string) {
       this.isPrivate = true;
       localStorage.setItem("toJoinChan", chan_name);

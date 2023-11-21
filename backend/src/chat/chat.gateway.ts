@@ -96,8 +96,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		const { channel_name, password } = payload;
 		const user = this.chatService.find_user_with_id(client.id);
 		const chan = await this.chatService.create_chan(channel_name, user, password, "pub");
-		client.join(channel_name);
 		if (chan) {
+			client.join(channel_name);
 			const data_to_send = {
 				chan_name: channel_name,
 				isPublic: true,
@@ -118,8 +118,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		const salt = await bcrypt.genSalt(10);
 		const hashedPassword = await bcrypt.hash(password, salt);
 		const chan = await this.chatService.create_chan(channel_name, user, hashedPassword, "prot");
-		client.join(channel_name);
 		if (chan) {
+			client.join(channel_name);
 			const data_to_send = {
 				chan_name: channel_name,
 				isPublic: false,
@@ -137,8 +137,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	async create_priv_room(client: any, chan_name: string): Promise<void> {
 		const user = this.chatService.find_user_with_id(client.id);
 		const chan = await this.chatService.create_chan(chan_name, user, "", "priv");
-		client.join(chan_name);
 		if (chan) {
+			client.join(chan_name);
 			const data_to_send = {
 				chan_name: chan_name,
 				isPublic: false,
@@ -184,18 +184,18 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				client.emit('join_room_success', data_to_send);
 				this.server.emit('update_mem_list', data_to_send);
 			}
-		}
-		else if (room.is_private === true) {
-			const data_to_send = {
-				chan_name: room_name,
-				isPublic: false,
-				isPrivate: true,
-				isProtected: false,
-				user: user.userName,
-				id: room.id,
-			};
-			client.emit('join_room_success', data_to_send);
-			this.server.emit('update_mem_list', data_to_send);
+			else if (room.is_private === true) {
+				const data_to_send = {
+					chan_name: room_name,
+					isPublic: false,
+					isPrivate: true,
+					isProtected: false,
+					user: user.userName,
+					id: room.id,
+				};
+				client.emit('join_room_success', data_to_send);
+				this.server.emit('update_mem_list', data_to_send);
+			}
 		}
 		// else
 		// 	client.emit('join_room_failure');
@@ -308,6 +308,18 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			this.server.to(id_to_rem).emit('kicked', room_name);
 		}
 		// else user does not have the priviledge
+	}
+
+	@SubscribeMessage('change_pass')
+	async change_pass(client: any, payload: any ) {
+		const { new_pass, room_name } = payload;
+		const user = this.chatService.find_user_with_id(client.id);
+		if (await this.chatService.is_admin(user.userName, room_name) || await this.chatService.is_owner(user.userName, room_name)) {
+			const salt = await bcrypt.genSalt(10);
+			const hashedPassword = await bcrypt.hash(new_pass, salt);
+			this.chatService.change_chan_pass(room_name, hashedPassword);
+			client.emit("password changed successfully");
+		}
 	}
 
 	// -------------------------------------------------------------------------------
