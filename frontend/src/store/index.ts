@@ -185,6 +185,7 @@ const store = createStore({
 						Authorization: `Bearer ${localStorage.getItem('token')}`,
 					},
 				});
+
 				// console.log(response.data.qrCodeDataURL);
 				localStorage.setItem("qr", response.data.qrCodeDataURL);
 			} catch(error) {

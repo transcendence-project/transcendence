@@ -25,14 +25,35 @@
 							class="w-[80%] h-[2rem] border-0 text-black ml-2 mr-1 rounded-full pl-4 mb-2 focus:border-0 focus:outline-none" />
 
 						<div class="w-full h-[55vh] overflow-y-auto overflow-x-hidden flex-grow max-w-full">
+							
+							
+	
+
+
+
+
+
 							<ul class="w-[95%] p-2 m-2">
 								<div v-for="(result, index) in filteredMyChannel" :key="index">
 									<li class="list-none w-full mb-1">
-										<div v-if="result.isPublic === false"
+										<div v-if="result.isPublic === true"
 											class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom px-4 w-full rounded-[5px]">
 											<a href="#" @click="showChatPage(result.name)">
 												{{ result.name
-												}}<span class="text-sm text-red-700"> private</span>
+												}}<span class="text-sm text-red-700"> public</span>
+											</a>
+
+											<div class="relative">
+												<button class="optbtn px-1 my-1" @click="showSelectedFriend(index)">
+													Options
+												</button>
+											</div>
+										</div>
+										<div v-else-if="result.isProtected === true"
+											class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom px-4 w-full rounded-[5px]">
+											<a href="#" @click="showChatPage(result.name)">
+												{{ result.name
+												}}<span class="text-sm text-green-700"> protected</span>
 											</a>
 
 											<div class="relative">
@@ -45,7 +66,7 @@
 											class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom px-4 w-full rounded-[5px]">
 											<a href="#" @click="showChatPage(result.name)">
 												{{ result.name
-												}}<span class="text-sm text-green-700"> public</span>
+												}}<span class="text-sm text-green-700"> private</span>
 											</a>
 
 											<div class="relative">
@@ -55,18 +76,39 @@
 											</div>
 										</div>
 
-										<div v-if="selectedFriendIndex === index" class="my-2 opt">
+										<div v-if="selectedFriendIndex === index && result.isPrivate === true" class="my-2 opt">
+										<!-- <div v-if="selectedFriendIndex === index && result.isPrivate === true" class="my-2 opt"> -->
 											<button class="intbtn p-2" @click="showMemberList(result.name)">
 												members
 											</button>
 											<button class="intbtn p-2" @click="leave_room(result.name)">
 												leave
 											</button>
+											<button class="intbtn p-2" @click="showAddMember">
+												add member
+											</button>
+											<AddMember v-if="addPrivateMember" @close="showAddMember"/>
+									
+										</div>
+										<div v-else-if="selectedFriendIndex === index" class="my-2 opt">
+										<!-- <div v-else-if="selectedFriendIndex === index" class="my-2 opt"> -->
+											<button class="intbtn p-2" @click="showMemberList(result.name)">
+												members
+											</button>
+											<button class="intbtn p-2" @click="leave_room(result.name)">
+												leave
+											</button>
+						
 										</div>
 										<ChannelMembers v-if="isMembersList" @close="showMemberList" />
 									</li>
 								</div>
 							</ul>
+
+
+
+	
+
 						</div>
 					</div>
 				</div>
@@ -199,6 +241,7 @@ import CreateChannel from "@/components/CreateChannel.vue";
 import OptionMenu from "@/components/OptionMenu.vue";
 import ChannelPassword from "@/components/ChannelPassword.vue";
 import ChannelMembers from "@/components/ChannelMembers.vue";
+import AddMember from "@/components/AddMember.vue";
 import io from "socket.io-client";
 import store from "@/store";
 import { IChannel } from "@/models/channel";
@@ -236,6 +279,7 @@ export default defineComponent({
       isMembersList: false,
 	  selectedRoom: "" as string,
       selectedFriendIndex: null,
+	  addPrivateMember: false,
 	  
 	  // for testing
       message1: "" as string,
@@ -337,6 +381,7 @@ export default defineComponent({
     OptionMenu,
     ChannelPassword,
     ChannelMembers,
+    AddMember,
   },
   computed: {
     searchFriends(): FriendsList[] {
@@ -382,6 +427,10 @@ export default defineComponent({
 	
 },
 methods: {
+	showAddMember(){
+		this.addPrivateMember = !this.addPrivateMember;
+	},
+	
     showSelectedFriend(index: any) {
       if (this.selectedFriendIndex === index) {
         this.selectedFriendIndex = null;
