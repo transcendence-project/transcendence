@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards, Req, Res, Post, HttpCode, Body, UnauthorizedException } from '@nestjs/common';
+import { Controller, Get, UseGuards, Req, Res, Param, Post, HttpCode, Body, UnauthorizedException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { ConfigService } from '@nestjs/config';
@@ -20,7 +20,7 @@ export class AuthController {
 	@Get('/me')
 	@UseGuards(JwtAuthGuard)
 	getProfile(@Req() req) {
-		console.log('in get profile, req.user: ', req.user);
+		// console.log('in get profile, req.user: ', req.user);
 		return req.user;
 	}
 
@@ -38,40 +38,36 @@ export class AuthController {
 	}
 
 	@Get('2fa/generate') // GET just for testing, will later be POST
-	// @UseGuards(JwtAuthGuard) // will get the user which is linked to the sent Bearer token
+	@UseGuards(JwtAuthGuard) // will get the user which is linked to the sent Bearer token
 	async generateQr(@Req() req, @Res() res) {
-		const user = { // for testing purposes
-			id: 4,
-			userName: 'arafeeq',
-			email: 'arafeeq@student.42abudhabi.ae',
-			twoFactorSecret: 'helloworld'
+		try {
+			const otp = this.authService.generateTwoFactorAuthenticationSecret(req.user);
+			// console.log(`user 2fa secret = ${user.twoFactorAuthenticationSecret}`);
+			const code = await this.authService.generateQrCodeDataURL((await otp).otpauthUrl);
+			res.json({ qrCodeDataURL: code });
+
+		} catch (error) {
+			console.error('Error generating QR code:', error.message);
+			res.status(500).json({ error: 'Internal Server Error' });
 		}
-		const otp = this.authService.generateTwoFactorAuthenticationSecret(user); // will be req.user later
-		// console.log(`user 2fa secret = ${user.twoFactorAuthenticationSecret}`);
-		const code = await this.authService.generateQrCodeDataURL((await otp).otpauthUrl);
-		return res.redirect(code);
 	}
 
-	@Post('2fa/authenticate')
+	@Post('2fa/authenticate/:code')
 	@HttpCode(200)
 	@UseGuards(JwtAuthGuard)
-	async authenticate2fa(@Req() req, @Body() body) {
-		const user = { // for testing purposes
-			id: 4,
-			username: 'arafeeq',
-			email: 'arafeeq@student.42abudhabi.ae',
-			twoFactorAuthenticationSecret: 'EIRE46D7NJOEQ53O',
-			is2fa: false
-		}
+	async authenticate2fa(@Param("code") code: string, @Req() req, ) {
+		// console.log(req.user);
 		const isCodeValid = this.authService.is2faCodeValid(
-			"129140",// will later be body.twoFactorAuthenticationCode
-			user, // will later be req.user
+			code,
+			req.user,
 		);
+		if (!isCodeValid) {
+			console.log("INCORRECT 2 FA CODE !!!!!!!!!!!!");
+		}
 		// if (!isCodeValid) {
 		// 	throw new UnauthorizedException('Wrong authentication code');
 		// }
+		// redirect to homepage??
 		// else login to game, display user profile
-		const token = this.authService.generate_jwt_token(user.username, user.id); // will later be req.user.username
-		return (token) // will store it local storage front end
 	}
 }

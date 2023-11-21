@@ -47,9 +47,8 @@ export class UsersService {
     });
     return this.repo.save(user2);
   }
-  async findOne(id: number) {
-	const user = await this.repo.findOneBy({ id });
-	return user;
+  findOne(id: number) {
+	return (this.repo.findOne({where: {id}, relations: ['channels']}))
   }
   async findOneByUserName(userName: string) {
     const user = await this.repo.findOneBy({ userName });
