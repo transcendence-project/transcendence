@@ -24,7 +24,7 @@ export class ChatService {
 		return this.channelRepo.find();
 	}
 
-	async chan_by_name(chan_name: string) // or by id
+	async chan_by_name(chan_name: string): Promise<Channel> // or by id
 	{
 		return (await this.channelRepo.findOne({ where: { room_name: chan_name }, relations: ['members', 'admins', 'owner', 'messages', 'banned'] }));
 	}
@@ -130,6 +130,22 @@ export class ChatService {
 		const chan = await this.chan_by_name(chan_name);
 		if (chan) {
 			chan.banned.push(user);
+			await this.channelRepo.save(chan);
+		}
+	}
+
+	async add_chan_mute(user: User, chan_name: string) {
+		const chan = await this.chan_by_name(chan_name);
+		if (chan) {
+			chan.muted.push(user);
+			await this.channelRepo.save(chan);
+		}
+	}
+
+	async rem_chan_mute(user: User, chan_name: string) {
+		const chan = await this.chan_by_name(chan_name);
+		if (chan) {
+			chan.muted = chan.muted.filter(mute => mute.id !== user.id);
 			await this.channelRepo.save(chan);
 		}
 	}

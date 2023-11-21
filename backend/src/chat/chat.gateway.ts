@@ -8,6 +8,7 @@
 import { Server, Socket } from "socket.io";
 import { ChatService } from "../chat/chat.service";
 import * as bcrypt from 'bcrypt';
+import { Channel } from "entities/channel.entity";
 
 @WebSocketGateway({
   cors: { origin: "http://localhost:8080" },
@@ -253,13 +254,22 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 	@SubscribeMessage('mute_user')
-	mute_user(client: any, payload: any): void {
+	async mute_user(client: any, payload: any): Promise<void> {
 		const { user_to_mute, room_name } = payload;
 		const user = this.chatService.find_user_with_id(client.id); // the one who id muting the other person
 		const user1 = this.chatService.find_user_with_name(user_to_mute); // the one being muted
-		const id_to_mute = this.chatService.find_id(user1.userName); // id of the one being muted
-		const chan = this.chatService.chan_by_name(room_name); // the channel
-
+		const id_to_mute = this.chatService.find_id(user1.userName); // id of the one being muted // the channel
+		if (await this.chatService.is_admin(user.userName, room_name) || await this.chatService.is_owner(user.userName, room_name)) {
+			this.chatService.add_chan_mute(user1, room_name); // add the mute to the channel
+			this.server.to(id_to_mute).emit('muted', user1.userName);
+			setTimeout(async () => {
+				await this.chatService.rem_chan_mute(user1, room_name);
+				this.server.to(id_to_mute).emit('unmuted', user1.userName);
+			}, 300000);
+		}
+		else{
+			client.emit('not_admin');
+		}
 	}
 
 	@SubscribeMessage('kick_user')
