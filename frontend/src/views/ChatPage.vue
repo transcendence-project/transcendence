@@ -173,7 +173,7 @@
 						<input v-model="message" placeholder="message"
 						class="w-[80%] h-[2.5rem] border-0 text-black ml-2 mr-1 rounded-full pl-4 mb-2 focus:border-0 focus:outline-none"
 						style="min-width: 300px" />
-						<ButtonComponent btnContent="Send" @click="sendMessage" class="text" />
+						<ButtonComponent btnContent="Send" @click="sendMessage(selectedRoom)" class="text" />
 					</div>
 
 				</div>
@@ -546,10 +546,12 @@ methods: {
 			this.chatMessage.push({send: true, chat: item.content});
 		});
     },
-    sendMessage() {
+    sendMessage(cur: string) {
+		console.log(cur)
 		if (this.message) {
-			this.chatMessage.push({send: true, chat: this.message});
-			this.isMessageSent = true;
+			localStorage.setItem("currentChanName", cur);
+			// this.chatMessage.push({send: true, chat: this.message});
+			// this.isMessageSent = true;
 			this.send_chan_msg(this.message);
 			this.message = "";
 			
@@ -638,6 +640,12 @@ methods: {
           this.chatMessage.push({send: false, chat: data.content});
           this.isMessageSent = true;
         }
+		else if ( data.user == store.getters.getUserName &&
+          localStorage.getItem("currentChanName") == data.chan)
+		{
+			this.chatMessage.push({send: true, chat: data.content});
+         	 this.isMessageSent = true;
+		}
       }
     });
     store.state.chat.socket.on("priv_msg_success", () => {
