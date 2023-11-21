@@ -71,6 +71,12 @@ export class ChatService {
 				console.log("Channel name too long");
 			return null;
 		}
+		else if (type === "prot" && (pass.length > 20 || pass === "")) {
+			if (pass.length > 20)
+				console.log("Password too long");
+			else
+				console.log("Password cannot be empty");
+		}
 		else {
 			try{
 				if (type === "prot"){
@@ -141,6 +147,15 @@ export class ChatService {
 		await this.messageRepo.save(message);
 	}
 
+	async change_chan_pass(chan_name: string, new_pass: string) {
+		const chan = await this.chan_by_name(chan_name);
+		if (chan)
+		{
+			chan.password = new_pass;
+			await this.channelRepo.save(chan);
+		}
+	}
+
 
 		//  ----------------------- REMOVE -----------------------------
 
@@ -180,17 +195,17 @@ export class ChatService {
 	//  ----------------------- CHECKS -----------------------------
 
 	async is_admin(user_name: string, chan_name: string) {
-		const chan = await this.chan_by_name(chan_name);
-		const isAdmin = chan.admins.some((admin: User) => admin.userName === user_name);
+		const admins = await this.admin_by_chan(chan_name);
+		const isAdmin = admins.some((admin: User) => admin.userName === user_name);
 		if (isAdmin)
 			return true;
 		else
 			return false;
 	}
 	async is_owner(user_name: string, chan_name: string) {
-		const chan = await this.chan_by_name(chan_name);
-		if (chan.owner)
-			if (chan.owner.userName === user_name)
+		const owner = await this.owner_by_chan(chan_name);
+		if (owner)
+			if (owner.userName === user_name)
 				return true;
 		return false;
 	}
