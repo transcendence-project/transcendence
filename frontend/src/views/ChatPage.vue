@@ -84,7 +84,7 @@
 											<button class="intbtn p-2" @click="leave_room(result.name)">
 												leave
 											</button>
-											<button class="intbtn p-2" @click="showAddMember">
+											<button class="intbtn p-2" @click="showAddMember(result.name)">
 												add member
 											</button>
 											<AddMember v-if="addPrivateMember" @close="showAddMember"/>
@@ -427,7 +427,8 @@ export default defineComponent({
 	
 },
 methods: {
-	showAddMember(){
+	showAddMember(channel: string){
+		localStorage.setItem("currentChanName", channel);
 		this.addPrivateMember = !this.addPrivateMember;
 	},
 	
@@ -477,13 +478,6 @@ methods: {
           arg: "",
         });
     },
-	add_priv_mem(room_name: string) {
-		if (store.state.chat.socket)
-        store.state.chat.socket.emit("add_user_to_priv", {
-		  user_to_add: "",
-          room_name: room_name,
-        });
-	},
     switch_to_group() {
       localStorage.setItem("chat", "group");
       console.log(localStorage.getItem("chat"));
@@ -606,6 +600,7 @@ methods: {
       }
     });
 	store.state.chat.socket.on("join_priv_room", (chan_name: string) => {
+		console.log("reached join room back in frontend")
 		if (chan_name){
 			store.state.chat.socket.emit("join_room", {
 			room_name: chan_name,
@@ -622,7 +617,6 @@ methods: {
           isProtected: data.isProtected,
           isPublic: data.isPublic,
         };
-        if (data.user != store.getters.getUserName)
           this.channels.push(newChannel);
       }
     });

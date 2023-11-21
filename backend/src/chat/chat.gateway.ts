@@ -146,6 +146,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				user: user.userName,
 				id: chan.id,
 			};
+			client.emit('create_room_success', data_to_send);
 		}
 	}
 
@@ -208,6 +209,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			if (add_user)
 			{
 				const user_id = this.chatService.find_id(add_user.userName);
+				console.log(user_id);
 				this.server.to(user_id).emit('join_priv_room', room_name);
 			}
 			// else
@@ -275,6 +277,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			this.server.to(room_name).emit('leave_room_update', data_to_send);
 			this.server.to(id_to_rem).emit('kicked', room_name);
 		}
+		// else
+
 	}
 
 	@SubscribeMessage('ban_user')

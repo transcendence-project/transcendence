@@ -7,7 +7,7 @@
           <div class="jn-div">
 			<div class="pas-btn">
 
-				<button class="jnbtn" >Add</button>
+				<button class="jnbtn" @click="add_priv_mem">Add</button>
 			</div>
 			<div class="cls-bt">
 				<button class="clsbtn" @click="closePrivatePage">Close</button>
@@ -20,7 +20,6 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 import store from "@/store";
-// import store from "@/store";
 
 export default defineComponent({
 	data(){
@@ -32,7 +31,13 @@ export default defineComponent({
     closePrivatePage(): void {
       this.$emit('close');
     },
-
+	add_priv_mem() {
+		if (store.state.chat.socket)
+        store.state.chat.socket.emit("add_user_to_priv", {
+		  user_to_add: this.member,
+          room_name: localStorage.getItem('currentChanName'),
+        });
+	},
   },
 });
 

@@ -92,6 +92,7 @@ export class ChatService {
 				}
 				else if (type === "priv")
 				{
+					console.log('type is priv');
 					const chan2 = this.channelRepo.create({ room_name: chan_name, owner: user, password: pass, 
 					members: [], admins: [], messages: [], banned: [], muted: [], isGroupChannel: true, is_private: true });
 					chan2.members.push(user);
