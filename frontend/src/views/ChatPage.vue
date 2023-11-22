@@ -66,7 +66,7 @@
 											class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom px-4 w-full rounded-[5px]">
 											<a href="#" @click="showChatPage(result.name)">
 												{{ result.name
-												}}<span class="text-sm text-green-700"> private</span>
+												}}<span class="text-sm text-blue-700"> private</span>
 											</a>
 
 											<div class="relative">
@@ -87,19 +87,35 @@
 											<button class="intbtn p-2" @click="showAddMember(result.name)">
 												add member
 											</button>
+
 											<AddMember v-if="addPrivateMember" @close="showAddMember"/>
-									
+											
 										</div>
-										<div v-else-if="selectedFriendIndex === index" class="my-2 opt">
-										<!-- <div v-else-if="selectedFriendIndex === index" class="my-2 opt"> -->
-											<button class="intbtn p-2" @click="showMemberList(result.name)">
-												members
-											</button>
-											<button class="intbtn p-2" @click="leave_room(result.name)">
-												leave
-											</button>
-						
-										</div>
+										<div v-else-if="selectedFriendIndex === index && result.isProtected === true" class="my-2 opt">
+											<!-- <div v-else-if="selectedFriendIndex === index" class="my-2 opt"> -->
+												<button class="intbtn p-2" @click="showMemberList(result.name)">
+													members
+												</button>
+												<button class="intbtn p-2" @click="leave_room(result.name)">
+													leave
+												</button>
+												<button class="intbtn p-2" @click="showChagnePassword">
+														change password
+													</button>
+											</div>
+											<ChangePassword v-if="isChangePassword" @close="showChagnePassword"/>
+											<div v-else-if="selectedFriendIndex === index && result.isPublic" class="my-2 opt">
+												<!-- <div v-else-if="selectedFriendIndex === index" class="my-2 opt"> -->
+													<button class="intbtn p-2" @click="showMemberList(result.name)">
+														members
+													</button>
+													<button class="intbtn p-2" @click="leave_room(result.name)">
+														leave
+													</button>
+										
+													
+													
+												</div>
 										<ChannelMembers v-if="isMembersList" @close="showMemberList" />
 									</li>
 								</div>
@@ -128,9 +144,19 @@
 												<div class="mx-2 px-3">{{ friend.user }}</div>
 											</a>
 
-											<div>
+											<div class="flex items-center justify-between">
 												<button class="intbtn p-1">Invite</button>
-												<button class="intbtn p-1">Block</button>
+													<!-- <div v-if="isBlock"> -->
+														<div v-if="friend.isBlock === true">
+														<button class="intbtn p-1" @click="showHideBlock(friend)">
+														<!-- {{ friend.isBlock ? 'Block' : 'Unblock' }} -->
+														Block
+														</button>
+													</div>
+													<div v-else>
+														<button class="intbtn p-1" @click="showHideBlock(friend)">Unblock</button>
+
+													</div>
 											</div>
 										</div>
 									</li>
@@ -242,6 +268,7 @@ import OptionMenu from "@/components/OptionMenu.vue";
 import ChannelPassword from "@/components/ChannelPassword.vue";
 import ChannelMembers from "@/components/ChannelMembers.vue";
 import AddMember from "@/components/AddMember.vue";
+import ChangePassword from "@/components/ChangePassword.vue";
 import io from "socket.io-client";
 import store from "@/store";
 import { IChannel } from "@/models/channel";
@@ -252,6 +279,7 @@ const m_frnd = ref([] as FriendsList[]);
 interface FriendsList {
   user: string;
   status: Boolean;
+  isBlock: boolean;
 }
 
 
@@ -289,39 +317,49 @@ export default defineComponent({
 	userInput1: "" as string,
 	userInput2: "" as string,
 	sndrcvmsg: [] as string[],
+	isBlock: true,
+	isChangePassword: false,
 	// friends: m_frnd,
       friends: [
         {
           user: "one",
           status: true,
+		  isBlock: true,
         },
         {
-          user: "two",
-          status: false,
+			user: "two",
+			status: false,
+			isBlock: false,
         },
         {
-          user: "three",
-          status: true,
+			user: "three",
+			status: true,
+			isBlock: false,
         },
         {
-          user: "four",
-          status: false,
+			user: "four",
+			status: false,
+			isBlock: false,
         },
         {
-          user: "five",
-          status: true,
+			user: "five",
+			status: true,
+			isBlock: true,
         },
         {
-          user: "one",
-          status: true,
+			user: "one",
+			status: true,
+			isBlock: false,
         },
         {
-          user: "two",
-          status: false,
+			user: "two",
+			status: false,
+			isBlock: false,
         },
         {
-          user: "three",
-          status: true,
+			user: "three",
+			status: true,
+			isBlock: false,
         },
       ] as FriendsList[],
     };
@@ -382,6 +420,7 @@ export default defineComponent({
     ChannelPassword,
     ChannelMembers,
     AddMember,
+	ChangePassword,
   },
   computed: {
     searchFriends(): FriendsList[] {
@@ -427,7 +466,13 @@ export default defineComponent({
 	
 },
 methods: {
-	showAddMember(channel: string){
+	showChagnePassword(){
+		this.isChangePassword = !this.isChangePassword;
+	},
+	showHideBlock(friend: string){
+		friend.isBlock = !friend.isBlock;
+	},
+	showAddMember(channel: string) {
 		localStorage.setItem("currentChanName", channel);
 		this.addPrivateMember = !this.addPrivateMember;
 	},
@@ -439,6 +484,7 @@ methods: {
         this.selectedFriendIndex = index;
       }
     },
+
     showMemberList(channel: string) {
       this.isMembersList = !this.isMembersList;
       localStorage.setItem("currentChanName", channel);
