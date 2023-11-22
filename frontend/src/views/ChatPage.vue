@@ -99,7 +99,7 @@
 												<button class="intbtn p-2" @click="leave_room(result.name)">
 													leave
 												</button>
-												<button class="intbtn p-2" @click="showChagnePassword">
+												<button class="intbtn p-2" @click="showChagnePassword(result.name)">
 														change password
 													</button>
 											</div>
@@ -406,6 +406,7 @@ export default defineComponent({
 			const my_frnds: FriendsList = {
 				user: item.userName,
 				status: false,
+				isBlock: false,
 			}
 			m_frnd.value.push(my_frnds);
 		});
@@ -466,10 +467,12 @@ export default defineComponent({
 	
 },
 methods: {
-	showChagnePassword(){
+	showChagnePassword(channel: string){
+		if (channel)
+			localStorage.setItem("currentChanName", channel);
 		this.isChangePassword = !this.isChangePassword;
 	},
-	showHideBlock(friend: string){
+	showHideBlock(friend: FriendsList){
 		friend.isBlock = !friend.isBlock;
 	},
 	showAddMember(channel: string) {

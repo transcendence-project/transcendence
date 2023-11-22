@@ -7,7 +7,7 @@
           <div class="jn-div">
 			<div class="pas-btn">
 
-				<button class="jnbtn" @click="add_priv_mem">Update</button>
+				<button class="jnbtn" @click="update_pass">Update</button>
 			</div>
 			<div class="cls-bt">
 				<button class="clsbtn" @click="closePrivatePage">Close</button>
@@ -31,10 +31,10 @@ export default defineComponent({
     closePrivatePage(): void {
       this.$emit('close');
     },
-	add_priv_mem() {
+	update_pass() {
 		if (store.state.chat.socket)
-        store.state.chat.socket.emit("add_user_to_priv", {
-		  user_to_add: this.member,
+        store.state.chat.socket.emit("change_pass", {
+		  new_pass: this.member,
           room_name: localStorage.getItem('currentChanName'),
         });
 	},

@@ -118,6 +118,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('create_prot_room')
 	async create_prot_room(client: any, payload: any): Promise<void> {
 		const { channel_name, password } = payload;
+		if (password.length > 20)
+			client.emit('Error: Password too long'); // notification
 		const user = this.chatService.find_user_with_id(client.id);
 		const salt = await bcrypt.genSalt(10);
 		const hashedPassword = await bcrypt.hash(password, salt);
@@ -323,6 +325,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			const salt = await bcrypt.genSalt(10);
 			const hashedPassword = await bcrypt.hash(new_pass, salt);
 			this.chatService.change_chan_pass(room_name, hashedPassword);
+			console.log("password changed SUCCESSFULLY");
 			client.emit("password changed successfully");
 		}
 	}

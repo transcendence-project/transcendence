@@ -71,10 +71,7 @@ export class ChatService {
 				console.log("Channel name too long");
 			return null;
 		}
-		else if (type === "prot" && (pass.length > 20 || pass === "")) {
-			if (pass.length > 20)
-				console.log("Password too long");
-			else
+		else if (type === "prot" &&  pass === "") {
 				console.log("Password cannot be empty");
 		}
 		else {
