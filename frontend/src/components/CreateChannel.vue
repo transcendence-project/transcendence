@@ -30,9 +30,7 @@
                 </div>
 
                 <div class="add-close mx-5">
-                  <div class="close">
-                    <button class="closebtn" @click="closePage">Close</button>
-                  </div>
+         
                   <div class="add">
                     <button class="addbtn" @click="create_priv_room">Add</button>
                   </div>
@@ -50,9 +48,7 @@
             <div class="text-center">
               <div class="inline-block">
                 <div class="add-close">
-                  <div class="close">
-                    <button class="closebtn" @click="closePage">Close</button>
-                  </div>
+  
                   <div class="add">
                     <button class="addbtn" @click="create_room">Add</button>
                   </div>
@@ -77,18 +73,21 @@
                 <div class="psopt">
                 </div>
                 <div class="add-close">
-                  <div class="close">
-                    <button class="closebtn" @click="closePage">Close</button>
-                  </div>
+  
                   <div class="add">
-                    <button class="addbtn" @click="create_room">Add</button>
-                  </div>
+					  <button class="addbtn" @click="create_room">Add</button>
+					</div>
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+			</div>
+		</div>
+	</div>
+</div>
+</div>
+
+<div class="close">
+  <button class="closebtn m-4" @click="closePage">Close</button>
+</div>
+
     </div>
   </div>
 </template>
@@ -161,10 +160,11 @@ export default defineComponent({
   width: 60%;
   height: 40%;
   padding: 5%;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.8);
   display: flex;
   justify-content: center;
   align-items: center;
+  border-radius: 2%;
   z-index: 999;
 }
 .adchn {

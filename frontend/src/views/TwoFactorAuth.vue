@@ -1,22 +1,20 @@
 <template>
-	<div class="fact">
+	<div class="fact flex flex-wrap justify-between bg-gradient-to-r from-[#451952] via-[#451952] to-[#ae4188] shadow-custom text-white w-full min-h-[85.9vh] m-5 rounded-md p-2.5 text-center">
+
 	  <h2 class="two">Two Factor Authentication</h2>
-	  <div class="not-msg flex flex-col align-center my-5">
-		<div class="flex align-center">
-		  <button class="twobtn p-3 mx-2">Enable</button>
-		  <button class="twobtn p-3 mx-2">Disable</button>
-		</div>
-		<div class="flex align-center m-3 p-2 w-[60%] h-[60%] bg-white">
-			<img v-if="qrcode" :src="qrcode" alt="QR Code" />
-     	</div>
-		<div class="authform flex align-center m-2">
-		  <input  placeholder="Verification code" class="px-2 m-3 text-black" />
-		  <div class="aut-div">
-		</div>
-		<div class="flex align-center aut-btn">
-		  <button class="autbtn my-2 mx-2 px-3">Add</button>
-		</div>
-		</div>
+	  <div class=" flex flex-col items-center my-3 w-full h-full">
+	
+		<div class="flex">
+
+				<img v-if="qrcode" :src="qrcode" alt="QR Code" class=" m-5 w-[50vh]" />
+			</div>
+			<div class="authform flex m-2">
+				<input  placeholder="Verification code" class="px-2 py-2 m-3 rounded-lg w-[25vw] text-black" />
+			
+				<div class="flex a aut-btn">
+					<button class="autbtn my-2 mx-2 px-3">Add</button>
+				</div>
+			</div>
 	  </div>
 	</div>
   </template>
