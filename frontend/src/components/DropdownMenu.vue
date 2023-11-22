@@ -28,7 +28,7 @@
           Disable
         </button>
       </div>
-      <router-link to="/login" @click.native="closeDropdown"
+      <router-link to="/" @click.native="logout"
         >Logout</router-link
       >
     </div>
@@ -74,6 +74,11 @@ const closeDropdown = () => {
   showTwoFactorButtons.value = false;
   document.removeEventListener("click", closeDropdownOnClickOutside);
 };
+
+const logout = () => {
+	localStorage.removeItem('token');
+	closeDropdown();
+}
 
 onMounted(() => {
   document.addEventListener("click", closeDropdownOnClickOutside);

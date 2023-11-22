@@ -473,6 +473,10 @@ methods: {
 		this.isChangePassword = !this.isChangePassword;
 	},
 	showHideBlock(friend: FriendsList){
+		if (friend.isBlock === false)
+			this.block_frnd(friend.user);
+		else (friend.isBlock === true)
+			this.unblock_friend(friend.user);
 		friend.isBlock = !friend.isBlock;
 	},
 	showAddMember(channel: string) {
@@ -552,6 +556,13 @@ methods: {
 				new_pass: "",
 				room_name: localStorage.getItem("currentChanName"),
 			});
+	},
+	block_frnd(friend: string){
+		if (store.state.chat.socket)
+			store.state.chat.socket.emit("block_frnd", friend);
+	},
+	unblock_friend(friend: string){
+
 	},
     showPasswordForm(chan_name: string) {
       this.isPrivate = true;

@@ -9,6 +9,7 @@ import { Server, Socket } from "socket.io";
 import { ChatService } from "../chat/chat.service";
 import * as bcrypt from 'bcrypt';
 import { Channel } from "entities/channel.entity";
+import { UsersService } from '../users/users.service';
 
 @WebSocketGateway({
   cors: { origin: "http://localhost:8080" },
@@ -17,6 +18,7 @@ import { Channel } from "entities/channel.entity";
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   constructor(
     private chatService: ChatService,
+	private userService: UsersService,
   ) /* , @InjectRepository(Channel) private roomRepo: Repository<Channel> */ {}
   @WebSocketServer()
   server: Server;
@@ -328,6 +330,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			console.log("password changed SUCCESSFULLY");
 			client.emit("password changed successfully");
 		}
+	}
+
+	@SubscribeMessage('block_frnd')
+	async block_frnd(client: any, friend: string) {
+		const user = this.chatService.find_user_with_id(client.id);
+		const user_frnds = await this.userService.getFriends(user.id);
 	}
 
 	// -------------------------------------------------------------------------------

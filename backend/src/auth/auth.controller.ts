@@ -15,6 +15,7 @@ export class AuthController {
 	@Get('42')
 	@UseGuards(AuthGuard('42'))
 	async login() {
+
 	}
 
 	@Get('/me')
