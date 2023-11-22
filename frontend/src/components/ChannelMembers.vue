@@ -214,7 +214,7 @@ export default defineComponent({
         }
       }
     });
-    this.listenForMuteEvents();
+    // this.listenForMuteEvents();
     this.listenForPermissionDenial();
     // store
   },
@@ -268,28 +268,13 @@ export default defineComponent({
         room_name: localStorage.getItem("currentChanName"),
       });
     },
-    listenForMuteEvents() {
-      store.state.chat.socket.on("muted", (userName: string) => {
-        this.$toast.add({
-          severity: "info",
-          summary: "User Muted",
-          detail: `You have been muted.`,
-        });
-      });
-      store.state.chat.socket.on("unmuted", (userName: string) => {
-        this.$toast.add({
-          severity: "info",
-          summary: "User Unmuted",
-          detail: `You have been unmuted.`,
-        });
-      });
-    },
     listenForPermissionDenial() {
       store.state.chat.socket.on("not_admin", () => {
         this.$toast.add({
           severity: "warn",
           summary: "Action Denied",
           detail: `You do not have permission to mute users.`,
+          life: 3000,
         });
       });
     },

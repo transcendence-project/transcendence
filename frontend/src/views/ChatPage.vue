@@ -558,6 +558,40 @@ export default defineComponent({
           message: message,
         });
     },
+    mute_omar() {
+      store.state.chat.socket.off("mute_message");
+      store.state.chat.socket.on("mute_message", (data: any) => {
+        console.log("in mute message");
+        this.$toast.add({
+          severity: "error",
+          summary: "Error while sending message",
+          detail: `You have been muted.`,
+          life: 3000,
+        });
+      });
+    },
+    listenForMuteEvents() {
+      console.log("in listen for mute events");
+      store.state.chat.socket.off("muted");
+      store.state.chat.socket.on("muted", (userName: string) => {
+        console.log("in listen for mute events");
+        this.$toast.add({
+          severity: "info",
+          summary: "User Muted",
+          detail: `You have been muted.`,
+          life: 3000,
+        });
+      });
+      store.state.chat.socket.off("unmuted");
+      store.state.chat.socket.on("unmuted", (userName: string) => {
+        this.$toast.add({
+          severity: "info",
+          summary: "User Unmuted",
+          detail: `You have been unmuted.`,
+          life: 3000,
+        });
+      });
+    },
     send_priv_msg() {
       if (store.state.chat.socket)
         store.state.chat.socket.emit("private_message");
@@ -613,8 +647,8 @@ export default defineComponent({
     },
     sendMessage() {
       if (this.message) {
-        this.chatMessage.push({ send: true, chat: this.message });
-        this.isMessageSent = true;
+        // this.chatMessage.push({ send: true, chat: this.message });
+        // this.isMessageSent = true;
         this.send_chan_msg(this.message);
         this.message = "";
       }
@@ -726,6 +760,8 @@ export default defineComponent({
       );
       if (index !== -1) this.my_chan.splice(index, 1);
     });
+    this.mute_omar();
+    this.listenForMuteEvents();
   },
   //   async mute_user(userId)
 });
