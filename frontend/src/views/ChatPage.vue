@@ -701,6 +701,12 @@ export default defineComponent({
         ) {
           this.chatMessage.push({ send: false, chat: data.content });
           this.isMessageSent = true;
+        } else if (
+          data.user == store.getters.getUserName &&
+          localStorage.getItem("currentChanName") == data.chan
+        ) {
+          this.chatMessage.push({ send: true, chat: data.content });
+          this.isMessageSent = true;
         }
       }
     });

@@ -26,7 +26,7 @@ export class ChatService {
 
 	async chan_by_name(chan_name: string): Promise<Channel> // or by id
 	{
-		return (await this.channelRepo.findOne({ where: { room_name: chan_name }, relations: ['members', 'admins', 'owner', 'messages', 'banned'] }));
+		return (await this.channelRepo.findOne({ where: { room_name: chan_name }, relations: ['members', 'admins', 'owner', 'messages', 'banned', 'muted'] }));
 	}
 
 	async mem_by_chan(chan_name: string): Promise<User[] | undefined> {
@@ -81,7 +81,7 @@ export class ChatService {
 			try{
 				if (type === "prot"){
 					const chan2 = this.channelRepo.create({ room_name: chan_name, owner: user, password: pass, 
-						members: [], admins: [], messages: [], banned: [], isGroupChannel: true, is_protected: true });
+						members: [], admins: [], messages: [], banned: [], muted: [], isGroupChannel: true, is_protected: true });
 					chan2.members.push(user);
 					await this.channelRepo.save(chan2);
 					console.log(`Channel ${chan_name} created successfully`);
@@ -246,11 +246,14 @@ export class ChatService {
 
 	async is_mute(user_name: string, chan_name: string) {
 		const muted = await this.muted_by_chan(chan_name);
-		const isBanned = muted.some((mute: User) => mute.userName === user_name);
-		if (isBanned)
-			return true;
-		else
-			return false;
+		if (muted)
+		{
+			const isMuted = muted.some((mute: User) => mute.userName === user_name);
+			if (isMuted)
+				return true;
+			else
+				return false;
+		}
 	}
 
 	async can_join(user: User, room: Channel, arg: string): Promise<boolean> {
