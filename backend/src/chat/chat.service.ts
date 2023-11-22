@@ -142,6 +142,7 @@ export class ChatService {
 
 	async add_chan_mute(user: User, chan_name: string) {
 		const chan = await this.chan_by_name(chan_name);
+		console.log('chan: ', chan);
 		if (chan) {
 			chan.muted.push(user);
 			await this.channelRepo.save(chan);
