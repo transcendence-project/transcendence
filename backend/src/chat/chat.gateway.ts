@@ -73,6 +73,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			};
 			this.server.emit('update_chan_message', data_to_send);
 		}
+		else
+			client.emit('mute_message');
 	}
 
 	// @SubscribeMessage('private_message')
@@ -268,12 +270,13 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		const user1 = this.chatService.find_user_with_name(user_to_mute); // the one being muted
 		const id_to_mute = this.chatService.find_id(user1.userName); // id of the one being muted // the channel
 		if (await this.chatService.is_admin(user.userName, room_name) || await this.chatService.is_owner(user.userName, room_name)) {
-			this.chatService.add_chan_mute(user1, room_name); // add the mute to the channel
+			await this.chatService.add_chan_mute(user1, room_name); // add the mute to the channel
 			this.server.to(id_to_mute).emit('muted', user1.userName);
+			console.log("client muted");
 			setTimeout(async () => {
 				await this.chatService.rem_chan_mute(user1, room_name);
 				this.server.to(id_to_mute).emit('unmuted', user1.userName);
-			}, 300000);
+			}, 10000);
 			console.log("client muted");
 		}
 		else{
