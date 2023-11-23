@@ -597,6 +597,18 @@ methods: {
         });
       });
     },
+	notify(){
+		store.state.chat.socket.off("notify");
+		console.log("reached notify");
+		store.state.chat.socket.on("notify", (data: any) => {
+        this.$toast.add({
+          severity: data.severity,
+          summary: data.summary,
+          detail: data.detail,
+          life: 3000,
+        });
+      });
+	},
     listenForMuteEvents() {
       console.log("in listen for mute events");
       store.state.chat.socket.off("muted");
@@ -796,6 +808,7 @@ methods: {
     });
     this.mute_omar();
     this.listenForMuteEvents();
+	this.notify();
   },
   //   async mute_user(userId)
 });

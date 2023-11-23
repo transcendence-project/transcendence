@@ -162,6 +162,7 @@ export default defineComponent({
   created() {
     store.state.chat.socket.off("update_mem_list");
     store.state.chat.socket.off("update_admin");
+    store.state.chat.socket.off("not_admin");
     store.state.chat.socket.on("update_mem_list", (data: any) => {
       if (data) {
         if (

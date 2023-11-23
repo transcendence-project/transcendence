@@ -12,8 +12,6 @@ import * as bcrypt from 'bcrypt'
 @Injectable()
 export class ChatService {
 	private connected_users: Map<string, User> = new Map();
-	// private game_invites: Map<string, string[]> = new Map(); // store only user names?
-	// private direct_msg: Map<string, {to: string, from: string, content: string, created: Date }[]> = new Map();
 
 	constructor(@InjectRepository(Channel) private channelRepo: Repository<Channel>,
 	@InjectRepository(Message) private messageRepo: Repository<Message>,
@@ -60,19 +58,47 @@ export class ChatService {
 	}
 
 		//  ----------------------- CREATE / UPDATE -----------------------------
-	async create_chan(chan_name: string, user: User, pass: string, type: string) {
+	async create_chan(chan_name: string, user: User, pass: string, type: string, client: any) {
 		const chan = await this.chan_by_name(chan_name);
 		if (chan || chan_name === "" || chan_name.length > 20){
+			const detail = ""
 			if (chan)
-				console.log(`Channel ${chan_name} already exists`);
+			{
+				const data_to_send = {
+					severity: "error",
+					summary: "Cannot Create Channel",
+					detail: `Channel ${chan_name} already exists.`
+				}
+				client.emit('notify', data_to_send);
+			}
 			else if (chan_name === "" || !chan_name)
-				console.log("Channel name cannot be empty");
+			{
+				const data_to_send = {
+					severity: "error",
+					summary: "Cannot Create Channel",
+					detail: `Channel name cannot be empty.`
+				}
+				client.emit('notify', data_to_send);
+			}
 			else
-				console.log("Channel name too long");
+			{
+				const data_to_send = {
+					severity: "error",
+					summary: "Cannot Create Channel",
+					detail: `Channel name too long.`
+				}
+				client.emit('notify', data_to_send);
+			}
 			return null;
 		}
 		else if (type === "prot" &&  pass === "") {
-				console.log("Password cannot be empty");
+			const data_to_send = {
+				severity: "error",
+				summary: "Cannot Create Channel",
+				detail: `Password cannot be empty.`
+			}
+			client.emit('notify', data_to_send);
+			return null;
 		}
 		else {
 			try{
@@ -253,9 +279,17 @@ export class ChatService {
 		}
 	}
 
-	async can_join(user: User, room: Channel, arg: string): Promise<boolean> {
+	async can_join(user: User, room: Channel, arg: string, client: any): Promise<boolean> {
 		if (await this.is_ban(user.userName, room.room_name) === true)
+		{
+			const data_to_send = {
+				severity: "error",
+				summary: "Unable to Join",
+				detail: `You are banned from Channel ${room.room_name}.`
+			};
+			client.emit('notify', data_to_send);
 			return false;
+		}
 		if (room.is_protected === true)
 		{
 			if (room.password)
@@ -265,7 +299,15 @@ export class ChatService {
 					if (match)
 						return true;
 					else
+					{
+						const data_to_send = {
+							severity: "error",
+							summary: "Unable to Join",
+							detail: `Incorrect Password`
+						};
+						client.emit('notify', data_to_send);
 						return false;
+					}
 				}
 				catch (error) {
 					console.error('Error while comparing password:', error);
