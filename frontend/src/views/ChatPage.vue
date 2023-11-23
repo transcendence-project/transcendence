@@ -166,18 +166,18 @@
                       </a>
 
 											<div class="flex items-center justify-between">
-												<button class="intbtn p-1">Invite</button>
-													<!-- <div v-if="isBlock"> -->
-														<div v-if="friend.isBlock === true">
-														<button class="intbtn p-1" @click="showHideBlock(friend)">
-														<!-- {{ friend.isBlock ? 'Block' : 'Unblock' }} -->
+												<div v-if="friend.isBlock === true">
+													<button class="intbtn p-1" @click="showHideBlock(friend)">
 														Block
-														</button>
-													</div>
-													<div v-else>
-														<button class="intbtn p-1" @click="showHideBlock(friend)">Unblock</button>
+													</button>
+												</div>
+												<div v-else>
+													<button class="intbtn p-1" @click="showHideBlock(friend)">Unblock</button>
+													
+												</div>
+												<button class="intbtn p-1">Invite</button>
 
-													</div>
+
 											</div>
 										</div>
 									</li>

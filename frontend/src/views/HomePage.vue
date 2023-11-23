@@ -4,8 +4,10 @@
       <div class="flex content-center justify-between">
         <div class="flex bg-gradient-to-r from-[#ae445a] to-[#451952] shadow-seconed rounded p-10 w-[45%]">
           <div class="mr-4">
-            <img class="w-[100px] rounded-full" :src="require(`@/assets/${imgname}`)" />
-          </div>
+            <!-- <img class="w-[100px] rounded-full" :src="require(`@/assets/${imgname}`)" /> -->
+
+			<img :src="userimage" class=" mx-2 rounded-full object-cover w-20 h-20" />
+		</div>
           <div v-if="avail">
             <StatusUser :isFriend="true" class="mt-12"/>
           </div>
@@ -64,22 +66,25 @@ onMounted(() => {
 	store.dispatch('fetchUserData');
 	});
 
-const match = ref<Match[]>([
-	{ date: "2023-08-15", opponent: "Player A", result: "Win" },
-	{ date: "2023-08-10", opponent: "Player B", result: "Loss" },
-	{ date: "2023-08-05", opponent: "Player C", result: "Draw" },
-	{ date: "2023-08-15", opponent: "Player A", result: "Win" },
-	{ date: "2023-08-10", opponent: "Player B", result: "Loss" },
-	{ date: "2023-08-05", opponent: "Player C", result: "Draw" },
-	{ date: "2023-08-15", opponent: "Player A", result: "Win" },
-	{ date: "2023-08-10", opponent: "Player B", result: "Loss" },
-	{ date: "2023-08-05", opponent: "Player C", result: "Draw" },
 	
-]);
+	const match = ref<Match[]>([
+		{ date: "2023-08-15", opponent: "Player A", result: "Win" },
+		{ date: "2023-08-10", opponent: "Player B", result: "Loss" },
+		{ date: "2023-08-05", opponent: "Player C", result: "Draw" },
+		{ date: "2023-08-15", opponent: "Player A", result: "Win" },
+		{ date: "2023-08-10", opponent: "Player B", result: "Loss" },
+		{ date: "2023-08-05", opponent: "Player C", result: "Draw" },
+		{ date: "2023-08-15", opponent: "Player A", result: "Win" },
+		{ date: "2023-08-10", opponent: "Player B", result: "Loss" },
+		{ date: "2023-08-05", opponent: "Player C", result: "Draw" },
+		
+	]);
+	
+	const data = ref(null);
+	const fullname = computed(() => store.getters.getDisplayName);
+	const userimage = computed(() => store.getters.getImage)
 
-const data = ref(null);
-const fullname = computed(() => store.getters.getDisplayName);
-const imgname = ref("head.svg");
+// const imgname = ref("head.svg");
 // const imgname = computed(() => store.getters.getImage);
 const win = computed(() => store.getters.getWin);
 const lose = computed(() => store.getters.getLose);

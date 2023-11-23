@@ -1,10 +1,31 @@
 <template>
   <div class="bg-gradient-to-r from-[#451952] via-[#451952] to-[#ae4188] shadow-custom m-5 p-5 rounded-md w-full text-white min-h-[85.4vh] md:min-h-[85.10vh] lg:min-h-[85.9vh]">
-    <h2>{{ filteredSearch.length }} friends</h2>
     <div class="flex justify-center pl-0  pt-2.5 pb-2.5 rounded-md m-0 mb-[5px] bg-[#AE445A]">
-      <input v-model="text" placeholder="Search friend" class="w-[60%] h-[2rem] rounded-full text-center focus:border-0 focus:outline-none text-black" />
+      <input v-model="text" placeholder="Search friend" class="w-[60%] h-[2rem] px-4 rounded-full focus:border-0 focus:outline-none text-black" />
     </div>
     <ul class="m-0 mt-4 p-0 rounded-md">
+		<div v-for="item in student" v-bind:key="item.id">
+        <li class="list-none p-0 m-0 mb-2">
+          <div class="flex items-center justify-between bg-[#AE445A] m-0 pt-3 md:pt-0 pb-3 md:pb-0 pr-6 pl-2 flex-col md:flex-row rounded-sm">
+			<div class="flex justify-between mx-4 my-2">
+
+				{{ item.userName }}
+				<img :src="item.image" class=" mx-2 rounded-full object-cover w-8 h-8" />
+				
+				
+			</div>
+            <div class="flex justify-between">
+              <ButtonComponent btnContent="Add"/>
+              <ButtonComponent btnContent="Block"/>
+            </div>
+          </div>
+        </li>
+      </div>
+    </ul>
+
+
+
+    <!-- <ul class="m-0 mt-4 p-0 rounded-md">
       <div v-for="(result, index) in filteredSearch" :key="index">
         <li class="list-none p-0 m-0 mb-2">
           <div class="flex items-center justify-between bg-[#AE445A] m-0 pt-3 md:pt-0 pb-3 md:pb-0 pr-6 pl-2 flex-col md:flex-row">
@@ -30,7 +51,10 @@
           </div>
         </li>
       </div>
-    </ul>
+    </ul> -->
+
+
+<!-- 
     <ul class="mt-5 p-0 rounded-md">
       <div v-for="(result, index) in filteredSearch" :key="index">
         <li class="list-none p-0 m-0 mb-2">
@@ -54,7 +78,9 @@
           </div>
         </li>
       </div>
-    </ul>
+    </ul> -->
+
+
   </div>
 </template>
 
@@ -63,12 +89,15 @@ import { defineComponent } from "vue";
 import OptionMenu from "@/components/OptionMenu.vue";
 import StatusUser from "@/components/StatusUser.vue";
 import ButtonComponent from "@/components/ButtonComponent.vue";
+import axios, { AxiosResponse } from "axios";
+import { IStudent } from "@/models/student";
 
-interface SearchItem {
-  user: string;
-  imgname: string;
-  friend: boolean;
-}
+
+// interface SearchItem {
+//   user: string;
+//   imgname: string;
+//   friend: boolean;
+// }
 
 export default defineComponent({
   name: "TopNavBar",
@@ -77,40 +106,65 @@ export default defineComponent({
     StatusUser,
     ButtonComponent,
   },
-  data() {
-    return {
-      search: [
-        {
-          user: "Player A",
-          imgname: "head.svg",
-          friend: true,
-        },
-        {
-          user: "Player B",
-          imgname: "chat.svg",
-          friend: false,
-        },
-        {
-          user: "five one",
-          imgname: "head.svg",
-          friend: true,
-        },
-        {
-          user: "size numer",
-          imgname: "chat.svg",
-          friend: false,
-        },
-      ] as SearchItem[],
-      text: "" as string,
-      activeDropdowns: null as number | null,
-    };
-  },
-  computed: {
-    filteredSearch(): SearchItem[] {
-      return this.search.filter((item) =>
-        item.user.toLowerCase().includes(this.text.toLowerCase())
-      );
-    },
-  },
+//   data() {
+//     return {
+//       search: [
+//         {
+//           user: "Player A",
+//           imgname: "head.svg",
+//           friend: true,
+//         },
+//         {
+//           user: "Player B",
+//           imgname: "chat.svg",
+//           friend: false,
+//         },
+//         {
+//           user: "five one",
+//           imgname: "head.svg",
+//           friend: true,
+//         },
+//         {
+//           user: "size numer",
+//           imgname: "chat.svg",
+//           friend: false,
+//         },
+//       ] as SearchItem[],
+//       text: "" as string,
+//       activeDropdowns: null as number | null,
+//     };
+//   },
+data() {
+		return {
+			student: [] as IStudent[],
+		};
+	},
+	mounted() {
+		axios
+			.get("http://localhost:3000/users")
+			.then((resp: AxiosResponse<IStudent[]>) => {
+				this.student = resp.data;
+			})
+			.catch((error) => {
+				console.error("Error fetching student data:", error);
+			});
+	},
+
+
+
+//   computed: {
+//     filteredSearch(): SearchItem[] {
+//       return this.student.filter((item) =>
+//         item.user.toLowerCase().includes(this.text.toLowerCase())
+//       );
+//     },
+//   },
 });
 </script>
+
+<style scoped>
+/* .usrimg{
+	border-radius: 90%;
+	
+} */
+</style>
