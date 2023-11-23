@@ -42,6 +42,9 @@ export class User {
   // @Exclude()
   twoFactorSecret: string;
 
+  @Column({ default: false })
+  isTwoFactorAuthenticated: boolean;
+
   @ManyToMany(() => User, (user) => user.friends)
   @JoinTable({
     name: "friends",

@@ -6,11 +6,10 @@ import { User } from '../entities/user.entity';
 import { FortyTwoStrategy } from './strategy.42';
 import { FortyTwoAuthGuard } from './guard.42';
 import { JwtAuthGuard } from './jwt.guard';
-import { JwtService } from '@nestjs/jwt';
 
 @Controller('auth')
 export class AuthController {
-	constructor(private authService: AuthService, private jwtService: JwtService) {
+	constructor(private authService: AuthService) {
 	}
 	@Get('42')
 	@UseGuards(AuthGuard('42'))
@@ -43,7 +42,6 @@ export class AuthController {
 	async generateQr(@Req() req, @Res() res) {
 		try {
 			const otp = this.authService.generateTwoFactorAuthenticationSecret(req.user);
-			// console.log(`user 2fa secret = ${user.twoFactorAuthenticationSecret}`);
 			const code = await this.authService.generateQrCodeDataURL((await otp).otpauthUrl);
 			res.json({ qrCodeDataURL: code });
 
@@ -53,22 +51,34 @@ export class AuthController {
 		}
 	}
 
-	@Post('2fa/authenticate/:code')
-	@HttpCode(200)
+	@Get('2fa/authenticate/:code')
 	@UseGuards(JwtAuthGuard)
 	async authenticate2fa(@Param("code") code: string, @Req() req, ) {
-		// console.log(req.user);
 		const isCodeValid = this.authService.is2faCodeValid(
 			code,
 			req.user,
 		);
 		if (!isCodeValid) {
 			console.log("INCORRECT 2 FA CODE !!!!!!!!!!!!");
+			return null;
 		}
-		// if (!isCodeValid) {
-		// 	throw new UnauthorizedException('Wrong authentication code');
-		// }
-		// redirect to homepage??
-		// else login to game, display user profile
+		else
+		{
+			console.log("! COOODEE SUCCESSFUULLLLLLL !");
+			// redirect to homepage??
+			return "verified";
+		}
+	}
+
+	@Get('2fa/enable')
+	@UseGuards(JwtAuthGuard)
+	async enable2fa(@Req() req, ) {
+		await this.authService.enable2FA(req.user);
+	}
+	
+	@Get('2fa/disable')
+	@UseGuards(JwtAuthGuard)
+	async disable2fa(@Req() req, ) {
+		await this.authService.disable2FA(req.user);
 	}
 }

@@ -38,6 +38,7 @@ export class UsersService {
       image,
       twoFactorSecret: null,
       is2FAEnabled: false,
+	  isTwoFactorAuthenticated: false,
       friends: [],
       channels: [],
 	matchesAsPlayerOne: [],

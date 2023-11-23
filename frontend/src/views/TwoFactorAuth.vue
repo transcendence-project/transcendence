@@ -9,10 +9,12 @@
 				<img v-if="qrcode" :src="qrcode" alt="QR Code" class=" m-5 w-[50vh]" />
 			</div>
 			<div class="authform flex m-2">
-				<input  placeholder="Verification code" class="px-2 py-2 m-3 rounded-lg w-[25vw] text-black" />
+				<input  
+				v-model="v_code"
+				placeholder="Verification code" class="px-2 py-2 m-3 rounded-lg w-[25vw] text-black" />
 			
 				<div class="flex a aut-btn">
-					<button class="autbtn my-2 mx-2 px-3">Add</button>
+					<button class="autbtn my-2 mx-2 px-3" @click="verify_code">Verify</button>
 				</div>
 			</div>
 	  </div>
@@ -26,6 +28,7 @@
   import store from '@/store';
   
   const qrcode = ref('');
+  const v_code = ref('');
   const factor = ref('');
   
 
@@ -46,6 +49,12 @@
     console.error("An error occurred during setup:", error);
   }
 });
+
+const verify_code = async () => {
+	console.log(v_code.value);
+	localStorage.setItem("2FACode", v_code.value);
+	await store.dispatch("ValidateTwoFA");
+}
 
   
   </script>

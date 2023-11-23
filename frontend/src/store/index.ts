@@ -195,16 +195,39 @@ const store = createStore({
 		},
 		async ValidateTwoFA(context: any) {
 			const code = localStorage.getItem('2FACode');
-			await axios.get(`http://localhost:3000/auth2fa/authenticate/${code}`, {
-				params: { chan_name: code },
+			console.log("reached the store to send verification store");
+			await axios.get(`http://localhost:3000/auth/2fa/authenticate/${code}`, {
 				headers: {
 					Authorization: `Bearer ${localStorage.getItem('token')}`,
 				},
 			}).then((resp: AxiosResponse) => {
-				context.commit('setCurrentChannel', resp.data);
+				// if (resp)
+					console.log(resp.data);
 			}).catch((error) => {
 				console.error("Error fetching current channel:", error);
 			});
+		},
+		async enabl2FA(context: any) {
+			try {
+				const response = await axios.get("http://localhost:3000/auth/2fa/enable", {
+					headers: {
+						Authorization: `Bearer ${localStorage.getItem('token')}`,
+					},
+				});
+			} catch(error) {
+				console.error('Error:', error);
+			}
+		},
+		async disabl2FA(context: any) {
+			try {
+				const response = await axios.get("http://localhost:3000/auth/2fa/disable", {
+					headers: {
+						Authorization: `Bearer ${localStorage.getItem('token')}`,
+					},
+				});
+			} catch(error) {
+				console.error('Error:', error);
+			  }
 		}
 	},
 	modules: { // allow you to organize your store into separate namespaces.

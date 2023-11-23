@@ -21,10 +21,10 @@
         >Two-factor-AUTH</router-link
       >
       <div class="flex">
-        <button v-if="showTwoFactorButtons" class="enbtn mx-2 px-2">
+        <button v-if="showTwoFactorButtons" class="enbtn mx-2 px-2" @click="enable">
           Enable
         </button>
-        <button v-if="showTwoFactorButtons" class="enbtn mx-2 px-2">
+        <button v-if="showTwoFactorButtons" class="enbtn mx-2 px-2"  @click="disable">
           Disable
         </button>
       </div>
@@ -78,6 +78,14 @@ const closeDropdown = () => {
 const logout = () => {
 	localStorage.removeItem('token');
 	closeDropdown();
+};
+
+const enable = async () => {
+	store.dispatch("enabl2FA");
+};
+
+const disable = async () => {
+	store.dispatch("disabl2FA");
 }
 
 onMounted(() => {
