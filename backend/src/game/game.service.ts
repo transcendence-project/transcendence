@@ -17,11 +17,11 @@ export class GameService {
 
     async set_online_user(client: Socket ,token: any){
 		const _token = token;
-		// console.log(token);
-		// const user = await this.authService.user_by_token(_token);
+		console.log(token);
+		const user = await this.authService.user_by_token(_token);
 
-        // this.connected_users.set(client.id,user);
-        // console.log("from the set_online_methoed", user);
+        this.connected_users.set(client.id,user);
+        console.log("from the set_online_methoed", user);
 	}
     find_user_with_id(client_id: string){
 		const user = this.connected_users.get(client_id);
@@ -38,26 +38,30 @@ export class GameService {
         this.paddle = { x: 0, y: 0, width: 20, height: 100, score: 0 };
         this.computer = { x: 0, y: 0, width: 20, height: 100, score: 0 };
         this.ball = { x: 0, y: 0, radius: 10, speed: 1, dirx: 0, diry: 0};
-      }
+    }
     
     draw_table(canvasWidth: number, canvasHeight: number)
     {
         const PLAYER_WIDTH_PX = 20;  // Paddle width in pixels
         const PLAYER_HEIGHT_PX = 100; // Paddle height in pixels
 
-        const paddleWidth = (PLAYER_WIDTH_PX / canvasWidth) * 100;
-        const paddleHeight = (PLAYER_HEIGHT_PX / canvasHeight) * 100;
+        // const paddleWidth = (PLAYER_WIDTH_PX / canvasWidth) * 100;
+        // const paddleHeight = (PLAYER_HEIGHT_PX / canvasHeight) * 100;
 
         this.paddle = {
-            x: 0, y: canvasWidth / 2 - PLAYER_HEIGHT_PX / 2, width: paddleWidth, height: paddleHeight, score: 0,
+            x: 0, y: canvasWidth / 2 - PLAYER_HEIGHT_PX / 2, width: PLAYER_WIDTH_PX, height: PLAYER_HEIGHT_PX, score: 0,
         }
         console.log(canvasWidth / 2 - PLAYER_HEIGHT_PX / 2)
         this.computer = {
             x: canvasWidth - PLAYER_WIDTH_PX, y: canvasHeight - PLAYER_HEIGHT_PX, width: PLAYER_WIDTH_PX, height: PLAYER_HEIGHT_PX, score: 0,
-        }        
+        }
+        this.ball = {
+            x: canvasWidth / 2, y: canvasHeight / 2, radius: 10, speed: 1, dirx: 5, diry: 5 
+        }
         return {
             paddleRe: this.paddle,
             compRe: this.computer,
+            ball: this.ball,
         }
     }
 }

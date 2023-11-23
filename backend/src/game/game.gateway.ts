@@ -45,11 +45,7 @@ export class GameGateway
   @SubscribeMessage('start-game')
   start_game(@ConnectedSocket() client: Socket,@MessageBody() payload: any)
   {
-    //   console.log(payload);
     const tableData = this.gameService.draw_table(payload.width, payload.height);
-    console.log(tableData);
     client.emit('table', tableData);
-    //   this.gameService.draw_table(payload.width,payload.height);
-    // return {event:'table' ,data: this.gameService.init_table(client)};
   }
 }

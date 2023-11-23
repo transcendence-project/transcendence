@@ -12,70 +12,16 @@
 import { ref, onMounted , getCurrentInstance } from 'vue';
 import WebSocketPlugin from '@/plugins/websocket-plugin';
 const { appContext } = getCurrentInstance();
-
-// export default {
-//   setup() {
     const socket = appContext.config.globalProperties.$socket;
     const canvasWidth = ref(900); // Default width, can be dynamically adjusted
     const canvasHeight = ref(400); // Default height, can be dynamically adjusted
     const pongCanvas = ref(null);
 
-    // const drawGame = () => {
-    //   const canvas = pongCanvas.value;
-    //   if (!canvas) return;
-    //   const ctx = canvas.getContext('2d');
-	//   ctx.fillStyle = '#F6F1F1';
-    //   ctx.fillRect(500, 200, canvasWidth.value, canvasHeight.value);
-    //   // Clear previous frame
-    // //   ctx.clearRect(0, 0, canvasWidth.value, canvasHeight.value);
-
-    //   // Draw paddles, ball, and other game elements
-    //   // Example: ctx.fillRect(x, y, width, height);
-    //   // ... game drawing logic ...
-    // };
-
-    // const updateGameStateFromServer = () => {
-    //   // Update game state based on data received from the server
-    //   // Example: playerPosition.value = data.playerPosition;
-
-    //   // Redraw the game
-    //   drawGame();
-    // };
-    // const startGame = () => {
-    //     if (socket) {
-    //         // console.log(canvas.value);
-    //         const canvasDimensions = {
-    //             width: pongCanvas.offsetWidth,
-    //             height: pongCanvas.offsetHeight,
-    //         };
-    //         socket.emit('start-game', canvasDimensions);
-    //     }
-    // };
-
-    // const resize_window = () => {
-    //     window.addEventListener('resize', startGame);
-    // };
     onMounted(() => {
-        // if (pongCanvas.value)
-        // {
-        //     const ctx = pongCanvas.value.getContext("2d");
-        //     if (ctx)
-        //     {
-        //         ctx.fillStyle = '#F6F1F1',
-        //         ctx.fillRect(0, 0, pongCanvas.value.width, pongCanvas.value.height);
-        //     }
-        // }
-        // console.log("try")
-    //     if (pongCanvas.value) {
-    //     console.log('Mounted - Canvas dimensions:', pongCanvas.value.offsetWidth, pongCanvas.value.offsetHeight);
-    // } else {
-    //     console.log('Mounted - Canvas element not found');
-    // }
-    //   setupWebSocket();
     if (socket)
     {
-        socket.on('table', (message: any[]) => {
-            console.log(message.paddleRe.x);
+        socket.on('table', (message: any) => {
+            console.log(message);
         if (pongCanvas.value)
         {
             const ctx = pongCanvas.value.getContext("2d");
@@ -103,13 +49,19 @@ const { appContext } = getCurrentInstance();
                     ctx.font = "45px fantasy";
                     ctx.fillText(text, x, y);
                 };
+                const drawNet = () => {
+                    if (pongCanvas.value) {
+                            for (var i = 0; i <= pongCanvas.value.height; i += 15) {
+                            drawRect(net.x, net.y + i, net.width, net.height, net.color);
+                        }
+                    }
+                };
                 const render = () => {
                     drawRect(0, 0, pongCanvas.value.width, pongCanvas.value.height, "#F6F1F1");
                     drawRect(0, pongCanvas.value.height / 2 - message.paddleRe.height / 2,message.paddleRe.width, message.paddleRe.height,"#9336B4");
-                    // console.log(pongCanvas.value.height / 2 - message.paddleRe.height / 2)
+                    drawRect(message.compRe.x, pongCanvas.value.height / 2 - message.compRe.height / 2,message.compRe.width, message.compRe.height,"#9336B4");
+                    drawCircle(message.ball.x, message.ball.y, message.ball.radius, "#19A7CE")
                 }
-                // ctx.fillStyle = '#F6F1F1',
-                // ctx.fillRect(0, 0, pongCanvas.value.width, pongCanvas.value.height);
                 const game = () => {
                     // update();
                     render();
@@ -120,9 +72,6 @@ const { appContext } = getCurrentInstance();
         }
         });
     }
-    // startGame();
-	// updateGameStateFromServer();
-    //   drawGame();
     });
     const startGame = () => {
         // if (socket) {
@@ -133,24 +82,20 @@ const { appContext } = getCurrentInstance();
         //     };
         //     socket.emit('start-game', canvasDimensions);
         // }
-        if (pongCanvas.value) {
-			console.log(pongCanvas.value.offsetWidth);
+    if (pongCanvas.value) 
+    {
+		console.log(pongCanvas.value.offsetWidth);
         const canvasDimensions = {
             width: pongCanvas.value.offsetWidth,
             height: pongCanvas.value.offsetHeight,
         };
         socket.emit('start-game', canvasDimensions);
-    } else {
+    } 
+    else 
+    {
         console.log('Canvas element not found in startGame');
     }
     };
-    // return {
-    //   canvasWidth,
-    //   canvasHeight,
-    //   pongCanvas,
-    // };
-//   },
-// };
 </script>
 <!-- <script lang="ts" setup>
     import { ref, onMounted} from 'vue';
