@@ -46,7 +46,7 @@ export class GameGateway
   start_game(@ConnectedSocket() client: Socket,@MessageBody() payload: any)
   {
     //   console.log(payload);
-    const tableData = this.gameService.draw_table(payload.width, payload.height);
+    const tableData = this.gameService.init_table(payload.width, payload.height);
     console.log(tableData);
     client.emit('table', tableData);
     //   this.gameService.draw_table(payload.width,payload.height);
