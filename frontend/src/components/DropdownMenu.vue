@@ -12,7 +12,7 @@
 		:class="{ active: showDropdown }"
 		@click.stop=""
 	  >
-	  <router-link to="/profile" @click.native="closeDropdown"
+	  <router-link to="/editprofile" @click.native="closeDropdown"
         >Edit Profile</router-link
       >
       <router-link to="#" @click.native="toggleTwoFactor"

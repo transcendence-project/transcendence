@@ -20,6 +20,13 @@ const routes: Array<RouteRecordRaw> = [
 
   },
   {
+    path: "/users",
+    name: "users",
+	alias: '/users',
+    component: () => import(/* webpackChunkName: "home" */ "../views/UserProfile.vue"),
+
+  },
+  {
     path: "/game",
     name: "game",
     component: () => import(/* webpackChunkName: "game" */ "../views/GamePage.vue"),
@@ -30,8 +37,8 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import(/* webpackChunkName: "game" */ "../views/FriendsPage.vue"),
   },
   {
-    path: "/profile",
-    name: "profile",
+    path: "/editprofile",
+    name: "editprofile",
     component: () => import(/* webpackChunkName: "game" */ "../views/EditProfilePage.vue"),
   },
   {
