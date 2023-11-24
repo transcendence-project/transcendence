@@ -2,49 +2,24 @@
   <div
     class="bg-gradient-to-r from-[#451952] via-[#451952] to-[#ae4188] shadow-custom m-5 p-5 rounded-md w-full text-white min-h-[85.4vh] md:min-h-[85.10vh] lg:min-h-[85.9vh]"
   >
-	 <div class="flex justify-center items-center pl-0 pt-2.5 pb-2.5 rounded-md relative">
-		<!-- <div class="relative"> -->
+    <div
+      class="flex justify-center pl-0 pt-2.5 pb-2.5 rounded-md m-0 mb-[5px] bg-[#AE445A]"
+    >
       <input
         v-model="text"
-        @input="handleInputChange" @focus="showDropdown" @blur="hideDropdown"
+        placeholder="Search friend"
+        @focus="showUsersList"
         class="w-[60%] h-[2rem] px-4 rounded-full focus:border-0 focus:outline-none text-black"
       />
-
-	  
     </div>
-    <div v-if="filteredStudents.length > 0">
-      <ul class="m-0 mb-4 p-0 w-[55%] rounded-md absolute">
-        <li v-for="item in filteredStudents" :key="item.id" class="list-none rounded-lg p-0 m-0 mb-1">
 
-          <div
-            class="flex items-center justify-between bg-[#ae4188] m-0 pt-3 md:pt-0 pb-3 md:pb-0 pr-6 pl-2 flex-col md:flex-row rounded-sm"
-          >
-            <div class="flex justify-between mx-4 mb-1">
-              <div class="w-[6vw]">
-                {{ item.userName }}
-              </div>
-              <div>
-                <img
-                  :src="item.image"
-                  class="mx-2 rounded-full object-cover w-8 h-8"
-                />
-              </div>
-            </div>
-            <div class="flex justify-between">
-              <ButtonComponent
-                btnContent="Add"
-                @click="sendFriendRequest(item)"
-              />
-              <ButtonComponent btnContent="Block" />
-            </div>
-          </div>
-        </li>
-      </ul>
-    </div>
+    <UsersList v-if="isUserList" @close="showUsersList"/>
 
     <div>
-      <h2 class="text-xl m-3">Friend Requests </h2>
-	  <p class="text-lg text-green-500 m-2">You have {{ requestNumber }} friend request</p>
+      <h2 class="text-xl m-3">Friend Requests</h2>
+      <p class="text-lg text-green-500 m-2">
+        You have {{ requestNumber }} friend request
+      </p>
       <ul>
         <li
           v-for="request in friendRequests"
@@ -56,9 +31,8 @@
           >
             <div class="flex justify-between mx-4 my-2">
               <div class="w-[40vw]">
-                {{ request.id}} 
-
-                {{ request.updatedAt}} 
+                {{ request.id }}
+                {{ request.updatedAt }}
               </div>
             </div>
             <div class="flex justify-between">
@@ -77,6 +51,7 @@ import { defineComponent } from "vue";
 import OptionMenu from "@/components/OptionMenu.vue";
 import StatusUser from "@/components/StatusUser.vue";
 import ButtonComponent from "@/components/ButtonComponent.vue";
+import UsersList from "@/components/UsersList.vue";
 import axios, { AxiosResponse } from "axios";
 import { IStudent } from "@/models/student";
 import { IFriend } from "@/models/friend";
@@ -87,11 +62,13 @@ export default defineComponent({
     OptionMenu,
     StatusUser,
     ButtonComponent,
+	UsersList,
   },
   data() {
     return {
       text: "",
-	  requestNumber: Number,
+      isUserList: false,
+      requestNumber: Number,
       student: [] as IStudent[],
       friendRequests: [] as IFriend[],
     };
@@ -107,19 +84,9 @@ export default defineComponent({
     },
   },
   methods: {
-
-	selectItem(item) {
-		this.text = "";
-		this.hideDropdown();
-	  },
-	  showDropdown() {
-		this.isDropdownVisible = true;
-	  },
-	  hideDropdown() {
-		setTimeout(() => {
-		  this.isDropdownVisible = false;
-		}, 200);
-	  },
+    showUsersList() {
+      this.isUserList = !this.isUserList;
+    },
     async sendFriendRequest(selectedUser: any) {
       try {
         const response = await axios.post(
@@ -149,9 +116,9 @@ export default defineComponent({
           },
         );
 
-		this.requestNumber = response.data.length;
-		console.log("NUmberrr is : " , this.requestNumber);
-		console.log("request " , response.data);
+        this.requestNumber = response.data.length;
+        console.log("NUmberrr is : ", this.requestNumber);
+        console.log("request ", response.data);
         this.friendRequests = response.data;
       } catch (error) {
         console.error("Error fetching friend requests:", error);
@@ -160,7 +127,7 @@ export default defineComponent({
   },
 
   mounted() {
-	this.viewFriendRequest();
+    this.viewFriendRequest();
     axios
       .get("http://localhost:3000/users")
       .then((resp: AxiosResponse<IStudent[]>) => {
@@ -173,41 +140,6 @@ export default defineComponent({
 });
 </script>
 <style scoped>
-.relative{
-	position: relative;
-	
-}
-.flex{
-	display: flex;
-}
-.absolute {
-	position: absolute;
-  }
-
-  .justify-center{
-	justify-content: center;
-  }
-  .items-center{
-	align-items: center;
-  }
-.dropdown {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  border: 1px solid #ccc;
-  border-top: none;
-}
-
-.dropdown li {
-  padding: 5px;
-  cursor: pointer;
-  background-color: #f9f9f9;
-  border-bottom: 1px solid #ccc;
-}
-
-.dropdown li:hover {
-  background-color: #e0e0e0;
-}
 .frd-btn {
   font-size: 0.8rem;
   margin: 3%;
@@ -227,5 +159,3 @@ export default defineComponent({
   color: #d9d9da;
 }
 </style>
-
-  
