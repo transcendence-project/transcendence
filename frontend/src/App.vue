@@ -2,7 +2,7 @@
   <div id="home">
     <TopNavBar v-if="!['login'].includes($route.name)" />
     <div class="side-cont">
-      <SideNavBar v-if="!['login'].includes($route.name)" />
+      <SideNavBar v-if="!['login','game'].includes($route.name)" />
       <router-view />
     </div>
   </div>

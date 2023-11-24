@@ -45,16 +45,15 @@ export class GameService {
         const PLAYER_WIDTH_PX = 20;  // Paddle width in pixels
         const PLAYER_HEIGHT_PX = 100; // Paddle height in pixels
 
-        const paddleWidth = (PLAYER_WIDTH_PX / canvasWidth) * 100;
-        const paddleHeight = (PLAYER_HEIGHT_PX / canvasHeight) * 100;
+        // const paddleWidth = (PLAYER_WIDTH_PX / canvasWidth) * 100;
+        // const paddleHeight = (PLAYER_HEIGHT_PX / canvasHeight) * 100;
 
         this.paddle = {
-            x: 0, y: canvasWidth / 2 - PLAYER_HEIGHT_PX / 2, width: paddleWidth, height: paddleHeight, score: 0,
+            x: 0, y: canvasHeight / 2 - PLAYER_HEIGHT_PX / 2, width: PLAYER_WIDTH_PX, height: PLAYER_HEIGHT_PX, score: 0,
         }
-        console.log(canvasWidth / 2 - PLAYER_HEIGHT_PX / 2)
         this.computer = {
             x: canvasWidth - PLAYER_WIDTH_PX, y: canvasHeight - PLAYER_HEIGHT_PX, width: PLAYER_WIDTH_PX, height: PLAYER_HEIGHT_PX, score: 0,
-        }        
+        }   
         return {
             paddleRe: this.paddle,
             compRe: this.computer,

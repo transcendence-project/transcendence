@@ -104,8 +104,8 @@ const { appContext } = getCurrentInstance();
                     ctx.fillText(text, x, y);
                 };
                 const render = () => {
-                    drawRect(0, 0, pongCanvas.value.width, pongCanvas.value.height, "#F6F1F1");
-                    drawRect(0, pongCanvas.value.height / 2 - message.paddleRe.height / 2,message.paddleRe.width, message.paddleRe.height,"#9336B4");
+                    drawRect(0, 0, pongCanvas.value?.width, pongCanvas.value?.height, "#F6F1F1");
+                    drawRect(0, message.paddleRe?.y, message.paddleRe?.width, message.paddleRe?.height, "#9336B4");
                     // console.log(pongCanvas.value.height / 2 - message.paddleRe.height / 2)
                 }
                 // ctx.fillStyle = '#F6F1F1',
