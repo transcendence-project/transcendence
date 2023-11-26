@@ -1,50 +1,52 @@
 <template>
-  <div
-    class="bg-gradient-to-r from-[#451952] via-[#451952] to-[#ae4188] shadow-custom m-5 p-5 rounded-md w-full text-white min-h-[85.4vh] md:min-h-[85.10vh] lg:min-h-[85.9vh]"
-  >
-	 <div class="flex justify-center items-center pl-0 pt-2.5 pb-2.5 rounded-md relative">
-		<!-- <div class="relative"> -->
+  <div class="bg-gradient-to-r from-[#451952] via-[#451952] to-[#ae4188] shadow-custom m-5 p-5 rounded-md w-full text-white min-h-[85.4vh] md:min-h-[85.10vh] lg:min-h-[85.9vh]">
+	<!-- <div> -->
+    <div class="pl-0 pt-2.5 pb-2.5 rounded-md relative">
       <input
         v-model="text"
-        @input="handleInputChange" @focus="showDropdown" @blur="hideDropdown"
-        class="w-[60%] h-[2rem] px-4 rounded-full focus:border-0 focus:outline-none text-black"
+        @input="handleInputChange"
+        @focus="showDropdown"
+        @blur="hideDropdown"
+		placeholder="Search User"
+        class="w-[50vw] h-[2rem] px-4 rounded-full focus:border-0 focus:outline-none text-black"
       />
-
-	  
     </div>
     <div v-if="filteredStudents.length > 0">
-      <ul class="m-0 mb-4 p-0 w-[55%] rounded-md absolute">
-        <li v-for="item in filteredStudents" :key="item.id" class="list-none rounded-lg p-0 m-0 mb-1">
+      <ul class="flex flex-col justify-center m-0 p-0 w-[80vw] rounded-md absolute">
+        <li
+          v-for="item in filteredStudents"
+          :key="item.id"
+          class="list-none w-[90vw] rounded-lg p-0 m-0" >
 
-          <div
-            class="flex items-center justify-between bg-[#ae4188] m-0 pt-3 md:pt-0 pb-3 md:pb-0 pr-6 pl-2 flex-col md:flex-row rounded-sm"
-          >
-            <div class="flex justify-between mx-4 mb-1">
-              <div class="w-[6vw]">
+
+          <div class="flex justify-between w-[50vw] bg-[#ae4188] m-1 pt-1 md:pt-0 pb-1 md:pb-0 pr-6 pl-2 flex-col md:flex-row rounded-sm">
+           
+			<div class="flex justify-start m-1">
+              <div class="w-[8vw]">
                 {{ item.userName }}
               </div>
               <div>
-                <img
-                  :src="item.image"
-                  class="mx-2 rounded-full object-cover w-8 h-8"
-                />
+                <img :src="item.image" class="mx-2 rounded-full object-cover w-8 h-8"/>
               </div>
             </div>
-            <div class="flex justify-between">
-              <ButtonComponent
-                btnContent="Add"
-                @click="sendFriendRequest(item)"
-              />
+
+            <div class="flex justify-end m-1">
+              <ButtonComponent btnContent="Add" @click="sendFriendRequest(item)"/>
               <ButtonComponent btnContent="Block" />
             </div>
           </div>
+
+
+
         </li>
       </ul>
     </div>
 
     <div>
-      <h2 class="text-xl m-3">Friend Requests </h2>
-	  <p class="text-lg text-green-500 m-2">You have {{ requestNumber }} friend request</p>
+      <h2 class="text-xl m-3">Friend Requests</h2>
+      <p class="text-lg text-green-500 m-2">
+        You have {{ requestNumber }} friend request
+      </p>
       <ul>
         <li
           v-for="request in friendRequests"
@@ -56,14 +58,12 @@
           >
             <div class="flex justify-between mx-4 my-2">
               <div class="w-[40vw]">
-                {{ request.id}} 
-
-                {{ request.updatedAt}} 
+                {{ request.id }}
               </div>
             </div>
             <div class="flex justify-between">
-              <button class="frd-btn">Accept</button>
-              <button class="frd-btn">Reject</button>
+              <button class="frd-btn" @click="acceptFriendRequest(request.id)">Accept</button>
+              <button class="frd-btn" @click="rejectFriendRequest(request.id)">Reject</button>
             </div>
           </div>
         </li>
@@ -91,8 +91,11 @@ export default defineComponent({
   data() {
     return {
       text: "",
-	  requestNumber: Number,
+      requestNumber: Number,
+	  friendName: String,
+	  selectedUser: null,
       student: [] as IStudent[],
+	  isDropdownVisible: true,
       friendRequests: [] as IFriend[],
     };
   },
@@ -101,26 +104,25 @@ export default defineComponent({
       if (this.text.trim() === "") {
         return [];
       }
-      return this.student.filter((item) =>
+      return this.student.filter((item: any) =>
         item.userName.toLowerCase().includes(this.text.toLowerCase()),
       );
     },
   },
   methods: {
-
-	selectItem(item) {
-		this.text = "";
-		this.hideDropdown();
-	  },
-	  showDropdown() {
-		this.isDropdownVisible = true;
-	  },
-	  hideDropdown() {
-		setTimeout(() => {
-		  this.isDropdownVisible = false;
-		}, 200);
-	  },
-    async sendFriendRequest(selectedUser: any) {
+    selectItem(item : any) {
+      this.text = "";
+      this.hideDropdown();
+    },
+    showDropdown() {
+      this.isDropdownVisible = true;
+    },
+    hideDropdown() {
+      setTimeout(() => {
+        this.isDropdownVisible = false;
+      }, 200);
+    },
+    async sendFriendRequest(selectedUser : any) {
       try {
         const response = await axios.post(
           `http://localhost:3000/friend-requests/${selectedUser.id}`,
@@ -130,9 +132,8 @@ export default defineComponent({
               Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
           },
-        );
+		  );
 
-        console.log("Response:", response.data);
       } catch (error) {
         console.error("Error:", error);
       }
@@ -148,19 +149,42 @@ export default defineComponent({
             },
           },
         );
-
-		this.requestNumber = response.data.length;
-		console.log("NUmberrr is : " , this.requestNumber);
-		console.log("request " , response.data);
+        this.requestNumber = response.data.length;
         this.friendRequests = response.data;
       } catch (error) {
         console.error("Error fetching friend requests:", error);
       }
     },
+
+	async acceptFriendRequest(selectedUser : any) {
+      try {
+        const response = await axios.patch(
+          `http://localhost:3000/friend-requests/accept/${selectedUser}`);
+		 
+		  console.log('Friend request accepted:', response);
+
+      } catch (error) {
+
+        console.error("friend accept Error:", error);
+      }
+    },
+	async rejectFriendRequest(selectedUser : any) {
+      try {
+        const response = await axios.patch(
+          `http://localhost:3000/friend-requests/${selectedUser}/reject`);
+
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    },
   },
 
   mounted() {
-	this.viewFriendRequest();
+
+    this.viewFriendRequest();
+	// this.acceptFriendRequest(this.selectedUser);
+    // this.rejectFriendRequest(this.selectedUser);
+
     axios
       .get("http://localhost:3000/users")
       .then((resp: AxiosResponse<IStudent[]>) => {
@@ -173,23 +197,22 @@ export default defineComponent({
 });
 </script>
 <style scoped>
-.relative{
-	position: relative;
-	
+.relative {
+  position: relative;
 }
-.flex{
-	display: flex;
+.flex {
+  display: flex;
 }
 .absolute {
-	position: absolute;
-  }
+  position: absolute;
+}
 
-  .justify-center{
-	justify-content: center;
-  }
-  .items-center{
-	align-items: center;
-  }
+.justify-center {
+  justify-content: center;
+}
+.items-center {
+  align-items: center;
+}
 .dropdown {
   list-style: none;
   padding: 0;
@@ -227,5 +250,3 @@ export default defineComponent({
   color: #d9d9da;
 }
 </style>
-
-  
