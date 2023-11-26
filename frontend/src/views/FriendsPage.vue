@@ -32,7 +32,6 @@
 
             <div class="flex justify-end m-1">
               <ButtonComponent btnContent="Add" @click="sendFriendRequest(item)"/>
-              <ButtonComponent btnContent="Block" />
             </div>
           </div>
 
@@ -151,6 +150,7 @@ export default defineComponent({
         );
         this.requestNumber = response.data.length;
         this.friendRequests = response.data;
+		console.log(response.data);
       } catch (error) {
         console.error("Error fetching friend requests:", error);
       }
