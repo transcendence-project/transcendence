@@ -455,7 +455,26 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('block_frnd')
 	async block_frnd(client: any, friend: string) {
 		const user = this.chatService.find_user_with_id(client.id);
-		const user_frnds = await this.userService.getFriends(user.id);
+		// const user_frnds = await this.userService.getFriends(user.id);
+		this.userService.add_blocked(friend, user.userName);
+		const data_to_send = {
+			severity: "info",
+			summary: "Friend Blocked",
+			detail: `You blocked ${friend}.`
+		}
+		client.emit('notify', data_to_send);
+	}
+
+	@SubscribeMessage('unblock_frnd')
+	async unblock_frnd(client: any, friend: string) {
+		const user = this.chatService.find_user_with_id(client.id);
+		this.userService.rem_blocked(friend, user.userName);
+		const data_to_send = {
+			severity: "info",
+			summary: "Friend Unblocked",
+			detail: `You unblocked ${friend}.`
+		}
+		client.emit('notify', data_to_send);
 	}
 
 	@SubscribeMessage('rem_admin')

@@ -41,6 +41,7 @@ export class UsersService {
 	  isTwoFactorAuthenticated: false,
       friends: [],
       channels: [],
+	  blocked: [],
 	matchesAsPlayerOne: [],
 	matchesAsPlayerTwo: [],
       achievements: [],
@@ -231,5 +232,31 @@ export class UsersService {
   async getMatches(userId: number) {
 	const matches = await this.matchesService.findMatches(userId);
 	return matches;
+  }
+
+  async add_blocked(friend_name: string, user_name: string) {
+	// const friend = await this.findOneByUserName(friend_name);
+	const user = await this.findOneByUserName(user_name);
+	if (user)
+	{
+		user.blocked.push(friend_name);
+		await this.repo.save(user);
+	}
+  }
+
+	async get_blocked(user_id: number){
+		const user = await this.repo.findOne({
+			where: { id: user_id },
+			relations: ["blocked"],
+		});
+		return user.blocked;
+	}
+  async rem_blocked(friend_name: string, user_name: string) {
+	const user = await this.findOneByUserName(user_name);
+	if (user)
+	{
+		user.blocked.filter((friend: string )=> friend !== friend_name);
+		await this.repo.save(user);
+	}
   }
 }

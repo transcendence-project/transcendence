@@ -408,14 +408,17 @@ export default defineComponent({
       const channel = computed(() => store.getters.getAllChannel);
       const arrayProxy = channel.value;
       arrayProxy.forEach((item: any) => {
-        const new_chan: IChannel = {
-          name: item.room_name,
-          id: item.id,
-          isPrivate: item.is_private,
-          isProtected: item.is_protected,
-          isPublic: item.is_public,
-        };
-        chan.value.push(new_chan);
+		if (item.isGroupChannel === true)
+		{
+			const new_chan: IChannel = {
+			  name: item.room_name,
+			  id: item.id,
+			  isPrivate: item.is_private,
+			  isProtected: item.is_protected,
+			  isPublic: item.is_public,
+			};
+			chan.value.push(new_chan);
+		}
       });
     };
     if (!chan.value.length) all();
@@ -424,29 +427,45 @@ export default defineComponent({
       const my_channel = computed(() => store.getters.getMyChannel);
       const arrayProxy_m = my_channel.value;
       arrayProxy_m.forEach((item: any) => {
-        const my_chan: IChannel = {
-          name: item.room_name,
-          id: item.id,
-          isPrivate: item.is_private,
-          isProtected: item.is_protected,
-          isPublic: item.is_public,
-        };
-        m_chan.value.push(my_chan);
+		if (item.isGroupChannel === true)
+		{
+			const my_chan: IChannel = {
+			  name: item.room_name,
+			  id: item.id,
+			  isPrivate: item.is_private,
+			  isProtected: item.is_protected,
+			  isPublic: item.is_public,
+			};
+			m_chan.value.push(my_chan);
+		}
       });
     };
     if (!m_chan.value.length) my();
 	const fr = async ()=> {
 		await store.dispatch("fetchMyFriends");
+		await store.dispatch("fetchMyBlocked");
 		const my_friends = computed(() => store.getters.getMyFriends);
-		// console.log(my_friends);
+		const my_blocked = computed(() => store.getters.getMyBlocked);
 		const arrayProxy_f = my_friends.value;
 		arrayProxy_f.forEach((item: any) => {
-			const my_frnds: FriendsList = {
-				user: item.userName,
-				status: false,
-				isBlock: false,
+			if (my_blocked.value.includes(item.userName))
+			{
+				const my_frnds: FriendsList = {
+					user: item.userName,
+					status: false,
+					isBlock: true,
+				}
+				m_frnd.value.push(my_frnds);
 			}
-			m_frnd.value.push(my_frnds);
+			else
+			{
+				const my_frnds: FriendsList = {
+					user: item.userName,
+					status: false,
+					isBlock: false,
+				}
+				m_frnd.value.push(my_frnds);
+			}
 		});
 	};
 	if (!m_frnd.value.length) fr();
@@ -647,7 +666,8 @@ methods: {
 			store.state.chat.socket.emit("block_frnd", friend);
 	},
 	unblock_friend(friend: string){
-
+		if (store.state.chat.socket)
+			store.state.chat.socket.emit("block_frnd", friend);
 	},
     showPasswordForm(chan_name: string) {
       this.isPrivate = true;
@@ -806,11 +826,20 @@ methods: {
       );
       if (index !== -1) this.my_chan.splice(index, 1);
     });
+	store.state.chat.socket.on("blocked", (friend_name: string) => {
+      const friend_found = this.friends.find((friend: FriendsList) => friend.user === friend_name);
+	  if (friend_found)
+		friend_found.isBlock = true;
+    });
+	store.state.chat.socket.on("unblocked", (friend_name: string) => {
+      const friend_found = this.friends.find((friend: FriendsList) => friend.user === friend_name);
+	  if (friend_found)
+		friend_found.isBlock = false;
+    });
     this.mute_omar();
     this.listenForMuteEvents();
 	this.notify();
   },
-  //   async mute_user(userId)
 });
 </script>
 

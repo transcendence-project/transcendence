@@ -23,12 +23,13 @@ const store = createStore({
 		},
 		chat: {
 			socket: null as Socket | null,
-			all_channels: [],
+			all_channels: [] ,
 			my_channels: [] as IChannel[],
-			my_friends: [],
+			my_friends: [] as IChannel[],
+			my_blocked: [] as string[],
 			current_chan_name: "",
+			current_friend: "",
 			current_channel: null,
-			test: "inside chat in store.. testingg",
 		},
 	},
 	getters: { // used to retrieve computed properties or derived state from the store.
@@ -38,6 +39,7 @@ const store = createStore({
 		getMyChannel: (state: any) => state.chat.my_channels,
 		getCurrentCahnnel: (state: any) => state.chat.current_channel,
 		getMyFriends: (state: any) => state.chat.my_friends,
+		getMyBlocked: (state: any) => state.chat.my_blocked,
 
 		// GETTERS FOR USER
 		getId: (state: any) => state.user.id,
@@ -67,6 +69,9 @@ const store = createStore({
 		},
 		setMyFriends(state: any, my_frnds: any) {
 			state.chat.my_friends = my_frnds;
+		},
+		setMyBlocked(state: any, my_blckd: string[]) {
+			state.chat.my_blocked = my_blckd;
 		},
 
 		// SETTERS FOR USER
@@ -163,6 +168,17 @@ const store = createStore({
 				context.commit('setMyFriends', resp.data);
 			}).catch((error) => {
 				console.error("Error fetching my friends:", error);
+			});
+		},
+		async fetchMyBlocked(context: any) {
+			await axios.get("http://localhost:3000/users/my/blocked", {
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem('token')}`,
+				},
+			}).then((resp: AxiosResponse) => {
+				context.commit('setMyBlocked', resp.data);
+			}).catch((error) => {
+				console.error("Error fetching my blocked:", error);
 			});
 		},
 		// async fetchFriendChan(context: any){
