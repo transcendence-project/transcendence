@@ -7,17 +7,17 @@ import { Message } from '../entities/message.entity';
 import { Socket } from 'socket.io';
 import { AuthService } from 'auth/auth.service';
 import * as bcrypt from 'bcrypt'
+import { UsersService } from 'users/users.service';
 
 
 @Injectable()
 export class ChatService {
 	private connected_users: Map<string, User> = new Map();
-	// private game_invites: Map<string, string[]> = new Map(); // store only user names?
-	// private direct_msg: Map<string, {to: string, from: string, content: string, created: Date }[]> = new Map();
 
 	constructor(@InjectRepository(Channel) private channelRepo: Repository<Channel>,
 	@InjectRepository(Message) private messageRepo: Repository<Message>,
-	private authService: AuthService ){}
+	private authService: AuthService, private userService: UsersService ){}
+	
 
 		//  ----------------------- CHANNEL GETTERS -----------------------------
 	async get_all_chan() {
@@ -26,56 +26,94 @@ export class ChatService {
 
 	async chan_by_name(chan_name: string): Promise<Channel> // or by id
 	{
-		return (await this.channelRepo.findOne({ where: { room_name: chan_name }, relations: ['members', 'admins', 'owner', 'messages', 'banned', 'muted'] }));
+		return (await this.channelRepo.findOne({ where: { room_name: chan_name, isGroupChannel: true }, relations: ['members', 'admins', 'owner', 'messages', 'banned', 'muted'] }));
 	}
 
 	async mem_by_chan(chan_name: string): Promise<User[] | undefined> {
-		const channel = await this.channelRepo.findOne({ where: { room_name: chan_name }, relations: ['members'] });
+		const channel = await this.channelRepo.findOne({ where: { room_name: chan_name, isGroupChannel: true }, relations: ['members'] });
 		if (channel)
 			return channel.members;
 	}
 
 	async admin_by_chan(chan_name: string): Promise<User[] | undefined> {
-		const channel = await this.channelRepo.findOne({ where: { room_name: chan_name }, relations: ['admins'] });
+		const channel = await this.channelRepo.findOne({ where: { room_name: chan_name, isGroupChannel: true }, relations: ['admins'] });
 		if (channel)
 			return channel.admins;
 	}
 
 	async owner_by_chan(chan_name: string): Promise<User | undefined> {
-		const channel = await this.channelRepo.findOne({ where: { room_name: chan_name }, relations: ['owner'] });
+		const channel = await this.channelRepo.findOne({ where: { room_name: chan_name, isGroupChannel: true }, relations: ['owner'] });
 		if (channel)
 			return channel.owner;
 	}
 
 	async banned_by_chan(chan_name: string): Promise<User[] | undefined> {
-		const channel = await this.channelRepo.findOne({ where: { room_name: chan_name }, relations: ['banned'] });
+		const channel = await this.channelRepo.findOne({ where: { room_name: chan_name, isGroupChannel: true }, relations: ['banned'] });
 		if (channel)
 			return channel.banned;
 	}
 
 	async muted_by_chan(chan_name: string): Promise<User[] | undefined> {
-		const channel = await this.channelRepo.findOne({ where: { room_name: chan_name }, relations: ['muted'] });
+		const channel = await this.channelRepo.findOne({ where: { room_name: chan_name, isGroupChannel: true }, relations: ['muted'] });
 		if (channel)
 			return channel.muted;
 	}
 
+	async frndchan_by_name(frnd_name: string): Promise<Channel> {
+		const channel = await this.channelRepo.createQueryBuilder("channel")
+		.leftJoinAndSelect("channel.members", "member")
+   		.leftJoinAndSelect("channel.messages", "message")
+		.where("member.name = :frnd_name", { frnd_name })
+		.getOne();
+		if (channel)
+		{
+			console.log(channel);
+			return channel;
+		}
+	}
+
 		//  ----------------------- CREATE / UPDATE -----------------------------
-	async create_chan(chan_name: string, user: User, pass: string, type: string) {
+	async create_chan(chan_name: string, user: User, pass: string, type: string, client: any) {
 		const chan = await this.chan_by_name(chan_name);
 		if (chan || chan_name === "" || chan_name.length > 20){
+			const detail = ""
 			if (chan)
-				console.log(`Channel ${chan_name} already exists`);
+			{
+				const data_to_send = {
+					severity: "error",
+					summary: "Cannot Create Channel",
+					detail: `Channel ${chan_name} already exists.`
+				}
+				client.emit('notify', data_to_send);
+			}
 			else if (chan_name === "" || !chan_name)
-				console.log("Channel name cannot be empty");
+			{
+				const data_to_send = {
+					severity: "error",
+					summary: "Cannot Create Channel",
+					detail: `Channel name cannot be empty.`
+				}
+				client.emit('notify', data_to_send);
+			}
 			else
-				console.log("Channel name too long");
+			{
+				const data_to_send = {
+					severity: "error",
+					summary: "Cannot Create Channel",
+					detail: `Channel name too long.`
+				}
+				client.emit('notify', data_to_send);
+			}
 			return null;
 		}
-		else if (type === "prot" && (pass.length > 20 || pass === "")) {
-			if (pass.length > 20)
-				console.log("Password too long");
-			else
-				console.log("Password cannot be empty");
+		else if (type === "prot" &&  pass === "") {
+			const data_to_send = {
+				severity: "error",
+				summary: "Cannot Create Channel",
+				detail: `Password cannot be empty.`
+			}
+			client.emit('notify', data_to_send);
+			return null;
 		}
 		else {
 			try{
@@ -256,9 +294,17 @@ export class ChatService {
 		}
 	}
 
-	async can_join(user: User, room: Channel, arg: string): Promise<boolean> {
+	async can_join(user: User, room: Channel, arg: string, client: any): Promise<boolean> {
 		if (await this.is_ban(user.userName, room.room_name) === true)
+		{
+			const data_to_send = {
+				severity: "error",
+				summary: "Unable to Join",
+				detail: `You are banned from Channel ${room.room_name}.`
+			};
+			client.emit('notify', data_to_send);
 			return false;
+		}
 		if (room.is_protected === true)
 		{
 			if (room.password)
@@ -268,7 +314,15 @@ export class ChatService {
 					if (match)
 						return true;
 					else
+					{
+						const data_to_send = {
+							severity: "error",
+							summary: "Unable to Join",
+							detail: `Incorrect Password`
+						};
+						client.emit('notify', data_to_send);
 						return false;
+					}
 				}
 				catch (error) {
 					console.error('Error while comparing password:', error);

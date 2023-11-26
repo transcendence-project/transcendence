@@ -28,16 +28,11 @@ export class AuthService{
 		return user;
 	}
 
-	async generateTwoFactorAuthenticationSecret(user: Partial<User>) {
+	async generateTwoFactorAuthenticationSecret(user: User) {
 		const secret = authenticator.generateSecret();
 	
-		const otpauthUrl = authenticator.keyuri(user.email, 'PONG 2.0', secret);
-	
-		user.twoFactorSecret = secret;
-		console.log(secret);
-		// this.userService.update(user.id, {twoFactorAuthenticationSecret: secret});
-		// await this.usersService.setTwoFactorAuthenticationSecret(secret, user.id);
-	
+		const otpauthUrl = authenticator.keyuri(user.userName, 'TRANSCENDENCE', secret);
+		await this.userService.update(user.id, {twoFactorSecret: secret});
 		return {
 		  secret,
 		  otpauthUrl
@@ -50,10 +45,21 @@ export class AuthService{
 		return dataURL;
 	  }
 	
-	  is2faCodeValid(twoFactorAuthenticationCode: string, user: Partial<User>) {
-		return authenticator.verify({
-		  token: twoFactorAuthenticationCode,
-		  secret: user.twoFactorSecret
-		});
+	 async is2faCodeValid(twoFactorAuthenticationCode: string, user: User) {
+		const verified = authenticator.verify({
+			token: twoFactorAuthenticationCode,
+			secret: user.twoFactorSecret
+		  });
+		  if (verified)
+		 	 await this.userService.update(user.id, {isTwoFactorAuthenticated: true});
+		return verified
+	  }
+
+	  async enable2FA(user: User){
+		await this.userService.update(user.id, {is2FAEnabled: true});
+	  }
+
+	 async disable2FA(user: User){
+		await this.userService.update(user.id, {is2FAEnabled: false});
 	  }
 }

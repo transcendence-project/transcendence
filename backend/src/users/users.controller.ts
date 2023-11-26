@@ -79,4 +79,10 @@ export class UsersController {
 		// console.log(req.user.id);
 		return (await this.userService.getFriends(req.user.id));
 	}
+
+	@Get('my/blocked')
+	@UseGuards(JwtAuthGuard)
+	async my_blocked(@Req() req){
+		return (await this.userService.get_blocked(req.user.id));
+	}
 }

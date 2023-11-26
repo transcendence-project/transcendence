@@ -42,6 +42,9 @@ export class User {
   // @Exclude()
   twoFactorSecret: string;
 
+  @Column({ default: false })
+  isTwoFactorAuthenticated: boolean;
+
   @ManyToMany(() => User, (user) => user.friends)
   @JoinTable({
     name: "friends",
@@ -55,6 +58,10 @@ export class User {
     },
   })
   friends: User[];
+
+  @ManyToMany(type => User)
+  @JoinTable()
+  blocked: string[];
 
   @OneToMany(() => User, (user) => user.friendRequestsSent)
   friendRequestsSent: FriendRequest[];
@@ -85,6 +92,7 @@ export class User {
   @ManyToMany(() => Channel, (channel) => channel.members)
   @JoinTable({ name: "my_channels" })
   channels: Channel[];
+
 
   @Column({ default: false })
   isOnline: boolean;

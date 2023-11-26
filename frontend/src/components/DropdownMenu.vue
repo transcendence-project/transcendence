@@ -1,66 +1,112 @@
 <template>
-	<div class="dropdown" ref="dropdown">
+	<div class="dropdowns" ref="dropdownsRef">
 	  <img
-		class="cursor-pointer w-10"
-		src="@/assets/game.svg"
-		alt="Dropdown Button"
-		@click="toggleDropdown"
+		class="dropsbtn rounded-full object-cover w-8 h-8"
+		:src="userimage"
+		alt="Dropdowns Button"
+		@click="toggleDropdowns"
 	  />
+  
 	  <div
-		class="dropdown-content hidden absolute"
+		class="dropdowns-content"
 		:class="{ active: showDropdown }"
 		@click.stop=""
 	  >
-		<router-link to="/profile" @click.native="closeDropdown">Edit Profile</router-link>
-		<router-link to="/twofactor" @click.native="closeDropdown" >Two-factor-AUTH</router-link>
-		<router-link to="/login" @click.native="closeDropdown">Logout</router-link>
+	  <router-link to="/editprofile" @click.native="closeDropdown"
+        >Edit Profile</router-link
+      >
+      <router-link to="#" @click.native="toggleTwoFactor"
+        >Two-factor-AUTH</router-link
+      >
+      <div class="flex">
+        <button v-if="showTwoFactorButtons" class="enbtn mx-2 px-2" @click="enable">
+          Enable
+        </button>
+        <button v-if="showTwoFactorButtons" class="enbtn mx-2 px-2"  @click="disable">
+          Disable
+        </button>
+      </div>
+      <router-link to="/" @click.native="logout"
+        >Logout</router-link
+      >
+
 	  </div>
 	</div>
-</template>
+  </template>
+  
+  
+  <script setup lang="ts">
+  import { ref, onMounted, onBeforeUnmount, computed } from "vue";
+  import store from "@/store";
+  
+  const showDropdown = ref(false);
+  const dropdownsRef = ref<HTMLElement | null>(null);
+	const showTwoFactorButtons = ref(false);
 
-<!----------------------------------------------------- TypeScript code ---------------------------------------------------------------------------------->
-<script setup lang="ts">
-	import { ref, onMounted, onBeforeUnmount } from 'vue';
-	import store from '@/store';
-
-	const showDropdown = ref(false);
-	const dropdownRef = ref<HTMLElement | null>(null); // Define the type of dropdownRef
-
-	const toggleDropdown = () => {
+	const toggleTwoFactor = () => {
+  showTwoFactorButtons.value = !showTwoFactorButtons.value;
+};
+  const toggleDropdowns = () => {
 	showDropdown.value = !showDropdown.value;
-	};
-
-	const closeDropdownOnClickOutside = (event: MouseEvent) => {
-	if (dropdownRef.value?.contains(event.target as Node)) { // Use optional chaining
-		showDropdown.value = false;
-		document.removeEventListener('click', closeDropdownOnClickOutside);
+  
+	if (showDropdown.value) {
+	  document.addEventListener("click", closeDropdownOnClickOutside);
+	} else {
+	  document.removeEventListener("click", closeDropdownOnClickOutside);
 	}
-	};
+  };
+  
+  const closeDropdownOnClickOutside = (event: MouseEvent) => {
+	if (
+	  dropdownsRef.value &&
+	  !dropdownsRef.value.contains(event.target as Node)
+	) {
+	  showDropdown.value = false;
+	  document.removeEventListener("click", closeDropdownOnClickOutside);
+	}
+  };
+  
+  const closeDropdown = () => {
+  showDropdown.value = false;
+  showTwoFactorButtons.value = false;
+  document.removeEventListener("click", closeDropdownOnClickOutside);
+};
 
-	const closeDropdown = () => {
-	showDropdown.value = false;
-	document.removeEventListener('click', closeDropdownOnClickOutside);
-	};
+const logout = () => {
+	localStorage.removeItem('token');
+	closeDropdown();
+};
 
-	// const two_fa = async () => {
-	// 	console.log("inside 2 FA function ");
-	// 	await store.dispatch("TwoFA")
-	// };
+const enable = async () => {
+	store.dispatch("enabl2FA");
+};
 
-	onMounted(() => {
-	document.addEventListener('click', closeDropdownOnClickOutside);
-	});
+const disable = async () => {
+	store.dispatch("disabl2FA");
+}
 
-	onBeforeUnmount(() => {
-	document.removeEventListener('click', closeDropdownOnClickOutside);
-	});
-</script>  
+onMounted(() => {
+	store.dispatch("fetchUserData");
+  document.addEventListener("click", closeDropdownOnClickOutside);
+});
 
-<!----------------------------------------------- CSS ------------------------------------------------------->
+const userimage = computed(() => store.getters.getImage);
+  const username = computed(() => store.getters.getUserName);
+
+onBeforeUnmount(() => {
+  document.removeEventListener("click", closeDropdownOnClickOutside);
+});
+</script>
+
 <style scoped>
-  .dropdown-content {
-	/* display: none; */
-	/* position: absolute; */
+  .dropsbtn {
+	cursor: pointer;
+	/* width: 40px; */
+  }
+  
+  .dropdowns-content {
+	display: none;
+	position: absolute;
 	background-color: #f9f9f9;
 	min-width: 160px;
 	box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
@@ -72,14 +118,30 @@
 	display: block;
   }
   
-  .dropdown-content a {
+  .dropdowns-content a {
 	color: black;
 	padding: 12px 16px;
 	text-decoration: none;
 	display: block;
   }
-  
-  .dropdown-content a:hover {
+  .enbtn {
+  font-size: 0.8rem;
+  color: white;
+  padding-top: 0.6rem;
+  padding-bottom: 0.6rem;
+  background: #451952;
+  border-radius: 5px;
+  margin-left: 10px;
+  cursor: pointer;
+  color: white;
+
+  border: none;
+}
+.enbtn:hover {
+  background: #ae4488;
+  color: #d9d9da;
+}
+  .dropdowns-content a:hover {
 	background-color: #f1f1f1;
   }
   </style>

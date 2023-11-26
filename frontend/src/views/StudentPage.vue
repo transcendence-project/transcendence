@@ -1,29 +1,25 @@
 <template>
 	<div class="std">
-		<h2>Student List</h2>
+		<h2 class="text-lg">Student List</h2>
 		<div class="std-stat">
-			<div class="std-title">
-				<div class="tit-list">Id</div>
-				<div class="tit-list">First</div>
-				<div class="tit-list">Last</div>
+			<div class="std-title text-white my-2">
+				<div class="tit-list">Full Name</div>
+				<div class="tit-list">User Name</div>
+				<div class="tit-list">Image</div>
 				<div class="tit-list">Email</div>
-				<div class="tit-list">Status</div>
-				<div class="tit-list">Win</div>
-				<div class="tit-list">Lose</div>
-				<div class="tit-list">Draw</div>
-				<div class="tit-list">Rank</div>
+				<div class="tit-list">Points</div>
 			</div>
 
 			<div v-for="item in student" v-bind:key="item.id" class="std-list">
 				<div class="lst-item">{{ item.id }}</div>
-				<div class="lst-item">{{ item.first_name }}</div>
-				<div class="lst-item">{{ item.last_name }}</div>
+				<div class="lst-item">{{ item.fullname }}</div>
+				<div class="lst-item">{{ item.userName }}</div>
+				<div class="lst-item">
+					<img :src="item.image" class=" m-1 w-[5vh] rounded-full" />
+
+					</div>
 				<div class="lst-item">{{ item.email }}</div>
-				<div class="lst-item">{{ item.status }}</div>
-				<div class="lst-item">{{ item.win }}</div>
-				<div class="lst-item">{{ item.lose }}</div>
-				<div class="lst-item">{{ item.draw }}</div>
-				<div class="lst-item">{{ item.rank }}</div>
+				<div class="lst-item">{{ item.points }}</div>
 			</div>
 		</div>
 	</div>
@@ -31,8 +27,8 @@
 
 <script lang="ts">
 import Vue from "vue";
-import axios, { AxiosResponse } from "axios";
 import { defineComponent } from "vue";
+import axios, { AxiosResponse } from "axios";
 import { IStudent } from "@/models/student";
 
 
@@ -92,8 +88,8 @@ export default defineComponent({
 
 .tit-list {
 	display: inline;
-	font-size: 1.5rem;
-	color: black;
+	font-size: 1rem;
+	/* color: black; */
 	background: #ae445a;
 	margin-bottom: 5px;
 	width: 98%;
