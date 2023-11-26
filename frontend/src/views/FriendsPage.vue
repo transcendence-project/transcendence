@@ -1,43 +1,50 @@
 <template>
-  <div class="bg-gradient-to-r from-[#451952] via-[#451952] to-[#ae4188] shadow-custom m-5 p-5 rounded-md w-full text-white min-h-[85.4vh] md:min-h-[85.10vh] lg:min-h-[85.9vh]">
-	<!-- <div> -->
+  <div
+    class="bg-gradient-to-r from-[#451952] via-[#451952] to-[#ae4188] shadow-custom m-5 p-5 rounded-md w-full text-white min-h-[85.4vh] md:min-h-[85.10vh] lg:min-h-[85.9vh]"
+  >
+    <!-- <div> -->
     <div class="pl-0 pt-2.5 pb-2.5 rounded-md relative">
       <input
         v-model="text"
         @input="handleInputChange"
         @focus="showDropdown"
         @blur="hideDropdown"
-		placeholder="Search User"
+        placeholder="Search User"
         class="w-[50vw] h-[2rem] px-4 rounded-full focus:border-0 focus:outline-none text-black"
       />
     </div>
     <div v-if="filteredStudents.length > 0">
-      <ul class="flex flex-col justify-center m-0 p-0 w-[80vw] rounded-md absolute">
+      <ul
+        class="flex flex-col justify-center m-0 p-0 w-[80vw] rounded-md absolute"
+      >
         <li
           v-for="item in filteredStudents"
           :key="item.id"
-          class="list-none w-[90vw] rounded-lg p-0 m-0" >
-
-
-          <div class="flex justify-between w-[50vw] bg-[#ae4188] m-1 pt-1 md:pt-0 pb-1 md:pb-0 pr-6 pl-2 flex-col md:flex-row rounded-sm">
-           
-			<div class="flex justify-start m-1">
+          class="list-none w-[90vw] rounded-lg p-0 m-0"
+        >
+          <div
+            class="flex justify-between w-[50vw] bg-[#ae4188] m-1 pt-1 md:pt-0 pb-1 md:pb-0 pr-6 pl-2 flex-col md:flex-row rounded-sm"
+          >
+            <div class="flex justify-start m-1">
               <div class="w-[8vw]">
                 {{ item.userName }}
               </div>
               <div>
-                <img :src="item.image" class="mx-2 rounded-full object-cover w-8 h-8"/>
+                <img
+                  :src="item.image"
+                  class="mx-2 rounded-full object-cover w-8 h-8"
+                />
               </div>
             </div>
 
             <div class="flex justify-end m-1">
-              <ButtonComponent btnContent="Add" @click="sendFriendRequest(item)"/>
+              <ButtonComponent
+                btnContent="Add"
+                @click="sendFriendRequest(item)"
+              />
               <ButtonComponent btnContent="Block" />
             </div>
           </div>
-
-
-
         </li>
       </ul>
     </div>
@@ -62,8 +69,12 @@
               </div>
             </div>
             <div class="flex justify-between">
-              <button class="frd-btn" @click="acceptFriendRequest(request.id)">Accept</button>
-              <button class="frd-btn" @click="rejectFriendRequest(request.id)">Reject</button>
+              <button class="frd-btn" @click="acceptFriendRequest(request.id)">
+                Accept
+              </button>
+              <button class="frd-btn" @click="rejectFriendRequest(request.id)">
+                Reject
+              </button>
             </div>
           </div>
         </li>
@@ -92,10 +103,10 @@ export default defineComponent({
     return {
       text: "",
       requestNumber: Number,
-	  friendName: String,
-	  selectedUser: null,
+      friendName: String,
+      selectedUser: null,
       student: [] as IStudent[],
-	  isDropdownVisible: true,
+      isDropdownVisible: true,
       friendRequests: [] as IFriend[],
     };
   },
@@ -110,7 +121,7 @@ export default defineComponent({
     },
   },
   methods: {
-    selectItem(item : any) {
+    selectItem(item: any) {
       this.text = "";
       this.hideDropdown();
     },
@@ -122,7 +133,7 @@ export default defineComponent({
         this.isDropdownVisible = false;
       }, 200);
     },
-    async sendFriendRequest(selectedUser : any) {
+    async sendFriendRequest(selectedUser: any) {
       try {
         const response = await axios.post(
           `http://localhost:3000/friend-requests/${selectedUser.id}`,
@@ -132,8 +143,7 @@ export default defineComponent({
               Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
           },
-		  );
-
+        );
       } catch (error) {
         console.error("Error:", error);
       }
@@ -156,23 +166,22 @@ export default defineComponent({
       }
     },
 
-	async acceptFriendRequest(selectedUser : any) {
+    async acceptFriendRequest(selectedUser: any) {
       try {
         const response = await axios.patch(
-          `http://localhost:3000/friend-requests/accept/${selectedUser}`);
-		 
-		  console.log('Friend request accepted:', response);
+          `http://localhost:3000/friend-requests/accept/${selectedUser}`,
+        );
 
+        console.log("Friend request accepted:", response);
       } catch (error) {
-
         console.error("friend accept Error:", error);
       }
     },
-	async rejectFriendRequest(selectedUser : any) {
+    async rejectFriendRequest(selectedUser: any) {
       try {
         const response = await axios.patch(
-          `http://localhost:3000/friend-requests/${selectedUser}/reject`);
-
+          `http://localhost:3000/friend-requests/${selectedUser}/reject`,
+        );
       } catch (error) {
         console.error("Error:", error);
       }
@@ -180,9 +189,8 @@ export default defineComponent({
   },
 
   mounted() {
-
     this.viewFriendRequest();
-	// this.acceptFriendRequest(this.selectedUser);
+    // this.acceptFriendRequest(this.selectedUser);
     // this.rejectFriendRequest(this.selectedUser);
 
     axios

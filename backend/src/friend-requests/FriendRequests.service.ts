@@ -10,11 +10,13 @@ export class FriendRequestService {
 				private userService: UsersService) {}
 
 	async sendFriendRequest(senderId: number, receiverId: number): Promise<FriendRequest> {
-		
-		if (senderId === receiverId) {
+		// console.log("senderId: " + senderId);
+		// console.log("receiverId: " + receiverId);
+		if (senderId == receiverId) {
 			throw new NotFoundException("Cannot send friend request to yourself");
 		}
 		if (await this.userService.isFriend(senderId, receiverId)) {
+			console.log("we are here")
 			throw new NotFoundException("Users are already friends");
 		}
 		// check if request already exists
@@ -23,8 +25,9 @@ export class FriendRequestService {
 			throw new NotFoundException("Friend request already exists");
 		}
 		const friendRequest = this.friendRequestRepository.create({
-			sender: { id: senderId },
-			receiver: { id: receiverId }
+			sender: await this.userService.findOne(senderId),
+			receiver: await this.userService.findOne(receiverId),
+			status: 'PENDING'
 		});
 		return await this.friendRequestRepository.save(friendRequest);
 	}
