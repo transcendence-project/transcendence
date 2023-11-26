@@ -91,6 +91,17 @@ export class UsersService {
     return this.repo.save(user);
   }
 
+  async isFriend(userId: number, friendId: number): Promise<boolean> {
+	const user = await this.repo.findOne({
+	  where: { id: userId },
+	  relations: ["friends"],
+	});
+	if (!user.friends) {
+	  user.friends = [];
+	}
+	return user.friends.some((friend) => friend.id === friendId);
+}
+
   async removeFriend(userId: number, friendId: number) {
     const user = await this.repo.findOne({
       where: { id: userId },
@@ -229,6 +240,11 @@ export class UsersService {
 
   async getMatches(userId: number) {
 	const matches = await this.matchesService.findMatches(userId);
+	return matches;
+  }
+
+  async getMatchesAsPlayerOne(userId: number) {
+	const matches = await this.matchesService.findMatchesAsPlayerOne(userId);
 	return matches;
   }
 }
