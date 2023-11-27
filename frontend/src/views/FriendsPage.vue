@@ -162,13 +162,7 @@ export default defineComponent({
       if (this.text.trim() === "") {
         return [];
       }
-      return this.student.filter((item: any) =>
-        item.userName
-          .toLowerCase()
-          .includes(
-            this.text.toLowerCase() ||
-              item.fullname.toLowerCase().includes(this.text.toLowerCase()),
-          ),
+      return this.student.filter((item: any) => item.userName.toLowerCase().includes(this.text.toLowerCase()) || item.fullname.toLowerCase().includes(this.text.toLowerCase())
       );
     },
   },
@@ -197,7 +191,9 @@ export default defineComponent({
             },
           },
         );
-      } catch (error) {}
+      } catch (error) {
+		  console.log("Error", error);
+	  }
     },
     async removeFriend(selectedUser: number) {
       console.log("in remove friend: ", selectedUser);

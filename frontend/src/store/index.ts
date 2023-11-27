@@ -181,6 +181,7 @@ const store = createStore({
 				console.error("Error fetching my blocked:", error);
 			});
 		},
+
 		// async fetchFriendChan(context: any){
 		// 	const cur = localStorage.getItem('fetchCurrentFriend');
 		// 	await axios.get("", {

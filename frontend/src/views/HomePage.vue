@@ -19,7 +19,7 @@
           </div>
         </div>
         <div class="bg-gradient-to-r from-[#ae445a] to-[#451952] shadow-third flex flex-col justify-center w-[45%] p-[10px] text-center rounded">
-          <h3>Player Stat</h3>
+          <h3 class="text-xl">Player Stat</h3>
           <div class="shadow-third flex align-center justify-between mb-[5px] px-[50px] pb-[10px] pt-[5px] rounded">
             <div>Wins</div>
             <div>{{ win }}</div>
@@ -28,12 +28,25 @@
             <div>Loses</div>
             <div>{{ lose }}</div>
           </div>
-          <div class="shadow-third flex align-center justify-between mb-[5px] px-[50px] pb-[10px] pt-[5px] rounded">
-            <div>Draws</div>
-            <div>{{ draw }}</div>
-          </div>
+  
           <div class="shadow-third flex align-center justify-between mb-[5px] px-[50px] pb-[10px] pt-[5px] rounded">
             <div>Rank</div>
+            <div>{{ rank }}</div>
+          </div>
+        </div>
+        <div class="bg-gradient-to-r from-[#ae445a] to-[#451952] shadow-third flex flex-col justify-center w-[45%] p-[10px] text-center rounded">
+          <h3 class="text-xl">Achievments</h3>
+          <div class="shadow-third flex align-center justify-between mb-[5px] px-[50px] pb-[10px] pt-[5px] rounded">
+            <div>First Match</div>
+            <div>{{ win }}</div>
+          </div>
+          <div class="shadow-third flex align-center justify-between mb-[5px] px-[50px] pb-[10px] pt-[5px] rounded">
+            <div>First Win</div>
+            <div>{{ lose }}</div>
+          </div>
+  
+          <div class="shadow-third flex align-center justify-between mb-[5px] px-[50px] pb-[10px] pt-[5px] rounded">
+            <div>Played 3 Matches</div>
             <div>{{ rank }}</div>
           </div>
         </div>
@@ -91,6 +104,8 @@ const lose = computed(() => store.getters.getLose);
 const draw = computed(() => store.getters.getDraw);
 const rank = computed(() => store.getters.getRank);
 const avail = ref(true);
+
+
 
 </script>
 
