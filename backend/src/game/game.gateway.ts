@@ -74,12 +74,4 @@ export class GameGateway
       this.lastUpdateTime = currentTime;
     }, 1000 / 60);
   }
-  // private startGameUpdates() {
-  //   setInterval(() => {
-  //     this.gameService.updateGame(); // Update the game state
-
-  //     const gameState = this.gameService.getCurrentGameState(); // Get the updated game state
-  //     this.server.emit('table', gameState); // Emit the game state to all connected clients
-  //   }, 1000 / 60); // Example: 60 updates per second
-  // }
 }
