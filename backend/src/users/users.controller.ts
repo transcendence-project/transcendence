@@ -29,10 +29,10 @@ export class UsersController {
 		return (this.userService.remove(parseInt(id)))
 	}
 
-	@Delete('/:id/friends/:friendId')
-	deleteFriend(@Param('id') id: string, @Param('friendId') fId: string){
-		return (this.userService.removeFriend(parseInt(id), parseInt(fId)))
-	}
+	// @Delete('/:id/friends/:friendId')
+	// deleteFriend(@Param('id') id: string, @Param('friendId') fId: string){
+	// 	return (this.userService.removeFriend(parseInt(id), parseInt(fId)))
+	// }
 
 	@Get('/achievements')
 	@UseGuards(JwtAuthGuard)
@@ -84,5 +84,11 @@ export class UsersController {
 	@UseGuards(JwtAuthGuard)
 	async my_blocked(@Req() req){
 		return (await this.userService.get_blocked(req.user.id));
+	}
+
+	@Delete('my/friends/:friendId')
+	@UseGuards(JwtAuthGuard)
+	async delete_friend(@Req() req, @Param('friendId') friendId: string){
+		return (await this.userService.removeFriend(req.user.id, parseInt(friendId)));
 	}
 }
