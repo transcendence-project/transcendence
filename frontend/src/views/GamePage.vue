@@ -1,7 +1,7 @@
 <template>
-    <div class="game-container">
+    <!-- <div class="game-container"> -->
          <canvas ref="pongCanvas" id="pong" :width="canvasWidth" :height="canvasHeight"></canvas>
-    </div>
+    <!-- </div> -->
       <div>
           <button @click="startGame">Start Game</button>
       </div>
@@ -9,76 +9,43 @@
 
 
 <script lang="ts" setup>
-import { ref, onMounted , getCurrentInstance } from 'vue';
+import { ref, onMounted , getCurrentInstance, onBeforeUnmount  } from 'vue';
 import WebSocketPlugin from '@/plugins/websocket-plugin';
 const { appContext } = getCurrentInstance();
-
-// export default {
-//   setup() {
     const socket = appContext.config.globalProperties.$socket;
     const canvasWidth = ref(900); // Default width, can be dynamically adjusted
     const canvasHeight = ref(400); // Default height, can be dynamically adjusted
-    const pongCanvas = ref(null);
+    const pongCanvas =  ref<HTMLCanvasElement | null>(null);;
 
-    // const drawGame = () => {
-    //   const canvas = pongCanvas.value;
-    //   if (!canvas) return;
-    //   const ctx = canvas.getContext('2d');
-	//   ctx.fillStyle = '#F6F1F1';
-    //   ctx.fillRect(500, 200, canvasWidth.value, canvasHeight.value);
-    //   // Clear previous frame
-    // //   ctx.clearRect(0, 0, canvasWidth.value, canvasHeight.value);
+	let keyDownHandler = (event: KeyboardEvent) => {
+		if (event.key === "w" || event.key === "W") {
+			sendPaddleMovement('up');
+		} else if (event.key === "s" || event.key === "S") {
+			sendPaddleMovement('down');
+		}
+	};
 
-    //   // Draw paddles, ball, and other game elements
-    //   // Example: ctx.fillRect(x, y, width, height);
-    //   // ... game drawing logic ...
-    // };
-
-    // const updateGameStateFromServer = () => {
-    //   // Update game state based on data received from the server
-    //   // Example: playerPosition.value = data.playerPosition;
-
-    //   // Redraw the game
-    //   drawGame();
-    // };
-    // const startGame = () => {
-    //     if (socket) {
-    //         // console.log(canvas.value);
-    //         const canvasDimensions = {
-    //             width: pongCanvas.offsetWidth,
-    //             height: pongCanvas.offsetHeight,
-    //         };
-    //         socket.emit('start-game', canvasDimensions);
-    //     }
-    // };
-
-    // const resize_window = () => {
-    //     window.addEventListener('resize', startGame);
-    // };
+	let keyUpHandler = (event: KeyboardEvent) => {
+		if (
+			event.key === "w" ||
+			event.key === "W" ||
+			event.key === "s" ||
+			event.key === "S"
+		) {
+			sendPaddleMovement('stop')
+		}
+	};
+	const sendPaddleMovement = (direction: string) => {
+		socket.emit('paddleMove', { direction });
+	};
     onMounted(() => {
-        // if (pongCanvas.value)
-        // {
-        //     const ctx = pongCanvas.value.getContext("2d");
-        //     if (ctx)
-        //     {
-        //         ctx.fillStyle = '#F6F1F1',
-        //         ctx.fillRect(0, 0, pongCanvas.value.width, pongCanvas.value.height);
-        //     }
-        // }
-        // console.log("try")
-    //     if (pongCanvas.value) {
-    //     console.log('Mounted - Canvas dimensions:', pongCanvas.value.offsetWidth, pongCanvas.value.offsetHeight);
-    // } else {
-    //     console.log('Mounted - Canvas element not found');
-    // }
-    //   setupWebSocket();
     if (socket)
     {
-        socket.on('table', (message: any[]) => {
-            console.log(message.paddleRe.x);
+        socket.on('table', (message: any) => {
+            console.log(message);
         if (pongCanvas.value)
         {
-            const ctx = pongCanvas.value.getContext("2d");
+            const ctx = pongCanvas.value.getContext('2d');
             if (ctx)
             {
                 const drawRect = (
@@ -103,13 +70,17 @@ const { appContext } = getCurrentInstance();
                     ctx.font = "45px fantasy";
                     ctx.fillText(text, x, y);
                 };
-                const render = () => {
-                    drawRect(0, 0, pongCanvas.value?.width, pongCanvas.value?.height, "#F6F1F1");
-                    drawRect(0, message.paddleRe?.y, message.paddleRe?.width, message.paddleRe?.height, "#9336B4");
-                    // console.log(pongCanvas.value.height / 2 - message.paddleRe.height / 2)
+                const render = () => { 
+					if (pongCanvas.value)
+					{
+						drawRect(0, 0, pongCanvas.value.width, pongCanvas.value.height, "#F6F1F1");
+						drawRect(0, message.paddleRe.y,message.paddleRe.width, message.paddleRe.height,"#9336B4");
+						drawRect(message.compRe.x, message.compRe.y,message.compRe.width, message.compRe.height,"#9336B4");
+						drawCircle(message.ball.x, message.ball.y, message.ball.radius, "#19A7CE")
+					}
                 }
-                // ctx.fillStyle = '#F6F1F1',
-                // ctx.fillRect(0, 0, pongCanvas.value.width, pongCanvas.value.height);
+				document.addEventListener("keydown", keyDownHandler);
+				document.addEventListener("keyup", keyUpHandler);
                 const game = () => {
                     // update();
                     render();
@@ -120,9 +91,6 @@ const { appContext } = getCurrentInstance();
         }
         });
     }
-    // startGame();
-	// updateGameStateFromServer();
-    //   drawGame();
     });
     const startGame = () => {
         // if (socket) {
@@ -133,76 +101,26 @@ const { appContext } = getCurrentInstance();
         //     };
         //     socket.emit('start-game', canvasDimensions);
         // }
-        if (pongCanvas.value) {
-			console.log(pongCanvas.value.offsetWidth);
+    if (pongCanvas.value) 
+    {
+		console.log(pongCanvas.value.offsetWidth);
         const canvasDimensions = {
             width: pongCanvas.value.offsetWidth,
             height: pongCanvas.value.offsetHeight,
         };
         socket.emit('start-game', canvasDimensions);
-    } else {
+    } 
+    else 
+    {
         console.log('Canvas element not found in startGame');
     }
     };
-    // return {
-    //   canvasWidth,
-    //   canvasHeight,
-    //   pongCanvas,
-    // };
-//   },
-// };
+	onBeforeUnmount(() => {
+		window.removeEventListener("keyup", keyUpHandler, false);
+		window.removeEventListener("keydown", keyDownHandler, false);
+	});
 </script>
-<!-- <script lang="ts" setup>
-    import { ref, onMounted} from 'vue';
-    import WebSocketPlugin from '@/plugins/websocket-plugin';
 
-	// WebSocketPlugin.connectWebSocket('http://localhost:3000/game');
-    const startGame = () => {
-        if (socket) {
-            socket.emit('start-game', 'This izs from the client to the server game');
-        }
-    };
-    const game = ref<HTMLCanvasElement | null>(null);
-    onMounted(() => {   
-            if (this.$socket) {
-                this.$socket.on('table', (message: any[]) => {
-				if (game.value)
-				{
-					const context = game.value.getContext('2d');
-					game.value.width = message[0];
-					game.value.height = message[1];
-					if (context) {
-						context.fillStyle = 'red';
-						// context
-						context.fillRect(50, 0, 100, 100);
-					}
-				}
-			});
-
-    onMounted(() => {
-            if (socket) {
-                socket.on('table', (message: any[]) => {
-            if (game.value)
-            {
-                const context = game.value.getContext('2d');
-                game.value.width = message[0];
-                game.value.height = message[1];
-                if (context) {
-					context.fillStyle = 'red';
-                    // context
-                    context.fillRect(0,0,game.value.width,game.value.height)
-                }
-            }
-        });
-        }
-    }); 
-</script> -->
-
-
-
-
-   
-  
 <style>
   .game-container {
 	/* width: fit-content; */
@@ -242,11 +160,7 @@ const { appContext } = getCurrentInstance();
   
   
 
-  <!-- <template>
-	<div class="game-container">
-	  <canvas ref="canvas" id="pong" width="900" height="400"></canvas>
-	</div>
-  </template>
+  <!--
   
   <script setup lang="ts">
   import { ref, onMounted } from "vue";

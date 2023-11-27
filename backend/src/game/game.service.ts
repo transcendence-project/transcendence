@@ -11,36 +11,124 @@ export class GameService {
     private paddle: Paddle;
     private ball: Ball;
     private computer: Computer;
+    private canvasWidth: number;
+    private canvasHeight: number;
+    private deltaTime: number;
     constructor(private readonly authService: AuthService) {
         this.initializeGameEntities()
     };
 
     async set_online_user(client: Socket ,token: any){
 		const _token = token;
-		// console.log(token);
-		// const user = await this.authService.user_by_token(_token);
+		console.log(token);
+		const user = await this.authService.user_by_token(_token);
 
-        // this.connected_users.set(client.id,user);
-        // console.log("from the set_online_methoed", user);
+        this.connected_users.set(client.id,user);
+        console.log("from the set_online_methoed", user);
 	}
     find_user_with_id(client_id: string){
 		const user = this.connected_users.get(client_id);
 		return user;
 	}
-    // init_table(client: Socket):number[]
-    // {
-    //     const width : number = 900;
-    //     const height : number = 400;
-    //     const table_size : number[] = [width,height];
-    //     return table_size;
-    // }
+
     private initializeGameEntities() {
         this.paddle = { x: 0, y: 0, width: 20, height: 100, score: 0 };
         this.computer = { x: 0, y: 0, width: 20, height: 100, score: 0 };
         this.ball = { x: 0, y: 0, radius: 10, speed: 1, dirx: 0, diry: 0};
-      }
+    }
+
+    checkCollisionWithPaddle() {
+        let selectedPaddle = this.ball.x < this.canvasWidth / 2 ? this.paddle : this.computer;
     
-    init_table(canvasWidth: number, canvasHeight: number)
+        // Define the edges of the ball and paddle
+        let paddleTopEdge = selectedPaddle.y;
+        let paddleBottomEdge = selectedPaddle.y + selectedPaddle.height;
+        let paddleLeftEdge = selectedPaddle.x;
+        let paddleRightEdge = selectedPaddle.x + selectedPaddle.width;
+    
+        let ballTopEdge = this.ball.y - this.ball.radius;
+        let ballBottomEdge = this.ball.y + this.ball.radius;
+        let ballLeftEdge = this.ball.x - this.ball.radius;
+        let ballRightEdge = this.ball.x + this.ball.radius;
+    
+        // Check for collision
+        if (ballRightEdge > paddleLeftEdge && ballLeftEdge < paddleRightEdge &&
+            ballBottomEdge > paddleTopEdge && ballTopEdge < paddleBottomEdge) {
+    
+          // Determine which side the ball hit
+          let hitTop = Math.abs(ballBottomEdge - paddleTopEdge);
+          let hitBottom = Math.abs(ballTopEdge - paddleBottomEdge);
+          let hitLeft = Math.abs(ballRightEdge - paddleLeftEdge);
+          let hitRight = Math.abs(ballLeftEdge - paddleRightEdge);
+    
+          let minHit = Math.min(hitTop, hitBottom, hitLeft, hitRight);
+    
+          if (minHit === hitTop || minHit === hitBottom) {
+            this.ball.diry = -this.ball.diry; // Reverse vertical direction
+          } else {
+            this.ball.dirx = -this.ball.dirx; // Reverse horizontal direction
+          }
+    
+          return true; // Collision occurred
+        }
+        return false; // No collision
+    }
+    computerAI()
+    {
+        const paddleSpeedPerSecond = 450; 
+        const middleOfPaddle = this.computer.y + this.computer.height / 2;
+        
+        if (this.ball.dirx > 0 && this.ball.x > this.canvasWidth / 2) {
+            if (middleOfPaddle < this.ball.y) {
+                this.computer.y += paddleSpeedPerSecond * this.deltaTime;
+            } else if (middleOfPaddle > this.ball.y) {
+                this.computer.y -= paddleSpeedPerSecond * this.deltaTime;
+            }
+        } 
+        this.computer.y = Math.max(0, Math.min(this.computer.y, this.canvasHeight - this.computer.height));
+    }
+    updateGame(deltaTime: number)
+    {
+        this.deltaTime = deltaTime;
+        this.ball.x += this.ball.dirx;
+        this.ball.y += this.ball.diry;
+        if (
+            this.ball.y + this.ball.radius > this.canvasHeight ||
+            this.ball.y - this.ball.radius < 0
+        ) {
+            this.ball.diry = -this.ball.diry;
+        }
+        this.checkCollisionWithPaddle();
+        this.computerAI();
+    }
+    movePlayerPaddle(direction: string) {
+        const paddleSpeedPerSecond = 450;
+        console.log(this.paddle.y);
+        if (direction === 'up')
+        {
+            this.paddle.y -= paddleSpeedPerSecond * this.deltaTime;
+        }
+        else if (direction === 'down')
+        {
+            this.paddle.y += paddleSpeedPerSecond * this.deltaTime;
+        }
+        this.paddle.y = Math.max(
+            0,
+            Math.min(this.paddle.y, this.canvasHeight - this.paddle.height)
+          );
+    }
+    setCanvasDimensions(width: number, height: number) {
+        this.canvasWidth = width;
+        this.canvasHeight = height;
+    }
+    getCurrentGameState() {
+        return {
+            paddleRe: this.paddle,
+            compRe: this.computer,
+            ball: this.ball,
+        };
+    }
+    init_table()
     {
         const PLAYER_WIDTH_PX = 20;  // Paddle width in pixels
         const PLAYER_HEIGHT_PX = 100; // Paddle height in pixels
@@ -49,14 +137,13 @@ export class GameService {
         // const paddleHeight = (PLAYER_HEIGHT_PX / canvasHeight) * 100;
 
         this.paddle = {
-            x: 0, y: canvasHeight / 2 - PLAYER_HEIGHT_PX / 2, width: PLAYER_WIDTH_PX, height: PLAYER_HEIGHT_PX, score: 0,
+            x: 0, y: this.canvasHeight / 2 - PLAYER_HEIGHT_PX / 2, width: PLAYER_WIDTH_PX, height: PLAYER_HEIGHT_PX, score: 0,
         }
         this.computer = {
-            x: canvasWidth - PLAYER_WIDTH_PX, y: canvasHeight - PLAYER_HEIGHT_PX, width: PLAYER_WIDTH_PX, height: PLAYER_HEIGHT_PX, score: 0,
-        }   
-        return {
-            paddleRe: this.paddle,
-            compRe: this.computer,
+            x: this.canvasWidth - PLAYER_WIDTH_PX, y: this.canvasHeight / 2 - PLAYER_HEIGHT_PX / 2, width: PLAYER_WIDTH_PX, height: PLAYER_HEIGHT_PX, score: 0,
+        }
+        this.ball = {
+            x: this.canvasWidth / 2, y: this.canvasHeight / 2, radius: 10, speed: 1, dirx: 5, diry: 5 
         }
     }
 }

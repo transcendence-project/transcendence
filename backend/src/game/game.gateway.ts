@@ -46,10 +46,40 @@ export class GameGateway
   start_game(@ConnectedSocket() client: Socket,@MessageBody() payload: any)
   {
     //   console.log(payload);
-    const tableData = this.gameService.init_table(payload.width, payload.height);
-    console.log(tableData);
-    client.emit('table', tableData);
+    this.gameService.setCanvasDimensions(payload.width, payload.height);
+    this.gameService.init_table();
+    this.startGameUpdates();
+    // console.log(tableData);
+    // client.emit('table', tableData);
     //   this.gameService.draw_table(payload.width,payload.height);
     // return {event:'table' ,data: this.gameService.init_table(client)};
   }
+  @SubscribeMessage('paddleMove')
+  handlePaddleMove(@ConnectedSocket() client: Socket, @MessageBody() data: { direction: string }) {
+    const playerId = client.id; // Or any other way you identify your player
+    this.gameService.movePlayerPaddle(data.direction);
+  }
+  private gameInterval;
+  private lastUpdateTime: number;
+  startGameUpdates() {
+    if (this.gameInterval) {
+      clearInterval(this.gameInterval);
+    }
+    this.lastUpdateTime = Date.now();
+    this.gameInterval = setInterval(() => {
+      const currentTime = Date.now();
+      const deltaTime = (currentTime - this.lastUpdateTime) / 1000;
+      this.gameService.updateGame(deltaTime);
+      this.server.emit('table', this.gameService.getCurrentGameState());
+      this.lastUpdateTime = currentTime;
+    }, 1000 / 60);
+  }
+  // private startGameUpdates() {
+  //   setInterval(() => {
+  //     this.gameService.updateGame(); // Update the game state
+
+  //     const gameState = this.gameService.getCurrentGameState(); // Get the updated game state
+  //     this.server.emit('table', gameState); // Emit the game state to all connected clients
+  //   }, 1000 / 60); // Example: 60 updates per second
+  // }
 }
