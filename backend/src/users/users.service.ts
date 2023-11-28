@@ -67,8 +67,25 @@ export class UsersService {
     return user.channels;
   }
 
-  update(id: number, attrs: Partial<User>) {
-    return this.repo.update(id, attrs);
+  async update(id: number, attrs: Partial<User>) {
+	const user = await this.repo.findOne({ where: { id } });
+	if (!user) return NotFoundException;
+	Object.assign(user, attrs);
+	return await this.repo.save(user);
+  }
+
+  async update_userName(id: number, userName: string) {
+	const user = await this.repo.findOne({ where: { id } });
+	if (!user) return NotFoundException;
+	user.userName = userName;
+	return await this.repo.save(user);
+  }
+
+  async update_profilePic(id: number, file_path: string) {
+	const user = await this.repo.findOne({ where: { id } });
+	if (!user) return NotFoundException;
+	user.image = file_path;
+	return await this.repo.save(user);
   }
 
   async remove(id: number) {

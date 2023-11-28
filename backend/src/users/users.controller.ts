@@ -1,4 +1,5 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UseGuards, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { createUserDTO } from '../dtos/createUser.dto'
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../auth/jwt.guard';
@@ -13,6 +14,20 @@ export class UsersController {
 	createUser(@Body() body: createUserDTO) {
 		this.userService.create(body.email, body.username, body.fullname, body.image);
 	}
+
+	@Post('/profile-picture')
+	@UseGuards(JwtAuthGuard)
+	@UseInterceptors(FileInterceptor('file'))
+	async upload_profile_picture(@Req() req, @UploadedFile() file){
+		return (await this.userService.update_profilePic(req.user.id, file.path));
+	}
+
+	@Post('/username')
+	@UseGuards(JwtAuthGuard)
+	async update_username(@Req() req, @Body() body: createUserDTO){
+		return (await this.userService.update_userName(req.user.id, body.username));
+	}
+
 
 	// @Get('/:id')
 	// findUser(@Param('id') id: string){

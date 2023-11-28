@@ -12,8 +12,12 @@ import { SeederService } from '../achievements/achievement.seed';
 // import { MatchesService } from 'matches/matches.service';
 // import { Match } from 'entities/match.entity';
 import { MatchModule } from 'matches/matches.module';
+import { MulterModule } from '@nestjs/platform-express';
 @Module({
-	imports: [TypeOrmModule.forFeature([User, FriendRequest, Achievement]), forwardRef(() => MatchModule)],
+	imports: [TypeOrmModule.forFeature([User, FriendRequest, Achievement]), forwardRef(() => MatchModule), 
+		MulterModule.register({
+			dest: './uploads',
+		})],
 	providers: [UsersService, FriendRequestService, SeederService],
 	controllers: [UsersController, FriendRequestController],
 	exports: [UsersService, SeederService]
