@@ -16,10 +16,17 @@ export class ChatController {
 	}
 
 	@Get('current_chan/:chan_name')
-	async chan_memebrs(@Param("chan_name") chan_name: string){
+	async cur_chan(@Param("chan_name") chan_name: string){
 		console.log(chan_name);
 		const chan_ = await this.chatService.chan_by_name(chan_name);
 		return (chan_)
 	}
 
+	@Get('current_frndchan/:frnd_name')
+	async frnd_chan(@Param("frnd_name") frnd_name: string){
+		console.log(frnd_name);
+		const chan_ = await this.chatService.frndchan_by_name(frnd_name);
+		// console.log(chan_);
+		return (chan_)
+	}
 }

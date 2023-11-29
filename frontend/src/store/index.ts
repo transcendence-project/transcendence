@@ -181,19 +181,19 @@ const store = createStore({
 				console.error("Error fetching my blocked:", error);
 			});
 		},
-		// async fetchFriendChan(context: any){
-		// 	const cur = localStorage.getItem('fetchCurrentFriend');
-		// 	await axios.get("", {
-		// 		headers: {
-		// 			Authorization: `Bearer ${localStorage.getItem('token')}`,
-		// 		},
-		// 	}).then((resp: AxiosResponse<IChannel[]>) => {
-		// 		// console.log(resp.data);
-		// 		context.commit('setCurrentFriend', resp.data);
-		// 	}).catch((error) => {
-		// 		console.error("Error fetching current channel:", error);
-		// 	});
-		// },
+		async fetchFriendChan(context: any){
+			const cur = localStorage.getItem('currentFriend');
+			await axios.get(`http://localhost:3000/chat/current_frndchan/${cur}`, {
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem('token')}`,
+				},
+			}).then((resp: AxiosResponse<IChannel[]>) => {
+				console.log(resp.data);
+				context.commit('setCurrentChannel', resp.data);
+			}).catch((error) => {
+				console.error("Error fetching current channel:", error);
+			});
+		},
 		async TwoFA(context: any) {
 			try {
 				const response = await axios.get("http://localhost:3000/auth/2fa/generate", {

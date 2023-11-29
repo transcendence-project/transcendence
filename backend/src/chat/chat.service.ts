@@ -63,7 +63,7 @@ export class ChatService {
 		const channel = await this.channelRepo.createQueryBuilder("channel")
 		.leftJoinAndSelect("channel.members", "member")
    		.leftJoinAndSelect("channel.messages", "message")
-		.where("member.name = :frnd_name", { frnd_name })
+		.where("member.userName = :frnd_name", { frnd_name })
 		.getOne();
 		if (channel)
 		{

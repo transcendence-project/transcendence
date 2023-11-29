@@ -53,7 +53,7 @@ export class UsersService {
 	return (this.repo.findOne({where: {id}, relations: ['channels']}))
   }
   async findOneByUserName(userName: string) {
-    const user = await this.repo.findOneBy({ userName });
+    const user = await this.repo.findOne({ where: {userName}, relations: ['blocked'] });
     return user;
   }
 
@@ -90,6 +90,7 @@ export class UsersService {
       throw new ConflictException("Friend already added");
     }
     user.friends.push(friend);
+	// add a channel to list of all channel
     return this.repo.save(user);
   }
 
@@ -237,6 +238,7 @@ export class UsersService {
   async add_blocked(friend_name: string, user_name: string) {
 	// const friend = await this.findOneByUserName(friend_name);
 	const user = await this.findOneByUserName(user_name);
+	console.log(`friend name in add blocked = ${friend_name}`);
 	if (user)
 	{
 		user.blocked.push(friend_name);

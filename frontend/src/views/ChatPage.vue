@@ -428,49 +428,49 @@
 		sndrcvmsg: [] as string[],
 		isBlock: true,
 		isChangePassword: false,
-		// friends: m_frnd,
-		friends: [
-		  {
-			user: "one",
-			status: true,
-			isBlock: true,
-		  },
-		  {
-			user: "two",
-			status: false,
-			isBlock: false,
-		  },
-		  {
-			user: "three",
-			status: true,
-			isBlock: false,
-		  },
-		  {
-			user: "four",
-			status: false,
-			isBlock: false,
-		  },
-		  {
-			user: "five",
-			status: true,
-			isBlock: true,
-		  },
-		  {
-			user: "one",
-			status: true,
-			isBlock: false,
-		  },
-		  {
-			user: "two",
-			status: false,
-			isBlock: false,
-		  },
-		  {
-			user: "three",
-			status: true,
-			isBlock: false,
-        },
-      ] as FriendsList[],
+		friends: m_frnd,
+	// 	friends: [
+	// 	  {
+	// 		user: "one",
+	// 		status: true,
+	// 		isBlock: true,
+	// 	  },
+	// 	  {
+	// 		user: "two",
+	// 		status: false,
+	// 		isBlock: false,
+	// 	  },
+	// 	  {
+	// 		user: "three",
+	// 		status: true,
+	// 		isBlock: false,
+	// 	  },
+	// 	  {
+	// 		user: "four",
+	// 		status: false,
+	// 		isBlock: false,
+	// 	  },
+	// 	  {
+	// 		user: "five",
+	// 		status: true,
+	// 		isBlock: true,
+	// 	  },
+	// 	  {
+	// 		user: "one",
+	// 		status: true,
+	// 		isBlock: false,
+	// 	  },
+	// 	  {
+	// 		user: "two",
+	// 		status: false,
+	// 		isBlock: false,
+	// 	  },
+	// 	  {
+	// 		user: "three",
+	// 		status: true,
+	// 		isBlock: false,
+    //     },
+    //   ] as FriendsList[],
     };
   },
   setup() {
@@ -524,7 +524,7 @@
 				const my_frnds: FriendsList = {
 					user: item.userName,
 					status: false,
-					isBlock: true,
+					isBlock: false,
 				}
 				m_frnd.value.push(my_frnds);
 			}
@@ -533,7 +533,7 @@
 				const my_frnds: FriendsList = {
 					user: item.userName,
 					status: false,
-					isBlock: false,
+					isBlock: true,
 				}
 				m_frnd.value.push(my_frnds);
 			}
@@ -604,9 +604,10 @@
 		this.isChangePassword = !this.isChangePassword;
 	  },
 	  showHideBlock(friend: FriendsList) {
-		if (friend.isBlock === false) this.block_frnd(friend.user);
-		else friend.isBlock === true;
-		this.unblock_friend(friend.user);
+		if (friend.isBlock === false) 
+			this.unblock_friend(friend.user);
+		else if (friend.isBlock === true)
+			this.block_frnd(friend.user);
 		friend.isBlock = !friend.isBlock;
 	  },
 	  showAddMember(channel: string) {
@@ -643,7 +644,7 @@
     async showChatPageFriend(friend: string) {
       this.msgField = true;
       localStorage.setItem("currentFriend", friend);
-      //   console.log(localStorage.getItem("currentFriend"));
+        // console.log(localStorage.getItem("currentFriend"));
       await this.displayFriendMessage();
       this.selectedRoom = friend;
     },
@@ -774,14 +775,14 @@
     },
     async displayFriendMessage() {
       this.chatMessage = [];
-      await store.dispatch("fetchCurrentFriend");
-      const chan = computed(() => store.getters.getCurrentCahnnel);
-      console.log(chan.value.messages);
-      const val = chan.value.messages;
-      val.forEach((item: any) => {
-        // will change later similar to chat
-        this.chatMessage.push({ send: true, chat: item.content });
-      });
+      await store.dispatch("fetchFriendChan");
+    //   const chan = computed(() => store.getters.getCurrentCahnnel);
+    //   console.log(chan.value.messages);
+    //   const val = chan.value.messages;
+    //   val.forEach((item: any) => {
+    //     // will change later similar to chat
+    //     this.chatMessage.push({ send: true, chat: item.content });
+    //   });
     },
     sendMessage() {
       if (this.message) {
