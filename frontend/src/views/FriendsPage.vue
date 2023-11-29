@@ -23,7 +23,8 @@
           :key="item.id"
           class="list-none w-[90vw] rounded-lg p-0 m-0"
         >
-          <div v-if="item.userName !== username"
+          <div
+            v-if="item.userName !== username"
             class="flex justify-between w-[50vw] bg-[#ae4188] m-1 pt-1 md:pt-0 pb-1 md:pb-0 pr-6 pl-2 flex-col md:flex-row rounded-sm"
           >
             <div class="flex justify-start m-1">
@@ -66,7 +67,7 @@
           >
             <div class="flex justify-between mx-4 my-2">
               <div class="w-[40vw]">
-                {{ request.id }}
+                {{ request.sender.fullname }}
               </div>
             </div>
             <div class="flex justify-between">
@@ -82,15 +83,14 @@
       </ul>
     </div>
 
-
     <div>
       <h2 class="text-xl m-3">My Friends</h2>
       <p class="text-lg text-green-500 m-2">
-        You have {{ friendsNumberNumber }} friends
+        You have {{ friendsNumber }} friends
       </p>
       <ul>
         <li
-          v-for="friend in myFriendList"
+          v-for="friend in myFriendsList"
           :key="friend.id"
           class="list-none p-0 m-0 mb-2"
         >
@@ -99,11 +99,11 @@
           >
             <div class="flex justify-between mx-4 my-2">
               <div class="w-[40vw]">
-                {{ friend.user }}
+                {{ friend.fullname }}
               </div>
             </div>
             <div class="flex justify-between">
-              <button class="frd-btn" @click="removeFriend">
+              <button class="frd-btn" @click="removeFriend(friend.id)">
                 Remove
               </button>
             </div>
@@ -115,169 +115,172 @@
 </template>
 
 <script lang="ts">
+import { defineComponent, onMounted } from "vue";
+import OptionMenu from "@/components/OptionMenu.vue";
+import StatusUser from "@/components/StatusUser.vue";
+import ButtonComponent from "@/components/ButtonComponent.vue";
+import axios, { AxiosResponse } from "axios";
+import { IStudent } from "@/models/student";
+import { IFriend } from "@/models/friend";
 
-  import { defineComponent, onMounted} from "vue";
-  import OptionMenu from "@/components/OptionMenu.vue";
-  import StatusUser from "@/components/StatusUser.vue";
-  import ButtonComponent from "@/components/ButtonComponent.vue";
-  import axios, { AxiosResponse } from "axios";
-  import { IStudent } from "@/models/student";
-  import { IFriend } from "@/models/friend";
+import { computed } from "vue";
+import store from "@/store";
 
-  import { computed } from 'vue';
-  import store from '@/store';
-
-  export default defineComponent({
-	name: "FriendList",
-	components: {
-	  OptionMenu,
-	  StatusUser,
-	  ButtonComponent,
-	},
+export default defineComponent({
+  name: "FriendList",
+  components: {
+    OptionMenu,
+    StatusUser,
+    ButtonComponent,
+  },
   data() {
-	  return {
-		  text: "",
-		  requestNumber: Number,
-		  friendsNumber: Number,
-		  myFriendsList: [] as IFriend[],
-		  friendName: String,
-		  selectedUser: null,
-		  student: [] as IStudent[],
-		  isDropdownVisible: true,
-		  friendRequests: [] as IFriend[],
-		};
-	},
-	setup() {
+    return {
+      text: "",
+      requestNumber: Number,
+      friendsNumber: Number,
+      myFriendsList: [] as IFriend[],
+      friendName: String,
+      selectedUser: null,
+      student: [] as IStudent[],
+      isDropdownVisible: true,
+      friendRequests: [] as IFriend[],
+    };
+  },
+  setup() {
     const username = computed(() => store.getters.getUserName);
 
     onMounted(() => {
-      store.dispatch('fetchUserData');
+      store.dispatch("fetchUserData");
     });
 
     return {
       username,
     };
   },
-	computed: {
-	  filteredStudents(): any {
-		if (this.text.trim() === "") {
-		  return [];
-		}
-		return this.student.filter((item: any) =>
-		  item.userName.toLowerCase().includes(this.text.toLowerCase()),
-		);
-	  },
-	},
+  computed: {
+    filteredStudents(): any {
+      if (this.text.trim() === "") {
+        return [];
+      }
+      return this.student.filter((item: any) => item.userName.toLowerCase().includes(this.text.toLowerCase()) || item.fullname.toLowerCase().includes(this.text.toLowerCase())
+      );
+    },
+  },
 
-	methods: {
-	  selectItem(item: any) {
-		this.text = "";
-		this.hideDropdown();
-	  },
-	  showDropdown() {
-		this.isDropdownVisible = true;
-	  },
-	  hideDropdown() {
-		setTimeout(() => {
-		  this.isDropdownVisible = false;
-		}, 200);
-	  },
-	  async sendFriendRequest(selectedUser: any) {
-		try {
-		  const response = await axios.post(
-			`http://localhost:3000/friend-requests/${selectedUser.id}`,
-			null,
-			{
-			  headers: {
-				Authorization: `Bearer ${localStorage.getItem("token")}`,
-			  },
-			},
-			);
-		} catch (error) {
-		}
-	  },
-	  async removeFriend(selectedUser: any) {
-		try {
-		  const response = await axios.delete(
-			`http://localhost:3000/users/friends/${selectedUser.id}`,
-			{
-			  headers: {
-				Authorization: `Bearer ${localStorage.getItem("token")}`,
-			  },
-			},
-			);
-		} catch (error) {
-			console.log("Error", error);
-		}
-	  },
-	  async myFriends() {
-		try {
-		  const response = await axios.get(
-			`http://localhost:3000/my/friends`,
-			{
-			  headers: {
-				Authorization: `Bearer ${localStorage.getItem("token")}`,
-			  },
-			},
-			);
-		this.friendsNumber = response.data.length;
-		this.myFriendsList = response.data;
-		} catch (error) {
-		}
-	  },
+  methods: {
+    selectItem(item: any) {
+      this.text = "";
+      this.hideDropdown();
+    },
+    showDropdown() {
+      this.isDropdownVisible = true;
+    },
+    hideDropdown() {
+      setTimeout(() => {
+        this.isDropdownVisible = false;
+      }, 200);
+    },
+    async sendFriendRequest(selectedUser: any) {
+      try {
+        const response = await axios.post(
+          `http://localhost:3000/friend-requests/${selectedUser.id}`,
+          null,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          },
+        );
+      } catch (error) {
+		  console.log("Error", error);
+	  }
+    },
+    async removeFriend(selectedUser: number) {
+      console.log("in remove friend: ", selectedUser);
+      try {
+        const response = await axios.delete(
+          `http://localhost:3000/users/my/friends/${selectedUser}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          },
+        );
+      } catch (error) {
+        console.log("Error", error);
+      }
+    },
+    async myFriends() {
+      try {
+        const response = await axios.get(
+          `http://localhost:3000/users/my/friends`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          },
+        );
+        this.friendsNumber = response.data.length;
+        this.myFriendsList = response.data;
+        console.log("testttttresp", response.data);
+      } catch (error) {
+        console.error("Error fetching friends:", error);
+      }
+    },
 
-	  async viewFriendRequest() {
-		try {
-		  const response = await axios.get(
-			`http://localhost:3000/friend-requests/my-friend-requests`,
-			{
-			  headers: {
-				Authorization: `Bearer ${localStorage.getItem("token")}`,
-			  },
-			},
-		  );
-		  this.requestNumber = response.data.length;
-		  this.friendRequests = response.data;
-		//   console.log(response.data);
-		} catch (error) {
-		  console.error("Error fetching friend requests:", error);
-		}
-	  },
+    async viewFriendRequest() {
+      try {
+        const response = await axios.get(
+          `http://localhost:3000/friend-requests/my-friend-requests`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          },
+        );
+        this.requestNumber = response.data.length;
+        this.friendRequests = response.data;
+        //   console.log(response.data);
+      } catch (error) {
+        console.error("Error fetching friend requests:", error);
+      }
+    },
 
-	  async acceptFriendRequest(selectedUser: any) {
-		try {
-		  const response = await axios.patch(
-			`http://localhost:3000/friend-requests/accept/${selectedUser}`,
-		  );
+    async acceptFriendRequest(selectedUser: any) {
+      try {
+        const response = await axios.patch(
+          `http://localhost:3000/friend-requests/accept/${selectedUser}`,
+        );
 
-		  console.log("Friend request accepted:", response);
-		} catch (error) {
-		  console.error("friend accept Error:", error);
-		}
-	  },
-	  async rejectFriendRequest(selectedUser: any) {
-		try {
-		  const response = await axios.patch(
-			`http://localhost:3000/friend-requests/${selectedUser}/reject`,
-		  );
-		} catch (error) {
-		  console.error("Error:", error);
-		}
-	  },
-	},
+        console.log("Friend request accepted:", response);
+      } catch (error) {
+        console.error("friend accept Error:", error);
+      }
+    },
+    async rejectFriendRequest(selectedUser: any) {
+      try {
+        const response = await axios.patch(
+          `http://localhost:3000/friend-requests/${selectedUser}/reject`,
+        );
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    },
+  },
 
-	mounted() {
-	  this.viewFriendRequest();
-	  axios
-		.get("http://localhost:3000/users")
-		.then((resp: AxiosResponse<IStudent[]>) => {
-		  this.student = resp.data;
-		})
-		.catch((error) => {
-		  console.error("Error fetching student data:", error);
-		});
-	},
-  });
+  mounted() {
+    this.viewFriendRequest();
+    this.myFriends();
+    axios
+      .get("http://localhost:3000/users")
+      .then((resp: AxiosResponse<IStudent[]>) => {
+        this.student = resp.data;
+      })
+      .catch((error) => {
+        console.error("Error fetching student data:", error);
+      });
+  },
+});
 </script>
 <style scoped>
 .relative {
