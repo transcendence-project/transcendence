@@ -1,42 +1,52 @@
 <template>
-  <div class="bg-gradient-to-r from-[#451952] via-[#451952] to-[#ae4188] shadow-custom m-5 p-5 rounded-md w-full text-white min-h-[85.4vh] md:min-h-[85.10vh] lg:min-h-[85.9vh]">
-	<!-- <div> -->
+  <div
+    class="bg-gradient-to-r from-[#451952] via-[#451952] to-[#ae4188] shadow-custom m-5 p-5 rounded-md w-full text-white min-h-[85.4vh] md:min-h-[85.10vh] lg:min-h-[85.9vh]"
+  >
+    <!-- <div> -->
+
     <div class="pl-0 pt-2.5 pb-2.5 rounded-md relative">
       <input
         v-model="text"
         @input="handleInputChange"
         @focus="showDropdown"
         @blur="hideDropdown"
-		placeholder="Search User"
+        placeholder="Search User"
         class="w-[50vw] h-[2rem] px-4 rounded-full focus:border-0 focus:outline-none text-black"
       />
     </div>
     <div v-if="filteredStudents.length > 0">
-      <ul class="flex flex-col justify-center m-0 p-0 w-[80vw] rounded-md absolute">
+      <ul
+        class="flex flex-col justify-center m-0 p-0 w-[80vw] rounded-md absolute"
+      >
         <li
           v-for="item in filteredStudents"
           :key="item.id"
-          class="list-none w-[90vw] rounded-lg p-0 m-0" >
-
-
-          <div class="flex justify-between w-[50vw] bg-[#ae4188] m-1 pt-1 md:pt-0 pb-1 md:pb-0 pr-6 pl-2 flex-col md:flex-row rounded-sm">
-           
-			<div class="flex justify-start m-1">
+          class="list-none w-[90vw] rounded-lg p-0 m-0"
+        >
+          <div
+            v-if="item.userName !== username"
+            class="flex justify-between w-[50vw] bg-[#ae4188] m-1 pt-1 md:pt-0 pb-1 md:pb-0 pr-6 pl-2 flex-col md:flex-row rounded-sm"
+          >
+            <div class="flex justify-start m-1">
               <div class="w-[8vw]">
                 {{ item.userName }}
               </div>
               <div>
-                <img :src="item.image" class="mx-2 rounded-full object-cover w-8 h-8"/>
+                <img
+                  :src="item.image"
+                  class="mx-2 rounded-full object-cover w-8 h-8"
+                />
               </div>
             </div>
 
             <div class="flex justify-end m-1">
-              <ButtonComponent btnContent="Add" @click="sendFriendRequest(item)"/>
+              <ButtonComponent
+                btnContent="Add"
+                @click="sendFriendRequest(item)"
+              />
+              <ButtonComponent btnContent="Block" />
             </div>
           </div>
-
-
-
         </li>
       </ul>
     </div>
@@ -57,12 +67,45 @@
           >
             <div class="flex justify-between mx-4 my-2">
               <div class="w-[40vw]">
-                {{ request.id }}
+                {{ request.sender.fullname }}
               </div>
             </div>
             <div class="flex justify-between">
-              <button class="frd-btn" @click="acceptFriendRequest(request.id)">Accept</button>
-              <button class="frd-btn" @click="rejectFriendRequest(request.id)">Reject</button>
+              <button class="frd-btn" @click="acceptFriendRequest(request.id)">
+                Accept
+              </button>
+              <button class="frd-btn" @click="rejectFriendRequest(request.id)">
+                Reject
+              </button>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <div>
+      <h2 class="text-xl m-3">My Friends</h2>
+      <p class="text-lg text-green-500 m-2">
+        You have {{ friendsNumber }} friends
+      </p>
+      <ul>
+        <li
+          v-for="friend in myFriendsList"
+          :key="friend.id"
+          class="list-none p-0 m-0 mb-2"
+        >
+          <div
+            class="flex items-center justify-between bg-[#AE445A] m-0 pt-3 md:pt-0 pb-3 md:pb-0 pr-6 pl-2 flex-col md:flex-row rounded-sm"
+          >
+            <div class="flex justify-between mx-4 my-2">
+              <div class="w-[40vw]">
+                {{ friend.fullname }}
+              </div>
+            </div>
+            <div class="flex justify-between">
+              <button class="frd-btn" @click="removeFriend(friend.id)">
+                Remove
+              </button>
             </div>
           </div>
         </li>
@@ -72,13 +115,16 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, onMounted } from "vue";
 import OptionMenu from "@/components/OptionMenu.vue";
 import StatusUser from "@/components/StatusUser.vue";
 import ButtonComponent from "@/components/ButtonComponent.vue";
 import axios, { AxiosResponse } from "axios";
 import { IStudent } from "@/models/student";
 import { IFriend } from "@/models/friend";
+
+import { computed } from "vue";
+import store from "@/store";
 
 export default defineComponent({
   name: "FriendList",
@@ -91,11 +137,24 @@ export default defineComponent({
     return {
       text: "",
       requestNumber: Number,
-	  friendName: String,
-	  selectedUser: null,
+      friendsNumber: Number,
+      myFriendsList: [] as IFriend[],
+      friendName: String,
+      selectedUser: null,
       student: [] as IStudent[],
-	  isDropdownVisible: true,
+      isDropdownVisible: true,
       friendRequests: [] as IFriend[],
+    };
+  },
+  setup() {
+    const username = computed(() => store.getters.getUserName);
+
+    onMounted(() => {
+      store.dispatch("fetchUserData");
+    });
+
+    return {
+      username,
     };
   },
   computed: {
@@ -103,13 +162,13 @@ export default defineComponent({
       if (this.text.trim() === "") {
         return [];
       }
-      return this.student.filter((item: any) =>
-        item.userName.toLowerCase().includes(this.text.toLowerCase()),
+      return this.student.filter((item: any) => item.userName.toLowerCase().includes(this.text.toLowerCase()) || item.fullname.toLowerCase().includes(this.text.toLowerCase())
       );
     },
   },
+
   methods: {
-    selectItem(item : any) {
+    selectItem(item: any) {
       this.text = "";
       this.hideDropdown();
     },
@@ -121,7 +180,7 @@ export default defineComponent({
         this.isDropdownVisible = false;
       }, 200);
     },
-    async sendFriendRequest(selectedUser : any) {
+    async sendFriendRequest(selectedUser: any) {
       try {
         const response = await axios.post(
           `http://localhost:3000/friend-requests/${selectedUser.id}`,
@@ -131,10 +190,41 @@ export default defineComponent({
               Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
           },
-		  );
-
+        );
       } catch (error) {
-        console.error("Error:", error);
+		  console.log("Error", error);
+	  }
+    },
+    async removeFriend(selectedUser: number) {
+      console.log("in remove friend: ", selectedUser);
+      try {
+        const response = await axios.delete(
+          `http://localhost:3000/users/my/friends/${selectedUser}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          },
+        );
+      } catch (error) {
+        console.log("Error", error);
+      }
+    },
+    async myFriends() {
+      try {
+        const response = await axios.get(
+          `http://localhost:3000/users/my/friends`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          },
+        );
+        this.friendsNumber = response.data.length;
+        this.myFriendsList = response.data;
+        console.log("testttttresp", response.data);
+      } catch (error) {
+        console.error("Error fetching friends:", error);
       }
     },
 
@@ -150,29 +240,28 @@ export default defineComponent({
         );
         this.requestNumber = response.data.length;
         this.friendRequests = response.data;
-		console.log(response.data);
+        //   console.log(response.data);
       } catch (error) {
         console.error("Error fetching friend requests:", error);
       }
     },
 
-	async acceptFriendRequest(selectedUser : any) {
+    async acceptFriendRequest(selectedUser: any) {
       try {
         const response = await axios.patch(
-          `http://localhost:3000/friend-requests/accept/${selectedUser}`);
-		 
-		  console.log('Friend request accepted:', response);
+          `http://localhost:3000/friend-requests/accept/${selectedUser}`,
+        );
 
+        console.log("Friend request accepted:", response);
       } catch (error) {
-
         console.error("friend accept Error:", error);
       }
     },
-	async rejectFriendRequest(selectedUser : any) {
+    async rejectFriendRequest(selectedUser: any) {
       try {
         const response = await axios.patch(
-          `http://localhost:3000/friend-requests/${selectedUser}/reject`);
-
+          `http://localhost:3000/friend-requests/${selectedUser}/reject`,
+        );
       } catch (error) {
         console.error("Error:", error);
       }
@@ -180,11 +269,8 @@ export default defineComponent({
   },
 
   mounted() {
-
     this.viewFriendRequest();
-	// this.acceptFriendRequest(this.selectedUser);
-    // this.rejectFriendRequest(this.selectedUser);
-
+    this.myFriends();
     axios
       .get("http://localhost:3000/users")
       .then((resp: AxiosResponse<IStudent[]>) => {

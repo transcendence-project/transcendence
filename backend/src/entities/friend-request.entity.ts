@@ -7,11 +7,11 @@ export class FriendRequest {
     id: number;
 
     @ManyToOne(() => User)
-    @JoinColumn({ name: 'senderId' }) // column name in the table
+    @JoinColumn({ name: 'sender' }) // column name in the table
     sender: User;
 
     @ManyToOne(() => User)
-    @JoinColumn({ name: 'receiverId' }) // column name in the table
+    @JoinColumn({ name: 'receiver' }) // column name in the table
     receiver: User;
 
     @Column({ type: 'enum', enum: ['PENDING', 'ACCEPTED', 'DECLINED'], default: 'PENDING' })

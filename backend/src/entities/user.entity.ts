@@ -62,12 +62,12 @@ export class User {
   @ManyToMany(type => User)
   @JoinTable()
   blocked: string[];
+	
+  @OneToMany(() => FriendRequest, (friendRequest) => friendRequest.sender)
+	friendRequestsSent: FriendRequest[];
 
-  @OneToMany(() => User, (user) => user.friendRequestsSent)
-  friendRequestsSent: FriendRequest[];
-
-  @OneToMany(() => User, (user) => user.friendRequestsReceived)
-  friendRequestsReceived: FriendRequest[];
+	@OneToMany(() => FriendRequest, (friendRequest) => friendRequest.receiver)
+	friendRequestsReceived: FriendRequest[];
 
   @OneToMany(() => Match, (match) => match.playerOne)
   matchesAsPlayerOne: Match[];
