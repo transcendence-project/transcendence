@@ -13,10 +13,19 @@ import { SeederService } from '../achievements/achievement.seed';
 // import { Match } from 'entities/match.entity';
 import { MatchModule } from 'matches/matches.module';
 import { MulterModule } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
 @Module({
 	imports: [TypeOrmModule.forFeature([User, FriendRequest, Achievement]), forwardRef(() => MatchModule), 
 		MulterModule.register({
-			dest: './uploads',
+			storage: diskStorage({
+				destination: (req, file, cb) => {
+					console.log('in multer destination, file: ', file);
+					cb(null, './uploads')},
+				filename: (req, file, cb) => {
+					console.log('in multer filename, file: ', file);
+					cb(null, file.originalname);
+				}
+			}),
 		})],
 	providers: [UsersService, FriendRequestService, SeederService],
 	controllers: [UsersController, FriendRequestController],

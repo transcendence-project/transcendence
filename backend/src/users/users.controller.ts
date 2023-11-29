@@ -5,6 +5,7 @@ import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../auth/jwt.guard';
 import { Achievement } from 'entities/achievement.entity';
 import { MatchDTO } from 'dtos/match.dto';
+import { Express } from 'express';
 
 @Controller('users')
 export class UsersController {
@@ -15,17 +16,19 @@ export class UsersController {
 		this.userService.create(body.email, body.username, body.fullname, body.image);
 	}
 
-	@Post('/profile-picture')
+	@Patch('/profile-picture')
 	@UseGuards(JwtAuthGuard)
-	@UseInterceptors(FileInterceptor('file'))
-	async upload_profile_picture(@Req() req, @UploadedFile() file){
+	@UseInterceptors(FileInterceptor('file', {dest: './uploads'}))
+	async upload_profile_picture(@Req() req, @UploadedFile() file : Express.Multer.File){
 		return (await this.userService.update_profilePic(req.user.id, file.path));
 	}
 
 	@Post('/username')
 	@UseGuards(JwtAuthGuard)
-	async update_username(@Req() req, @Body() body: createUserDTO){
-		return (await this.userService.update_userName(req.user.id, body.username));
+	async update_username(@Req() req, @Body() body){
+		const user = await this.userService.update_userName(req.user.id, body.username);
+		// console.log('in update username, user: ', user);
+		return (user);
 	}
 
 
