@@ -89,6 +89,19 @@ export class GameService {
     }
     updateGame(deltaTime: number)
     {
+        if (this.ball.x - this.ball.radius < 0) {
+            // Ball has passed the left edge, point for computer
+            this.computer.score += 1;
+            // Reset ball to the center
+            this.ball.x = this.canvasWidth / 2;
+            this.ball.y = this.canvasHeight / 2;
+          } else if (this.ball.x + this.ball.radius > this.canvasWidth) {
+            // Ball has passed the right edge, point for player
+            this.paddle.score += 1;
+            // Reset ball to the center
+            this.ball.x = this.canvasWidth / 2;
+            this.ball.y = this.canvasHeight / 2;
+        }
         this.deltaTime = deltaTime;
         this.ball.x += this.ball.dirx;
         this.ball.y += this.ball.diry;
@@ -102,8 +115,7 @@ export class GameService {
         this.computerAI();
     }
     movePlayerPaddle(direction: string) {
-        const paddleSpeedPerSecond = 450;
-        console.log(this.paddle.y);
+        const paddleSpeedPerSecond = 2000; 
         if (direction === 'up')
         {
             this.paddle.y -= paddleSpeedPerSecond * this.deltaTime;

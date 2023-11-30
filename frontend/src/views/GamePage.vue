@@ -14,6 +14,8 @@ const { appContext } = getCurrentInstance();
     const socket = appContext.config.globalProperties.$socket;
     const canvasWidth = ref(900); // Default width, can be dynamically adjusted
     const canvasHeight = ref(400); // Default height, can be dynamically adjusted
+    const playerScore = ref(0);
+    const computerScore = ref(0);
     const pongCanvas =  ref<HTMLCanvasElement | null>(null);;
 
 	let keyDownHandler = (event: KeyboardEvent) => {
@@ -42,6 +44,8 @@ const { appContext } = getCurrentInstance();
     {
         socket.on('table', (message: any) => {
             console.log(message);
+            playerScore.value = message.paddleRe.score;
+            computerScore.value = message.compRe.score;
         if (pongCanvas.value)
         {
             const ctx = pongCanvas.value.getContext('2d');
@@ -64,11 +68,11 @@ const { appContext } = getCurrentInstance();
                     ctx.closePath();
                     ctx.fill();
                 };
-                const drawText = (text: string, x: number, y: number, color: string) => {
-                    ctx.fillStyle = color;
-                    ctx.font = "45px fantasy";
-                    ctx.fillText(text, x, y);
-                };
+                // const drawText = (text: string, x: number, y: number, color: string) => {
+                //     ctx.fillStyle = color;
+                //     ctx.font = "45px fantasy";
+                //     ctx.fillText(text, x, y);
+                // };
                 const render = () => { 
 					if (pongCanvas.value)
 					{
@@ -117,6 +121,7 @@ const { appContext } = getCurrentInstance();
 	onBeforeUnmount(() => {
 		window.removeEventListener("keyup", keyUpHandler, false);
 		window.removeEventListener("keydown", keyDownHandler, false);
+        socket.off()
 	});
 </script>
 
@@ -133,14 +138,29 @@ const { appContext } = getCurrentInstance();
 	/* width: fit-content; */
     display: flex;
     justify-content: center;
+    align-items: center;
 	background: linear-gradient(to right, #451952, #451952, #ae4188);
   	box-shadow: 0 4px 4px rgba(0, 0, 0, 0.5); 
-	margin: 20px;
+	margin-top: 10%;
 	padding: 20px;
 	border-radius: 5px;
 	width: 100%;
 	height: 100%;
 	color: white;
+  }
+  .game {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    margin-left: 35rem;
+    margin-top: 10rem;
+  }
+  .score {
+    display: flex;
+    flex-direction: row;
+    width: 100px;
+    justify-content: space-around;
   }
   .game-canvas {
 	display: flex;
