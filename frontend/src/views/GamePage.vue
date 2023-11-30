@@ -1,16 +1,15 @@
 <template>
-    <!-- <div class="game-container"> -->
-         <canvas ref="pongCanvas" id="pong" :width="canvasWidth" :height="canvasHeight"></canvas>
-    <!-- </div> -->
-      <div>
-          <button @click="startGame">Start Game</button>
-      </div>
+	<div class="game-page-container">
+		<GameSelect />
+	</div>
 </template>
 
 
 <script lang="ts" setup>
 import { ref, onMounted , getCurrentInstance, onBeforeUnmount  } from 'vue';
 import WebSocketPlugin from '@/plugins/websocket-plugin';
+import GameSelect from '@/components/GameSelect.vue';
+
 const { appContext } = getCurrentInstance();
     const socket = appContext.config.globalProperties.$socket;
     const canvasWidth = ref(900); // Default width, can be dynamically adjusted
@@ -122,6 +121,14 @@ const { appContext } = getCurrentInstance();
 </script>
 
 <style>
+.game-page-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 50px;
+  width: 100%;
+  /* Add any additional styling for GamePage here */
+}
   .game-container {
 	/* width: fit-content; */
     display: flex;
