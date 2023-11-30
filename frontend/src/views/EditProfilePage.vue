@@ -3,16 +3,20 @@
     <div class="edit-cont">
       <h2>Edit Profile</h2>
       <div class="editform">
-        <input v-model="text" placeholder="New username" class="input" />
+        <input
+          v-model="text"
+          placeholder="New username"
+          class="input text-black"
+        />
         <div class="upload">
           <input type="file" @change="uploadFile" ref="file" />
         </div>
         <div class="acc-dec">
-          <div class="accept">
-            <button class="accbtn" @click="submitFile">Accept</button>
-          </div>
           <div class="decline">
             <button class="resbtn" @click="resetForm">Reset</button>
+          </div>
+          <div class="accept">
+            <button class="accbtn" @click="submitFile">Submit</button>
           </div>
         </div>
       </div>
@@ -31,7 +35,7 @@ export default {
 
     const uploadFile = () => {
       const fileInput = document.querySelector(
-        'input[type="file"]'
+        'input[type="file"]',
       ) as HTMLInputElement;
       if (fileInput.files) {
         Images.value = fileInput.files[0];
@@ -39,7 +43,7 @@ export default {
     };
 
     const submitFile = async () => {
-      if (Images.value) {
+      if (Images.value || text.value) {
         const formData = new FormData();
         formData.append("file", Images.value);
         formData.append("username", text.value);
@@ -49,7 +53,7 @@ export default {
           const response = await axios.post(
             "https://httpbin.org/post",
             formData,
-            { headers }
+            { headers },
           );
           const binaryRepresentation = response.data.files;
           const httpStatus = response.status;
@@ -58,13 +62,14 @@ export default {
           console.error("Error uploading file:", error);
         }
       }
+      resetForm();
     };
 
     const resetForm = () => {
       Images.value = null;
       text.value = "";
       const fileInput = document.querySelector(
-        'input[type="file"]'
+        'input[type="file"]',
       ) as HTMLInputElement;
       if (fileInput) {
         fileInput.value = "";
@@ -88,7 +93,7 @@ export default {
   flex-direction: column;
   align-items: center;
   background: linear-gradient(to right, #451952, #451952, #ae4188);
-  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.5);  
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.5);
   margin: 20px;
   padding: 20px;
   border-radius: 5px;
@@ -109,7 +114,7 @@ export default {
   align-items: center;
   justify-content: space-between;
   justify-content: center;
-  background: #AE445A;
+  background: #ae445a;
   width: 90%;
   border-radius: 1rem;
 }
@@ -145,40 +150,41 @@ export default {
 .accbtn,
 .resbtn {
   font-size: 1rem;
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-  border-radius: 20px;
+  margin: 3%;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 0.3rem;
+  padding-bottom: 0.3rem;
+  border-radius: 10px;
   cursor: pointer;
   color: white;
-  background: #697692;
+  background: #451952;
   border: none;
 }
 .upbtn:hover,
 .accbtn:hover,
 .resbtn:hover {
-  background: #7c8392;
+  background: #ae4488;
   color: #d9d9da;
 }
 
 input[type="file"]::file-selector-button {
-  margin-right: 10px;
-  border: none;
-  background: #697692;
   font-size: 1rem;
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-  border-radius: 20px;
-  color: #fff;
+  margin: 3%;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 0.3rem;
+  padding-bottom: 0.3rem;
+  border-radius: 10px;
   cursor: pointer;
+  color: white;
+  background: #451952;
+  border: none;
   transition: background 0.2s ease-in-out;
 }
 
 input[type="file"]::file-selector-button:hover {
-  background: #7c8392;
+  background: #ae4488;
 }
 
 @media screen and (max-width: 768px) {

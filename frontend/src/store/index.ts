@@ -5,6 +5,7 @@ import axios, { AxiosResponse } from "axios";
 import { Socket } from "socket.io-client";
 import { IStudent } from "../models/student";
 import { computed } from "vue";
+import { IFriend } from "@/models/friend";
 
 
 const store = createStore({
@@ -31,6 +32,7 @@ const store = createStore({
 			current_friend: "",
 			current_channel: null,
 		},
+
 	},
 	getters: { // used to retrieve computed properties or derived state from the store.
 
@@ -181,6 +183,13 @@ const store = createStore({
 				console.error("Error fetching my blocked:", error);
 			});
 		},
+
+
+
+
+
+
+
 
 		// async fetchFriendChan(context: any){
 		// 	const cur = localStorage.getItem('fetchCurrentFriend');

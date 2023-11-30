@@ -126,6 +126,11 @@ import { IFriend } from "@/models/friend";
 import { computed } from "vue";
 import store from "@/store";
 
+
+// import { mapState, mapActions } from 'vuex';
+
+
+
 export default defineComponent({
   name: "FriendList",
   components: {
@@ -146,6 +151,25 @@ export default defineComponent({
       friendRequests: [] as IFriend[],
     };
   },
+
+
+
+//   computed: {
+//     ...mapState(['friendsNumber', 'myFriendsList']),
+//   },
+//   methods: {
+//     ...mapActions(['fetchMyFriends']),
+//     // You can call fetchMyFriends in your component
+//     // and access friendsNumber and myFriendsList from the store
+//   },
+//   async created() {
+//     await this.Friends();
+//   },
+
+
+
+
+
   setup() {
     const username = computed(() => store.getters.getUserName);
 
@@ -158,6 +182,8 @@ export default defineComponent({
     };
   },
   computed: {
+	// ...mapState(['friendsNumber', 'myFriendsList']),
+
     filteredStudents(): any {
       if (this.text.trim() === "") {
         return [];
@@ -168,6 +194,9 @@ export default defineComponent({
   },
 
   methods: {
+
+	// ...mapActions(['Friends']),
+
     selectItem(item: any) {
       this.text = "";
       this.hideDropdown();
@@ -210,6 +239,9 @@ export default defineComponent({
         console.log("Error", error);
       }
     },
+
+
+
     async myFriends() {
       try {
         const response = await axios.get(
@@ -227,6 +259,11 @@ export default defineComponent({
         console.error("Error fetching friends:", error);
       }
     },
+
+
+
+
+
 
     async viewFriendRequest() {
       try {
