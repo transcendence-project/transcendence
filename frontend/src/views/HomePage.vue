@@ -38,10 +38,6 @@
             <div>{{ lose }}</div>
           </div>
           <div class="shadow-third flex align-center justify-between mb-[5px] px-[50px] pb-[10px] pt-[5px] rounded">
-            <div>Draws</div>
-            <div>{{ draw }}</div>
-          </div>
-          <div class="shadow-third flex align-center justify-between mb-[5px] px-[50px] pb-[10px] pt-[5px] rounded">
             <div>Rank</div>
             <div>{{ rank }}</div>
           </div>

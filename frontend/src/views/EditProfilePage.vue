@@ -9,7 +9,7 @@
           class="input text-black"
         />
         <div class="upload">
-          <input type="file" @change="uploadFile" ref="file" />
+			<input type="file" @change="uploadFile" ref="file" v-model="fileInput" />
         </div>
         <div class="acc-dec">
           <div class="decline">
@@ -33,28 +33,45 @@ export default {
     const Images = ref<File | null>(null);
     const text = ref("");
 
-    const uploadFile = () => {
-      const fileInput = document.querySelector(
-        'input[type="file"]',
-      ) as HTMLInputElement;
-      if (fileInput.files) {
-        Images.value = fileInput.files[0];
-      }
-    };
+	const fileInput = ref(null);
+
+const uploadFile = () => {
+  if (fileInput.value && fileInput.value.files) {
+    Images.value = fileInput.value.files[0];
+  }
+};
+
 
     const submitFile = async () => {
       if (Images.value || text.value) {
         const formData = new FormData();
         formData.append("file", Images.value);
         formData.append("username", text.value);
-        const headers = { "Content-Type": "multipart/form-data" };
+        // const headers = { "Content-Type": "multipart/form-data" };
 
         try {
-          const response = await axios.post(
-            "https://httpbin.org/post",
-            formData,
-            { headers },
-          );
+
+		// 	const response1 = await axios.patch(
+        //   `http://localhost:3000/users/username`,
+        //   null,
+        //   {
+        //     headers: {
+        //       Authorization: `Bearer ${localStorage.getItem("token")}`,
+        //     },
+        //   },
+        // );
+
+
+		const response = await axios.patch(
+          `http://localhost:3000/users/profile-picture`,
+          formData,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          },
+        );
+		  console.log(text.value);
           const binaryRepresentation = response.data.files;
           const httpStatus = response.status;
           console.log(binaryRepresentation, httpStatus);
@@ -62,9 +79,12 @@ export default {
           console.error("Error uploading file:", error);
         }
       }
+	  else{
+		console.log("provide an input")
+	  }
+
       resetForm();
     };
-
     const resetForm = () => {
       Images.value = null;
       text.value = "";
@@ -84,6 +104,8 @@ export default {
       resetForm,
     };
   },
+
+
 };
 </script>
 

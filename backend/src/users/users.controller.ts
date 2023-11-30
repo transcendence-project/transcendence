@@ -20,14 +20,20 @@ export class UsersController {
 	@UseGuards(JwtAuthGuard)
 	@UseInterceptors(FileInterceptor('file', {dest: './uploads'}))
 	async upload_profile_picture(@Req() req, @UploadedFile() file : Express.Multer.File){
+		// if (file) {
+		// 	return await this.userService.update_profilePic(req.user.id, file.path);
+		//   } else {
 		return (await this.userService.update_profilePic(req.user.id, file.path));
+		//   }
 	}
+
+
 
 	@Post('/username')
 	@UseGuards(JwtAuthGuard)
 	async update_username(@Req() req, @Body() body){
 		const user = await this.userService.update_userName(req.user.id, body.username);
-		// console.log('in update username, user: ', user);
+		console.log('in update username, user: ', user);
 		return (user);
 	}
 
