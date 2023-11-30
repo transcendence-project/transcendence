@@ -6,12 +6,13 @@
 
 
 <script lang="ts" setup>
-import { ref, onMounted , getCurrentInstance, onBeforeUnmount  } from 'vue';
+import { ref, onMounted , getCurrentInstance, onBeforeUnmount, provide} from 'vue';
 import WebSocketPlugin from '@/plugins/websocket-plugin';
 import GameSelect from '@/components/GameSelect.vue';
 
 const { appContext } = getCurrentInstance();
     const socket = appContext.config.globalProperties.$socket;
+    provide('websocket', socket);
     const canvasWidth = ref(900); // Default width, can be dynamically adjusted
     const canvasHeight = ref(400); // Default height, can be dynamically adjusted
     const playerScore = ref(0);
