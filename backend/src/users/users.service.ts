@@ -20,6 +20,8 @@ export class UsersService {
     private seederService: SeederService,
 	private matchesService: MatchesService,
     @InjectRepository(User) private repo: Repository<User>,
+	// private readonly userRepository: Repository<User>,
+
   ) {}
 
   async create(

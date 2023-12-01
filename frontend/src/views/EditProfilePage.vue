@@ -1,113 +1,193 @@
 <template>
-  <div class="profile">
-    <div class="edit-cont">
-      <h2>Edit Profile</h2>
-      <div class="editform">
-        <input
-          v-model="text"
-          placeholder="New username"
-          class="input text-black"
-        />
-        <div class="upload">
-			<input type="file" @change="uploadFile" ref="file" v-model="fileInput" />
-        </div>
-        <div class="acc-dec">
-          <div class="decline">
-            <button class="resbtn" @click="resetForm">Reset</button>
-          </div>
-          <div class="accept">
-            <button class="accbtn" @click="submitFile">Submit</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
+	<div class="profile">
+	  <div class="edit-cont">
+		<h2>Edit Profile</h2>
+		<div class="editform">
+		  <input
+			v-model="username"
+			placeholder="New username"
+			class="input text-black"
+		  />
+		  <div class="acc-dec">
+			<div class="decline">
+			  <button class="resbtn" @click="resetForm">Reset</button>
+			</div>
+			<div class="accept">
+			  <button class="accbtn" @click="updateUserName">update</button>
+			</div>
+		  </div>
 
-<script lang="ts">
-import { ref } from "vue";
-import axios from "axios";
+		  <div class="upload">
+			<input type="file" @change="uploadFile" ref="fileInput" />
+		  </div>
+		  <div class="acc-dec">
+			<div class="decline">
+			  <button class="resbtn" @click="resetForm">Reset</button>
+			</div>
+			<div class="accept">
+			  <button class="accbtn" @click="submitFile">Submit</button>
+			</div>
+		  </div>
+		</div>
+	  </div>
+	</div>
+  </template>
+  
+  <script lang="ts">
+  import { ref } from "vue";
+  import axios from "axios";
+  
+  export default {
+	setup() {
+	  const Images = ref(null);
+	  const username = ref("");
+	  const fileInput = ref(null);
+      const formData = new FormData();
 
-export default {
-  setup() {
-    const Images = ref<File | null>(null);
-    const text = ref("");
-
-	const fileInput = ref(null);
-
-const uploadFile = () => {
-  if (fileInput.value && fileInput.value.files) {
-    Images.value = fileInput.value.files[0];
-  }
-};
-
-
-    const submitFile = async () => {
-      if (Images.value || text.value) {
-        const formData = new FormData();
-        formData.append("file", Images.value);
-        formData.append("username", text.value);
-        // const headers = { "Content-Type": "multipart/form-data" };
-
-        try {
-
-		// 	const response1 = await axios.patch(
-        //   `http://localhost:3000/users/username`,
-        //   null,
-        //   {
-        //     headers: {
-        //       Authorization: `Bearer ${localStorage.getItem("token")}`,
-        //     },
-        //   },
-        // );
+	  const uploadFile = (event) => {
+		console.log("uploadFile function called");
+  
+		const selectedFile = event.target.files[0];
+		if (selectedFile) {
+		  Images.value = selectedFile;
+		  console.log("File selected:", Images.value);
+		} else {
+		  console.log("No file selected");
+		}
+	  };
+  
 
 
-		const response = await axios.patch(
-          `http://localhost:3000/users/profile-picture`,
-          formData,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
+
+
+
+
+
+	const submitFile = async () => {
+  if (Images.value) {
+    // const formData = new FormData();
+    formData.append("file", Images.value);
+    // formData.append("username", username.value);
+
+    try {
+      // Update the profile picture
+      const profilePicResponse = await axios.patch(
+        "http://localhost:3000/users/profile-picture",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
-        );
-		  console.log(text.value);
-          const binaryRepresentation = response.data.files;
-          const httpStatus = response.status;
-          console.log(binaryRepresentation, httpStatus);
-        } catch (error) {
-          console.error("Error uploading file:", error);
         }
-      }
-	  else{
-		console.log("provide an input")
-	  }
+      );
+      console.log("Profile Picture Response:", profilePicResponse.data);
 
-      resetForm();
-    };
-    const resetForm = () => {
-      Images.value = null;
-      text.value = "";
-      const fileInput = document.querySelector(
-        'input[type="file"]',
-      ) as HTMLInputElement;
-      if (fileInput) {
-        fileInput.value = "";
-      }
-    };
+      const binaryRepresentation = profilePicResponse.data.files;
+      const httpStatus = profilePicResponse.status;
+      console.log(binaryRepresentation, httpStatus);
+    } catch (error) {
+      console.error("Error updating profile picture:", error);
+    }
+  } else {
+    console.log("No file selected");
+  }
 
-    return {
-      Images,
-      text,
-      uploadFile,
-      submitFile,
-      resetForm,
-    };
-  },
-
-
+  resetForm();
 };
-</script>
+
+const updateUserName = async () => {
+  if (username.value) {
+    formData.append("userName", username.value);
+
+    // Log formData to check if username is present
+    console.log("formData before axios call:", formData);
+
+    try {
+      const usernameResponse = await axios.post(
+        `http://localhost:3000/users/username`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      console.log("Username Response:", usernameResponse.data);
+    } catch (error) {
+      console.error("Error updating username:", error);
+    } finally {
+      // Clear the form data after the update
+      formData.delete("userName");
+    }
+  } else {
+    console.error("Insert a username");
+  }
+
+  // Clear the input after the update
+  username.value = "";
+};
+
+
+
+// const updateUserName = async () => {
+// //   const userformData = new FormData();
+// if (username.value)
+// {
+
+// 	formData.append("username", username.value);
+	
+// 	try {
+// 		const usernameResponse = await axios.post(
+// 			`http://localhost:3000/users/username`,
+// 			formData,
+// 			{
+// 				headers: {
+// 					Authorization: `Bearer ${localStorage.getItem("token")}`,
+// 				},
+// 			}
+// 			);
+			
+// 			console.log("Username Response:", usernameResponse.data);
+// 		} catch (error) {
+// 			console.error("Error updating username:", error);
+// 		}
+// 		formData.delete("username");
+// 	}
+// 	else{
+// 		console.error("insert a user name:");
+
+// 	}
+
+//   // Clear the input after the update
+//   username.value = "";
+// };
+
+
+  
+	  const resetForm = () => {
+		Images.value = null;
+		// username.value = "";
+		const fileInput = document.querySelector(
+		  'input[type="file"]'
+		) as HTMLInputElement;
+		if (fileInput) {
+		  fileInput.value = "";
+		}
+	  };
+  
+	  return {
+		Images,
+		username,
+		uploadFile,
+		submitFile,
+		resetForm,
+		updateUserName,
+	  };
+	},
+  };
+  </script>
+
 
 <style scoped>
 .profile {
