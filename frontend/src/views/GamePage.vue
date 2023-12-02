@@ -11,8 +11,8 @@ import WebSocketPlugin from '@/plugins/websocket-plugin';
 import GameSelect from '@/components/GameSelect.vue';
 
 const { appContext } = getCurrentInstance();
-    const socket = appContext.config.globalProperties.$socket;
-    provide('websocket', socket);
+    // const socket = appContext.config.globalProperties.$socket;
+    // provide('websocket', appContext.$socket);
     const canvasWidth = ref(900); // Default width, can be dynamically adjusted
     const canvasHeight = ref(400); // Default height, can be dynamically adjusted
     const playerScore = ref(0);
@@ -38,12 +38,12 @@ const { appContext } = getCurrentInstance();
 		}
 	};
 	const sendPaddleMovement = (direction: string) => {
-		socket.emit('paddleMove', { direction });
+		appContext.$socket.emit('paddleMove', { direction });
 	};
     onMounted(() => {
-    if (socket)
+    if (appContext.$socket)
     {
-        socket.on('table', (message: any) => {
+        appContext.$socket.on('table', (message: any) => {
             console.log(message);
             playerScore.value = message.paddleRe.score;
             computerScore.value = message.compRe.score;
@@ -112,7 +112,7 @@ const { appContext } = getCurrentInstance();
             width: pongCanvas.value.offsetWidth,
             height: pongCanvas.value.offsetHeight,
         };
-        socket.emit('start-game', canvasDimensions);
+        appContext.$socket.emit('start-game', canvasDimensions);
     } 
     else 
     {
@@ -122,7 +122,7 @@ const { appContext } = getCurrentInstance();
 	onBeforeUnmount(() => {
 		window.removeEventListener("keyup", keyUpHandler, false);
 		window.removeEventListener("keydown", keyDownHandler, false);
-        socket.off()
+        appContext.$socket.off()
 	});
 </script>
 

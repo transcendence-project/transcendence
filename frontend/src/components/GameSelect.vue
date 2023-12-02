@@ -24,12 +24,13 @@
 
 
 <script lang="ts" setup>
-import { ref, inject } from 'vue';
+import { ref, getCurrentInstance, onMounted} from 'vue';
 
     const gameType = ref('');
     const gameMode = ref('');
 
-    const websocket = inject('websocket');
+    // const websocket = inject('websocket');
+    const { appContext } = getCurrentInstance();
     const selectGameType = (type: string) => {
       gameType.value = type;
       gameMode.value = ''; // Reset game mode when game type changes
@@ -44,7 +45,9 @@ import { ref, inject } from 'vue';
             type: gameType.value,
             mode: gameMode.value
         };
-        websocket.emit('info',gameInfo);
+        onMounted(() => {
+          appContext.$socket.emit('info',gameInfo);
+        });
     };
 </script>
 
