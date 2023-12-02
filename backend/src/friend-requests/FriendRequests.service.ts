@@ -10,9 +10,23 @@ export class FriendRequestService {
 				private userService: UsersService) {}
 
 	async sendFriendRequest(senderId: number, receiverId: number): Promise<FriendRequest> {
+		// console.log("senderId: " + senderId);
+		// console.log("receiverId: " + receiverId);
+		if (senderId == receiverId) {
+			throw new NotFoundException("Cannot send friend request to yourself");
+		}
+		if (await this.userService.isFriend(senderId, receiverId)) {
+			throw new NotFoundException("Users are already friends");
+		}
+		// check if request already exists
+		const request = await this.friendRequestRepository.findOne({where: {sender: {id: senderId}, receiver: {id: receiverId}}});
+		if (request) {
+			throw new NotFoundException("Friend request already exists");
+		}
 		const friendRequest = this.friendRequestRepository.create({
-			sender: { id: senderId },
-			receiver: { id: receiverId }
+			sender: await this.userService.findOne(senderId),
+			receiver: await this.userService.findOne(receiverId),
+			status: 'PENDING'
 		});
 		return await this.friendRequestRepository.save(friendRequest);
 	}
@@ -27,7 +41,6 @@ export class FriendRequestService {
 		// add sender to receiver's friends
 		await this.userService.addFriend(request.sender.id, request.receiver);
 		await this.userService.addFriend(request.receiver.id, request.sender);
-
 		this.friendRequestRepository.delete(requestId);
     }
 
@@ -35,9 +48,14 @@ export class FriendRequestService {
 		return await this.friendRequestRepository.delete(requestId);
 	}
 
-	async getFriendRequests(userId: number): Promise<FriendRequest[]> {
-		return await this.friendRequestRepository.find({where: {receiver: {id: userId}, status: 'PENDING'}});
-	}
+async getFriendRequests(userId: number): Promise<FriendRequest[]> {
+    const friendRequests = await this.friendRequestRepository.find({
+        where: { receiver: { id: userId }, status: 'PENDING' },
+        relations: ['sender', 'receiver']
+    });
+    return friendRequests;
+}
+
 
 	async getSentRequests(userId: number): Promise<FriendRequest[]> {
 		return await this.friendRequestRepository.find({where: {sender: {id: userId}, status: 'PENDING'}});

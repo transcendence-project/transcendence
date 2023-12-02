@@ -5,9 +5,11 @@ import { GameService } from './game.service';
 import { UsersService } from '../users/users.service';
 
 @WebSocketGateway({
-  namespace: 'game',
-  cors: { origin: 'http://localhost:8080',
-  credentials: true, },
+	namespace: 'game',
+	cors: {
+		origin: 'http://localhost:8080',
+		credentials: true,
+	},
 
 })
 export class GameGateway

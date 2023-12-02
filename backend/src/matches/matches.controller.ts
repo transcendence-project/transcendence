@@ -29,4 +29,16 @@ export class MatchController {
 	return this.matchesService.findMatches(req.user.id);
   }
 
+  @Get('my/wins')
+  @UseGuards(JwtAuthGuard)
+  async findWins(@Req() req) {
+	return this.matchesService.findMatchesAsPlayerOne(req.user.id);
+  }
+
+  @Get('my/losses')
+  @UseGuards(JwtAuthGuard)
+  async findLosses(@Req() req) {
+	return this.matchesService.findMatchesAsPlayerTwo(req.user.id);
+  }
+
 }

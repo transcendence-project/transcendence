@@ -1,5 +1,6 @@
 <template>
   <div id="home">
+    <Toast />
     <TopNavBar v-if="!['login'].includes($route.name)" />
     <div class="side-cont">
       <SideNavBar v-if="!['login'].includes($route.name)" />
@@ -12,12 +13,14 @@
 import { defineComponent } from "vue";
 import TopNavBar from "@/components/TopNavBar.vue";
 import SideNavBar from "@/components/SideNavBar.vue";
+import Toast from "primevue/toast";
 
 export default defineComponent({
   name: "homePage",
   components: {
     TopNavBar,
     SideNavBar,
+    Toast,
   },
 });
 </script>

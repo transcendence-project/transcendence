@@ -10,9 +10,6 @@ export class Channel {
     @Column()
     room_name: string;
 
-    @Column()
-    description: string; // ??
-
     @OneToMany(() => Message, message => message.channel)
     messages: Message[];
 
@@ -24,13 +21,8 @@ export class Channel {
 	@JoinTable()
 	admins: User[];
 
-    @ManyToMany(() => User, user => user.channels,)
-	// @JoinTable()
+    @ManyToMany(() => User, user => user.channels)
     members: User[];
-
-	@ManyToMany(type => User)
-	@JoinTable()
-	invites: User[];
 
     @Column({default: false})
     isGroupChannel: boolean;
@@ -47,11 +39,13 @@ export class Channel {
 	@Column({nullable: true, default: false})
 	is_public: boolean;
 
-	//   @Column('text', { array: true, nullable: true  })
-//   banned: string[];
+	@ManyToMany(type => User)
+	@JoinTable()
+  	banned: User[];
 
-//   @Column('text', { array: true , nullable: true})
-//   muted: string[];
+	@ManyToMany(type => User)
+	@JoinTable()
+	muted: User[];
 }
 
 /* The @JoinTable() decorator in TypeORM is used to specify 

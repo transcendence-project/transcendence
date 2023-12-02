@@ -47,4 +47,26 @@ async findMatches(userId: number) {
   return matches;
 }
 
+async findMatchesAsPlayerOne(userId: number) {
+	const matches = await this.repo.find({
+	where: [
+	  { playerOne: { id: userId } }
+	],
+	relations: ["playerOne", "playerTwo"]
+  });
+  matches.sort((a, b) => b.id - a.id)
+  return matches;
+}
+
+async findMatchesAsPlayerTwo(userId: number) {
+	const matches = await this.repo.find({
+	where: [
+	  { playerTwo: { id: userId } }
+	],
+	relations: ["playerOne", "playerTwo"]
+  });
+  matches.sort((a, b) => b.id - a.id)
+  return matches;
+}
+
 }

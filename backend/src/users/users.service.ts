@@ -13,12 +13,14 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Achievement } from "entities/achievement.entity";
 import { SeederService } from "../achievements/achievement.seed";
 import { MatchesService } from "matches/matches.service";
+import { ChatService } from "chat/chat.service";
 
 @Injectable()
 export class UsersService {
   constructor(
     private seederService: SeederService,
 	private matchesService: MatchesService,
+	private chatService: ChatService,
     @InjectRepository(User) private repo: Repository<User>,
   ) {}
 
@@ -38,8 +40,10 @@ export class UsersService {
       image,
       twoFactorSecret: null,
       is2FAEnabled: false,
+	  isTwoFactorAuthenticated: false,
       friends: [],
       channels: [],
+	  blocked: [],
 	matchesAsPlayerOne: [],
 	matchesAsPlayerTwo: [],
       achievements: [],
@@ -47,12 +51,11 @@ export class UsersService {
     });
     return this.repo.save(user2);
   }
-  async findOne(id: number) {
-	const user = await this.repo.findOneBy({ id });
-	return user;
+  findOne(id: number) {
+	return (this.repo.findOne({where: {id}, relations: ['channels']}))
   }
   async findOneByUserName(userName: string) {
-    const user = await this.repo.findOneBy({ userName });
+    const user = await this.repo.findOne({ where: {userName}, relations: ['blocked'] });
     return user;
   }
 
@@ -89,10 +92,30 @@ export class UsersService {
       throw new ConflictException("Friend already added");
     }
     user.friends.push(friend);
+	await this.chatService.create_friend_chan(user, friend);
     return this.repo.save(user);
   }
 
+  async isFriend(userId: number, friendId: number): Promise<boolean> {
+	// console.log('in is friend, userId: ', userId);
+	const num_friend_id: number = parseInt(friendId.toString(), 10); // convert string to number
+	const user = await this.repo.findOne({
+	  where: { id: userId },
+	  relations: ["friends"],
+	});
+
+	if (!user.friends) {
+	  user.friends = [];
+	}
+	// console.log('in is friend, user.friends: ', user.friends);
+	// console.log('in is friend, friendId: ', friendId);
+	// console.log('in is friend, user.friends.find((f) => f.id === friendId): ', user.friends.find((f) => f.id === friendId));
+	return user.friends.some((friend) => friend.id === num_friend_id);
+
+}
+
   async removeFriend(userId: number, friendId: number) {
+	console.log('in remove friend, userId: ', userId);
     const user = await this.repo.findOne({
       where: { id: userId },
       relations: ["friends"],
@@ -213,9 +236,9 @@ export class UsersService {
 	const score: string = winnerScoreString + '-' + loserScoreString;
 
 	const match = await this.matchesService.create(winner, loser, score, loserID, winnerID);
-	console.log('in save match, winner: ', winner);
-	console.log('in save match, loser: ', loser);
-	console.log('in save match, match: ', match);
+	// console.log('in save match, winner: ', winner);
+	// console.log('in save match, loser: ', loser);
+	// console.log('in save match, match: ', match);
 	// console.log('in save match, winner matches as player one: ', winner.matchesAsPlayerOne);
 	// console.log('in save match, loser matches as player two: ', loser.matchesAsPlayerTwo);
 	winner.matchesAsPlayerOne.push(match);
@@ -231,5 +254,52 @@ export class UsersService {
   async getMatches(userId: number) {
 	const matches = await this.matchesService.findMatches(userId);
 	return matches;
+  }
+
+  async getMatchesAsPlayerOne(userId: number) {
+	const matches = await this.matchesService.findMatchesAsPlayerOne(userId);
+	return matches;
+  }
+
+  async add_blocked(friend_name: string, user_name: string) {
+	// const friend = await this.findOneByUserName(friend_name);
+	const user = await this.findOneByUserName(user_name);
+	if (user)
+	{
+		const frnd = await this.repo.findOne({
+			where: { userName: friend_name }});
+		user.blocked.push(frnd);
+		await this.repo.save(user);
+	}
+  }
+
+	async get_blocked(user_id: number){
+		const user = await this.repo.findOne({
+			where: { id: user_id },
+			relations: ["blocked"],
+		});
+		return user.blocked;
+	}
+  async rem_blocked(friend_name: string, user_name: string) {
+	const user = await this.findOneByUserName(user_name);
+	if (user)
+	{
+		user.blocked = user.blocked.filter((friend: User )=> friend.userName !== friend_name);
+		await this.repo.save(user);
+	}
+  }
+
+  async is_blocked(friend_name: string, user_name: string){
+	// const user = await this.repo.findOne({
+	// 	where: { userName: user_name },
+	// 	relations: ["blocked"],
+	// });
+	const user = await this.findOneByUserName(user_name);
+	console.log(user);
+	const isBlocked = user.blocked.some((friend: User) => friend.userName === friend_name);
+	if (isBlocked)
+		return true;
+	else
+		return false;
   }
 }
