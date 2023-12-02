@@ -53,6 +53,11 @@ export class GameGateway
     //   this.gameService.draw_table(payload.width,payload.height);
     // return {event:'table' ,data: this.gameService.init_table(client)};
   }
+  
+  @SubscribeMessage('info')
+  handleInfoGame(@ConnectedSocket() client: Socket, @MessageBody() data: { info: object }) {
+    console.log(data);
+  }
   @SubscribeMessage('paddleMove')
   handlePaddleMove(@ConnectedSocket() client: Socket, @MessageBody() data: { direction: string }) {
     const playerId = client.id; // Or any other way you identify your player
@@ -73,4 +78,12 @@ export class GameGateway
       this.lastUpdateTime = currentTime;
     }, 1000 / 60);
   }
+  
+  inviteUser(client: Socket, receiver: string): void {
+    client.to(receiver).emit("invite", client.id);
+  }
+
+  updateGame(winnerID: number, winnerScore: number, loserID, loserScore): void {
+	this.userService.saveMatch(winnerID, winnerScore, loserID, loserScore);
+	}
 }

@@ -121,7 +121,7 @@ export class GameService {
         this.computerAI();
     }
     movePlayerPaddle(direction: string) {
-        const paddleSpeedPerSecond = 2000; 
+        const paddleSpeedPerSecond = 3000; 
         if (direction === 'up')
         {
             this.paddle.y -= paddleSpeedPerSecond * this.deltaTime;
