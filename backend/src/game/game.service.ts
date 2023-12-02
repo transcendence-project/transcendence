@@ -18,6 +18,12 @@ export class GameService {
         this.initializeGameEntities()
     };
 
+    public async addConnectUser(client : Socket, token: any)
+    {
+        await this.set_online_user(client, token);
+        const oo = this.find_user_with_id(client.id);
+        // console.log(oo);
+    }
     async set_online_user(client: Socket ,token: any){
 		const _token = token;
 		console.log(token);

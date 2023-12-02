@@ -1,5 +1,7 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 import store from '@/store';
+// Import the WebSocket plugin's connect method
+import { useWebSocket } from '@/plugins/websocket-plugin';
 
 
 const routes: Array<RouteRecordRaw> = [
@@ -96,9 +98,11 @@ router.beforeEach((to: any, from: any, next: any) => {
     next();
     if (to.path == '/home' && to.query.code)
     {
-          const token = to.query.code;
-          localStorage.setItem('token', token);
+      const token = to.query.code;
+      localStorage.setItem('token', token);
 		  store.dispatch('fetchUserData');
+      const { connectSocket } = useWebSocket();
+      connectSocket();
     }
   });
 export default router;
