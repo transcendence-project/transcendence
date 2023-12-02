@@ -12,8 +12,9 @@ import { SeederService } from '../achievements/achievement.seed';
 // import { MatchesService } from 'matches/matches.service';
 // import { Match } from 'entities/match.entity';
 import { MatchModule } from 'matches/matches.module';
+import { ChatModule } from 'chat/chat.module';
 @Module({
-	imports: [TypeOrmModule.forFeature([User, FriendRequest, Achievement]), forwardRef(() => MatchModule)],
+	imports: [TypeOrmModule.forFeature([User, FriendRequest, Achievement]), forwardRef(() => MatchModule, ), forwardRef(() => ChatModule)],
 	providers: [UsersService, FriendRequestService, SeederService],
 	controllers: [UsersController, FriendRequestController],
 	exports: [UsersService, SeederService]

@@ -16,7 +16,7 @@ export class ChatService {
 
 	constructor(@InjectRepository(Channel) private channelRepo: Repository<Channel>,
 	@InjectRepository(Message) private messageRepo: Repository<Message>,
-	private authService: AuthService, private userService: UsersService ){}
+	private authService: AuthService){}
 	
 
 		//  ----------------------- CHANNEL GETTERS -----------------------------
@@ -64,12 +64,10 @@ export class ChatService {
 		.leftJoinAndSelect("channel.members", "member")
    		.leftJoinAndSelect("channel.messages", "message")
 		.where("member.userName = :frnd_name", { frnd_name })
+		.andWhere("channel.isGroupChannel = :is_group", { is_group: false })
 		.getOne();
 		if (channel)
-		{
-			console.log(channel);
 			return channel;
-		}
 	}
 
 		//  ----------------------- CREATE / UPDATE -----------------------------
@@ -161,6 +159,15 @@ export class ChatService {
 		// else channel doesnot exist
 	}
 
+	async create_friend_chan(user: User, friend: User) {
+		const chan = this.channelRepo.create({ room_name: "", owner: null, password: "", 
+			members: [], admins: [], messages: [], banned: [], muted: [], isGroupChannel: false, is_protected: true });
+			chan.members.push(user);
+			chan.members.push(friend);
+			await this.channelRepo.save(chan);
+
+	}
+
 	async add_chan_admin(user_to_add: string, chan_name: string) {
 		const chan = await this.chan_by_name(chan_name);
 		const user = await this.find_user_with_name(user_to_add);
@@ -199,6 +206,13 @@ export class ChatService {
 		const chan = await this.chan_by_name(chan_name);
 		const message = this.messageRepo.create({senderID: sender.id, sender: sender, channel: chan, content: content, createdAt: null });
 		chan.messages.push(message);
+		await this.messageRepo.save(message);
+	}
+
+	async save_frnd_chan_msg(sender: User, frnd_name: string, content: string) {
+		const channel = await this.frndchan_by_name(frnd_name);
+		const message = this.messageRepo.create({senderID: sender.id, sender: sender, channel: channel, content: content, createdAt: null });
+		channel.messages.push(message);
 		await this.messageRepo.save(message);
 	}
 
@@ -361,11 +375,21 @@ export class ChatService {
 		}
 	}
 
+	user_exist(client_id: string) {
+		if (this.connected_users.get(client_id))
+			return true;
+		else
+			return false;
+	}
 
 	async set_user(client: Socket){
 		const token = client.handshake.auth.token;
 		const user = await this.authService.user_by_token(token);
+		if (user && this.find_user_with_name(user.userName)){
+			return null;
+		}
 		this.connected_users.set(client.id, user);
+		return user;
 		// set user as online
 	}
 
@@ -373,22 +397,6 @@ export class ChatService {
 		this.connected_users.delete(client.id);
 		// set user as offline
 	}
-
-
-	// rem_user_invites(client: any) {
-	// 	const user = this.find_user_with_id(client.id);
-	// 	for (const [recipient, senders] of this.game_invites.entries()) {
-	// 	  if (recipient === user.userName)
-	// 		this.game_invites.delete(recipient);
-	// 	}
-	// }
-
-	// invite_user_to_game(inviter: User, invitee: User)
-	// {
-	// 	const senders = this.game_invites.get(invitee.userName) || [];
-	// 	senders.push(inviter.userName);
-	// 	this.game_invites.set(inviter.userName, senders);
-	// }
 	
 	is_online(client: any): boolean{ // or set user as online in databse ??
 		for (const [userID, user] of this.connected_users.entries())

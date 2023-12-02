@@ -524,7 +524,7 @@
 				const my_frnds: FriendsList = {
 					user: item.userName,
 					status: false,
-					isBlock: false,
+					isBlock: true,
 				}
 				m_frnd.value.push(my_frnds);
 			}
@@ -533,7 +533,7 @@
 				const my_frnds: FriendsList = {
 					user: item.userName,
 					status: false,
-					isBlock: true,
+					isBlock: false,
 				}
 				m_frnd.value.push(my_frnds);
 			}
@@ -632,6 +632,7 @@
     },
 
     showGroup() {
+		localStorage.setItem("chat", "group");
       this.showGroupList = true;
     },
 
@@ -653,6 +654,7 @@
       this.msgField = false;
     },
     showDm() {
+		localStorage.setItem("chat", "dm");
       this.showGroupList = false;
     },
     join_pub_chan(room_name: string) {
@@ -662,14 +664,6 @@
           arg: "",
         });
     },
-    switch_to_group() {
-      localStorage.setItem("chat", "group");
-      console.log(localStorage.getItem("chat"));
-    },
-    switch_to_dm() {
-      localStorage.setItem("chat", "dm");
-      console.log(localStorage.getItem("chat"));
-    },
     send_chan_msg(message: string) {
       if (store.state.chat.socket)
         store.state.chat.socket.emit("send_msg_to_chan", {
@@ -677,18 +671,25 @@
           message: message,
         });
     },
-    mute_omar() {
-      store.state.chat.socket.off("mute_message");
-      store.state.chat.socket.on("mute_message", (data: any) => {
-        console.log("in mute message");
-        this.$toast.add({
-          severity: "error",
-          summary: "Error while sending message",
-          detail: `You have been muted.`,
-          life: 3000,
+	send_priv_msg(message: string) {
+      if (store.state.chat.socket)
+        store.state.chat.socket.emit("private_message", {
+          frnd_name: localStorage.getItem("currentFriend"),
+          message: message,
         });
-      });
     },
+    // mute_omar() {
+    //   store.state.chat.socket.off("mute_message");
+    //   store.state.chat.socket.on("mute_message", (data: any) => {
+    //     console.log("in mute message");
+    //     this.$toast.add({
+    //       severity: "error",
+    //       summary: "Error while sending message",
+    //       detail: `You have been muted.`,
+    //       life: 3000,
+    //     });
+    //   });
+    // },
 	notify(){
 		store.state.chat.socket.off("notify");
 		console.log("reached notify");
@@ -722,10 +723,6 @@
           life: 3000,
         });
       });
-    },
-    send_priv_msg() {
-      if (store.state.chat.socket)
-        store.state.chat.socket.emit("private_message");
     },
 	change_password() {
 		if (store.state.chat.socket)
@@ -776,19 +773,22 @@
     async displayFriendMessage() {
       this.chatMessage = [];
       await store.dispatch("fetchFriendChan");
-    //   const chan = computed(() => store.getters.getCurrentCahnnel);
-    //   console.log(chan.value.messages);
-    //   const val = chan.value.messages;
-    //   val.forEach((item: any) => {
-    //     // will change later similar to chat
-    //     this.chatMessage.push({ send: true, chat: item.content });
-    //   });
+      const chan = computed(() => store.getters.getCurrentCahnnel);
+      console.log(chan.value.messages);
+      const val = chan.value.messages;
+	  val.forEach((item: any) => {
+        if (item.senderID === store.getters.getId)
+          this.chatMessage.push({ send: true, chat: item.content });
+        else this.chatMessage.push({ send: false, chat: item.content });
+      });
     },
     sendMessage() {
       if (this.message) {
-        // this.chatMessage.push({ send: true, chat: this.message });
-        // this.isMessageSent = true;
-        this.send_chan_msg(this.message);
+		const chat = localStorage.getItem("chat");
+		if (chat === "dm")
+			this.send_priv_msg(this.message);
+		else
+			this.send_chan_msg(this.message);
         this.message = "";
       }
     },
@@ -883,8 +883,22 @@
         }
       }
     });
-    store.state.chat.socket.on("priv_msg_success", () => {
-      console.log("Send message to channel successfully and back in front end");
+    store.state.chat.socket.on("priv_msg_success", (data: any) => {
+      console.log("Send priv successfully and back in front end");
+	  if (data)
+	  {
+		if (data.frnd == store.getters.getUserName && localStorage.getItem("currentFriend") == data.user){
+			this.chatMessage.push({ send: false, chat: data.content });
+          	this.isMessageSent = true;
+		}
+		else if (data.user == store.getters.getUserName && localStorage.getItem("currentFriend") == data.frnd){
+			console.log("hellllooooo");
+			console.log(localStorage.getItem("currentFriend"));
+			console.log(data.frnd)
+			this.chatMessage.push({ send: true, chat: data.content });
+         	this.isMessageSent = true;
+		}
+	  }
     });
     store.state.chat.socket.on("leave_room_success", (room_name: string) => {
       const index = this.my_chan.findIndex(
@@ -909,7 +923,7 @@
 	  if (friend_found)
 		friend_found.isBlock = false;
     });
-    this.mute_omar();
+    // this.mute_omar();
     this.listenForMuteEvents();
 	this.notify();
   },

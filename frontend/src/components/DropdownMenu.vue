@@ -15,10 +15,11 @@
 	  <router-link to="/editprofile" @click.native="closeDropdown"
         >Edit Profile</router-link
       >
-      <router-link to="#" @click.native="toggleTwoFactor"
+		<!-- <router-link to="/twofactor" @click.native="toggleTwoFactor">Two-factor-AUTH</router-link> -->
+     <router-link to="#" @click.native="toggleTwoFactor"
         >Two-factor-AUTH</router-link
       >
-      <div class="flex">
+       <div class="flex">
         <button v-if="showTwoFactorButtons" class="enbtn mx-2 px-2" @click="enable">
           Enable
         </button>
