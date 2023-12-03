@@ -10,4 +10,5 @@ export interface IStudent{
 	lose: number;
 	draw: number;
 	rank: number;
+	twofa: boolean;
 }

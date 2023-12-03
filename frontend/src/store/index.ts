@@ -20,6 +20,7 @@ const store = createStore({
 			lose: 0,
 			draw: 0,
 			rank: 0,
+			twofa: false,
 		},
 		chat: {
 			socket: null as Socket | null,
@@ -42,6 +43,7 @@ const store = createStore({
 			lose: 0,
 			draw: 0,
 			rank: 0,
+			twofa: false,
 		},
 	},
 	getters: { // used to retrieve computed properties or derived state from the store.
@@ -65,6 +67,7 @@ const store = createStore({
 		getLose: (state: any) => state.user.lose,
 		getDraw: (state: any) => state.user.draw,
 		getRank: (state: any) => state.user.rank,
+		getTwofa: (state: any) => state.user.twofa,
 
 		// GETTERS FOR FRIEND
 		getFrndDisplayName: (state: any) => state.friend.display_name,
@@ -127,6 +130,9 @@ const store = createStore({
 		setRank(state: any, rank: number) {
 			state.user.rank = rank;
 		},
+		setis2FA(state: any, status: string) {
+			state.user.twofa = status;
+		},
 
 		// SETTERS FOR THE USER
 		setFrndDisplayName(state: any, name: string) {
@@ -141,6 +147,7 @@ const store = createStore({
 		setFrndImage(state: any, image: string) {
 			state.friend.image = image;
 		},
+
 	},
 	actions: { // asynchronous functions used to perform operations and commit mutations, like API requests
 		// axios requests to database / backend
@@ -157,6 +164,7 @@ const store = createStore({
 				store.commit('setUserName', response.data.userName);
 				store.commit('setEmail', response.data.email);
 				store.commit('setImage', response.data.image);
+				store.commit('setis2FA', response.data.is2FAEnabled)
 			}).catch((error) => {
 				console.error('An error occurred while fetching data:', error);
 			});
@@ -255,8 +263,6 @@ const store = createStore({
 						Authorization: `Bearer ${localStorage.getItem('token')}`,
 					},
 				});
-
-				// console.log(response.data.qrCodeDataURL);
 				localStorage.setItem("qr", response.data.qrCodeDataURL);
 			} catch(error) {
 				// Handle errors here

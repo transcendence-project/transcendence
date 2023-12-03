@@ -28,7 +28,7 @@
         </button>
       </div>
       <router-link to="/" @click.native="logout"
-        >Logout</router-link
+    	>Logout</router-link
       >
 
 	  </div>
@@ -39,6 +39,7 @@
   <script setup lang="ts">
   import { ref, onMounted, onBeforeUnmount, computed } from "vue";
   import store from "@/store";
+  import router from "@/router";
   
   const showDropdown = ref(false);
   const dropdownsRef = ref<HTMLElement | null>(null);
@@ -74,7 +75,10 @@
 };
 
 const logout = () => {
-	localStorage.removeItem('token');
+	// localStorage.removeItem('token');
+	console.log("HELLOOOOOO");
+	localStorage.clear();
+	router.push('/');
 	closeDropdown();
 };
 

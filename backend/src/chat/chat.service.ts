@@ -160,11 +160,14 @@ export class ChatService {
 	}
 
 	async create_friend_chan(user: User, friend: User) {
-		const chan = this.channelRepo.create({ room_name: "", owner: null, password: "", 
-			members: [], admins: [], messages: [], banned: [], muted: [], isGroupChannel: false, is_protected: true });
-			chan.members.push(user);
-			chan.members.push(friend);
-			await this.channelRepo.save(chan);
+		const channel = await this.frndchan_by_name(friend.userName);
+		if (!channel){
+			const chan = this.channelRepo.create({ room_name: "", owner: null, password: "", 
+				members: [], admins: [], messages: [], banned: [], muted: [], isGroupChannel: false, is_protected: true });
+				chan.members.push(user);
+				chan.members.push(friend);
+				await this.channelRepo.save(chan);
+		}
 
 	}
 

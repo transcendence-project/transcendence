@@ -295,7 +295,6 @@ export class UsersService {
 	// 	relations: ["blocked"],
 	// });
 	const user = await this.findOneByUserName(user_name);
-	console.log(user);
 	const isBlocked = user.blocked.some((friend: User) => friend.userName === friend_name);
 	if (isBlocked)
 		return true;

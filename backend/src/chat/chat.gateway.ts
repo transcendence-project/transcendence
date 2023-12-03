@@ -344,7 +344,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				const add_user = this.chatService.find_user_with_name(user_to_add);
 				if (add_user) {
 					const user_id = this.chatService.find_id(add_user.userName);
-					console.log(user_id);
 					this.server.to(user_id).emit('join_priv_room', room_name);
 				}
 				else {
