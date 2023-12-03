@@ -3,11 +3,14 @@ import { OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect ,SubscribeMessa
 import { Socket, Server } from 'socket.io';
 import { GameService } from './game.service';
 import { UsersService } from '../users/users.service';
+import { info } from 'console';
 
 @WebSocketGateway({
-  namespace: 'game',
-  cors: { origin: 'http://localhost:8080',
-  credentials: true, },
+	namespace: 'game',
+	cors: {
+		origin: 'http://localhost:8080',
+		credentials: true,
+	},
 
 })
 export class GameGateway
@@ -29,12 +32,8 @@ export class GameGateway
 
     const token = header.token;
     this.gameService.addConnectUser(client, token);
-    // await this.gameService.set_online_user(client,token);
-    // const user = this.gameService.find_user_with_id(client.id);
-    
-    // console.log("from websocket user output ", user);
-    // console.log("from the client ", client.id);
   }
+
   handleDisconnect(client: any) {
     this.clientCount--;
     console.log("Client disconnected");
@@ -55,8 +54,12 @@ export class GameGateway
   }
   
   @SubscribeMessage('info')
-  handleInfoGame(@ConnectedSocket() client: Socket, @MessageBody() data: { info: object }) {
+  handleInfoGame(@ConnectedSocket() client: Socket, @MessageBody() data: object) {
     console.log(data);
+    // if (data && data.info)
+    // {
+    //   const dataType = data.info.type;
+    // }
   }
   @SubscribeMessage('paddleMove')
   handlePaddleMove(@ConnectedSocket() client: Socket, @MessageBody() data: { direction: string }) {

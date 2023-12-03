@@ -1,14 +1,13 @@
 <template>
   <div class="chn-pass">
     <div class="pass-cont flex flex-col ">
-    
+    <p class="text-lg m-4">Change password</p>
       <div class="passform">
-        <input v-model="password" placeholder="Password" class="pass" type="password"/>
-        <!-- <input placeholder="Password" class="pass text-left" /> -->
+        <input v-model="member" placeholder="New Password" class="member rounded-sm p-2 text-black"/>
           <div class="jn-div">
 			<div class="pas-btn">
 
-				<button class="jnbtn" @click="join_prot_chan">Join</button>
+				<button class="jnbtn" @click="update_pass">Update</button>
 			</div>
 			<div class="cls-bt">
 				<button class="clsbtn" @click="closePrivatePage">Close</button>
@@ -21,27 +20,24 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 import store from "@/store";
-// import store from "@/store";
 
 export default defineComponent({
 	data(){
 		return{
-			password: '',
+			member: '',
 		};
 	},
   methods: {
     closePrivatePage(): void {
       this.$emit('close');
     },
-	join_prot_chan() {
-      console.log("reached join prot chan");
-      if (store.state.chat.socket)
-        store.state.chat.socket.emit("join_room", {
-          room_name: localStorage.getItem('toJoinChan'),
-          arg: this.password,
+	update_pass() {
+		if (store.state.chat.socket)
+        store.state.chat.socket.emit("change_pass", {
+		  new_pass: this.member,
+          room_name: localStorage.getItem('currentChanName'),
         });
-		this.closePrivatePage()
-    },
+	},
   },
 });
 
@@ -55,7 +51,7 @@ export default defineComponent({
   width: 40%;
   height: 40%;
   margin-left:10%;
-  right: 10%;
+  left: 10%;
   bottom: 10%;
   padding: 3%;
   background: rgba(0, 0, 0, 0.7); 

@@ -15,18 +15,16 @@ export class ChatController {
 		return (await this.chatService.get_all_chan());
 	}
 
-	// could add it in the users service
-	// @Get('my_channels')
-	// @UseGuards(JwtAuthGuard)
-	// async my_channels(){
-	// 	// return all the channels that the user is part of from the repo 
-	// }
 	@Get('current_chan/:chan_name')
-	async chan_memebrs(@Param("chan_name") chan_name: string){
-		// console.log(`chan name in finding chan memebers is ${chan}`);
+	async cur_chan(@Param("chan_name") chan_name: string){
 		console.log(chan_name);
 		const chan_ = await this.chatService.chan_by_name(chan_name);
-		// return (chan_.members);
+		return (chan_)
+	}
+
+	@Get('current_frndchan/:frnd_name')
+	async frnd_chan(@Param("frnd_name") frnd_name: string){
+		const chan_ = await this.chatService.frndchan_by_name(frnd_name);
 		return (chan_)
 	}
 }

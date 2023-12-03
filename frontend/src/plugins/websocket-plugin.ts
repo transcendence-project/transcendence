@@ -69,7 +69,7 @@
 import { App, reactive } from 'vue';
 import { io, Socket } from 'socket.io-client';
 
-const socketState = reactive({
+export const socketState = reactive({
   socket: null as Socket | null,
 });
 

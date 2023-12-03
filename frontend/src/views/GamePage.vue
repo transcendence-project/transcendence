@@ -6,11 +6,19 @@
 
 
 <script lang="ts" setup>
-import { ref, onMounted , getCurrentInstance, onBeforeUnmount, provide} from 'vue';
+import { ref, onMounted , getCurrentInstance, onBeforeUnmount, computed} from 'vue';
 import WebSocketPlugin from '@/plugins/websocket-plugin';
 import GameSelect from '@/components/GameSelect.vue';
 
-const { appContext } = getCurrentInstance();
+// const instance  = getCurrentInstance();
+    // const socket = instance?.proxy?.$socket;
+	const instance = getCurrentInstance();
+	// const socket = appContext.config.globalProperties.$socket;
+	// console.log(socket);
+// console.log("this is:,",instance?.proxy)
+// const socket = computed(() => {
+//       return instance && instance.proxy ? instance.proxy.$socket : null;
+//     });
     // const socket = appContext.config.globalProperties.$socket;
     // provide('websocket', appContext.$socket);
     const canvasWidth = ref(900); // Default width, can be dynamically adjusted
@@ -38,62 +46,63 @@ const { appContext } = getCurrentInstance();
 		}
 	};
 	const sendPaddleMovement = (direction: string) => {
-		appContext.$socket.emit('paddleMove', { direction });
+		if (instance?.proxy)
+		{
+			const socket = instance.proxy.$socket.socket;
+			socket.emit('paddleMove', { direction });
+		}
 	};
     onMounted(() => {
-    if (appContext.$socket)
+	// console.log("inside the onMounted 55555", socket)
+    if (instance?.proxy)
     {
-        appContext.$socket.on('table', (message: any) => {
-            console.log(message);
-            playerScore.value = message.paddleRe.score;
-            computerScore.value = message.compRe.score;
-        if (pongCanvas.value)
-        {
-            const ctx = pongCanvas.value.getContext('2d');
-            if (ctx)
-            {
-                const drawRect = (
-                    x: number,
-                    y: number,
-                    w: number,
-                    h: number,
-                    color: string
-                    ) => {
-                    ctx.fillStyle = color;
-                    ctx.fillRect(x, y, w, h);
-                };
-                const drawCircle = (x: number, y: number, r: number, color: string) => {
-                    ctx.fillStyle = color;
-                    ctx.beginPath();
-                    ctx.arc(x, y, r, 0, Math.PI * 2, false);
-                    ctx.closePath();
-                    ctx.fill();
-                };
-                // const drawText = (text: string, x: number, y: number, color: string) => {
-                //     ctx.fillStyle = color;
-                //     ctx.font = "45px fantasy";
-                //     ctx.fillText(text, x, y);
-                // };
-                const render = () => { 
-					if (pongCanvas.value)
-					{
-						drawRect(0, 0, pongCanvas.value.width, pongCanvas.value.height, "#F6F1F1");
-						drawRect(0, message.paddleRe.y,message.paddleRe.width, message.paddleRe.height,"#9336B4");
-						drawRect(message.compRe.x, message.compRe.y,message.compRe.width, message.compRe.height,"#9336B4");
-						drawCircle(message.ball.x, message.ball.y, message.ball.radius, "#19A7CE")
-					}
-                }
-				document.addEventListener("keydown", keyDownHandler);
-				document.addEventListener("keyup", keyUpHandler);
-                const game = () => {
-                    // update();
-                    render();
-                    requestAnimationFrame(game);
-                };
-                requestAnimationFrame(game);
-            }
-        }
-        });
+		const socket = instance.proxy.$socket.socket;
+        // socket.value.on('table', (message: any) => {
+            // console.log(message);
+        //     playerScore.value = message.paddleRe.score;
+        //     computerScore.value = message.compRe.score;
+        // if (pongCanvas.value)
+        // {
+        //     const ctx = pongCanvas.value.getContext('2d');
+        //     if (ctx)
+        //     {
+        //         const drawRect = (
+        //             x: number,
+        //             y: number,
+        //             w: number,
+        //             h: number,
+        //             color: string
+        //             ) => {
+        //             ctx.fillStyle = color;
+        //             ctx.fillRect(x, y, w, h);
+        //         };
+        //         const drawCircle = (x: number, y: number, r: number, color: string) => {
+        //             ctx.fillStyle = color;
+        //             ctx.beginPath();
+        //             ctx.arc(x, y, r, 0, Math.PI * 2, false);
+        //             ctx.closePath();
+        //             ctx.fill();
+        //         };
+        //         const render = () => { 
+		// 			if (pongCanvas.value)
+		// 			{
+		// 				drawRect(0, 0, pongCanvas.value.width, pongCanvas.value.height, "#F6F1F1");
+		// 				drawRect(0, message.paddleRe.y,message.paddleRe.width, message.paddleRe.height,"#9336B4");
+		// 				drawRect(message.compRe.x, message.compRe.y,message.compRe.width, message.compRe.height,"#9336B4");
+		// 				drawCircle(message.ball.x, message.ball.y, message.ball.radius, "#19A7CE")
+		// 			}
+        //         }
+		// 		document.addEventListener("keydown", keyDownHandler);
+		// 		document.addEventListener("keyup", keyUpHandler);
+        //         const game = () => {
+        //             // update();
+        //             render();
+        //             requestAnimationFrame(game);
+        //         };
+        //         requestAnimationFrame(game);
+        //     }
+        // }
+        // });
     }
     });
     const startGame = () => {
@@ -112,7 +121,12 @@ const { appContext } = getCurrentInstance();
             width: pongCanvas.value.offsetWidth,
             height: pongCanvas.value.offsetHeight,
         };
-        appContext.$socket.emit('start-game', canvasDimensions);
+		if (instance?.proxy)
+		{
+        	const socket = instance.proxy.$socket.socket;
+			socket.emit('start-game', canvasDimensions);
+
+		}
     } 
     else 
     {
@@ -122,7 +136,7 @@ const { appContext } = getCurrentInstance();
 	onBeforeUnmount(() => {
 		window.removeEventListener("keyup", keyUpHandler, false);
 		window.removeEventListener("keydown", keyDownHandler, false);
-        appContext.$socket.off()
+        // appContext.$socket.off()
 	});
 </script>
 
@@ -170,8 +184,8 @@ const { appContext } = getCurrentInstance();
 	width: 100%;
 	margin: 0;
 	text-align: center;
-  }
-  </style>
+}
+</style>
   
   
   

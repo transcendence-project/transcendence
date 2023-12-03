@@ -24,16 +24,21 @@
 
 
 <script lang="ts" setup>
-import { ref, getCurrentInstance, onMounted} from 'vue';
+import { ref, getCurrentInstance, computed, onMounted} from 'vue';
 
     const gameType = ref('');
     const gameMode = ref('');
+    const instance = getCurrentInstance();
+	// const socket = appContext.config.globalProperties.$socket;
+    // const instance = getCurrentInstance();
+    // const socket = instance?.proxy?.$socket;
+    // const socket = computed(() => {
+    //   return instance && instance.proxy ? instance.proxy.$socket : null;
+    // });
 
-    // const websocket = inject('websocket');
-    const { appContext } = getCurrentInstance();
     const selectGameType = (type: string) => {
       gameType.value = type;
-      gameMode.value = ''; // Reset game mode when game type changes
+      gameMode.value = '';
     };
 
     const selectGameMode = (mode: string) => {
@@ -41,13 +46,20 @@ import { ref, getCurrentInstance, onMounted} from 'vue';
     };
 
     const sendToServer = () => {
+      // console.log("this is the value",instance && instance.proxy && instance.proxy.$socket)
+      if (instance?.proxy) 
+      {
         const gameInfo = {
-            type: gameType.value,
-            mode: gameMode.value
+          type: gameType.value,
+          mode: gameMode.value
         };
-        onMounted(() => {
-          appContext.$socket.emit('info',gameInfo);
-        });
+        const socket = instance.proxy.$socket.socket;
+        socket.emit('info', gameInfo);
+      } 
+      else 
+      {
+          console.log("Socket is not connected or something is wrong in the component");
+      }
     };
 </script>
 
