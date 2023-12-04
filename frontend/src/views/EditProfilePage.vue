@@ -1,86 +1,193 @@
 <template>
-  <div class="profile">
-    <div class="edit-cont">
-      <h2>Edit Profile</h2>
-      <div class="editform">
-        <input v-model="text" placeholder="New username" class="input" />
-        <div class="upload">
-          <input type="file" @change="uploadFile" ref="file" />
-        </div>
-        <div class="acc-dec">
-          <div class="accept">
-            <button class="accbtn" @click="submitFile">Accept</button>
-          </div>
-          <div class="decline">
-            <button class="resbtn" @click="resetForm">Reset</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
+	<div class="profile">
+	  <div class="edit-cont">
+		<h2>Edit Profile</h2>
+		<div class="editform">
+		  <input
+			v-model="username"
+			placeholder="New username"
+			class="input text-black"
+		  />
+		  <div class="acc-dec">
+			<div class="decline">
+			  <button class="resbtn" @click="resetForm">Reset</button>
+			</div>
+			<div class="accept">
+			  <button class="accbtn" @click="updateUserName">update</button>
+			</div>
+		  </div>
 
-<script lang="ts">
-import { ref } from "vue";
-import axios from "axios";
+		  <div class="upload">
+			<input type="file" @change="uploadFile" ref="fileInput" />
+		  </div>
+		  <div class="acc-dec">
+			<div class="decline">
+			  <button class="resbtn" @click="resetForm">Reset</button>
+			</div>
+			<div class="accept">
+			  <button class="accbtn" @click="submitFile">Submit</button>
+			</div>
+		  </div>
+		</div>
+	  </div>
+	</div>
+  </template>
+  
+  <script lang="ts">
+  import { ref } from "vue";
+  import axios from "axios";
+  
+  export default {
+	setup() {
+	  const Images = ref(null);
+	  const username = ref("");
+	  const fileInput = ref(null);
+      const formData = new FormData();
 
-export default {
-  setup() {
-    const Images = ref<File | null>(null);
-    const text = ref("");
+	  const uploadFile = (event: any) => {
+		console.log("uploadFile function called");
+  
+		const selectedFile = event.target.files[0];
+		if (selectedFile) {
+		  Images.value = selectedFile;
+		  console.log("File selected:", Images.value);
+		} else {
+		  console.log("No file selected");
+		}
+	  };
+  
 
-    const uploadFile = () => {
-      const fileInput = document.querySelector(
-        'input[type="file"]'
-      ) as HTMLInputElement;
-      if (fileInput.files) {
-        Images.value = fileInput.files[0];
-      }
-    };
 
-    const submitFile = async () => {
-      if (Images.value) {
-        const formData = new FormData();
-        formData.append("file", Images.value);
-        formData.append("username", text.value);
-        const headers = { "Content-Type": "multipart/form-data" };
 
-        try {
-          const response = await axios.post(
-            "https://httpbin.org/post",
-            formData,
-            { headers }
-          );
-          const binaryRepresentation = response.data.files;
-          const httpStatus = response.status;
-          console.log(binaryRepresentation, httpStatus);
-        } catch (error) {
-          console.error("Error uploading file:", error);
+
+
+
+
+	const submitFile = async () => {
+  if (Images.value) {
+    // const formData = new FormData();
+    formData.append("file", Images.value);
+    // formData.append("username", username.value);
+
+    try {
+      // Update the profile picture
+      const profilePicResponse = await axios.patch(
+        "http://localhost:3000/users/profile-picture",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
         }
-      }
-    };
+      );
+      console.log("Profile Picture Response:", profilePicResponse.data);
 
-    const resetForm = () => {
-      Images.value = null;
-      text.value = "";
-      const fileInput = document.querySelector(
-        'input[type="file"]'
-      ) as HTMLInputElement;
-      if (fileInput) {
-        fileInput.value = "";
-      }
-    };
+      const binaryRepresentation = profilePicResponse.data.files;
+      const httpStatus = profilePicResponse.status;
+      console.log(binaryRepresentation, httpStatus);
+    } catch (error) {
+      console.error("Error updating profile picture:", error);
+    }
+  } else {
+    console.log("No file selected");
+  }
 
-    return {
-      Images,
-      text,
-      uploadFile,
-      submitFile,
-      resetForm,
-    };
-  },
+  resetForm();
 };
-</script>
+
+const updateUserName = async () => {
+  if (username.value) {
+    formData.append("userName", username.value);
+
+    // Log formData to check if username is present
+    console.log("formData before axios call:", formData);
+
+    try {
+      const usernameResponse = await axios.post(
+        `http://localhost:3000/users/username`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      );
+
+      console.log("Username Response:", usernameResponse.data);
+    } catch (error) {
+      console.error("Error updating username:", error);
+    } finally {
+      // Clear the form data after the update
+      formData.delete("userName");
+    }
+  } else {
+    console.error("Insert a username");
+  }
+
+  // Clear the input after the update
+  username.value = "";
+};
+
+
+
+// const updateUserName = async () => {
+// //   const userformData = new FormData();
+// if (username.value)
+// {
+
+// 	formData.append("username", username.value);
+	
+// 	try {
+// 		const usernameResponse = await axios.post(
+// 			`http://localhost:3000/users/username`,
+// 			formData,
+// 			{
+// 				headers: {
+// 					Authorization: `Bearer ${localStorage.getItem("token")}`,
+// 				},
+// 			}
+// 			);
+			
+// 			console.log("Username Response:", usernameResponse.data);
+// 		} catch (error) {
+// 			console.error("Error updating username:", error);
+// 		}
+// 		formData.delete("username");
+// 	}
+// 	else{
+// 		console.error("insert a user name:");
+
+// 	}
+
+//   // Clear the input after the update
+//   username.value = "";
+// };
+
+
+  
+	  const resetForm = () => {
+		Images.value = null;
+		// username.value = "";
+		const fileInput = document.querySelector(
+		  'input[type="file"]'
+		) as HTMLInputElement;
+		if (fileInput) {
+		  fileInput.value = "";
+		}
+	  };
+  
+	  return {
+		Images,
+		username,
+		uploadFile,
+		submitFile,
+		resetForm,
+		updateUserName,
+	  };
+	},
+  };
+  </script>
+
 
 <style scoped>
 .profile {
@@ -88,7 +195,7 @@ export default {
   flex-direction: column;
   align-items: center;
   background: linear-gradient(to right, #451952, #451952, #ae4188);
-  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.5);  
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.5);
   margin: 20px;
   padding: 20px;
   border-radius: 5px;
@@ -109,7 +216,7 @@ export default {
   align-items: center;
   justify-content: space-between;
   justify-content: center;
-  background: #AE445A;
+  background: #ae445a;
   width: 90%;
   border-radius: 1rem;
 }
@@ -145,40 +252,41 @@ export default {
 .accbtn,
 .resbtn {
   font-size: 1rem;
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-  border-radius: 20px;
+  margin: 3%;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 0.3rem;
+  padding-bottom: 0.3rem;
+  border-radius: 10px;
   cursor: pointer;
   color: white;
-  background: #697692;
+  background: #451952;
   border: none;
 }
 .upbtn:hover,
 .accbtn:hover,
 .resbtn:hover {
-  background: #7c8392;
+  background: #ae4488;
   color: #d9d9da;
 }
 
 input[type="file"]::file-selector-button {
-  margin-right: 10px;
-  border: none;
-  background: #697692;
   font-size: 1rem;
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-  border-radius: 20px;
-  color: #fff;
+  margin: 3%;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 0.3rem;
+  padding-bottom: 0.3rem;
+  border-radius: 10px;
   cursor: pointer;
+  color: white;
+  background: #451952;
+  border: none;
   transition: background 0.2s ease-in-out;
 }
 
 input[type="file"]::file-selector-button:hover {
-  background: #7c8392;
+  background: #ae4488;
 }
 
 @media screen and (max-width: 768px) {

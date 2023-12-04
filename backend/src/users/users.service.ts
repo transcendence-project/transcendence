@@ -22,6 +22,8 @@ export class UsersService {
 	private matchesService: MatchesService,
 	private chatService: ChatService,
     @InjectRepository(User) private repo: Repository<User>,
+	// private readonly userRepository: Repository<User>,
+
   ) {}
 
   async create(
@@ -31,7 +33,7 @@ export class UsersService {
     image: string,
   ) {
     // const user = await this.findAll(userName);
-    const user = await this.findOneByUserName(userName);
+    const user = await this.findOneByEmail(email);
     if (user) return user;
     const user2 = this.repo.create({
       email,
@@ -69,8 +71,32 @@ export class UsersService {
     return user.channels;
   }
 
-  update(id: number, attrs: Partial<User>) {
-    return this.repo.update(id, attrs);
+  async update(id: number, attrs: Partial<User>) {
+	const user = await this.repo.findOne({ where: { id } });
+	if (!user) return NotFoundException;
+	Object.assign(user, attrs);
+	return await this.repo.save(user);
+  }
+
+  async update_userName(id: number, userName: string): Promise<User> {
+	const user = await this.repo.findOne({ where: { id } });
+	if (!user) throw new NotFoundException;
+
+	const user_list = await this.repo.find();
+	if (user_list.find((u) => u.userName === userName)){
+		throw new BadRequestException("Username already exists");
+	}
+
+	user.userName = userName;
+	return await this.repo.save(user);
+  }
+
+  async update_profilePic(id: number, file_path: string) {
+	const user = await this.repo.findOne({ where: { id } });
+	if (!user) return NotFoundException;
+	user.image = "http://localhost:3000/" + file_path;
+	console.log('in update profile pic, user.image: ', user.image);
+	return await this.repo.save(user);
   }
 
   async remove(id: number) {
@@ -202,6 +228,7 @@ export class UsersService {
 	const achievements: Achievement[] = await this.getAchievements(winner.id);
 
 	// console.log('in check achievements, matches: ', matches);
+	console.log('in check achievements, matches.length: ', matches.length);
 	if (matches.length === 1 && !achievements.find((a) => a.title === "First Match")) {
 		this.addAchievement(winner.id, "First Match");
 	}
@@ -236,6 +263,7 @@ export class UsersService {
 	const score: string = winnerScoreString + '-' + loserScoreString;
 
 	const match = await this.matchesService.create(winner, loser, score, loserID, winnerID);
+	console.log('in save match, loser: ', loser);
 	// console.log('in save match, winner: ', winner);
 	// console.log('in save match, loser: ', loser);
 	// console.log('in save match, match: ', match);

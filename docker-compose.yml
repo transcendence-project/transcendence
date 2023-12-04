@@ -7,6 +7,7 @@ services:
       - "3000:3000"
     volumes:
        - ./backend/src:/app/backend/src
+       - ./backend/uploads:/app/uploads
     working_dir: /app/backend # This maps your host's ./backend/src directory to /app/backend/src in the container
   database:
     image: postgres:13

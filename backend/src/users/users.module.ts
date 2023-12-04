@@ -12,9 +12,21 @@ import { SeederService } from '../achievements/achievement.seed';
 // import { MatchesService } from 'matches/matches.service';
 // import { Match } from 'entities/match.entity';
 import { MatchModule } from 'matches/matches.module';
-import { ChatModule } from 'chat/chat.module';
+import { MulterModule } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
 @Module({
-	imports: [TypeOrmModule.forFeature([User, FriendRequest, Achievement]), forwardRef(() => MatchModule, ), forwardRef(() => ChatModule)],
+	imports: [TypeOrmModule.forFeature([User, FriendRequest, Achievement]), forwardRef(() => MatchModule), 
+		MulterModule.register({
+			storage: diskStorage({
+				destination: (req, file, cb) => {
+					console.log('in multer destination, file: ', file);
+					cb(null, './uploads')},
+				filename: (req, file, cb) => {
+					console.log('in multer filename, file: ', file);
+					cb(null, file.originalname);
+				}
+			}),
+		})],
 	providers: [UsersService, FriendRequestService, SeederService],
 	controllers: [UsersController, FriendRequestController],
 	exports: [UsersService, SeederService]
