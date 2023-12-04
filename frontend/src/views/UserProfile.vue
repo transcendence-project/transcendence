@@ -63,29 +63,27 @@ interface Match {
 }
 
 onMounted(() => {
-	store.dispatch('fetchUserData');
-	});
+	store.dispatch('fetchFriendData');
+});
 
-	
-	const match = ref<Match[]>([
-		{ date: "2023-08-15", opponent: "Player A", result: "Win" },
-		{ date: "2023-08-10", opponent: "Player B", result: "Loss" },
-		{ date: "2023-08-05", opponent: "Player C", result: "Draw" },
-		{ date: "2023-08-15", opponent: "Player A", result: "Win" },
-		{ date: "2023-08-10", opponent: "Player B", result: "Loss" },
-		{ date: "2023-08-05", opponent: "Player C", result: "Draw" },
-		{ date: "2023-08-15", opponent: "Player A", result: "Win" },
-		{ date: "2023-08-10", opponent: "Player B", result: "Loss" },
-		{ date: "2023-08-05", opponent: "Player C", result: "Draw" },
-		
-	]);
-	
-	const data = ref(null);
-	const fullname = computed(() => store.getters.getDisplayName);
-	const userimage = computed(() => store.getters.getImage)
 
-// const imgname = ref("head.svg");
-// const imgname = computed(() => store.getters.getImage);
+const match = ref<Match[]>([
+	{ date: "2023-08-15", opponent: "Player A", result: "Win" },
+	{ date: "2023-08-10", opponent: "Player B", result: "Loss" },
+	{ date: "2023-08-05", opponent: "Player C", result: "Draw" },
+	{ date: "2023-08-15", opponent: "Player A", result: "Win" },
+	{ date: "2023-08-10", opponent: "Player B", result: "Loss" },
+	{ date: "2023-08-05", opponent: "Player C", result: "Draw" },
+	{ date: "2023-08-15", opponent: "Player A", result: "Win" },
+	{ date: "2023-08-10", opponent: "Player B", result: "Loss" },
+	{ date: "2023-08-05", opponent: "Player C", result: "Draw" },
+	
+]);
+
+const data = ref(null);
+const fullname = computed(() => store.getters.getFrndDisplayName);
+const userimage = computed(() => store.getters.getFrndImage)
+
 const win = computed(() => store.getters.getWin);
 const lose = computed(() => store.getters.getLose);
 const draw = computed(() => store.getters.getDraw);

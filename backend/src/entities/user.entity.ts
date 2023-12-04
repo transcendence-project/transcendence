@@ -61,7 +61,7 @@ export class User {
 
   @ManyToMany(type => User)
   @JoinTable()
-  blocked: string[];
+  blocked: User[];
 	
   @OneToMany(() => FriendRequest, (friendRequest) => friendRequest.sender)
 	friendRequestsSent: FriendRequest[];

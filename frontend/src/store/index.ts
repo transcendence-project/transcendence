@@ -21,6 +21,7 @@ const store = createStore({
 			lose: 0,
 			draw: 0,
 			rank: 0,
+			twofa: false,
 		},
 		chat: {
 			socket: null as Socket | null,
@@ -29,10 +30,22 @@ const store = createStore({
 			my_friends: [] as IChannel[],
 			my_blocked: [] as string[],
 			current_chan_name: "",
-			current_friend: "",
+			current_friend: null,
 			current_channel: null,
 		},
-
+		friend: <IStudent>{
+			id: 0,
+			display_name: "",
+			username: "",
+			email: "",
+			image: "",
+			status: "",
+			win: 0,
+			lose: 0,
+			draw: 0,
+			rank: 0,
+			twofa: false,
+		},
 	},
 	getters: { // used to retrieve computed properties or derived state from the store.
 
@@ -40,6 +53,7 @@ const store = createStore({
 		getAllChannel: (state: any) => state.chat.all_channels,
 		getMyChannel: (state: any) => state.chat.my_channels,
 		getCurrentCahnnel: (state: any) => state.chat.current_channel,
+		getCurrentFriend: (state: any) => state.chat.current_friend,
 		getMyFriends: (state: any) => state.chat.my_friends,
 		getMyBlocked: (state: any) => state.chat.my_blocked,
 
@@ -54,6 +68,13 @@ const store = createStore({
 		getLose: (state: any) => state.user.lose,
 		getDraw: (state: any) => state.user.draw,
 		getRank: (state: any) => state.user.rank,
+		getTwofa: (state: any) => state.user.twofa,
+
+		// GETTERS FOR FRIEND
+		getFrndDisplayName: (state: any) => state.friend.display_name,
+		getFrndUserNamee: (state: any) => state.friend.username,
+		getFrndEmail: (state: any) => state.friend.email,
+		getFrndImage: (state: any) => state.friend.image,
 
 	},
 	mutations: { //used to modify the state. synchronous functions, take current state as argument & make changes to it. (i.e setters)
@@ -68,6 +89,9 @@ const store = createStore({
 		},
 		setCurrentChannel(state: any, cur_chan: any) {
 			state.chat.current_channel = cur_chan;
+		},
+		setCurrentFriend(state: any, friend_data: any) {
+			state.chat.current_friend = friend_data;
 		},
 		setMyFriends(state: any, my_frnds: any) {
 			state.chat.my_friends = my_frnds;
@@ -107,6 +131,24 @@ const store = createStore({
 		setRank(state: any, rank: number) {
 			state.user.rank = rank;
 		},
+		setis2FA(state: any, status: string) {
+			state.user.twofa = status;
+		},
+
+		// SETTERS FOR THE USER
+		setFrndDisplayName(state: any, name: string) {
+			state.friend.display_name = name;
+		},
+		setFrndUserName(state: any, u_name: string) {
+			state.friend.username = u_name;
+		},
+		setFrndEmail(state: any, email: string) {
+			state.friend.email = email;
+		},
+		setFrndImage(state: any, image: string) {
+			state.friend.image = image;
+		},
+
 	},
 	actions: { // asynchronous functions used to perform operations and commit mutations, like API requests
 		// axios requests to database / backend
@@ -123,6 +165,7 @@ const store = createStore({
 				store.commit('setUserName', response.data.userName);
 				store.commit('setEmail', response.data.email);
 				store.commit('setImage', response.data.image);
+				store.commit('setis2FA', response.data.is2FAEnabled)
 			}).catch((error) => {
 				console.error('An error occurred while fetching data:', error);
 			});
@@ -183,27 +226,37 @@ const store = createStore({
 				console.error("Error fetching my blocked:", error);
 			});
 		},
+		async fetchFriendChan(context: any){
+			const cur = localStorage.getItem('currentFriend');
+			await axios.get(`http://localhost:3000/chat/current_frndchan/${cur}`, {
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem('token')}`,
+				},
+			}).then((resp: AxiosResponse<IChannel[]>) => {
+				// console.log(resp.data);
+				context.commit('setCurrentChannel', resp.data);
+			}).catch((error) => {
+				console.error("Error fetching current channel:", error);
+			});
+		},
+		async fetchFriendData(context: any) {
+			const cur = localStorage.getItem('currentFriend');
+			await axios.get(`http://localhost:3000/users/friend/${cur}`, {
+				headers: {
+					Authorization: `Bearer ${localStorage.getItem('token')}`,
+				},
+			}).then((resp) => {
+				console.log(resp.data);
+				store.commit('setFrndDisplayName', resp.data.fullname);
+				store.commit('setFrndUserName', resp.data.userName);
+				store.commit('setFrndEmail', resp.data.email);
+				store.commit('setFrndImage', resp.data.image);
+				// context.commit('setCurrentFriend', resp.data);
+			}).catch((error) => {
+				console.error("Error fetching friend data:", error);
+			});
 
-
-
-
-
-
-
-
-		// async fetchFriendChan(context: any){
-		// 	const cur = localStorage.getItem('fetchCurrentFriend');
-		// 	await axios.get("", {
-		// 		headers: {
-		// 			Authorization: `Bearer ${localStorage.getItem('token')}`,
-		// 		},
-		// 	}).then((resp: AxiosResponse<IChannel[]>) => {
-		// 		// console.log(resp.data);
-		// 		context.commit('setCurrentFriend', resp.data);
-		// 	}).catch((error) => {
-		// 		console.error("Error fetching current channel:", error);
-		// 	});
-		// },
+		},
 		async TwoFA(context: any) {
 			try {
 				const response = await axios.get("http://localhost:3000/auth/2fa/generate", {
@@ -211,8 +264,6 @@ const store = createStore({
 						Authorization: `Bearer ${localStorage.getItem('token')}`,
 					},
 				});
-
-				// console.log(response.data.qrCodeDataURL);
 				localStorage.setItem("qr", response.data.qrCodeDataURL);
 			} catch(error) {
 				// Handle errors here

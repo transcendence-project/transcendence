@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards, Req, Res, Param, Post, HttpCode, Body, UnauthorizedException } from '@nestjs/common';
+import { Controller, Get, UseGuards, Req, Res, Param, Post, Header, HttpCode, Body, UnauthorizedException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { ConfigService } from '@nestjs/config';
@@ -13,6 +13,7 @@ export class AuthController {
 	}
 	@Get('42')
 	@UseGuards(AuthGuard('42'))
+	@Header('Cache-Control', 'no-store, no-cache, must-revalidate')
 	async login() {
 
 	}
@@ -26,20 +27,30 @@ export class AuthController {
 
 	@Get('42/callback')
 	@UseGuards(AuthGuard('42'))
+	// @Header('Cache-Control', 'no-store, no-cache, must-revalidate')
 	async callback(@Req() req, @Res() res) {
-		const user = req.user; // the authenticated user
+		const user = req.user;
 		const token = this.authService.generate_jwt_token(user.userName, user.id);
-		// const decodeToken = this.authService.decode_token(token);
-		// console.log('back in controller');
-		console.log("Token: ", token);
+		// console.log("Token: ", token);
+		if (user.is2FAEnabled == true)
+		{
+			// redirect to 2fa page and then take them to homepage
+			const url = new URL('http://localhost:8080/twofactor');
+			url.searchParams.set('code', token);
+			return res.status(200).redirect(url.href);
+		}
+		else{
+			// the one below
+		}
 		const url = new URL('http://localhost:8080/home');
 		url.searchParams.set('code', token);
-		res.status(200).redirect(url.href);
+		return res.status(200).redirect(url.href);
 	}
 
-	@Get('2fa/generate') // GET just for testing, will later be POST
-	@UseGuards(JwtAuthGuard) // will get the user which is linked to the sent Bearer token
+	@Get('2fa/generate')
+	@UseGuards(JwtAuthGuard)
 	async generateQr(@Req() req, @Res() res) {
+		console.log("reached jwt generate");
 		try {
 			const otp = this.authService.generateTwoFactorAuthenticationSecret(req.user);
 			const code = await this.authService.generateQrCodeDataURL((await otp).otpauthUrl);
@@ -53,11 +64,13 @@ export class AuthController {
 
 	@Get('2fa/authenticate/:code')
 	@UseGuards(JwtAuthGuard)
-	async authenticate2fa(@Param("code") code: string, @Req() req, ) {
-		const isCodeValid = this.authService.is2faCodeValid(
+	async authenticate2fa(@Param("code") code: string, @Req() req, @Res() res) {
+		console.log("inside verifying 2fa");
+		const isCodeValid = await this.authService.is2faCodeValid(
 			code,
 			req.user,
 		);
+		console.log(isCodeValid)
 		if (!isCodeValid) {
 			console.log("INCORRECT 2 FA CODE !!!!!!!!!!!!");
 			return null;
@@ -65,7 +78,10 @@ export class AuthController {
 		else
 		{
 			console.log("! COOODEE SUCCESSFUULLLLLLL !");
-			// redirect to homepage??
+			// const url = new URL('http://localhost:8080/home');
+			// res.redirect('http://localhost:8080/home')
+			// url.searchParams.set('code', token);
+			// return res.status(200).redirect(url.href);
 			return "verified";
 		}
 	}
