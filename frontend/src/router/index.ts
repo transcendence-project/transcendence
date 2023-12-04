@@ -96,9 +96,9 @@ router.beforeEach((to: any, from: any, next: any) => {
     next();
     if (to.path == '/home' && to.query.code)
     {
-          const token = to.query.code;
-          localStorage.setItem('token', token);
-		  store.dispatch('fetchUserData');
+        const token = to.query.code;
+        localStorage.setItem('token', token);
+        store.dispatch('fetchUserData');
     }
   });
 export default router;

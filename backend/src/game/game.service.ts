@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { AuthService } from 'auth/auth.service';
 import { User } from '../entities/user.entity';
-import {Paddle, Ball, Computer} from './interface/game.interface';
+import {Paddle, Ball, Computer, ConnectedUser} from './interface/game.interface';
 import { Socket } from 'socket.io';
 @Injectable()
 export class GameService {
-    private connected_users: Map<string,User> = new Map();
+    private connected_users:Map<string,User> = new Map();
     private classic_queue: string[] = [];
     private custom_queue: string[] = [];
     private paddle: Paddle;
@@ -14,17 +14,45 @@ export class GameService {
     private canvasWidth: number;
     private canvasHeight: number;
     private deltaTime: number;
+
     constructor(private readonly authService: AuthService) {
         this.initializeGameEntities()
     };
 
+    public async addConnectedUser(client: Socket, token: any)
+    {
+        if (token == undefined)
+        {
+            console.log(token);
+        }
+        else
+        {
+            await this.set_online_user(client,token);
+
+            const oo = this.find_user_with_id(client.id);
+        }
+        // console.log(this.connected_users)
+    }
+
     async set_online_user(client: Socket ,token: any){
 		const _token = token;
-		console.log(token);
-		const user = await this.authService.user_by_token(_token);
+		// console.log(token);
+        if (_token == undefined)
+        {
+            console.log(_token);
+        }
+        else
+        {
+            const user = await this.authService.user_by_token(_token);
 
-        this.connected_users.set(client.id,user);
-        console.log("from the set_online_methoed", user);
+            if (this.connected_users.has(client.id))
+            {
+                console.log('this user try to connecte again ' ,user);
+                client.disconnect(true);
+            }
+            this.connected_users.set(client.id,user);
+        }
+        // console.log("from the set_online_methoed", user);
 	}
     find_user_with_id(client_id: string){
 		const user = this.connected_users.get(client_id);

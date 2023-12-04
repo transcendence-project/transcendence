@@ -62,6 +62,7 @@ interface Match {
 
 onMounted(() => {
 	store.dispatch('fetchUserData');
+    
 	});
 
 const match = ref<Match[]>([

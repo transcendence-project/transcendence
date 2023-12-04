@@ -23,23 +23,15 @@ export class GameGateway
   afterInit(): void {
     this.logger.log("WebSocket Gateay Game created");
   }
-  private clientCount = 0;
+
   async handleConnection(client: Socket, ...args: any[]) {
-    // this.clientCount++;
-    this.server.emit('connected', this.clientCount);
     const header = client.handshake.headers;
 
     const token = header.token;
-    await this.gameService.set_online_user(client,token);
-    const user = this.gameService.find_user_with_id(client.id);
-    
-    console.log("from websocket user output ", user);
-    console.log("from the client ", client.id);
+        this.gameService.addConnectedUser(client, token);
   }
   handleDisconnect(client: any) {
-    this.clientCount--;
     console.log("Client disconnected");
-    client.emit('disconnected', this.clientCount);
   }
 
   @SubscribeMessage('start-game')
@@ -55,9 +47,10 @@ export class GameGateway
     // return {event:'table' ,data: this.gameService.init_table(client)};
   }
   
-  @SubscribeMessage('info')
+  @SubscribeMessage('play-game')
   handleInfoGame(@ConnectedSocket() client: Socket, @MessageBody() data: { info: object }) {
     console.log(data);
+    // this.gameService.createSingleGame(client, data);
   }
   @SubscribeMessage('paddleMove')
   handlePaddleMove(@ConnectedSocket() client: Socket, @MessageBody() data: { direction: string }) {

@@ -13,6 +13,9 @@ export default createStore({
       socket: null as Socket | null,
       test: "inside chat in store.. testingg",
     },
+    game: {
+        
+    },
   },
   getters: {
     // used to retrieve computed properties or derived state from the store.
@@ -25,8 +28,6 @@ export default createStore({
     },
   },
   actions: {
-    // asynchronous functions used to perform operations and commit mutations, like API requests
-    // axos requests to database
   },
   modules: {
     // allow you to organize your store into separate namespaces.

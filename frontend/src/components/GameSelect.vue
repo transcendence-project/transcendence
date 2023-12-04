@@ -44,7 +44,7 @@ import { ref, inject } from 'vue';
             type: gameType.value,
             mode: gameMode.value
         };
-        websocket.emit('info',gameInfo);
+        websocket.emit('play-game',gameInfo);
     };
 </script>
 
