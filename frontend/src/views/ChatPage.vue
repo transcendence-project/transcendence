@@ -224,7 +224,7 @@
 						v-if="selectedFriendIndex === index"
 						class="flex items-center justify-between"
 					  >
-						<div v-if="friend.isBlock === true">
+						<div v-if="friend.isBlock === false">
 						  <button
 							class="intbtn px-1 w-[8vh]"
 							@click="showHideBlock(friend)"
@@ -418,59 +418,8 @@
 		addPrivateMember: false,
 		isProfile: false,
   
-		// for testing
-		message1: "" as string,
-		testMessage: "" as String,
-		testMessages: [] as string[],
-		allMessages: [] as string[],
-		userInput1: "" as string,
-		userInput2: "" as string,
-		sndrcvmsg: [] as string[],
-		isBlock: true,
 		isChangePassword: false,
 		friends: m_frnd,
-	// 	friends: [
-	// 	  {
-	// 		user: "one",
-	// 		status: true,
-	// 		isBlock: true,
-	// 	  },
-	// 	  {
-	// 		user: "two",
-	// 		status: false,
-	// 		isBlock: false,
-	// 	  },
-	// 	  {
-	// 		user: "three",
-	// 		status: true,
-	// 		isBlock: false,
-	// 	  },
-	// 	  {
-	// 		user: "four",
-	// 		status: false,
-	// 		isBlock: false,
-	// 	  },
-	// 	  {
-	// 		user: "five",
-	// 		status: true,
-	// 		isBlock: true,
-	// 	  },
-	// 	  {
-	// 		user: "one",
-	// 		status: true,
-	// 		isBlock: false,
-	// 	  },
-	// 	  {
-	// 		user: "two",
-	// 		status: false,
-	// 		isBlock: false,
-	// 	  },
-	// 	  {
-	// 		user: "three",
-	// 		status: true,
-	// 		isBlock: false,
-    //     },
-    //   ] as FriendsList[],
     };
   },
   setup() {
@@ -518,9 +467,11 @@
 		const my_friends = computed(() => store.getters.getMyFriends);
 		const my_blocked = computed(() => store.getters.getMyBlocked);
 		const arrayProxy_f = my_friends.value;
+		console.log(my_blocked.value);
 		arrayProxy_f.forEach((item: any) => {
 			if (my_blocked.value.includes(item.userName))
 			{
+				console.log("goes inside for blocked is true")
 				const my_frnds: FriendsList = {
 					user: item.userName,
 					status: false,
@@ -530,6 +481,7 @@
 			}
 			else
 			{
+				console.log("goes inside for blocked is false")
 				const my_frnds: FriendsList = {
 					user: item.userName,
 					status: false,
@@ -604,9 +556,9 @@
 		this.isChangePassword = !this.isChangePassword;
 	  },
 	  showHideBlock(friend: FriendsList) {
-		if (friend.isBlock === false) 
+		if (friend.isBlock === true) 
 			this.unblock_friend(friend.user);
-		else if (friend.isBlock === true)
+		else if (friend.isBlock === false)
 			this.block_frnd(friend.user);
 		friend.isBlock = !friend.isBlock;
 	  },

@@ -113,7 +113,7 @@ router.beforeEach((to: any, from: any, next: any) => {
     {
           const token = to.query.code;
           localStorage.setItem('token', token);
-		//   store.dispatch('fetchUserData');
+		  store.dispatch('fetchUserData');
     }
   });
 export default router;
