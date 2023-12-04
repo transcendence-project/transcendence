@@ -276,12 +276,14 @@
 					v-if="message.send === true"
 					class="bg-blue-400 text-grey-500 py-2 px-4 inline-block mx-5 my-1 rounded-md"
 				  >
-					{{ message.chat }}
-				  </div>
-				  <div v-else class="my-5 mx-5" style="text-align: left">
+				  {{ message.chat }}
+				</div>
+				<div v-else class="my-5 mx-5" style="text-align: left">
+					<!-- <p>{{ message.send }}</p> -->
 					<span
-					  class="bg-blue-200 text-grey-500 py-2 px-3 inline rounded-md"
+					class="bg-blue-200 text-grey-500 py-2 px-3 inline rounded-md"
 					>
+					<p class="text-sm">sender name</p>
 					  {{ message.chat }}
 					</span>
 				  </div>

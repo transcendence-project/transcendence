@@ -44,7 +44,7 @@
 	  const fileInput = ref(null);
       const formData = new FormData();
 
-	  const uploadFile = (event) => {
+	  const uploadFile = (event: any) => {
 		console.log("uploadFile function called");
   
 		const selectedFile = event.target.files[0];
