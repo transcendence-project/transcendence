@@ -4,10 +4,13 @@ import { Socket, Server } from 'socket.io';
 import { GameService } from './game.service';
 import { UsersService } from '../users/users.service';
 
+
 @WebSocketGateway({
-  namespace: 'game',
-  cors: { origin: 'http://localhost:8080',
-  credentials: true, },
+	namespace: 'game',
+	cors: {
+		origin: 'http://localhost:8080',
+		credentials: true,
+	},
 
 })
 export class GameGateway
@@ -28,8 +31,9 @@ export class GameGateway
     const header = client.handshake.headers;
 
     const token = header.token;
-        this.gameService.addConnectedUser(client, token);
+    this.gameService.addConnectUser(client, token);
   }
+
   handleDisconnect(client: any) {
     console.log("Client disconnected");
   }
@@ -47,10 +51,13 @@ export class GameGateway
     // return {event:'table' ,data: this.gameService.init_table(client)};
   }
   
-  @SubscribeMessage('play-game')
-  handleInfoGame(@ConnectedSocket() client: Socket, @MessageBody() data: { info: object }) {
-    console.log(data);
-    // this.gameService.createSingleGame(client, data);
+  @SubscribeMessage('info')
+  handleInfoGame(@ConnectedSocket() client: Socket, @MessageBody() data: any ) {
+    if (data.mode === 'single')
+    {
+        this.gameService.creatSingleGame(client, data);
+    }
+    // console.log(data.mode);
   }
   @SubscribeMessage('paddleMove')
   handlePaddleMove(@ConnectedSocket() client: Socket, @MessageBody() data: { direction: string }) {

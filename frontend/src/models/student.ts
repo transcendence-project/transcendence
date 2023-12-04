@@ -5,6 +5,7 @@ export interface IStudent{
 	email: string;
 	image: string;
 	status: string;
+	qr: string,
 	win: number;
 	lose: number;
 	draw: number;

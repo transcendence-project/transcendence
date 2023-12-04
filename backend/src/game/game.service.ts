@@ -19,46 +19,60 @@ export class GameService {
         this.initializeGameEntities()
     };
 
-    public async addConnectedUser(client: Socket, token: any)
+    public async addConnectUser(client : Socket, token: any)
     {
-        if (token == undefined)
-        {
-            console.log(token);
-        }
-        else
-        {
-            await this.set_online_user(client,token);
-
-            const oo = this.find_user_with_id(client.id);
-        }
-        // console.log(this.connected_users)
+        console.log("before",this.connected_users);
+        await this.set_online_user(client, token);
+        const oo = this.find_user_with_id(client.id);
+        console.log("after",this.connected_users);
+        // console.log(oo);
     }
-
     async set_online_user(client: Socket ,token: any){
 		const _token = token;
-		// console.log(token);
-        if (_token == undefined)
-        {
-            console.log(_token);
-        }
-        else
-        {
+        let flag = 0;
             const user = await this.authService.user_by_token(_token);
-
-            if (this.connected_users.has(client.id))
+            // console.log(this.connected_users.has(user.userName));
+            if (this.connected_users != undefined)
             {
-                console.log('this user try to connecte again ' ,user);
-                client.disconnect(true);
+                this.connected_users.forEach((value, key, map) =>{
+                    if (user.userName === value.userName)
+                    {
+                        console.log("ehre");
+                        this.connected_users.delete(client.id);
+                        client.disconnect(true);
+                         flag = 1;
+                        // console.log(key, value.userName);
+                    }
+                });
+
             }
-            this.connected_users.set(client.id,user);
-        }
-        // console.log("from the set_online_methoed", user);
+            // console.log(this.connected_users.);
+            // if (this.connected_users.has(user.userName))
+            // {
+            //     console.log('this user try to connecte again ' ,user);
+            //     client.disconnect(true);
+            //     return; 
+            // }
+            if (flag == 0)
+                this.connected_users.set(client.id,user);
+            
 	}
     find_user_with_id(client_id: string){
 		const user = this.connected_users.get(client_id);
 		return user;
 	}
-
+    public creatSingleGame(client: Socket, gameInfo: any)
+    {
+        // console.log(gameInfo);
+        const player = this.connected_users.get(client.id);
+        if (player)
+        {
+            if (gameInfo.type === 'classic')
+            {
+                console.log("test");
+            }
+        }
+    }
     private initializeGameEntities() {
         this.paddle = { x: 0, y: 0, width: 20, height: 100, score: 0 };
         this.computer = { x: 0, y: 0, width: 20, height: 100, score: 0 };

@@ -19,7 +19,7 @@
           </div>
         </div>
         <div class="bg-gradient-to-r from-[#ae445a] to-[#451952] shadow-third flex flex-col justify-center w-[45%] p-[10px] text-center rounded">
-          <h3 class="text-xl">Player Stat</h3>
+          <h3>Player Stat</h3>
           <div class="shadow-third flex align-center justify-between mb-[5px] px-[50px] pb-[10px] pt-[5px] rounded">
             <div>Wins</div>
             <div>{{ win }}</div>
@@ -28,25 +28,12 @@
             <div>Loses</div>
             <div>{{ lose }}</div>
           </div>
-  
+          <div class="shadow-third flex align-center justify-between mb-[5px] px-[50px] pb-[10px] pt-[5px] rounded">
+            <div>Draws</div>
+            <div>{{ draw }}</div>
+          </div>
           <div class="shadow-third flex align-center justify-between mb-[5px] px-[50px] pb-[10px] pt-[5px] rounded">
             <div>Rank</div>
-            <div>{{ rank }}</div>
-          </div>
-        </div>
-        <div class="bg-gradient-to-r from-[#ae445a] to-[#451952] shadow-third flex flex-col justify-center w-[45%] p-[10px] text-center rounded">
-          <h3 class="text-xl">Achievments</h3>
-          <div class="shadow-third flex align-center justify-between mb-[5px] px-[50px] pb-[10px] pt-[5px] rounded">
-            <div>First Match</div>
-            <div>{{ win }}</div>
-          </div>
-          <div class="shadow-third flex align-center justify-between mb-[5px] px-[50px] pb-[10px] pt-[5px] rounded">
-            <div>First Win</div>
-            <div>{{ lose }}</div>
-          </div>
-  
-          <div class="shadow-third flex align-center justify-between mb-[5px] px-[50px] pb-[10px] pt-[5px] rounded">
-            <div>Played 3 Matches</div>
             <div>{{ rank }}</div>
           </div>
         </div>
@@ -76,37 +63,32 @@ interface Match {
 }
 
 onMounted(() => {
-	store.dispatch('fetchUserData');
-    
-	});
+	store.dispatch('fetchFriendData');
+});
 
-	
-	const match = ref<Match[]>([
-		{ date: "2023-08-15", opponent: "Player A", result: "Win" },
-		{ date: "2023-08-10", opponent: "Player B", result: "Loss" },
-		{ date: "2023-08-05", opponent: "Player C", result: "Draw" },
-		{ date: "2023-08-15", opponent: "Player A", result: "Win" },
-		{ date: "2023-08-10", opponent: "Player B", result: "Loss" },
-		{ date: "2023-08-05", opponent: "Player C", result: "Draw" },
-		{ date: "2023-08-15", opponent: "Player A", result: "Win" },
-		{ date: "2023-08-10", opponent: "Player B", result: "Loss" },
-		{ date: "2023-08-05", opponent: "Player C", result: "Draw" },
-		
-	]);
-	
-	const data = ref(null);
-	const fullname = computed(() => store.getters.getDisplayName);
-	const userimage = computed(() => store.getters.getImage)
 
-// const imgname = ref("head.svg");
-// const imgname = computed(() => store.getters.getImage);
+const match = ref<Match[]>([
+	{ date: "2023-08-15", opponent: "Player A", result: "Win" },
+	{ date: "2023-08-10", opponent: "Player B", result: "Loss" },
+	{ date: "2023-08-05", opponent: "Player C", result: "Draw" },
+	{ date: "2023-08-15", opponent: "Player A", result: "Win" },
+	{ date: "2023-08-10", opponent: "Player B", result: "Loss" },
+	{ date: "2023-08-05", opponent: "Player C", result: "Draw" },
+	{ date: "2023-08-15", opponent: "Player A", result: "Win" },
+	{ date: "2023-08-10", opponent: "Player B", result: "Loss" },
+	{ date: "2023-08-05", opponent: "Player C", result: "Draw" },
+	
+]);
+
+const data = ref(null);
+const fullname = computed(() => store.getters.getFrndDisplayName);
+const userimage = computed(() => store.getters.getFrndImage)
+
 const win = computed(() => store.getters.getWin);
 const lose = computed(() => store.getters.getLose);
 const draw = computed(() => store.getters.getDraw);
 const rank = computed(() => store.getters.getRank);
 const avail = ref(true);
-
-
 
 </script>
 
