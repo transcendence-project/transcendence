@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { PassportModule } from '@nestjs/passport';
@@ -10,12 +10,12 @@ import { FortyTwoStrategy } from './strategy.42';
 import { AppModule } from 'app.module';
 
 @Module({
-	imports: [UsersModule, PassportModule.register({}), ConfigModule, JwtModule.register({
+	imports: [PassportModule.register({}), ConfigModule, JwtModule.register({
 		secret: process.env.CLIENT_SECRET,
 		signOptions: { 
 			// expiresIn: '5h',
 			algorithm: 'HS256'},
-	  })],
+	  }),forwardRef(() => UsersModule )],
 	controllers: [AuthController],
 	providers: [AuthService, FortyTwoStrategy, JwtStrategy, ConfigService],
 	exports: [AuthService]

@@ -15,9 +15,9 @@ import { ChatGateway } from './chat/chat.gateway';
 import { ChatService } from './chat/chat.service';
 
 @Module({
-	imports: [UsersModule,
+	imports: [AuthModule, UsersModule,
 		TypeOrmModule.forRoot(typeOrmConfig),
-		AuthModule, ConfigModule.forRoot(), ChatModule, GameModule],
+		 ConfigModule.forRoot(), ChatModule, GameModule],
 	controllers: [AppController],
 	providers: [AppService],
 })
