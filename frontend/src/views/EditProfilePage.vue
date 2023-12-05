@@ -57,20 +57,11 @@
 	  };
   
 
-
-
-
-
-
-
 	const submitFile = async () => {
   if (Images.value) {
-    // const formData = new FormData();
     formData.append("file", Images.value);
-    // formData.append("username", username.value);
 
     try {
-      // Update the profile picture
       const profilePicResponse = await axios.patch(
         "http://localhost:3000/users/profile-picture",
         formData,
@@ -97,7 +88,7 @@
 
 const updateUserName = async () => {
   if (username.value) {
-    formData.append("userName", username.value);
+    formData.append("username", username.value);
 
     // Log formData to check if username is present
     console.log("formData before axios call:", formData);
@@ -127,44 +118,7 @@ const updateUserName = async () => {
   // Clear the input after the update
   username.value = "";
 };
-
-
-
-// const updateUserName = async () => {
-// //   const userformData = new FormData();
-// if (username.value)
-// {
-
-// 	formData.append("username", username.value);
-	
-// 	try {
-// 		const usernameResponse = await axios.post(
-// 			`http://localhost:3000/users/username`,
-// 			formData,
-// 			{
-// 				headers: {
-// 					Authorization: `Bearer ${localStorage.getItem("token")}`,
-// 				},
-// 			}
-// 			);
-			
-// 			console.log("Username Response:", usernameResponse.data);
-// 		} catch (error) {
-// 			console.error("Error updating username:", error);
-// 		}
-// 		formData.delete("username");
-// 	}
-// 	else{
-// 		console.error("insert a user name:");
-
-// 	}
-
-//   // Clear the input after the update
-//   username.value = "";
-// };
-
-
-  
+ 
 	  const resetForm = () => {
 		Images.value = null;
 		// username.value = "";

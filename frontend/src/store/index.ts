@@ -32,9 +32,19 @@ const store = createStore({
 			current_friend: "",
 			current_channel: null,
 		},
+		achievments: {
+			firstmatch: 10,
+			firstwin: 10,
+			played3matches: 50,
+
+		},
 
 	},
 	getters: { // used to retrieve computed properties or derived state from the store.
+
+		getFirstMatch: (state: any) => state.achievments.firstmatch,
+		getFirstWin: (state: any) => state.achievments.firstwin,
+		getPlayed3Matches: (state: any) => state.achievments.played3matches,
 
 		// GETTERS FOR CHAT
 		getAllChannel: (state: any) => state.chat.all_channels,
@@ -57,6 +67,17 @@ const store = createStore({
 
 	},
 	mutations: { //used to modify the state. synchronous functions, take current state as argument & make changes to it. (i.e setters)
+
+		setFirstMatch(state: any, firstmatch: number){
+			state.achievments.firstmatch = firstmatch;
+		},
+
+		setFirstWin(state: any, firstwin: number){
+			state.achievments.firstwin = firstwin;
+		},
+		setPlayed3Matches(state: any, played3matches: number){
+			state.achievments.played3matches = played3matches;
+		},
 
 		// SETTERS FOR CHAT
 		setAllChannel(state: any, all_chan: any) {
@@ -184,7 +205,19 @@ const store = createStore({
 			});
 		},
 
-
+		async achievments(context : any) {
+			await axios.patch(
+				"http://localhost:3000/users/achievments",
+				{
+				  headers: {
+					Authorization: `Bearer ${localStorage.getItem("token")}`,
+				  },
+				}).then((resp: AxiosResponse) => {
+					context.commit('achievments', resp.data);
+				}).catch((error) => {
+					console.error("Error fetching achievments", error);
+				});
+		},
 
 
 

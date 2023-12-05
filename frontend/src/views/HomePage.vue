@@ -46,16 +46,16 @@
           <h3 class="text-xl">Achievments</h3>
           <div class="shadow-third flex align-center justify-between mb-[5px] px-[50px] pb-[10px] pt-[5px] rounded">
             <div>First Match</div>
-            <div>{{ win }}</div>
+            <div>{{ firstmatch }}</div>
           </div>
           <div class="shadow-third flex align-center justify-between mb-[5px] px-[50px] pb-[10px] pt-[5px] rounded">
             <div>First Win</div>
-            <div>{{ lose }}</div>
+            <div>{{ firstwin }}</div>
           </div>
   
           <div class="shadow-third flex align-center justify-between mb-[5px] px-[50px] pb-[10px] pt-[5px] rounded">
             <div>Played 3 Matches</div>
-            <div>{{ rank }}</div>
+            <div>{{ played3matches }}</div>
           </div>
         </div>
       </div>
@@ -81,7 +81,9 @@
 <script lang="ts" setup>
 import { ref, onMounted, computed } from "vue";
 import StatusUser from "@/components/StatusUser.vue";
+import axios from "axios";
 import store from "@/store";
+
 
 interface Match {
   date: string;
@@ -123,6 +125,9 @@ const draw = computed(() => store.getters.getDraw);
 const rank = computed(() => store.getters.getRank);
 const avail = ref(true);
 
+const firstmatch = computed(() => store.getters.getFirstMatch);
+const firstwin = computed(() => store.getters.getFirstWin);
+const played3matches = computed(() => store.getters.getPlayed3Matches);
 
 
 </script>

@@ -1,476 +1,480 @@
 <template>
-	<div
-	  class="prof_page flex flex-wrap justify-between bg-gradient-to-r from-[#451952] via-[#451952] to-[#ae4188] shadow-custom text-white w-full min-h-[85.9vh] m-5 rounded-md p-2.5 text-center"
-	>
-	  <div class="container flex flex-col min-h-[50vh]">
-		<div class="row mt-3">
-		  <h2 class="chn-head">My Channel</h2>
-		  <div class="flex-grow max-w-full">
-			<div class="chn-btm">
-			  <button class="grpbtn px-2 mx-2" @click="showGroup">Group</button>
-			  <button class="dmbtn" @click="showDm">DM</button>
-			</div>
-		  </div>
-		</div>
-  
-		<div class="row flex-grow max-w-full">
-		  <div v-if="showGroupList">
-			<div class="max-w-full mb-2">
-			  <ButtonComponent
-				class="adbtn"
-				btnContent="Create Channel"
-				@click="AddChannelForm"
-			  />
-			  <CreateChannel
-				v-if="isAddChannelForm"
-				@close="closeAddChannelForm"
-			  />
-  
-			  <ChannelMembers v-if="isSearchChannelVisible" />
-			</div>
-			<div class="flex-grow max-w-full">
-			  <input
-				placeholder="Search channel"
-				v-model="src_channel"
-				class="w-[80%] h-[2rem] border-0 text-black ml-2 mr-1 rounded-full pl-4 mb-2 focus:border-0 focus:outline-none"
-			  />
-  
-			  <div
-				class="w-full h-[55vh] overflow-y-auto overflow-x-hidden flex-grow max-w-full"
-			  >
-				<ul class="w-[95%] p-2 m-2">
-				  <div v-for="(result, index) in filteredMyChannel" :key="index">
-					<li class="list-none w-full mb-1">
-					  <div
-						v-if="result.isPublic === true"
-						class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom px-4 w-full rounded-[5px]"
-					  >
-						<a href="#" @click="showChatPage(result.name)">
-						  {{ result.name
-						  }}<span class="text-sm text-red-700"> public</span>
-						</a>
-  
-						<div class="relative">
-						  <button
-							class="optbtn px-1 my-1"
-							@click="showSelectedFriend(index)"
-						  >
-							Options
-						  </button>
-						</div>
-					  </div>
-					  <div
-						v-else-if="result.isProtected === true"
-						class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom px-4 w-full rounded-[5px]"
-					  >
-						<a href="#" @click="showChatPage(result.name)">
-						  {{ result.name
-						  }}<span class="text-sm text-green-700"> protected</span>
-						</a>
-  
-						<div class="relative">
-						  <button
-							class="optbtn px-1 my-1"
-							@click="showSelectedFriend(index)"
-						  >
-							Options
-						  </button>
-						</div>
-					  </div>
-					  <div
-						v-else
-						class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom px-4 w-full rounded-[5px]"
-					  >
-						<a href="#" @click="showChatPage(result.name)">
-						  {{ result.name
-						  }}<span class="text-sm text-blue-700"> private</span>
-						</a>
-  
-						<div class="relative">
-						  <button
-							class="optbtn px-1 my-1"
-							@click="showSelectedFriend(index)"
-						  >
-							Options
-						  </button>
-						</div>
-					  </div>
-  
-					  <div
-						v-if="
-						  selectedFriendIndex === index &&
-						  result.isPrivate === true
-						"
-						class="my-2 opt"
-					  >
-						<!-- <div v-if="selectedFriendIndex === index && result.isPrivate === true" class="my-2 opt"> -->
-						<button
-						  class="intbtn p-2"
-						  @click="showMemberList(result.name)"
-						>
-						  members
-						</button>
-						<button
-						  class="intbtn p-2"
-						  @click="leave_room(result.name)"
-						>
-						  leave
-						</button>
-						<button
-						  class="intbtn p-2"
-						  @click="showAddMember(result.name)"
-						>
-						  add member
-						</button>
-  
-						<AddMember
-						  v-if="addPrivateMember"
-						  @close="showAddMember"
-						/>
-					  </div>
-					  <div
-						v-else-if="
-						  selectedFriendIndex === index &&
-						  result.isProtected === true
-						"
-						class="my-2 opt"
-					  >
-						<!-- <div v-else-if="selectedFriendIndex === index" class="my-2 opt"> -->
-						<button
-						  class="intbtn p-2"
-						  @click="showMemberList(result.name)"
-						>
-						  members
-						</button>
-						<button
-						  class="intbtn p-2"
-						  @click="leave_room(result.name)"
-						>
-						  leave
-						</button>
-						<button
-						  class="intbtn p-2"
-						  @click="showChagnePassword(result.name)"
-						>
-						  change password
-						</button>
-					  </div>
-					  <ChangePassword
-						v-if="isChangePassword"
-						@close="showChagnePassword"
-					  />
-					  <div
-						v-else-if="
-						  selectedFriendIndex === index && result.isPublic
-						"
-						class="my-2 opt"
-					  >
-						<!-- <div v-else-if="selectedFriendIndex === index" class="my-2 opt"> -->
-						<button
-						  class="intbtn p-2"
-						  @click="showMemberList(result.name)"
-						>
-						  members
-						</button>
-						<button
-						  class="intbtn p-2"
-						  @click="leave_room(result.name)"
-						>
-						  leave
-						</button>
-					  </div>
-					  <ChannelMembers
-						v-if="isMembersList"
-						@close="showMemberList"
-					  />
-					</li>
-				  </div>
-				</ul>
-			  </div>
-			</div>
-		  </div>
-  
-		  <div v-else>
-			<div class="flex-grow max-w-full">
-			  <input
-				placeholder="Search friend"
-				v-model="src_friend"
-				class="w-[80%] h-[2rem] border-0 text-black ml-2 mr-1 rounded-full pl-4 mb-2 focus:border-0 focus:outline-none"
-			  />
-  
-			  <div
-				class="w-full h-[60vh] overflow-y-auto overflow-x-hidden flex-grow max-w-full"
-			  >
-				<ul class="w-[95%] p-2 m-2">
-				  <div v-for="(friend, index) in searchFriends" :key="index">
-					<li class="list-none w-full mb-1">
-					  <div
-						class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom mx-1 p-1 w-full rounded-[10px] usr-item"
-					  >
-						<a href="#" @click="showChatPageFriend(friend.user)">
-						  <div class="mx-2 px-3">{{ friend.user }}</div>
-						</a>
-  
-						<div class="relative">
-						  <button
-							class="optbtn px-1 my-1"
-							@click="showSelectedFriend(index)"
-						  >
-							Options
-						  </button>
-						</div>
-					  </div>
-					  <div
-						v-if="selectedFriendIndex === index"
-						class="flex items-center justify-between"
-					  >
-						<div v-if="friend.isBlock === true">
-						  <button
-							class="intbtn px-1 w-[8vh]"
-							@click="showHideBlock(friend)"
-						  >
-							Block
-						  </button>
-						</div>
-						<div v-else>
-						  <button
-							class="intbtn px-1 w-[8vh]"
-							@click="showHideBlock(friend)"
-						  >
-							Unblock
-						  </button>
-						</div>
-						<button class="intbtn px-2">Invite</button>
-						<!-- <button class="intbtn px-2" @click="showProfilePage"> -->
-						<button class="intbtn px-2" @click="">
-						  <router-link to="/users">Profile</router-link>
-  
-						  <!-- Profile -->
-						</button>
-					  </div>
-					  <!-- <ProfilePage v-if="isProfile" @close="showProfilePage" /> -->
-					</li>
-				  </div>
-				</ul>
-			  </div>
-			</div>
-		  </div>
-		</div>
-	  </div>
-  
-	  <div class="container1 flex flex-col-reverse min-h-[50vh]">
-		<div v-if="msgField">
-		  <h1 class="cht">Chat</h1>
-  
-		  <div class="row1 flex-grow max-w-full">
-			<div
-			  class="flex flex-col bg-white h-[60vh] p-2 mb-10 m-3 text-black"
-			  style="text-align: right"
-			>
-			  <div class="overflow-y-auto overflow-x-hidden h-[55vh]">
-				<div class="aa mx-3 text-black-600 text-xl text-center">
-				  {{ selectedRoom }}
-				</div>
-				<div v-for="(message, index) in allMessage" :key="index">
-				  <div
-					v-if="message.send === true"
-					class="bg-blue-400 text-grey-500 py-2 px-4 inline-block mx-5 my-1 rounded-md"
-				  >
-				  {{ message.chat }}
-				</div>
-				<div v-else class="my-5 mx-5" style="text-align: left">
-					<!-- <p>{{ message.send }}</p> -->
-					<span
-					class="bg-blue-200 text-grey-500 py-2 px-3 inline rounded-md"
-					>
-					<p class="text-sm">sender name</p>
-					  {{ message.chat }}
-					</span>
-				  </div>
-				</div>
-			  </div>
-			</div>
-  
-			<div class="flex-grow max-w-full">
-			  <input
-				v-model="message"
-				placeholder="message"
-				class="w-[80%] h-[2.5rem] border-0 text-black ml-2 mr-1 rounded-full pl-4 mb-2 focus:border-0 focus:outline-none"
-				style="min-width: 300px"
-			  />
-			  <ButtonComponent
-				btnContent="Send"
-				@click="sendMessage"
-				class="text"
-			  />
-			</div>
-		  </div>
-		</div>
-		<div v-else>
-		  <div class="row1 flex-grow max-w-full">
-			<span class="text-xl">Select a channel or a friend to chat</span>
-		  </div>
-		</div>
-	  </div>
-  
-	  <div class="container2 min-h-[50vh]">
-		<div class="row2">
-		  <h2 class="chn-head my-5">All Channel</h2>
-		  <div class="my-2">Public Channels</div>
-		  <div class="h-[40vh] overflow-y-auto overflow-x-hidden">
-			<ul class="w-[95%] p-1 mx-3">
-			  <div v-for="(result, index) in filteredPublicChannel" :key="index">
-				<li class="list-none w-full mb-1">
-				  <div
-					class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom px-4 w-full rounded-[5px]"
-				  >
-					{{ result.name }}
-					<div class="relative">
-					  <button
-						class="jpub-btn"
-						@click="join_pub_chan(result.name)"
-					  >
-						Join
-					  </button>
-					</div>
-				  </div>
-				</li>
-			  </div>
-			</ul>
-		  </div>
-  
-		  <div class="my-2">Protected Channels</div>
-		  <div class="h-[30vh] overflow-y-auto overflow-x-hidden prv-chn">
-			<ul class="w-[95%] p-1 mx-3">
-			  <div v-for="(result, index) in filteredPrivateChannel" :key="index">
-				<li class="list-none w-full mb-1">
-				  <div
-					class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom px-4 w-full rounded-[5px]"
-				  >
-					{{ result.name }}
-					<div class="relative">
-					  <button
-						class="jpub-btn"
-						@click="showPasswordForm(result.name)"
-					  >
-						Join
-					  </button>
-					</div>
-				  </div>
-				</li>
-			  </div>
-			</ul>
-		  </div>
-		  <!-- </div> -->
-  
-		  <ChannelPassword v-if="isPrivate" @close="closePasswordFomr" />
-		</div>
-	  </div>
-	</div>
-  </template>
-  
-  <script lang="ts">
-  import { defineComponent, onMounted, computed, ref } from "vue";
-  import ChannelOption from "@/components/ChannelOption.vue";
-  import ButtonComponent from "@/components/ButtonComponent.vue";
-  import CreateChannel from "@/components/CreateChannel.vue";
-  import OptionMenu from "@/components/OptionMenu.vue";
-  import ChannelPassword from "@/components/ChannelPassword.vue";
-  import ChannelMembers from "@/components/ChannelMembers.vue";
-  import AddMember from "@/components/AddMember.vue";
-  import ChangePassword from "@/components/ChangePassword.vue";
-  import ProfilePage from "@/components/ProfilePage.vue";
-  import io from "socket.io-client";
-  import store from "@/store";
-  import { IChannel } from "@/models/channel";
-  
-  const chan = ref([] as IChannel[]);
-  const m_chan = ref([] as IChannel[]);
-  const m_frnd = ref([] as FriendsList[]);
-  interface FriendsList {
-	user: string;
-	status: Boolean;
-	isBlock: boolean;
-  }
-  
-  export default defineComponent({
-	data() {
-	  return {
-		channels: chan,
-		my_chan: m_chan,
-		src_friend: "" as string,
-		src_channel: "" as string,
-		message: "" as string,
-		isAddChannelForm: false,
-		isSearchChannelVisible: false,
-		selectedItem: null as IChannel | null,
-		isMessageSent: false,
-		chatMessage: [] as { send: boolean; chat: string }[],
-		isPrivate: false,
-		isOptions: false,
-		searchQuery: "" as string,
-		userList: [] as string[],
-		selectedChannel: null as IChannel | null,
-		inputText: "",
-		showGroupList: true,
-		msgField: false,
-		isMembersList: false,
-		selectedRoom: "" as string,
-		selectedFriendIndex: null,
-		addPrivateMember: false,
-		isProfile: false,
-  
-		// for testing
-		message1: "" as string,
-		testMessage: "" as String,
-		testMessages: [] as string[],
-		allMessages: [] as string[],
-		userInput1: "" as string,
-		userInput2: "" as string,
-		sndrcvmsg: [] as string[],
-		isBlock: true,
-		isChangePassword: false,
-		// friends: m_frnd,
-		friends: [
-		  {
-			user: "one",
-			status: true,
-			isBlock: true,
-		  },
-		  {
-			user: "two",
-			status: false,
-			isBlock: false,
-		  },
-		  {
-			user: "three",
-			status: true,
-			isBlock: false,
-		  },
-		  {
-			user: "four",
-			status: false,
-			isBlock: false,
-		  },
-		  {
-			user: "five",
-			status: true,
-			isBlock: true,
-		  },
-		  {
-			user: "one",
-			status: true,
-			isBlock: false,
-		  },
-		  {
-			user: "two",
-			status: false,
-			isBlock: false,
-		  },
-		  {
-			user: "three",
-			status: true,
-			isBlock: false,
+  <div
+    class="prof_page flex flex-wrap justify-between bg-gradient-to-r from-[#451952] via-[#451952] to-[#ae4188] shadow-custom text-white w-full min-h-[85.9vh] m-5 rounded-md p-2.5 text-center"
+  >
+    <div class="container flex flex-col min-h-[50vh]">
+      <div class="row mt-3">
+        <h2 class="chn-head">My Channel</h2>
+        <div class="flex-grow max-w-full">
+          <div class="chn-btm">
+            <button class="grpbtn px-2 mx-2" @click="showGroup">Group</button>
+            <button class="dmbtn" @click="showDm">DM</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="row flex-grow max-w-full">
+        <div v-if="showGroupList">
+          <div class="max-w-full mb-2">
+            <ButtonComponent
+              class="adbtn"
+              btnContent="Create Channel"
+              @click="AddChannelForm"
+            />
+            <CreateChannel
+              v-if="isAddChannelForm"
+              @close="closeAddChannelForm"
+            />
+
+            <ChannelMembers v-if="isSearchChannelVisible" />
+          </div>
+          <div class="flex-grow max-w-full">
+            <input
+              placeholder="Search channel"
+              v-model="src_channel"
+              class="w-[80%] h-[2rem] border-0 text-black ml-2 mr-1 rounded-full pl-4 mb-2 focus:border-0 focus:outline-none"
+            />
+
+            <div
+              class="w-full h-[55vh] overflow-y-auto overflow-x-hidden flex-grow max-w-full"
+            >
+              <ul class="w-[95%] p-2 m-2">
+                <div v-for="(result, index) in filteredMyChannel" :key="index">
+                  <li class="list-none w-full mb-1">
+                    <div
+                      v-if="result.isPublic === true"
+                      class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom px-4 w-full rounded-[5px]"
+                    >
+                      <a href="#" @click="showChatPage(result.name)">
+                        {{ result.name
+                        }}<span class="text-sm text-red-700"> public</span>
+                      </a>
+
+                      <div class="relative">
+                        <button
+                          class="optbtn px-1 my-1"
+                          @click="showSelectedFriend(index)"
+                        >
+                          Options
+                        </button>
+                      </div>
+                    </div>
+                    <div
+                      v-else-if="result.isProtected === true"
+                      class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom px-4 w-full rounded-[5px]"
+                    >
+                      <a href="#" @click="showChatPage(result.name)">
+                        {{ result.name
+                        }}<span class="text-sm text-green-700"> protected</span>
+                      </a>
+
+                      <div class="relative">
+                        <button
+                          class="optbtn px-1 my-1"
+                          @click="showSelectedFriend(index)"
+                        >
+                          Options
+                        </button>
+                      </div>
+                    </div>
+                    <div
+                      v-else
+                      class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom px-4 w-full rounded-[5px]"
+                    >
+                      <a href="#" @click="showChatPage(result.name)">
+                        {{ result.name
+                        }}<span class="text-sm text-blue-700"> private</span>
+                      </a>
+
+                      <div class="relative">
+                        <button
+                          class="optbtn px-1 my-1"
+                          @click="showSelectedFriend(index)"
+                        >
+                          Options
+                        </button>
+                      </div>
+                    </div>
+
+                    <div
+                      v-if="
+                        selectedFriendIndex === index &&
+                        result.isPrivate === true
+                      "
+                      class="my-2 opt"
+                    >
+                      <!-- <div v-if="selectedFriendIndex === index && result.isPrivate === true" class="my-2 opt"> -->
+                      <button
+                        class="intbtn p-2"
+                        @click="showMemberList(result.name)"
+                      >
+                        members
+                      </button>
+                      <button
+                        class="intbtn p-2"
+                        @click="leave_room(result.name)"
+                      >
+                        leave
+                      </button>
+                      <button
+                        class="intbtn p-2"
+                        @click="showAddMember(result.name)"
+                      >
+                        add member
+                      </button>
+
+                      <AddMember
+                        v-if="addPrivateMember"
+                        @close="showAddMember"
+                      />
+                    </div>
+                    <div
+                      v-else-if="
+                        selectedFriendIndex === index &&
+                        result.isProtected === true
+                      "
+                      class="my-2 opt"
+                    >
+                      <!-- <div v-else-if="selectedFriendIndex === index" class="my-2 opt"> -->
+                      <button
+                        class="intbtn p-2"
+                        @click="showMemberList(result.name)"
+                      >
+                        members
+                      </button>
+                      <button
+                        class="intbtn p-2"
+                        @click="leave_room(result.name)"
+                      >
+                        leave
+                      </button>
+                      <button
+                        class="intbtn p-2"
+                        @click="showChagnePassword(result.name)"
+                      >
+                        change password
+                      </button>
+                    </div>
+                    <ChangePassword
+                      v-if="isChangePassword"
+                      @close="showChagnePassword"
+                    />
+                    <div
+                      v-else-if="
+                        selectedFriendIndex === index && result.isPublic
+                      "
+                      class="my-2 opt"
+                    >
+                      <!-- <div v-else-if="selectedFriendIndex === index" class="my-2 opt"> -->
+                      <button
+                        class="intbtn p-2"
+                        @click="showMemberList(result.name)"
+                      >
+                        members
+                      </button>
+                      <button
+                        class="intbtn p-2"
+                        @click="leave_room(result.name)"
+                      >
+                        leave
+                      </button>
+                    </div>
+                    <ChannelMembers
+                      v-if="isMembersList"
+                      @close="showMemberList"
+                    />
+                  </li>
+                </div>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div v-else>
+          <div class="flex-grow max-w-full">
+            <input
+              placeholder="Search friend"
+              v-model="src_friend"
+              class="w-[80%] h-[2rem] border-0 text-black ml-2 mr-1 rounded-full pl-4 mb-2 focus:border-0 focus:outline-none"
+            />
+
+            <div
+              class="w-full h-[60vh] overflow-y-auto overflow-x-hidden flex-grow max-w-full"
+            >
+              <ul class="w-[95%] p-2 m-2">
+                <div v-for="(friend, index) in searchFriends" :key="index">
+                  <li class="list-none w-full mb-1">
+                    <div
+                      class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom mx-1 p-1 w-full rounded-[10px] usr-item"
+                    >
+                      <a href="#" @click="showChatPageFriend(friend.user)">
+                        <div class="mx-2 px-3">{{ friend.user }}</div>
+                      </a>
+
+                      <div class="relative">
+                        <button
+                          class="optbtn px-1 my-1"
+                          @click="showSelectedFriend(index)"
+                        >
+                          Options
+                        </button>
+                      </div>
+                    </div>
+                    <div
+                      v-if="selectedFriendIndex === index"
+                      class="flex items-center justify-between"
+                    >
+                      <div v-if="friend.isBlock === true">
+                        <button
+                          class="intbtn px-1 w-[8vh]"
+                          @click="showHideBlock(friend)"
+                        >
+                          Block
+                        </button>
+                      </div>
+                      <div v-else>
+                        <button
+                          class="intbtn px-1 w-[8vh]"
+                          @click="showHideBlock(friend)"
+                        >
+                          Unblock
+                        </button>
+                      </div>
+                      <button class="intbtn px-2">Invite</button>
+                      <!-- <button class="intbtn px-2" @click="showProfilePage"> -->
+                      <button class="intbtn px-2" @click="">
+                        <router-link to="/users">Profile</router-link>
+
+                        <!-- Profile -->
+                      </button>
+                    </div>
+                    <!-- <ProfilePage v-if="isProfile" @close="showProfilePage" /> -->
+                  </li>
+                </div>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container1 flex flex-col-reverse min-h-[50vh]">
+      <div v-if="msgField">
+        <h1 class="cht">Chat</h1>
+
+        <div class="row1 flex-grow max-w-full">
+          <div
+            class="flex flex-col bg-white h-[60vh] p-2 mb-10 m-3 text-black"
+            style="text-align: right"
+          >
+            <div class="overflow-y-auto overflow-x-hidden h-[55vh]">
+              <div class="aa mx-3 text-black-600 text-xl text-center">
+                {{ selectedRoom }}
+              </div>
+              <div v-for="(message, index) in allMessage" :key="index">
+                <div
+                  v-if="message.send === true"
+                  class="bg-blue-400 text-grey-500 py-2 px-4 inline-block mx-5 my-1 rounded-md"
+                >
+                  {{ message.chat }}
+                </div>
+                <div v-else class="my-2 mx-5" style="text-align: left">
+                  <span
+                    class="bg-blue-200 text-grey-500 py-1 px-3 inline rounded-md"
+                    style="display: inline-block"
+                  >
+                    <span class="text-xs">
+                      {{ message.sender }} 
+					 <!-- sender  -->
+					  </span
+                    ><br />
+                    {{ message.chat }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex-grow max-w-full">
+            <input
+              v-model="message"
+              placeholder="message"
+              class="w-[80%] h-[2.5rem] border-0 text-black ml-2 mr-1 rounded-full pl-4 mb-2 focus:border-0 focus:outline-none"
+              style="min-width: 300px"
+            />
+            <ButtonComponent
+              btnContent="Send"
+              @click="sendMessage"
+              class="text"
+            />
+          </div>
+        </div>
+      </div>
+      <div v-else>
+        <div class="row1 flex-grow max-w-full">
+          <span class="text-xl">Select a channel or a friend to chat</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="container2 min-h-[50vh]">
+      <div class="row2">
+        <h2 class="chn-head my-5">All Channel</h2>
+        <div class="my-2">Public Channels</div>
+        <div class="h-[40vh] overflow-y-auto overflow-x-hidden">
+          <ul class="w-[95%] p-1 mx-3">
+            <div v-for="(result, index) in filteredPublicChannel" :key="index">
+              <li class="list-none w-full mb-1">
+                <div
+                  class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom px-4 w-full rounded-[5px]"
+                >
+                  {{ result.name }}
+                  <div class="relative">
+                    <button
+                      class="jpub-btn"
+                      @click="join_pub_chan(result.name)"
+                    >
+                      Join
+                    </button>
+                  </div>
+                </div>
+              </li>
+            </div>
+          </ul>
+        </div>
+
+        <div class="my-2">Protected Channels</div>
+        <div class="h-[30vh] overflow-y-auto overflow-x-hidden prv-chn">
+          <ul class="w-[95%] p-1 mx-3">
+            <div v-for="(result, index) in filteredPrivateChannel" :key="index">
+              <li class="list-none w-full mb-1">
+                <div
+                  class="flex items-center justify-between mb-1 bg-gradient-to-l from-[#ae4488] to-[#f39f5a] shadow-custom px-4 w-full rounded-[5px]"
+                >
+                  {{ result.name }}
+                  <div class="relative">
+                    <button
+                      class="jpub-btn"
+                      @click="showPasswordForm(result.name)"
+                    >
+                      Join
+                    </button>
+                  </div>
+                </div>
+              </li>
+            </div>
+          </ul>
+        </div>
+        <!-- </div> -->
+
+        <ChannelPassword v-if="isPrivate" @close="closePasswordFomr" />
+      </div>
+    </div>
+  </div>
+</template>
+
+<script lang="ts">
+import { defineComponent, onMounted, computed, ref } from "vue";
+import ChannelOption from "@/components/ChannelOption.vue";
+import ButtonComponent from "@/components/ButtonComponent.vue";
+import CreateChannel from "@/components/CreateChannel.vue";
+import OptionMenu from "@/components/OptionMenu.vue";
+import ChannelPassword from "@/components/ChannelPassword.vue";
+import ChannelMembers from "@/components/ChannelMembers.vue";
+import AddMember from "@/components/AddMember.vue";
+import ChangePassword from "@/components/ChangePassword.vue";
+import ProfilePage from "@/components/ProfilePage.vue";
+import io from "socket.io-client";
+import store from "@/store";
+import { IChannel } from "@/models/channel";
+
+const chan = ref([] as IChannel[]);
+const m_chan = ref([] as IChannel[]);
+const m_frnd = ref([] as FriendsList[]);
+interface FriendsList {
+  user: string;
+  status: Boolean;
+  isBlock: boolean;
+}
+
+export default defineComponent({
+  data() {
+    return {
+      channels: chan,
+      my_chan: m_chan,
+      src_friend: "" as string,
+      src_channel: "" as string,
+      message: "" as string,
+      isAddChannelForm: false,
+      isSearchChannelVisible: false,
+      selectedItem: null as IChannel | null,
+      isMessageSent: false,
+      chatMessage: [] as { send: boolean; chat: string }[],
+      isPrivate: false,
+      isOptions: false,
+      searchQuery: "" as string,
+      userList: [] as string[],
+      selectedChannel: null as IChannel | null,
+      inputText: "",
+      showGroupList: true,
+      msgField: false,
+      isMembersList: false,
+      selectedRoom: "" as string,
+      selectedFriendIndex: null,
+      addPrivateMember: false,
+      isProfile: false,
+
+      // for testing
+      message1: "" as string,
+      testMessage: "" as String,
+      testMessages: [] as string[],
+      allMessages: [] as string[],
+      userInput1: "" as string,
+      userInput2: "" as string,
+      sndrcvmsg: [] as string[],
+      isBlock: true,
+      isChangePassword: false,
+      // friends: m_frnd,
+      friends: [
+        {
+          user: "one",
+          status: true,
+          isBlock: true,
+        },
+        {
+          user: "two",
+          status: false,
+          isBlock: false,
+        },
+        {
+          user: "three",
+          status: true,
+          isBlock: false,
+        },
+        {
+          user: "four",
+          status: false,
+          isBlock: false,
+        },
+        {
+          user: "five",
+          status: true,
+          isBlock: true,
+        },
+        {
+          user: "one",
+          status: true,
+          isBlock: false,
+        },
+        {
+          user: "two",
+          status: false,
+          isBlock: false,
+        },
+        {
+          user: "three",
+          status: true,
+          isBlock: false,
         },
       ] as FriendsList[],
     };
@@ -481,17 +485,16 @@
       const channel = computed(() => store.getters.getAllChannel);
       const arrayProxy = channel.value;
       arrayProxy.forEach((item: any) => {
-		if (item.isGroupChannel === true)
-		{
-			const new_chan: IChannel = {
-			  name: item.room_name,
-			  id: item.id,
-			  isPrivate: item.is_private,
-			  isProtected: item.is_protected,
-			  isPublic: item.is_public,
-			};
-			chan.value.push(new_chan);
-		}
+        if (item.isGroupChannel === true) {
+          const new_chan: IChannel = {
+            name: item.room_name,
+            id: item.id,
+            isPrivate: item.is_private,
+            isProtected: item.is_protected,
+            isPublic: item.is_public,
+          };
+          chan.value.push(new_chan);
+        }
       });
     };
     if (!chan.value.length) all();
@@ -500,122 +503,118 @@
       const my_channel = computed(() => store.getters.getMyChannel);
       const arrayProxy_m = my_channel.value;
       arrayProxy_m.forEach((item: any) => {
-		if (item.isGroupChannel === true)
-		{
-			const my_chan: IChannel = {
-			  name: item.room_name,
-			  id: item.id,
-			  isPrivate: item.is_private,
-			  isProtected: item.is_protected,
-			  isPublic: item.is_public,
-			};
-			m_chan.value.push(my_chan);
-		}
+        if (item.isGroupChannel === true) {
+          const my_chan: IChannel = {
+            name: item.room_name,
+            id: item.id,
+            isPrivate: item.is_private,
+            isProtected: item.is_protected,
+            isPublic: item.is_public,
+          };
+          m_chan.value.push(my_chan);
+        }
       });
     };
     if (!m_chan.value.length) my();
-	const fr = async ()=> {
-		await store.dispatch("fetchMyFriends");
-		await store.dispatch("fetchMyBlocked");
-		const my_friends = computed(() => store.getters.getMyFriends);
-		const my_blocked = computed(() => store.getters.getMyBlocked);
-		const arrayProxy_f = my_friends.value;
-		arrayProxy_f.forEach((item: any) => {
-			if (my_blocked.value.includes(item.userName))
-			{
-				const my_frnds: FriendsList = {
-					user: item.userName,
-					status: false,
-					isBlock: true,
-				}
-				m_frnd.value.push(my_frnds);
-			}
-			else
-			{
-				const my_frnds: FriendsList = {
-					user: item.userName,
-					status: false,
-					isBlock: false,
-				}
-				m_frnd.value.push(my_frnds);
-			}
-		});
-	  };
-	  if (!m_frnd.value.length) fr();
-	},
-	components: {
-	  ChannelOption,
-	  ButtonComponent,
-	  CreateChannel,
-	  OptionMenu,
-	  ChannelPassword,
-	  ChannelMembers,
-	  AddMember,
-	  ChangePassword,
-	  ProfilePage,
-	},
-	computed: {
-	  searchFriends(): FriendsList[] {
-		return this.friends.filter(
-		  (item: any) =>
-			item.user /* .toLowerCase().includes(this.src_friend.toLowerCase()) */,
-		);
-	  },
-	  filteredMyChannel(): IChannel[] {
-		return this.my_chan.filter(
-		  (item: IChannel) => item.name,
-		  //   item.name.toLowerCase().includes(this.src_channel.toLowerCase())
-		);
-	  },
-	  // filteredMyChannel(): IChannel[] {
-	  //   return this.my_chan.filter(
-	  // (item: IChannel) =>
-	  //   item.name /* .toLowerCase().includes(this.searchQuery.toLowerCase()) &&
-	  // item.member === true */
-	  //   );
-	  // },
-	  filteredPublicChannel(): IChannel[] {
-		return this.channels.filter(
-		  (item: IChannel) =>
-			item.isPublic === true &&
-			!this.my_chan.some(
-			  (userChannel: IChannel) => userChannel.name === item.name,
-			),
-		);
-	  },
-	  filteredPrivateChannel(): IChannel[] {
-		return this.channels.filter(
-		  (item: IChannel) =>
-			item.isProtected === true &&
-			!this.my_chan.some(
-			  (userChannel: IChannel) => userChannel.name === item.name,
-			),
-		);
-	  },
-	  allMessage(): any {
-		return this.chatMessage;
-	  },
-	},
-	methods: {
-	  // showProfilePage(index: any)
-	  showProfilePage() {
-		this.isProfile = !this.isProfile;
-	  },
-	  showChagnePassword(channel: string) {
-		if (channel) localStorage.setItem("currentChanName", channel);
-		this.isChangePassword = !this.isChangePassword;
-	  },
-	  showHideBlock(friend: FriendsList) {
-		if (friend.isBlock === false) this.block_frnd(friend.user);
-		else friend.isBlock === true;
-		this.unblock_friend(friend.user);
-		friend.isBlock = !friend.isBlock;
-	  },
-	  showAddMember(channel: string) {
-		localStorage.setItem("currentChanName", channel);
-		this.addPrivateMember = !this.addPrivateMember;
-	},
-	
+    const fr = async () => {
+      await store.dispatch("fetchMyFriends");
+      await store.dispatch("fetchMyBlocked");
+      const my_friends = computed(() => store.getters.getMyFriends);
+      const my_blocked = computed(() => store.getters.getMyBlocked);
+      const arrayProxy_f = my_friends.value;
+      arrayProxy_f.forEach((item: any) => {
+        if (my_blocked.value.includes(item.userName)) {
+          const my_frnds: FriendsList = {
+            user: item.userName,
+            status: false,
+            isBlock: true,
+          };
+          m_frnd.value.push(my_frnds);
+        } else {
+          const my_frnds: FriendsList = {
+            user: item.userName,
+            status: false,
+            isBlock: false,
+          };
+          m_frnd.value.push(my_frnds);
+        }
+      });
+    };
+    if (!m_frnd.value.length) fr();
+  },
+  components: {
+    ChannelOption,
+    ButtonComponent,
+    CreateChannel,
+    OptionMenu,
+    ChannelPassword,
+    ChannelMembers,
+    AddMember,
+    ChangePassword,
+    ProfilePage,
+  },
+  computed: {
+    searchFriends(): FriendsList[] {
+      return this.friends.filter(
+        (item: any) =>
+          item.user /* .toLowerCase().includes(this.src_friend.toLowerCase()) */,
+      );
+    },
+    filteredMyChannel(): IChannel[] {
+      return this.my_chan.filter(
+        (item: IChannel) => item.name,
+        //   item.name.toLowerCase().includes(this.src_channel.toLowerCase())
+      );
+    },
+    // filteredMyChannel(): IChannel[] {
+    //   return this.my_chan.filter(
+    // (item: IChannel) =>
+    //   item.name /* .toLowerCase().includes(this.searchQuery.toLowerCase()) &&
+    // item.member === true */
+    //   );
+    // },
+    filteredPublicChannel(): IChannel[] {
+      return this.channels.filter(
+        (item: IChannel) =>
+          item.isPublic === true &&
+          !this.my_chan.some(
+            (userChannel: IChannel) => userChannel.name === item.name,
+          ),
+      );
+    },
+    filteredPrivateChannel(): IChannel[] {
+      return this.channels.filter(
+        (item: IChannel) =>
+          item.isProtected === true &&
+          !this.my_chan.some(
+            (userChannel: IChannel) => userChannel.name === item.name,
+          ),
+      );
+    },
+    allMessage(): any {
+      return this.chatMessage;
+    },
+  },
+  methods: {
+    // showProfilePage(index: any)
+    showProfilePage() {
+      this.isProfile = !this.isProfile;
+    },
+    showChagnePassword(channel: string) {
+      if (channel) localStorage.setItem("currentChanName", channel);
+      this.isChangePassword = !this.isChangePassword;
+    },
+    showHideBlock(friend: FriendsList) {
+      if (friend.isBlock === false) this.block_frnd(friend.user);
+      else friend.isBlock === true;
+      this.unblock_friend(friend.user);
+      friend.isBlock = !friend.isBlock;
+    },
+    showAddMember(channel: string) {
+      localStorage.setItem("currentChanName", channel);
+      this.addPrivateMember = !this.addPrivateMember;
+    },
+
     showSelectedFriend(index: any) {
       if (this.selectedFriendIndex === index) {
         this.selectedFriendIndex = null;
@@ -690,10 +689,10 @@
         });
       });
     },
-	notify(){
-		store.state.chat.socket.off("notify");
-		console.log("reached notify");
-		store.state.chat.socket.on("notify", (data: any) => {
+    notify() {
+      store.state.chat.socket.off("notify");
+      console.log("reached notify");
+      store.state.chat.socket.on("notify", (data: any) => {
         this.$toast.add({
           severity: data.severity,
           summary: data.summary,
@@ -701,7 +700,7 @@
           life: 3000,
         });
       });
-	},
+    },
     listenForMuteEvents() {
       console.log("in listen for mute events");
       store.state.chat.socket.off("muted");
@@ -728,21 +727,21 @@
       if (store.state.chat.socket)
         store.state.chat.socket.emit("private_message");
     },
-	change_password() {
-		if (store.state.chat.socket)
-		  store.state.chat.socket.emit("change_pass", {
-			new_pass: "",
-			room_name: localStorage.getItem("currentChanName"),
-		  });
-	  },
-	  block_frnd(friend: string) {
-		if (store.state.chat.socket)
-			store.state.chat.socket.emit("block_frnd", friend);
-	},
-	unblock_friend(friend: string){
-		if (store.state.chat.socket)
-			store.state.chat.socket.emit("unblock_frnd", friend);
-	},
+    change_password() {
+      if (store.state.chat.socket)
+        store.state.chat.socket.emit("change_pass", {
+          new_pass: "",
+          room_name: localStorage.getItem("currentChanName"),
+        });
+    },
+    block_frnd(friend: string) {
+      if (store.state.chat.socket)
+        store.state.chat.socket.emit("block_frnd", friend);
+    },
+    unblock_friend(friend: string) {
+      if (store.state.chat.socket)
+        store.state.chat.socket.emit("unblock_frnd", friend);
+    },
     showPasswordForm(chan_name: string) {
       this.isPrivate = true;
       localStorage.setItem("toJoinChan", chan_name);
@@ -900,19 +899,21 @@
       );
       if (index !== -1) this.my_chan.splice(index, 1);
     });
-	store.state.chat.socket.on("blocked", (friend_name: string) => {
-      const friend_found = this.friends.find((friend: FriendsList) => friend.user === friend_name);
-	  if (friend_found)
-		friend_found.isBlock = true;
+    store.state.chat.socket.on("blocked", (friend_name: string) => {
+      const friend_found = this.friends.find(
+        (friend: FriendsList) => friend.user === friend_name,
+      );
+      if (friend_found) friend_found.isBlock = true;
     });
-	store.state.chat.socket.on("unblocked", (friend_name: string) => {
-      const friend_found = this.friends.find((friend: FriendsList) => friend.user === friend_name);
-	  if (friend_found)
-		friend_found.isBlock = false;
+    store.state.chat.socket.on("unblocked", (friend_name: string) => {
+      const friend_found = this.friends.find(
+        (friend: FriendsList) => friend.user === friend_name,
+      );
+      if (friend_found) friend_found.isBlock = false;
     });
     this.mute_omar();
     this.listenForMuteEvents();
-	this.notify();
+    this.notify();
   },
 });
 </script>
