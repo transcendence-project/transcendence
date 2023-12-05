@@ -24,6 +24,7 @@ export class ChatController {
 
 	@Get('current_frndchan/:frnd_name')
 	async frnd_chan(@Param("frnd_name") frnd_name: string){
+		console.log(frnd_name);
 		const chan_ = await this.chatService.frndchan_by_name(frnd_name);
 		return (chan_)
 	}

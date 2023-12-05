@@ -279,14 +279,15 @@
 				  {{ message.chat }}
 				</div>
 				<div v-else class="my-5 mx-5" style="text-align: left">
-					<!-- <p>{{ message.send }}</p> -->
-					<span
-					class="bg-blue-200 text-grey-500 py-2 px-3 inline rounded-md"
-					>
-					<p class="text-sm">sender name</p>
-					  {{ message.chat }}
+					<span class="bg-blue-200 text-grey-500 py-2 px-3 inline rounded-md" style="display:inline-block;">
+						<span class="text-xs">
+							{{ message.sender }}
+						</span>
+						<br>
+						<hr>
+						{{ message.chat }}
 					</span>
-				  </div>
+				</div>
 				</div>
 			  </div>
 			</div>
@@ -405,7 +406,7 @@
 		isSearchChannelVisible: false,
 		selectedItem: null as IChannel | null,
 		isMessageSent: false,
-		chatMessage: [] as { send: boolean; chat: string }[],
+		chatMessage: [] as { send: boolean; chat: string; sender: string }[],
 		isPrivate: false,
 		isOptions: false,
 		searchQuery: "" as string,
@@ -719,9 +720,10 @@
       console.log(chan.value.messages);
       const val = chan.value.messages;
       val.forEach((item: any) => {
+		console.log(item)
         if (item.senderID === store.getters.getId)
-          this.chatMessage.push({ send: true, chat: item.content });
-        else this.chatMessage.push({ send: false, chat: item.content });
+          this.chatMessage.push({ send: true, chat: item.content, sender: item.sendername });
+        else this.chatMessage.push({ send: false, chat: item.content, sender: item.sendername });
       });
     },
     async displayFriendMessage() {
@@ -732,8 +734,8 @@
       const val = chan.value.messages;
 	  val.forEach((item: any) => {
         if (item.senderID === store.getters.getId)
-          this.chatMessage.push({ send: true, chat: item.content });
-        else this.chatMessage.push({ send: false, chat: item.content });
+          this.chatMessage.push({ send: true, chat: item.content, sender: item.sendername });
+        else this.chatMessage.push({ send: false, chat: item.content, sender: item.sendername });
       });
     },
     sendMessage() {
@@ -822,17 +824,20 @@
       console.log(localStorage.getItem("currentChanName"));
       console.log("reached update msg event listener");
       if (data) {
+		console.log(data);
         if (
           data.user != store.getters.getUserName &&
           localStorage.getItem("currentChanName") == data.chan
         ) {
-          this.chatMessage.push({ send: false, chat: data.content });
+			console.log("shouldnt come herreee!")
+          this.chatMessage.push({ send: false, chat: data.content, sender: data.user });
           this.isMessageSent = true;
         } else if (
           data.user == store.getters.getUserName &&
           localStorage.getItem("currentChanName") == data.chan
         ) {
-          this.chatMessage.push({ send: true, chat: data.content });
+			console.log("should come herreee!")
+          this.chatMessage.push({ send: true, chat: data.content, sender: data.user  });
           this.isMessageSent = true;
         }
       }
@@ -842,14 +847,14 @@
 	  if (data)
 	  {
 		if (data.frnd == store.getters.getUserName && localStorage.getItem("currentFriend") == data.user){
-			this.chatMessage.push({ send: false, chat: data.content });
+			this.chatMessage.push({ send: false, chat: data.content, sender: data.user });
           	this.isMessageSent = true;
 		}
 		else if (data.user == store.getters.getUserName && localStorage.getItem("currentFriend") == data.frnd){
 			console.log("hellllooooo");
 			console.log(localStorage.getItem("currentFriend"));
 			console.log(data.frnd)
-			this.chatMessage.push({ send: true, chat: data.content });
+			this.chatMessage.push({ send: true, chat: data.content, sender: data.user });
          	this.isMessageSent = true;
 		}
 	  }

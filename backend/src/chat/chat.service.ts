@@ -67,7 +67,10 @@ export class ChatService {
 		.andWhere("channel.isGroupChannel = :is_group", { is_group: false })
 		.getOne();
 		if (channel)
+		{
+			console.log(channel);
 			return channel;
+		}
 	}
 
 		//  ----------------------- CREATE / UPDATE -----------------------------
@@ -161,14 +164,17 @@ export class ChatService {
 
 	async create_friend_chan(user: User, friend: User) {
 		const channel = await this.frndchan_by_name(friend.userName);
+		console.log(friend);
+		// console.log(user);
 		if (!channel){
 			const chan = this.channelRepo.create({ room_name: "", owner: null, password: "", 
 				members: [], admins: [], messages: [], banned: [], muted: [], isGroupChannel: false, is_protected: true });
 				chan.members.push(user);
 				chan.members.push(friend);
 				await this.channelRepo.save(chan);
+				console
 		}
-
+		// console.log(channel);
 	}
 
 	async add_chan_admin(user_to_add: string, chan_name: string) {
@@ -207,15 +213,19 @@ export class ChatService {
 
 	async save_chan_message(sender: User, chan_name: string, content: string){
 		const chan = await this.chan_by_name(chan_name);
-		const message = this.messageRepo.create({senderID: sender.id, sender: sender, channel: chan, content: content, createdAt: null });
+		const message = this.messageRepo.create({senderID: sender.id, sendername: sender.userName, sender: sender, channel: chan, content: content, createdAt: null });
 		chan.messages.push(message);
 		await this.messageRepo.save(message);
 	}
 
 	async save_frnd_chan_msg(sender: User, frnd_name: string, content: string) {
+		console.log(`frnd name = ${frnd_name}`);
 		const channel = await this.frndchan_by_name(frnd_name);
-		const message = this.messageRepo.create({senderID: sender.id, sender: sender, channel: channel, content: content, createdAt: null });
-		channel.messages.push(message);
+		// console.log(channel)
+		const message = this.messageRepo.create({senderID: sender.id, sendername: sender.userName, sender: sender, channel: channel, content: content, createdAt: null });
+		if (channel.messages) {
+			channel.messages.push(message);
+		}
 		await this.messageRepo.save(message);
 	}
 
