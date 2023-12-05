@@ -56,10 +56,6 @@ export class GameGateway
   @SubscribeMessage('info')
   handleInfoGame(@ConnectedSocket() client: Socket, @MessageBody() data: object) {
     console.log(data);
-    // if (data && data.info)
-    // {
-    //   const dataType = data.info.type;
-    // }
   }
   @SubscribeMessage('paddleMove')
   handlePaddleMove(@ConnectedSocket() client: Socket, @MessageBody() data: { direction: string }) {
