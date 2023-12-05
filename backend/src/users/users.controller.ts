@@ -17,45 +17,48 @@ export class UsersController {
 	// 	this.userService.create(body.email, body.username, body.fullname, body.image);
 	// }
 
-	// @Patch('/profile-picture')
+	@Patch('/profile-picture')
+	@UseGuards(JwtAuthGuard)
+	@UseInterceptors(FileInterceptor('file', {dest: './uploads'}))
+	async upload_profile_picture(@Req() req, @UploadedFile() file : Express.Multer.File){
+		// if (file) {
+		// 	return await this.userService.update_profilePic(req.user.id, file.path);
+		//   } else {
+		return (await this.userService.update_profilePic(req.user.id, file.path));
+		//   }
+	}
+
+	// @Patch('/update')
 	// @UseGuards(JwtAuthGuard)
 	// @UseInterceptors(FileInterceptor('file', {dest: './uploads'}))
 	// async upload_profile_picture(@Req() req, @UploadedFile() file : Express.Multer.File){
-	// 	// if (file) {
-	// 	// 	return await this.userService.update_profilePic(req.user.id, file.path);
-	// 	//   } else {
 	// 	return (await this.userService.update_profilePic(req.user.id, file.path));
-	// 	//   }
 	// }
 
-	@Patch('/update')
+
+
+	@Post('/username')
 	@UseGuards(JwtAuthGuard)
-	@UseInterceptors(FileInterceptor('file', {dest: './uploads'}))
-	async update_user(@Req() req, @Body() body: UpdateUserDTO){
-		if (body.username){
-			await this.userService.update_userName(req.user.id, body.username);
-		}
-		console.log('in update user, body: ', body);
-		if (body.image){
-			await this.userService.update_profilePic(req.user.id, body.image);
-		}
-		return (await this.userService.findOne(req.user.id));
+	async update_username(@Req() req, @Body() body) {
+	//   console.log('Received request to update username:', body);
+	  const user = await this.userService.update_userName(req.user.id, body.username);
+	//   console.log('In update username, user: ', user);
+	  return user;
 	}
 
-	// @Post('/username')
-	// @UseGuards(JwtAuthGuard)
-	// async update_username(@Req() req, @Body() body){
-	// 	console.log('in update username, body: ', body);
-	// 	const user = await this.userService.update_userName(req.user.id, body.username);
-	// 	// console.log('in update username, user: ', user);
-	// 	return (user);
-	// }
 
 
 	// @Get('/:id')
 	// findUser(@Param('id') id: string){
 	// 	return (this.userService.findOne(parseInt(id)))
 	// }
+
+	@Get('friend/:name')
+	getFriend(@Param("name") name: string){
+		console.log(name);
+		const frnd = this.userService.findOneByUserName(name);
+		return (frnd);
+	}
 
 	@Get()
 	findAllUsers(){

@@ -11,4 +11,5 @@ export interface IStudent {
   draw: number;
   rank: number;
   isAuthenticated: boolean;
+  twofa: boolean;
 }

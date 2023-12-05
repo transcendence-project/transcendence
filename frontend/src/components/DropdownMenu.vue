@@ -15,15 +15,12 @@
       <router-link to="/editprofile" @click.native="closeDropdown"
         >Edit Profile</router-link
       >
-      <router-link to="#" @click.native="toggleTwoFactor"
+		<!-- <router-link to="/twofactor" @click.native="toggleTwoFactor">Two-factor-AUTH</router-link> -->
+     <router-link to="#" @click.native="toggleTwoFactor"
         >Two-factor-AUTH</router-link
       >
-      <div class="flex">
-        <button
-          v-if="showTwoFactorButtons"
-          class="enbtn mx-2 px-2"
-          @click="enable"
-        >
+       <div class="flex">
+        <button v-if="showTwoFactorButtons" class="enbtn mx-2 px-2" @click="enable">
           Enable
         </button>
         <button
@@ -43,7 +40,7 @@
 import { ref, onMounted, onBeforeUnmount, computed } from "vue";
 import store from "@/store";
 import axios from "axios";
-import { useRouter } from "vue-router";
+import router from "@/router";
 
 const showDropdown = ref(false);
 const dropdownsRef = ref<HTMLElement | null>(null);
@@ -86,13 +83,16 @@ const logout = () => {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
     });
-    localStorage.removeItem("token");
+    // localStorage.removeItem("token");
     router.push("/");
   } catch (error) {
     console.log(error);
   }
   //   store.commit("CLEAR_AUTH_DATA");
   //   router.push("/login");
+	console.log("HELLOOOOOO");
+	localStorage.clear();
+	router.push('/');
   closeDropdown();
 };
 

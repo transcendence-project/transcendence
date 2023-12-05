@@ -1,14 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { authenticator } from 'otplib';
 import { createUserDTO } from '../dtos/createUser.dto';
 import { User } from '../entities/user.entity';
-import { UsersService } from 'users/users.service';
+import { UsersService } from '../users/users.service';
 import { toDataURL } from 'qrcode';
 import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService{
-	constructor(private userService: UsersService, private jwtService: JwtService) {}
+	constructor(@Inject(forwardRef(() => UsersService)) private userService: UsersService, private jwtService: JwtService) {}
 	async validate(user: createUserDTO): Promise<User> {
 		console.log('in validate, user: ', user);
 		const user1 = await this.userService.create(user.email, user.username, user.fullname, user.image);
@@ -16,7 +16,7 @@ export class AuthService{
 		return user1;
 	}
 	generate_jwt_token(username: string, id: number ){
-		return this.jwtService.sign({ sub: id, username: username}, {expiresIn: '1m'});
+		return this.jwtService.sign({ sub: id, username: username});
 	}
 
 	decode_token(token: string) {
