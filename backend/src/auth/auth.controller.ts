@@ -23,18 +23,29 @@ export class AuthController {
 		// console.log('in get profile, req.user: ', req.user);
 		return req.user;
 	}
-
+	
 	@Get('42/callback')
 	@UseGuards(AuthGuard('42'))
 	async callback(@Req() req, @Res() res) {
 		const user = req.user; // the authenticated user
 		const token = this.authService.generate_jwt_token(user.userName, user.id);
 		// const decodeToken = this.authService.decode_token(token);
+		this.authService.authenticate(user, true);
 		// console.log('back in controller');
 		console.log("Token: ", token);
 		const url = new URL('http://localhost:8080/home');
 		url.searchParams.set('code', token);
+		// url.searchParams.delete('code');
 		res.status(200).redirect(url.href);
+	}
+
+	@Get('/logout')
+	@UseGuards(JwtAuthGuard)
+	async logout(@Req() req, @Res() res) {
+		
+		// req.logout();
+		this.authService.authenticate(req.user, false);
+		// res.redirect('http://localhost:8080');
 	}
 
 	@Get('2fa/generate') // GET just for testing, will later be POST

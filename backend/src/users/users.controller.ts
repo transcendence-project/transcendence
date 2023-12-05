@@ -5,37 +5,51 @@ import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../auth/jwt.guard';
 import { Achievement } from 'entities/achievement.entity';
 import { MatchDTO } from 'dtos/match.dto';
+import { UpdateUserDTO } from 'dtos/UpdateUser.dto';
 import { Express } from 'express';
 
 @Controller('users')
 export class UsersController {
 	
 	constructor(private userService: UsersService){}
-	@Post('/signup')
-	createUser(@Body() body: createUserDTO) {
-		this.userService.create(body.email, body.username, body.fullname, body.image);
-	}
+	// @Post('/signup')
+	// createUser(@Body() body: createUserDTO) {
+	// 	this.userService.create(body.email, body.username, body.fullname, body.image);
+	// }
 
-	@Patch('/profile-picture')
+	// @Patch('/profile-picture')
+	// @UseGuards(JwtAuthGuard)
+	// @UseInterceptors(FileInterceptor('file', {dest: './uploads'}))
+	// async upload_profile_picture(@Req() req, @UploadedFile() file : Express.Multer.File){
+	// 	// if (file) {
+	// 	// 	return await this.userService.update_profilePic(req.user.id, file.path);
+	// 	//   } else {
+	// 	return (await this.userService.update_profilePic(req.user.id, file.path));
+	// 	//   }
+	// }
+
+	@Patch('/update')
 	@UseGuards(JwtAuthGuard)
 	@UseInterceptors(FileInterceptor('file', {dest: './uploads'}))
-	async upload_profile_picture(@Req() req, @UploadedFile() file : Express.Multer.File){
-		// if (file) {
-		// 	return await this.userService.update_profilePic(req.user.id, file.path);
-		//   } else {
-		return (await this.userService.update_profilePic(req.user.id, file.path));
-		//   }
+	async update_user(@Req() req, @Body() body: UpdateUserDTO){
+		if (body.username){
+			await this.userService.update_userName(req.user.id, body.username);
+		}
+		console.log('in update user, body: ', body);
+		if (body.image){
+			await this.userService.update_profilePic(req.user.id, body.image);
+		}
+		return (await this.userService.findOne(req.user.id));
 	}
 
-
-
-	@Post('/username')
-	@UseGuards(JwtAuthGuard)
-	async update_username(@Req() req, @Body() body){
-		const user = await this.userService.update_userName(req.user.id, body.username);
-		console.log('in update username, user: ', user);
-		return (user);
-	}
+	// @Post('/username')
+	// @UseGuards(JwtAuthGuard)
+	// async update_username(@Req() req, @Body() body){
+	// 	console.log('in update username, body: ', body);
+	// 	const user = await this.userService.update_userName(req.user.id, body.username);
+	// 	// console.log('in update username, user: ', user);
+	// 	return (user);
+	// }
 
 
 	// @Get('/:id')

@@ -10,9 +10,9 @@ export class FortyTwoAuthGuard extends AuthGuard('42') {
 		return result;
 	}
 	handleRequest(err, user, info) {
-		// if (err || !user) {
-		// 	throw err || new UnauthorizedException();
-		// }
+		if (err || !user) {
+			throw err || new UnauthorizedException();
+		}
 		return user;
 	}
 }

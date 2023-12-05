@@ -9,14 +9,17 @@
           class="input text-black"
         />
         <div class="upload">
-			<input type="file" @change="uploadFile" ref="file" v-model="fileInput" />
+          <input type="file" @change="uploadFile" ref="file" />
         </div>
         <div class="acc-dec">
           <div class="decline">
             <button class="resbtn" @click="resetForm">Reset</button>
           </div>
           <div class="accept">
-            <button class="accbtn" @click="submitFile">Submit</button>
+            <button class="accbtn" @click="submitFile">update user</button>
+          </div>
+          <div class="accept">
+            <button class="accbtn" @click="submitFile">update picture</button>
           </div>
         </div>
       </div>
@@ -33,36 +36,28 @@ export default {
     const Images = ref<File | null>(null);
     const text = ref("");
 
-	const fileInput = ref(null);
+    const fileInput = ref<HTMLInputElement | null>(null);
 
-const uploadFile = () => {
-  if (fileInput.value && fileInput.value.files) {
-    Images.value = fileInput.value.files[0];
-  }
-};
-
+    const uploadFile = () => {
+      console.log("uploading file, value is: ", fileInput.value);
+      if (
+        fileInput.value &&
+        fileInput.value.files &&
+        fileInput.value.files.length > 0
+      ) {
+        console.log("uploading fillllleeeee, value is: ", fileInput.value);
+        Images.value = fileInput.value.files[0];
+      }
+    };
 
     const submitFile = async () => {
-      if (Images.value || text.value) {
+      //   if (Images.value || text.value) {
+      //   console.log("the file is: ", Images.value);
+      if (Images.value) {
         const formData = new FormData();
+        console.log("the file is: ", Images.value);
         formData.append("file", Images.value);
-        formData.append("username", text.value);
-        // const headers = { "Content-Type": "multipart/form-data" };
-
-        try {
-
-		// 	const response1 = await axios.patch(
-        //   `http://localhost:3000/users/username`,
-        //   null,
-        //   {
-        //     headers: {
-        //       Authorization: `Bearer ${localStorage.getItem("token")}`,
-        //     },
-        //   },
-        // );
-
-
-		const response = await axios.patch(
+        const response = await axios.patch(
           `http://localhost:3000/users/profile-picture`,
           formData,
           {
@@ -71,17 +66,30 @@ const uploadFile = () => {
             },
           },
         );
-		  console.log(text.value);
-          const binaryRepresentation = response.data.files;
-          const httpStatus = response.status;
-          console.log(binaryRepresentation, httpStatus);
-        } catch (error) {
-          console.error("Error uploading file:", error);
-        }
       }
-	  else{
-		console.log("provide an input")
-	  }
+      // formData.append("username", text.value);
+      // const headers = { "Content-Type": "multipart/form-data" };
+
+      try {
+        // 	const response1 = await axios.patch(
+        //   `http://localhost:3000/users/username`,
+        //   null,
+        //   {
+        //     headers: {
+        //       Authorization: `Bearer ${localStorage.getItem("token")}`,
+        //     },
+        //   },
+        // );
+        // console.log(text.value);
+        // const binaryRepresentation = response.data.files;
+        // const httpStatus = response.status;
+        // console.log(binaryRepresentation, httpStatus);
+      } catch (error) {
+        console.error("Error uploading file:", error);
+      }
+      //   } else {
+      //     console.log("provide an input");
+      //   }
 
       resetForm();
     };
@@ -104,8 +112,6 @@ const uploadFile = () => {
       resetForm,
     };
   },
-
-
 };
 </script>
 
