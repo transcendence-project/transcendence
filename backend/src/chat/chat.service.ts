@@ -16,7 +16,7 @@ export class ChatService {
 
 	constructor(@InjectRepository(Channel) private channelRepo: Repository<Channel>,
 	@InjectRepository(Message) private messageRepo: Repository<Message>,
-	private authService: AuthService){}
+	private authService: AuthService, private usersService: UsersService){}
 	
 
 		//  ----------------------- CHANNEL GETTERS -----------------------------
@@ -27,6 +27,11 @@ export class ChatService {
 	async chan_by_name(chan_name: string): Promise<Channel> // or by id
 	{
 		return (await this.channelRepo.findOne({ where: { room_name: chan_name, isGroupChannel: true }, relations: ['members', 'admins', 'owner', 'messages', 'banned', 'muted'] }));
+	}
+
+	async chan_by_id(id_: number): Promise<Channel> // or by id
+	{
+		return (await this.channelRepo.findOne({ where: { id: id_, isGroupChannel: false }, relations: ['members'] }));
 	}
 
 	async mem_by_chan(chan_name: string): Promise<User[] | undefined> {
@@ -59,7 +64,15 @@ export class ChatService {
 			return channel.muted;
 	}
 
-	async frndchan_by_name(frnd_name: string): Promise<Channel> {
+	async frndchan_by_name(frnd_name: string, user: User): Promise<Channel> {
+		console.log(frnd_name);
+		const user_ = await this.usersService.findOne(user.id)
+		// console.log(channels);
+		for (const channel of user_.channels) {
+			// Access each channel and do something
+			const with_members = await this.chan_by_id(channel.id);
+			console.log(with_members);
+		  }
 		const channel = await this.channelRepo.createQueryBuilder("channel")
 		.leftJoinAndSelect("channel.members", "member")
    		.leftJoinAndSelect("channel.messages", "message")
@@ -163,7 +176,7 @@ export class ChatService {
 	}
 
 	async create_friend_chan(user: User, friend: User) {
-		const channel = await this.frndchan_by_name(friend.userName);
+		const channel = await this.frndchan_by_name(friend.userName, user);
 		console.log(friend);
 		// console.log(user);
 		if (!channel){
@@ -172,7 +185,7 @@ export class ChatService {
 				chan.members.push(user);
 				chan.members.push(friend);
 				await this.channelRepo.save(chan);
-				console
+				console.log(chan);
 		}
 		// console.log(channel);
 	}
@@ -220,7 +233,7 @@ export class ChatService {
 
 	async save_frnd_chan_msg(sender: User, frnd_name: string, content: string) {
 		console.log(`frnd name = ${frnd_name}`);
-		const channel = await this.frndchan_by_name(frnd_name);
+		const channel = await this.frndchan_by_name(frnd_name, sender);
 		// console.log(channel)
 		const message = this.messageRepo.create({senderID: sender.id, sendername: sender.userName, sender: sender, channel: channel, content: content, createdAt: null });
 		if (channel.messages) {

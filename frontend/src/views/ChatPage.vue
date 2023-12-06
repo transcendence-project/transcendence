@@ -730,13 +730,14 @@
       this.chatMessage = [];
       await store.dispatch("fetchFriendChan");
       const chan = computed(() => store.getters.getCurrentCahnnel);
-      console.log(chan.value.messages);
-      const val = chan.value.messages;
-	  val.forEach((item: any) => {
-        if (item.senderID === store.getters.getId)
-          this.chatMessage.push({ send: true, chat: item.content, sender: item.sendername });
-        else this.chatMessage.push({ send: false, chat: item.content, sender: item.sendername });
-      });
+	  console.log(chan.value)
+    //   console.log(chan.value.messages);
+    //   const val = chan.value.messages;
+	//   val.forEach((item: any) => {
+    //     if (item.senderID === store.getters.getId)
+    //       this.chatMessage.push({ send: true, chat: item.content, sender: item.sendername });
+    //     else this.chatMessage.push({ send: false, chat: item.content, sender: item.sendername });
+    //   });
     },
     sendMessage() {
       if (this.message) {
