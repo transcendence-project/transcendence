@@ -16,7 +16,6 @@ import { Channel } from "./channel.entity";
 
 @Entity()
 export class User {
-    [x: string]: import("c:/Users/ab567/OneDrive/Desktop/yonas/backend/src/game/logic/LogicGame").LogicGame;
   //@PrimaryGeneratedColumn() - to mark as the primary key
   @PrimaryGeneratedColumn()
   id: number;

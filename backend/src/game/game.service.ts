@@ -1,12 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { AuthService } from 'auth/auth.service';
 import { User } from '../entities/user.entity';
-import {LogicGame} from '../game/logic/LogicGame'
+import { LogicGame } from './logic/LogicGame'
 import {Paddle, Ball, Computer, } from './interface/game.interface';
 import { Socket } from 'socket.io';
+import { SocketService } from './socket.service'
+
 @Injectable()
 export class GameService {
-    private connected_users:Map<string,User> = new Map();
+    // private connected_users:Map<string,User> = new Map();
+    private connected_users: Map<string, { user: User, logicGame: LogicGame | null }> = new Map();
     private classic_queue: string[] = [];
     private custom_queue: string[] = [];
     private paddle: Paddle;
@@ -16,7 +19,7 @@ export class GameService {
     private canvasHeight: number;
     private deltaTime: number;
 
-    constructor(private readonly authService: AuthService) {
+    constructor(private readonly authService: AuthService, private socketService: SocketService,) {
         this.initializeGameEntities()
     };
 
@@ -36,7 +39,7 @@ export class GameService {
             if (this.connected_users != undefined)
             {
                 this.connected_users.forEach((value, key, map) =>{
-                    if (user.userName === value.userName)
+                    if (user.userName === value.user.userName)
                     {
                         console.log("ehre");
                         this.connected_users.delete(client.id);
@@ -55,7 +58,7 @@ export class GameService {
             //     return; 
             // }
             if (flag == 0)
-                this.connected_users.set(client.id,user);
+                this.connected_users.set(client.id,{user, logicGame: null});
             
 	}
     find_user_with_id(client_id: string){
@@ -64,17 +67,35 @@ export class GameService {
 	}
     public creatSingleGame(client: Socket, gameInfo: any)
     {
-        // console.log(gameInfo);
         const player = this.connected_users.get(client.id);
+        // const oo = this.connected_users.has(client.id);
         if (player)
         {
-            let logic_game;
+            let logic;
             if (gameInfo.type === 'classic')
             {
-                player.logic_game = new LogicGame(player.userName, 'computer,', gameInfo.type);
-                console.log(player);
+                if (player.logicGame == null)
+                {
+                    logic = new LogicGame(player.user.userName, 'computer,', gameInfo.type);
+                    player.logicGame = logic;
+                    client.join(logic.getGameID());
+                    console.log(player.logicGame);
+                    this.startGame(logic);
+                }
+                // cleint.log(logic.getGameID());
+                // console.log(player)
+
+                // this.connected_users.set(client.id, {oo,logic_game});
+
             }
         }
+    }
+    private startGame(gameLogic: LogicGame)
+    {
+        const gameInterval = setInterval(() => {
+            gameLogic.getObjectStatus();
+            this.socketService.emitToRoom(gameLogic.getGameID(), 'game-data', gameLogic.getObjectStatus());
+          }, 1000 / 60);
     }
     private initializeGameEntities() {
         this.paddle = { x: 0, y: 0, width: 20, height: 100, score: 0 };

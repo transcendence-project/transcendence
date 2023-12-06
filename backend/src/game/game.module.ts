@@ -7,12 +7,13 @@ import { UsersModule } from "users/users.module";
 import { AuthModule } from '../auth/auth.module';
 import { MatchesService } from "../matches/matches.service";
 import { MatchModule } from "matches/matches.module";
+import { SocketService } from "./socket.service";
 // import {TypeOrmModule} from "@nestjs/typeorm";
 // import {Match} from "../entities/match.entity";
 
 @Module({
   controllers: [GameController],
   imports: [AuthModule, UsersModule, MatchModule],
-  providers: [GameService, GameGateway],
+  providers: [GameService, GameGateway, SocketService],
 })
 export class GameModule {}

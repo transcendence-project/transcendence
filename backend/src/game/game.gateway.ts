@@ -3,12 +3,12 @@ import { OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect ,SubscribeMessa
 import { Socket, Server } from 'socket.io';
 import { GameService } from './game.service';
 import { UsersService } from '../users/users.service';
-
+import { SocketService } from './socket.service'
 
 @WebSocketGateway({
 	namespace: 'game',
 	cors: {
-		origin: 'http://localhost:8080',
+		origin: 'http://10.12.3.5:8080',
 		credentials: true,
 	},
 
@@ -17,14 +17,17 @@ export class GameGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
   @WebSocketServer()
- private server: Server;
+  server: Server;
+
   private readonly logger = new Logger("GameGateway");
+
   constructor(
     private readonly gameService: GameService,
     private readonly userService: UsersService,
+    private readonly socketService: SocketService,
   ) {}
-  afterInit(): void {
-    this.logger.log("WebSocket Gateay Game created");
+  afterInit(server : Server): void {
+    this.socketService.setServer(server);
   }
 
   async handleConnection(client: Socket, ...args: any[]) {
@@ -32,6 +35,7 @@ export class GameGateway
 
     const token = header.token;
     this.gameService.addConnectUser(client, token);
+    console.log("Connected");
   }
 
   handleDisconnect(client: any) {

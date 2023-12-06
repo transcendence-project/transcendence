@@ -13,14 +13,6 @@ import GameSelect from '@/components/GameSelect.vue';
 // const instance  = getCurrentInstance();
     // const socket = instance?.proxy?.$socket;
 	const instance = getCurrentInstance();
-	// const socket = appContext.config.globalProperties.$socket;
-	// console.log(socket);
-// console.log("this is:,",instance?.proxy)
-// const socket = computed(() => {
-//       return instance && instance.proxy ? instance.proxy.$socket : null;
-//     });
-    // const socket = appContext.config.globalProperties.$socket;
-    // provide('websocket', appContext.$socket);
     const canvasWidth = ref(900); // Default width, can be dynamically adjusted
     const canvasHeight = ref(400); // Default height, can be dynamically adjusted
     const playerScore = ref(0);

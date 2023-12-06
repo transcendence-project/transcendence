@@ -1,6 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import {objectStatusDto, PlayerDto} from '../dto/game.dto'
 
+const Paddle_Width = 0.02
+const Paddle_Height = 0.2
+const Paddle_Speed = 0.0175
+const Ball_Radius = 0.03
+const Collision_Angle = 80
+const Ball_XSpeed = 0.0165
+const Ball_YSpeed = 0.0
+const Computer_Speed = 0.0075
 
 @Injectable()
 export class LogicGame {
@@ -39,12 +47,11 @@ export class LogicGame {
                 this.createPlayer(Player2Login, 2),
             ],
             ball: {
-                x: 0,
-                y: 0,
-                dx: 0,
-                dy: 0,
-                speed:1,
-                radius: 10,
+                x: 0.5,
+                y: 0.5,
+                dx: Ball_XSpeed,
+                dy: Math.random() > 0.5 ? Ball_YSpeed : -Ball_YSpeed,
+                radius: Ball_Radius,
                 color: 'white',
             },
             // time: 120,
@@ -52,9 +59,9 @@ export class LogicGame {
         }
     }
 
-    // public getObjectStatus(): objectStatusDto {
-    //     return this.objectGame
-    // }
+    public getObjectStatus(): objectStatusDto {
+        return this.objectGame
+    }
 
     // public getPlayer1ID(): string {
     //     return this.game_status.players[0].login
@@ -64,9 +71,9 @@ export class LogicGame {
     //     return this.game_status.players[1].login
     // }
 
-    // public getGameID(): string {
-    //     return this.game_id
-    // }
+    public getGameID(): string {
+        return this.gameId
+    }
 
     // public getGameType(): string {
     //     return this.gameType
@@ -89,11 +96,11 @@ export class LogicGame {
             login,
             score: 0,
             paddle: {
-                x: side == 1 ? 20 / 2 : 1 - 20 / 2,
+                x: side == 1 ? Paddle_Width / 2 : 1 - Paddle_Width / 2,
                 y: 0.5,
-                width: 20,
-                height: 100,
-                speed: 0,
+                width: Paddle_Width,
+                height: Paddle_Height,
+                speed: Paddle_Speed,
                 color: '#9336B4',
             },
             gameID: this.gameId,

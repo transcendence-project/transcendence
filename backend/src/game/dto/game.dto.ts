@@ -45,7 +45,6 @@ export class BallDto {
     dx: number
     dy: number
     radius: number
-    speed: number
     color: string
 }
 

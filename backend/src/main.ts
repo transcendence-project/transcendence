@@ -9,7 +9,7 @@ import passport from 'passport';
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
 	app.enableCors({
-		origin: 'http://localhost:8080',
+		origin: 'http://10.12.3.5:8080',
 		methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
 		credentials: true,
 	});
@@ -22,7 +22,7 @@ async function bootstrap() {
 		}));
 	//   await app.listen(3000);
 	app.listen(3000, () => {
-		console.log('Server started on http://localhost:3000');
+		console.log('Server started on http://10.12.3.5:3000');
 	});
 }
 bootstrap();

@@ -14,7 +14,7 @@ export default {
 	methods: {
 		async login42() {
 			// console.log("Button Clickedd");
-			window.location.href = 'http://localhost:3000/auth/42/callback';
+			window.location.href = 'http://10.12.3.5:3000/auth/42/callback';
 		}
 	}
 };
