@@ -70,7 +70,7 @@ import { App, reactive } from 'vue';
 import { io, Socket } from 'socket.io-client';
 
 export const socketState = reactive({
-  socket: null as Socket | null,
+    socket: null as Socket | null,
 });
 
 export function useWebSocket() {

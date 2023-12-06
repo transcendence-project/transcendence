@@ -77,6 +77,7 @@ interface Match {
 
 onMounted(() => {
 	store.dispatch('fetchUserData');
+    
 	});
 
 	

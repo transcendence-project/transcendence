@@ -1,3 +1,18 @@
+import {
+    IsArray,
+    IsAscii,
+    IsBoolean,
+    IsEnum,
+    IsNotEmpty,
+    IsNumber,
+    IsOptional,
+    IsString,
+    IsUUID,
+    Length,
+    Min,
+} from 'class-validator'
+import { Socket } from 'socket.io'
+
 export interface Paddle {
     x: number;
     y: number;
@@ -30,3 +45,14 @@ export interface Computer {
     height: number;
     score: number;
 }
+
+
+// export interface ConnectedUser {
+//     login: string
+//     socket: Socket
+//     status: 'ingame' | 'inqueue' | 'online' | 'busy' | 'offline'
+//     // game?: PongGame
+//     // powerUps?: string[]
+//     // pendingInvite?: InviteDto
+// }
+

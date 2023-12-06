@@ -23,7 +23,7 @@ export class AuthService{
 	}
 	async user_by_token(token: string)
 	{
-        console.log('in user by token: ', token)
+        // console.log('in user by token: ', token)
 		const decode_token = this.decode_token(token);
 		const user = await this.userService.findOne(decode_token.sub);
 		return user;

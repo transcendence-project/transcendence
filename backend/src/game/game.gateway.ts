@@ -3,7 +3,7 @@ import { OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect ,SubscribeMessa
 import { Socket, Server } from 'socket.io';
 import { GameService } from './game.service';
 import { UsersService } from '../users/users.service';
-import { info } from 'console';
+
 
 @WebSocketGateway({
 	namespace: 'game',
@@ -26,7 +26,7 @@ export class GameGateway
   afterInit(): void {
     this.logger.log("WebSocket Gateay Game created");
   }
-  private clientCount = 0;
+
   async handleConnection(client: Socket, ...args: any[]) {
     const header = client.handshake.headers;
 
@@ -35,9 +35,7 @@ export class GameGateway
   }
 
   handleDisconnect(client: any) {
-    this.clientCount--;
     console.log("Client disconnected");
-    client.emit('disconnected', this.clientCount);
   }
 
   @SubscribeMessage('start-game')
@@ -54,8 +52,12 @@ export class GameGateway
   }
   
   @SubscribeMessage('info')
-  handleInfoGame(@ConnectedSocket() client: Socket, @MessageBody() data: object) {
-    console.log(data);
+  handleInfoGame(@ConnectedSocket() client: Socket, @MessageBody() data: any ) {
+    if (data.mode === 'single')
+    {
+        this.gameService.creatSingleGame(client, data);
+    }
+    // console.log(data.mode);
   }
   @SubscribeMessage('paddleMove')
   handlePaddleMove(@ConnectedSocket() client: Socket, @MessageBody() data: { direction: string }) {

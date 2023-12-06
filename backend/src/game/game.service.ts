@@ -1,11 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { AuthService } from 'auth/auth.service';
 import { User } from '../entities/user.entity';
-import {Paddle, Ball, Computer} from './interface/game.interface';
+import {LogicGame} from '../game/logic/LogicGame'
+import {Paddle, Ball, Computer, } from './interface/game.interface';
 import { Socket } from 'socket.io';
 @Injectable()
 export class GameService {
-    private connected_users: Map<string,User> = new Map();
+    private connected_users:Map<string,User> = new Map();
     private classic_queue: string[] = [];
     private custom_queue: string[] = [];
     private paddle: Paddle;
@@ -14,29 +15,67 @@ export class GameService {
     private canvasWidth: number;
     private canvasHeight: number;
     private deltaTime: number;
+
     constructor(private readonly authService: AuthService) {
         this.initializeGameEntities()
     };
 
     public async addConnectUser(client : Socket, token: any)
     {
+        console.log("before",this.connected_users);
         await this.set_online_user(client, token);
         const oo = this.find_user_with_id(client.id);
+        console.log("after",this.connected_users);
         // console.log(oo);
     }
     async set_online_user(client: Socket ,token: any){
 		const _token = token;
-		console.log(token);
-		const user = await this.authService.user_by_token(_token);
+        let flag = 0;
+            const user = await this.authService.user_by_token(_token);
+            // console.log(this.connected_users.has(user.userName));
+            if (this.connected_users != undefined)
+            {
+                this.connected_users.forEach((value, key, map) =>{
+                    if (user.userName === value.userName)
+                    {
+                        console.log("ehre");
+                        this.connected_users.delete(client.id);
+                        client.disconnect(true);
+                         flag = 1;
+                        // console.log(key, value.userName);
+                    }
+                });
 
-        this.connected_users.set(client.id,user);
-        console.log("from the set_online_methoed", user);
+            }
+            // console.log(this.connected_users.);
+            // if (this.connected_users.has(user.userName))
+            // {
+            //     console.log('this user try to connecte again ' ,user);
+            //     client.disconnect(true);
+            //     return; 
+            // }
+            if (flag == 0)
+                this.connected_users.set(client.id,user);
+            
 	}
     find_user_with_id(client_id: string){
 		const user = this.connected_users.get(client_id);
 		return user;
 	}
-
+    public creatSingleGame(client: Socket, gameInfo: any)
+    {
+        // console.log(gameInfo);
+        const player = this.connected_users.get(client.id);
+        if (player)
+        {
+            let logic_game;
+            if (gameInfo.type === 'classic')
+            {
+                player.logic_game = new LogicGame(player.userName, 'computer,', gameInfo.type);
+                console.log(player);
+            }
+        }
+    }
     private initializeGameEntities() {
         this.paddle = { x: 0, y: 0, width: 20, height: 100, score: 0 };
         this.computer = { x: 0, y: 0, width: 20, height: 100, score: 0 };
