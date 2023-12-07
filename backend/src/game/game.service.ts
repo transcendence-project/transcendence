@@ -33,23 +33,23 @@ export class GameService {
     }
     async set_online_user(client: Socket ,token: any){
 		const _token = token;
-        let flag = 0;
+        // let flag = 0;
             const user = await this.authService.user_by_token(_token);
             // console.log(this.connected_users.has(user.userName));
-            if (this.connected_users != undefined)
-            {
-                this.connected_users.forEach((value, key, map) =>{
-                    if (user.userName === value.user.userName)
-                    {
-                        console.log("ehre");
-                        this.connected_users.delete(client.id);
-                        client.disconnect(true);
-                         flag = 1;
-                        // console.log(key, value.userName);
-                    }
-                });
+            // if (this.connected_users != undefined)
+            // {
+            //     this.connected_users.forEach((value, key, map) =>{
+            //         if (user.userName === value.user.userName)
+            //         {
+            //             console.log("ehre");
+            //             this.connected_users.delete(client.id);
+            //             client.disconnect(true);
+            //              flag = 1;
+            //             // console.log(key, value.userName);
+            //         }
+            //     });
 
-            }
+            // }
             // console.log(this.connected_users.);
             // if (this.connected_users.has(user.userName))
             // {
@@ -57,7 +57,7 @@ export class GameService {
             //     client.disconnect(true);
             //     return; 
             // }
-            if (flag == 0)
+            // if (flag == 0)
                 this.connected_users.set(client.id,{user, logicGame: null});
             
 	}

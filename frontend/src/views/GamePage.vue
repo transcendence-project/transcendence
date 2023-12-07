@@ -1,6 +1,7 @@
 <template>
-	<div class="game-page-container">
+	<div class="game-container">
 		<GameSelect v-if="isGameSelectVisible"/>
+        <canvas v-show="isCanvasVisible" width="900" height="400" ref="game" id="pong"></canvas>
 	</div>
 </template>
 
@@ -14,8 +15,9 @@ import GameSelect from '@/components/GameSelect.vue';
     const canvasHeight = ref(400); // Default height, can be dynamically adjusted
     const playerScore = ref(0);
 	const isGameSelectVisible = ref(true);
+	const isCanvasVisible = ref(false);
     const computerScore = ref(0);
-    const pongCanvas =  ref<HTMLCanvasElement | null>(null);;
+    const pongCanvas =  ref<HTMLCanvasElement | null>(null);
 
 	let keyDownHandler = (event: KeyboardEvent) => {
 		if (event.key === "w" || event.key === "W") {
@@ -43,13 +45,39 @@ import GameSelect from '@/components/GameSelect.vue';
 		}
 	};
     onMounted(() => {
-	// console.log("inside the onMounted 55555", socket)
-    if (instance?.proxy)
-    {
-		const socket = instance.proxy.$socket.socket;
-		socket.on('game-data', (data: object) => {
-			console.log(data);
-			isGameSelectVisible.value = false
+        if (instance?.proxy)
+        {
+            const socket = instance.proxy.$socket.socket;
+            socket.on('game-data', (data: object) => {
+                
+                isGameSelectVisible.value = false;
+                isCanvasVisible.value = true;
+                const canvas = pongCanvas.value;
+
+            if (canvas)
+            {
+                console.log("hereeeee")
+                // pongCanvas.value.width = 900;
+                // pongCanvas.value.height = 400;
+                const ctx = canvas.getContext('2d');
+                if (ctx)
+                {
+                    // ctx.fillStyle = 'red';
+                    const render = () => { 
+                        if (pongCanvas.value)
+                        {
+                                ctx.fillStyle = 'red';
+                                // ctx.fillRect(0,0, canvas.width, canvas.height);
+                        }
+                    }
+                    const game = () => {
+                            // update();
+                            render();
+                            requestAnimationFrame(game);
+                        };
+                        requestAnimationFrame(game);
+                }
+            }
 		});
         // socket.value.on('table', (message: any) => {
             // console.log(message);
@@ -58,75 +86,75 @@ import GameSelect from '@/components/GameSelect.vue';
         // if (pongCanvas.value)
         // {
         //     const ctx = pongCanvas.value.getContext('2d');
-        //     if (ctx)
-        //     {
-        //         const drawRect = (
-        //             x: number,
-        //             y: number,
-        //             w: number,
-        //             h: number,
-        //             color: string
-        //             ) => {
-        //             ctx.fillStyle = color;
-        //             ctx.fillRect(x, y, w, h);
-        //         };
-        //         const drawCircle = (x: number, y: number, r: number, color: string) => {
-        //             ctx.fillStyle = color;
-        //             ctx.beginPath();
-        //             ctx.arc(x, y, r, 0, Math.PI * 2, false);
-        //             ctx.closePath();
-        //             ctx.fill();
-        //         };
-        //         const render = () => { 
-		// 			if (pongCanvas.value)
-		// 			{
-		// 				drawRect(0, 0, pongCanvas.value.width, pongCanvas.value.height, "#F6F1F1");
-		// 				drawRect(0, message.paddleRe.y,message.paddleRe.width, message.paddleRe.height,"#9336B4");
-		// 				drawRect(message.compRe.x, message.compRe.y,message.compRe.width, message.compRe.height,"#9336B4");
-		// 				drawCircle(message.ball.x, message.ball.y, message.ball.radius, "#19A7CE")
-		// 			}
-        //         }
-		// 		document.addEventListener("keydown", keyDownHandler);
-		// 		document.addEventListener("keyup", keyUpHandler);
-        //         const game = () => {
-        //             // update();
-        //             render();
-        //             requestAnimationFrame(game);
-        //         };
-        //         requestAnimationFrame(game);
-        //     }
+            // if (ctx)
+            // {
+            //     const drawRect = (
+            //         x: number,
+            //         y: number,
+            //         w: number,
+            //         h: number,
+            //         color: string
+            //         ) => {
+            //         ctx.fillStyle = color;
+            //         ctx.fillRect(x, y, w, h);
+            //     };
+            //     const drawCircle = (x: number, y: number, r: number, color: string) => {
+            //         ctx.fillStyle = color;
+            //         ctx.beginPath();
+            //         ctx.arc(x, y, r, 0, Math.PI * 2, false);
+            //         ctx.closePath();
+            //         ctx.fill();
+            //     };
+            //     const render = () => { 
+			// 		if (pongCanvas.value)
+			// 		{
+			// 			drawRect(0, 0, pongCanvas.value.width, pongCanvas.value.height, "#F6F1F1");
+			// 			drawRect(0, message.paddleRe.y,message.paddleRe.width, message.paddleRe.height,"#9336B4");
+			// 			drawRect(message.compRe.x, message.compRe.y,message.compRe.width, message.compRe.height,"#9336B4");
+			// 			drawCircle(message.ball.x, message.ball.y, message.ball.radius, "#19A7CE")
+			// 		}
+            //     }
+			// 	document.addEventListener("keydown", keyDownHandler);
+			// 	document.addEventListener("keyup", keyUpHandler);
+            //     const game = () => {
+            //         // update();
+            //         render();
+            //         requestAnimationFrame(game);
+            //     };
+            //     requestAnimationFrame(game);
+            // }
         // }
         // });
     }
     });
-    const startGame = () => {
-        // if (socket) {
-        //     console.log(canvas.value.offsetWidth);
-        //     const canvasDimensions = {
-        //         width: canvas.value.offsetWidth,
-        //         height: canvas.offsetHeight,
-        //     };
-        //     socket.emit('start-game', canvasDimensions);
-        // }
-    if (pongCanvas.value) 
-    {
-		console.log(pongCanvas.value.offsetWidth);
-        const canvasDimensions = {
-            width: pongCanvas.value.offsetWidth,
-            height: pongCanvas.value.offsetHeight,
-        };
-		if (instance?.proxy)
-		{
-        	const socket = instance.proxy.$socket.socket;
-			socket.emit('start-game', canvasDimensions);
+    // const startGame = () => {
+    //     // if (socket) {
+    //     //     console.log(canvas.value.offsetWidth);
+    //     //     const canvasDimensions = {
+    //     //         width: canvas.value.offsetWidth,
+    //     //         height: canvas.offsetHeight,
+    //     //     };
+    //     //     socket.emit('start-game', canvasDimensions);
+    //     // }
+    // if (pongCanvas.value) 
+    // {
+	// 	console.log(pongCanvas.value.offsetWidth);
+    //     const canvasDimensions = {
+    //         width: pongCanvas.value.offsetWidth,
+    //         height: pongCanvas.value.offsetHeight,
+    //     };
+	// 	if (instance?.proxy)
+	// 	{
+    //     	const socket = instance.proxy.$socket.socket;
+	// 		socket.emit('start-game', canvasDimensions);
 
-		}
-    } 
-    else 
-    {
-        console.log('Canvas element not found in startGame');
-    }
-    };
+	// 	}
+    // } 
+    // else 
+    // {
+    //     console.log('Canvas element not found in startGame');
+    // }
+    // };
 	onBeforeUnmount(() => {
 		window.removeEventListener("keyup", keyUpHandler, false);
 		window.removeEventListener("keydown", keyDownHandler, false);
@@ -135,14 +163,9 @@ import GameSelect from '@/components/GameSelect.vue';
 </script>
 
 <style>
-.game-page-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-top: 50px;
-  width: 100%;
-  /* Add any additional styling for GamePage here */
-}
+/* #pong {
+    background-color: white;
+} */
   .game-container {
 	/* width: fit-content; */
     display: flex;
