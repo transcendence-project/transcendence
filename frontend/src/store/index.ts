@@ -33,6 +33,7 @@ const store = createStore({
 			current_friend: null,
 			current_channel: null,
 		},
+<<<<<<<<< Temporary merge branch 1
 		friend: <IStudent>{
 			id: 0,
 			display_name: "",
@@ -46,6 +47,7 @@ const store = createStore({
 			rank: 0,
 			twofa: false,
 		},
+>>>>>>> c0f8523e991636345c3b3d06430363b392ea2b6d
 	},
 	getters: { // used to retrieve computed properties or derived state from the store.
 
@@ -257,6 +259,26 @@ const store = createStore({
 			});
 
 		},
+
+
+
+
+
+
+		// async fetchFriendChan(context: any){
+		// 	const cur = localStorage.getItem('fetchCurrentFriend');
+		// 	await axios.get("", {
+		// 		headers: {
+		// 			Authorization: `Bearer ${localStorage.getItem('token')}`,
+		// 		},
+		// 	}).then((resp: AxiosResponse<IChannel[]>) => {
+		// 		// console.log(resp.data);
+		// 		context.commit('setCurrentFriend', resp.data);
+		// 	}).catch((error) => {
+		// 		console.error("Error fetching current channel:", error);
+		// 	});
+		// },
+>>>>>>>>> Temporary merge branch 2
 		async TwoFA(context: any) {
 			try {
 				const response = await axios.get("http://localhost:3000/auth/2fa/generate", {
