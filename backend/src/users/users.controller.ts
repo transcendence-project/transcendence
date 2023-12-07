@@ -41,6 +41,13 @@ export class UsersController {
 	// 	return (this.userService.findOne(parseInt(id)))
 	// }
 
+	@Get('friend/:name')
+	getFriend(@Param("name") name: string){
+		console.log(name);
+		const frnd = this.userService.findOneByUserName(name);
+		return (frnd);
+	}
+
 	@Get()
 	findAllUsers(){
 		return (this.userService.findAllUsers())

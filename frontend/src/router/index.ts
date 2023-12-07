@@ -109,5 +109,11 @@ router.beforeEach((to: any, from: any, next: any) => {
           localStorage.setItem('token', token);
 		  store.dispatch('fetchUserData');
     }
+	if (to.path == '/twofactor' && to.query.code)
+    {
+          const token = to.query.code;
+          localStorage.setItem('token', token);
+		  store.dispatch('fetchUserData');
+    }
   });
 export default router;

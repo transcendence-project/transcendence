@@ -13,6 +13,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Achievement } from "entities/achievement.entity";
 import { SeederService } from "../achievements/achievement.seed";
 import { MatchesService } from "matches/matches.service";
+import { ChatService } from "chat/chat.service";
 
 @Injectable()
 export class UsersService {
@@ -55,7 +56,7 @@ export class UsersService {
 	return (this.repo.findOne({where: {id}, relations: ['channels']}))
   }
   async findOneByUserName(userName: string) {
-    const user = await this.repo.findOneBy({ userName });
+    const user = await this.repo.findOne({ where: {userName}, relations: ['blocked'] });
     return user;
   }
 
@@ -291,7 +292,9 @@ export class UsersService {
 	const user = await this.findOneByUserName(user_name);
 	if (user)
 	{
-		user.blocked.push(friend_name);
+		const frnd = await this.repo.findOne({
+			where: { userName: friend_name }});
+		user.blocked.push(frnd);
 		await this.repo.save(user);
 	}
   }
@@ -307,8 +310,21 @@ export class UsersService {
 	const user = await this.findOneByUserName(user_name);
 	if (user)
 	{
-		user.blocked.filter((friend: string )=> friend !== friend_name);
+		user.blocked = user.blocked.filter((friend: User )=> friend.userName !== friend_name);
 		await this.repo.save(user);
 	}
+  }
+
+  async is_blocked(friend_name: string, user_name: string){
+	// const user = await this.repo.findOne({
+	// 	where: { userName: user_name },
+	// 	relations: ["blocked"],
+	// });
+	const user = await this.findOneByUserName(user_name);
+	const isBlocked = user.blocked.some((friend: User) => friend.userName === friend_name);
+	if (isBlocked)
+		return true;
+	else
+		return false;
   }
 }
