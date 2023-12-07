@@ -146,7 +146,7 @@ const store = createStore({
 		// axios requests to database / backend
 		fetchUserData(context: any) {
 			console.log("inside fetch user data");
-			axios.get('http://10.12.3.5:3000/auth/me', {
+			axios.get('http://localhost:3000/auth/me', {
 				headers: {
 					Authorization: `Bearer ${localStorage.getItem('token')}`,
 				},
@@ -162,7 +162,7 @@ const store = createStore({
 			});
 		},
 		async fetchAllChan(context: any) {
-			const resp = await axios.get("http://10.12.3.5:3000/chat/all_channels");
+			const resp = await axios.get("http://localhost:3000/chat/all_channels");
 			const all_chan = resp.data;
 			context.commit('setAllChannel', all_chan);
 			// const get_chan =  store.getters.getAllChannel;
@@ -171,7 +171,7 @@ const store = createStore({
 		},
 		async fetchMyChan(context: any) {
 			console.log('inside fetch my chan')
-			const resp = await axios.get("http://10.12.3.5:3000/users/my/channels", {
+			const resp = await axios.get("http://localhost:3000/users/my/channels", {
 				headers: {
 					Authorization: `Bearer ${localStorage.getItem('token')}`,
 				},
@@ -184,7 +184,7 @@ const store = createStore({
 		},
 		async fetchCurrentChan(context: any) {
 			const cur = localStorage.getItem('currentChanName');
-			await axios.get(`http://10.12.3.5:3000/chat/current_chan/${cur}`, {
+			await axios.get(`http://localhost:3000/chat/current_chan/${cur}`, {
 				params: { chan_name: cur },
 				headers: {
 					Authorization: `Bearer ${localStorage.getItem('token')}`,
@@ -196,7 +196,7 @@ const store = createStore({
 			});
 		},
 		async fetchMyFriends(context: any) {
-			await axios.get("http://10.12.3.5:3000/users/my/friends", {
+			await axios.get("http://localhost:3000/users/my/friends", {
 				headers: {
 					Authorization: `Bearer ${localStorage.getItem('token')}`,
 				},
@@ -207,7 +207,7 @@ const store = createStore({
 			});
 		},
 		async fetchMyBlocked(context: any) {
-			await axios.get("http://10.12.3.5:3000/users/my/blocked", {
+			await axios.get("http://localhost:3000/users/my/blocked", {
 				headers: {
 					Authorization: `Bearer ${localStorage.getItem('token')}`,
 				},
@@ -219,7 +219,7 @@ const store = createStore({
 		},
 		async fetchFriendChan(context: any){
 			const cur = localStorage.getItem('currentFriend');
-			await axios.get(`http://10.12.3.5:3000/chat/current_frndchan/${cur}`, {
+			await axios.get(`http://localhost:3000/chat/current_frndchan/${cur}`, {
 				headers: {
 					Authorization: `Bearer ${localStorage.getItem('token')}`,
 				},
@@ -232,7 +232,7 @@ const store = createStore({
 		},
 		async fetchFriendData(context: any) {
 			const cur = localStorage.getItem('currentFriend');
-			await axios.get(`http://10.12.3.5:3000/users/friend/${cur}`, {
+			await axios.get(`http://localhost:3000/users/friend/${cur}`, {
 				headers: {
 					Authorization: `Bearer ${localStorage.getItem('token')}`,
 				},
@@ -250,7 +250,7 @@ const store = createStore({
 		},
 		async TwoFA(context: any) {
 			try {
-				const response = await axios.get("http://10.12.3.5:3000/auth/2fa/generate", {
+				const response = await axios.get("http://localhost:3000/auth/2fa/generate", {
 					headers: {
 						Authorization: `Bearer ${localStorage.getItem('token')}`,
 					},
@@ -266,7 +266,7 @@ const store = createStore({
 		async ValidateTwoFA(context: any) {
 			const code = localStorage.getItem('2FACode');
 			console.log("reached the store to send verification store");
-			await axios.get(`http://10.12.3.5:3000/auth/2fa/authenticate/${code}`, {
+			await axios.get(`http://localhost:3000/auth/2fa/authenticate/${code}`, {
 				headers: {
 					Authorization: `Bearer ${localStorage.getItem('token')}`,
 				},
@@ -279,7 +279,7 @@ const store = createStore({
 		},
 		async enabl2FA(context: any) {
 			try {
-				const response = await axios.get("http://10.12.3.5:3000/auth/2fa/enable", {
+				const response = await axios.get("http://localhost:3000/auth/2fa/enable", {
 					headers: {
 						Authorization: `Bearer ${localStorage.getItem('token')}`,
 					},
@@ -290,7 +290,7 @@ const store = createStore({
 		},
 		async disabl2FA(context: any) {
 			try {
-				const response = await axios.get("http://10.12.3.5:3000/auth/2fa/disable", {
+				const response = await axios.get("http://localhost:3000/auth/2fa/disable", {
 					headers: {
 						Authorization: `Bearer ${localStorage.getItem('token')}`,
 					},

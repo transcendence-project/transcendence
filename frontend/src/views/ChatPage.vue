@@ -810,7 +810,7 @@
   created() {
     if (!store.state.chat.socket) {
       console.log("establishing connection again");
-      store.state.chat.socket = io("http://10.12.3.5:3000/chat", {
+      store.state.chat.socket = io("http://localhost:3000/chat", {
         auth: {
           token: localStorage.getItem("token"),
         },

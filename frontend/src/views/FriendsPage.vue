@@ -183,7 +183,7 @@ export default defineComponent({
     async sendFriendRequest(selectedUser: any) {
       try {
         const response = await axios.post(
-          `http://10.12.3.5:3000/friend-requests/${selectedUser.id}`,
+          `http://localhost:3000/friend-requests/${selectedUser.id}`,
           null,
           {
             headers: {
@@ -199,7 +199,7 @@ export default defineComponent({
       console.log("in remove friend: ", selectedUser);
       try {
         const response = await axios.delete(
-          `http://10.12.3.5:3000/users/my/friends/${selectedUser}`,
+          `http://localhost:3000/users/my/friends/${selectedUser}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -213,7 +213,7 @@ export default defineComponent({
     async myFriends() {
       try {
         const response = await axios.get(
-          `http://10.12.3.5:3000/users/my/friends`,
+          `http://localhost:3000/users/my/friends`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -231,7 +231,7 @@ export default defineComponent({
     async viewFriendRequest() {
       try {
         const response = await axios.get(
-          `http://10.12.3.5:3000/friend-requests/my-friend-requests`,
+          `http://localhost:3000/friend-requests/my-friend-requests`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -249,7 +249,7 @@ export default defineComponent({
     async acceptFriendRequest(selectedUser: any) {
       try {
         const response = await axios.patch(
-          `http://10.12.3.5:3000/friend-requests/accept/${selectedUser}`,
+          `http://localhost:3000/friend-requests/accept/${selectedUser}`,
         );
 
         console.log("Friend request accepted:", response);
@@ -260,7 +260,7 @@ export default defineComponent({
     async rejectFriendRequest(selectedUser: any) {
       try {
         const response = await axios.patch(
-          `http://10.12.3.5:3000/friend-requests/${selectedUser}/reject`,
+          `http://localhost:3000/friend-requests/${selectedUser}/reject`,
         );
       } catch (error) {
         console.error("Error:", error);
@@ -272,7 +272,7 @@ export default defineComponent({
     this.viewFriendRequest();
     this.myFriends();
     axios
-      .get("http://10.12.3.5:3000/users")
+      .get("http://localhost:3000/users")
       .then((resp: AxiosResponse<IStudent[]>) => {
         this.student = resp.data;
       })

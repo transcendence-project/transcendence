@@ -8,7 +8,7 @@ import { SocketService } from './socket.service'
 @WebSocketGateway({
 	namespace: 'game',
 	cors: {
-		origin: 'http://10.12.3.5:8080',
+		origin: 'http://localhost:8080',
 		credentials: true,
 	},
 

@@ -41,7 +41,7 @@ export default defineComponent({
 	},
 	mounted() {
 		axios
-			.get("http://10.12.3.5:3000/users")
+			.get("http://localhost:3000/users")
 			.then((resp: AxiosResponse<IStudent[]>) => {
 				this.student = resp.data;
 			})

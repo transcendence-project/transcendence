@@ -32,7 +32,7 @@ export class AuthController {
 		// const decodeToken = this.authService.decode_token(token);
 		// console.log('back in controller');
 		console.log("Token: ", token);
-		const url = new URL('http://10.12.3.5:8080/home');
+		const url = new URL('http://localhost:8080/home');
 		url.searchParams.set('code', token);
 		res.status(200).redirect(url.href);
 	}

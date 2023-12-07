@@ -71,7 +71,7 @@ export class GameService {
         // const oo = this.connected_users.has(client.id);
         if (player)
         {
-            let logic;
+            let logic: LogicGame;
             if (gameInfo.type === 'classic')
             {
                 if (player.logicGame == null)

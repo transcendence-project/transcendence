@@ -7,7 +7,7 @@
 //     // Connect to WebSocket when the app is mounted
 //     app.mixin({
 //       mounted() {
-//         connectWebSocket('http://10.12.3.5:3000/game');
+//         connectWebSocket('http://localhost:3000/game');
 //       },
 //     });
 
@@ -30,7 +30,7 @@
 //                 extraHeaders: _token ? { token:  _token} : undefined,
 //             };
   
-//             const socket = io('http://10.12.3.5:3000/game', headers);
+//             const socket = io('http://localhost:3000/game', headers);
 //         app.config.globalProperties.$socket = socket;
 //   },
 // };
@@ -51,7 +51,7 @@
 //         const headers = {
 //           extraHeaders: { token: _token },
 //         };
-//         socketState.socket = io('http://10.12.3.5:3000/game', headers);
+//         socketState.socket = io('http://localhost:3000/game', headers);
 //       }
 //     };
 
@@ -82,7 +82,7 @@ export function useWebSocket() {
         const headers = {
           extraHeaders: { token: _token },
         };
-        socketState.socket = io('http://10.12.3.5:3000/game', headers);
+        socketState.socket = io('http://localhost:3000/game', headers);
       }
     },
     disconnectSocket: () => {

@@ -1,17 +1,17 @@
-@Host=http://10.12.3.5:3000
+@Host=http://localhost:3000
 @myToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjIsInVzZXJuYW1lIjoib2FidXNoYXIiLCJpYXQiOjE2OTk5ODY2MDV9.CB9BKd7aEjckKLvD3DyMvT7o-Hr8eYE573Hs8PFkpCA
 @amhusseiToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFtaHVzc2VpIiwiaWF0IjoxNjk4MDQ3MjY1fQ.tXVcsCmlUBDTmmFnrq29XY90AfhWe-C7tLGph3L7bHo
 ###Get my user
-GET http://10.12.3.5:3000/auth/me
+GET http://localhost:3000/auth/me
 Authorization: Bearer {{myToken}}
 
 ### Get amhussei user
-GET http://10.12.3.5:3000/auth/me
+GET http://localhost:3000/auth/me
 Authorization: Bearer {{amhusseiToken}}
 
 
 ### sign up
-POST http://10.12.3.5:3000/users/signup
+POST http://localhost:3000/users/signup
 Content-Type: application/json
 
 {
@@ -21,59 +21,59 @@ Content-Type: application/json
 }
 
 ### authentication
-GET http://10.12.3.5:3000/auth/42
+GET http://localhost:3000/auth/42
 
 ### find user by id
-GET http://10.12.3.5:3000/users/
+GET http://localhost:3000/users/
 
 ###find all users
 
-GET http://10.12.3.5:3000/users?userName=oabushar
+GET http://localhost:3000/users?userName=oabushar
 
 ### print goodbye
-GET http://10.12.3.5:3000/auth/me
+GET http://localhost:3000/auth/me
 Authorization: Bearer {{myToken}}
 
 ### remove user
-DELETE http://10.12.3.5:3000/users/
+DELETE http://localhost:3000/users/
 
 ### generate qr code
-GET  http://10.12.3.5:3000/auth/2fa/generate
+GET  http://localhost:3000/auth/2fa/generate
 
 ### authenticate 2fa
-GET  http://10.12.3.5:3000/auth/2fa/authenticate
+GET  http://localhost:3000/auth/2fa/authenticate
 
 ### send friend request to user with id: 
-POST http://10.12.3.5:3000/friend-requests/4
+POST http://localhost:3000/friend-requests/4
 Authorization: Bearer {{myToken}}
 
 ### check friend requests
-GET http://10.12.3.5:3000/friend-requests/my-friend-requests
+GET http://localhost:3000/friend-requests/my-friend-requests
 Authorization: Bearer {{amhusseiToken}}
 
 ### accept friend request
-PATCH http://10.12.3.5:3000/friend-requests/10/accept
+PATCH http://localhost:3000/friend-requests/10/accept
 
 ### reject friend request
-PATCH http://10.12.3.5:3000/friend-requests/8/reject
+PATCH http://localhost:3000/friend-requests/8/reject
 
 ### Delete friend
-DELETE http://10.12.3.5:3000/users/2/friends/1
+DELETE http://localhost:3000/users/2/friends/1
 
 ### Get oabushar achievements
-GET http://10.12.3.5:3000/users/achievements
+GET http://localhost:3000/users/achievements
 Authorization: Bearer {{myToken}}
 
 ### Give oabushar achievement
-PATCH http://10.12.3.5:3000/users/3/giveAchievement/First%20Win
+PATCH http://localhost:3000/users/3/giveAchievement/First%20Win
 Authorization: Bearer {{myToken}}
 
 ### Get oabushar matches
-GET http://10.12.3.5:3000/matches/my/matches
+GET http://localhost:3000/matches/my/matches
 Authorization: Bearer {{myToken}}
 
 ### save oabushar match
-POST http://10.12.3.5:3000/users/save/match
+POST http://localhost:3000/users/save/match
 Authorization: Bearer {{myToken}}
 
 Content-Type: application/json

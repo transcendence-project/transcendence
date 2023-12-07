@@ -12,7 +12,7 @@ import { Channel } from "entities/channel.entity";
 import { UsersService } from '../users/users.service';
 
 @WebSocketGateway({
-	cors: { origin: "http://10.12.3.5:8080" },
+	cors: { origin: "http://localhost:8080" },
 	namespace: "chat",
 })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {

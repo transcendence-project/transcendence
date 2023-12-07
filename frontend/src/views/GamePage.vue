@@ -1,6 +1,6 @@
 <template>
 	<div class="game-page-container">
-		<GameSelect />
+		<GameSelect v-if="isGameSelectVisible"/>
 	</div>
 </template>
 
@@ -9,13 +9,11 @@
 import { ref, onMounted , getCurrentInstance, onBeforeUnmount, computed} from 'vue';
 import WebSocketPlugin from '@/plugins/websocket-plugin';
 import GameSelect from '@/components/GameSelect.vue';
-
-// const instance  = getCurrentInstance();
-    // const socket = instance?.proxy?.$socket;
 	const instance = getCurrentInstance();
     const canvasWidth = ref(900); // Default width, can be dynamically adjusted
     const canvasHeight = ref(400); // Default height, can be dynamically adjusted
     const playerScore = ref(0);
+	const isGameSelectVisible = ref(true);
     const computerScore = ref(0);
     const pongCanvas =  ref<HTMLCanvasElement | null>(null);;
 
@@ -49,6 +47,10 @@ import GameSelect from '@/components/GameSelect.vue';
     if (instance?.proxy)
     {
 		const socket = instance.proxy.$socket.socket;
+		socket.on('game-data', (data: object) => {
+			console.log(data);
+			isGameSelectVisible.value = false
+		});
         // socket.value.on('table', (message: any) => {
             // console.log(message);
         //     playerScore.value = message.paddleRe.score;
