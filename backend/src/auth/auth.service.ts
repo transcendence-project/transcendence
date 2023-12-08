@@ -10,6 +10,7 @@ import { JwtService } from '@nestjs/jwt';
 export class AuthService{
 	constructor(@Inject(forwardRef(() => UsersService)) private userService: UsersService, private jwtService: JwtService) {}
 	async validate(user: createUserDTO): Promise<User> {
+		console.log('in validate, user: ', user);
 		const user1 = await this.userService.create(user.email, user.username, user.fullname, user.image);
 		console.log(user1.userName);
 		return user1;
@@ -26,6 +27,10 @@ export class AuthService{
 		const decode_token = this.decode_token(token);
 		const user = await this.userService.findOne(decode_token.sub);
 		return user;
+	}
+
+	async authenticate(user: User, auth: boolean) {
+		return this.userService.update(user.id, {isAuthenticated: auth});
 	}
 
 	async generateTwoFactorAuthenticationSecret(user: User) {
