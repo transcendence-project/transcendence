@@ -48,6 +48,8 @@ export class UsersService {
 	matchesAsPlayerOne: [],
 	matchesAsPlayerTwo: [],
       achievements: [],
+	  wins: 2,
+	  loses: 5,
 	  points: 50,
     });
     return this.repo.save(user2);

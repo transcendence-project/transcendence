@@ -241,14 +241,10 @@
 						  </button>
 						</div>
 						<button class="intbtn px-2">Invite</button>
-						<!-- <button class="intbtn px-2" @click="showProfilePage"> -->
-						<button class="intbtn px-2" @click="">
+						<button class="intbtn px-2" @click="goToUserProfile(friend.user)">
 						  <router-link to="/users">Profile</router-link>
-  
-						  <!-- Profile -->
-						</button>
+  						</button>
 					  </div>
-					  <!-- <ProfilePage v-if="isProfile" @close="showProfilePage" /> -->
 					</li>
 				  </div>
 				</ul>
@@ -550,6 +546,11 @@
 	  },
 	},
 	methods: {
+
+		goToUserProfile(selectedUser: string){
+			// const selectedUser = "aghazi";
+			this.$router.push({name: 'users', params: { username: selectedUser}})
+		},
 	  // showProfilePage(index: any)
 	  showProfilePage() {
 		this.isProfile = !this.isProfile;
