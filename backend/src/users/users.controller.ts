@@ -34,6 +34,10 @@ export class UsersController {
 	  return user;
 	}
 
+	@Get('leaderboard')
+	async get_leaderboard() {
+		return await this.userService.findAllRankedUser();
+	}
 
 
 	// @Get('/:id')
