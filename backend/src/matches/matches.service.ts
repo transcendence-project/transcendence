@@ -47,7 +47,7 @@ async findMatches(userId: number) {
   return matches;
 }
 
-async findMatchesAsPlayerOne(userId: number) {
+async findMatchesAsPlayerOne(userId: number): Promise<Match[]> {
 	const matches = await this.repo.find({
 	where: [
 	  { playerOne: { id: userId } }

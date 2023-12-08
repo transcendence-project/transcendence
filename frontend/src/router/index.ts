@@ -24,7 +24,7 @@ const routes: Array<RouteRecordRaw> = [
     },
   },
   {
-    path: "/users",
+    path: "/users/:username",
     name: "users",
     alias: "/users",
     component: () =>

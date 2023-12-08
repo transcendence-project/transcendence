@@ -12,6 +12,9 @@ export class Message {
 	@Column()
 	senderID: number
 
+	@Column()
+	sendername: string
+
 	@ManyToOne(() => User)
 	sender: User
 

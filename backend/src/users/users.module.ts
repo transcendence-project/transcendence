@@ -15,7 +15,6 @@ import { MatchModule } from 'matches/matches.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { ChatModule } from 'chat/chat.module';
-@Module({
 	imports: [TypeOrmModule.forFeature([User, FriendRequest, Achievement]), forwardRef(() => MatchModule), forwardRef(() => ChatModule), 
 		MulterModule.register({
 			storage: diskStorage({

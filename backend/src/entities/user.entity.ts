@@ -32,8 +32,15 @@ export class User {
   @Column()
   email: string;
   
+  @Column({default: 9})
+  wins: number;
+
+  @Column({default: 2})
+  loses: number;
+  
   @Column({default: 50})
   points: number;
+
 
   @Column({ nullable: true })
   is2FAEnabled: boolean;

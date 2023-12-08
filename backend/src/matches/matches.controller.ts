@@ -31,14 +31,16 @@ export class MatchController {
 
   @Get('my/wins')
   @UseGuards(JwtAuthGuard)
-  async findWins(@Req() req) {
-	return this.matchesService.findMatchesAsPlayerOne(req.user.id);
+  async findWins(@Req() req): Promise<number> {
+	const matches_len =  (await this.matchesService.findMatchesAsPlayerOne(req.user.id)).length;
+	return matches_len
   }
 
   @Get('my/losses')
   @UseGuards(JwtAuthGuard)
-  async findLosses(@Req() req) {
-	return this.matchesService.findMatchesAsPlayerTwo(req.user.id);
+  async findLosses(@Req() req): Promise<number>{
+	const matches_len =  (await this.matchesService.findMatchesAsPlayerTwo(req.user.id)).length;
+	return matches_len
   }
 
 }

@@ -241,14 +241,10 @@
 						  </button>
 						</div>
 						<button class="intbtn px-2">Invite</button>
-						<!-- <button class="intbtn px-2" @click="showProfilePage"> -->
-						<button class="intbtn px-2" @click="">
+						<button class="intbtn px-2" @click="goToUserProfile(friend.user)">
 						  <router-link to="/users">Profile</router-link>
-  
-						  <!-- Profile -->
-						</button>
+  						</button>
 					  </div>
-					  <!-- <ProfilePage v-if="isProfile" @close="showProfilePage" /> -->
 					</li>
 				  </div>
 				</ul>
@@ -279,19 +275,15 @@
 				  {{ message.chat }}
 				</div>
 				<div v-else class="my-5 mx-5" style="text-align: left">
-					<!-- <p>{{ message.send }}</p> -->
-					<span
-                    class="bg-blue-200 text-grey-500 py-1 px-3 inline rounded-md"
-                    style="display: inline-block"
-                  >
-                    <span class="text-xs">
-                      {{ message.sender }} 
-					 <!-- sender  -->
-					  </span
-                    ><br />
-                    {{ message.chat }}
-                  </span>
-				  </div>
+					<span class="bg-blue-200 text-grey-500 py-2 px-3 inline rounded-md" style="display:inline-block;">
+						<span class="text-xs">
+							{{ message.sender }}
+						</span>
+						<br>
+						<hr>
+						{{ message.chat }}
+					</span>
+				</div>
 				</div>
 			  </div>
 			</div>
@@ -410,7 +402,7 @@
 		isSearchChannelVisible: false,
 		selectedItem: null as IChannel | null,
 		isMessageSent: false,
-		chatMessage: [] as { send: boolean; chat: string }[],
+		chatMessage: [] as { send: boolean; chat: string; sender: string }[],
 		isPrivate: false,
 		isOptions: false,
 		searchQuery: "" as string,
@@ -425,11 +417,8 @@
 		addPrivateMember: false,
 		isProfile: false,
   
-
 		isChangePassword: false,
 		friends: m_frnd,
-		// friends: m_frnd,
-	
     };
   },
   setup() {
@@ -438,16 +427,17 @@
       const channel = computed(() => store.getters.getAllChannel);
       const arrayProxy = channel.value;
       arrayProxy.forEach((item: any) => {
-        if (item.isGroupChannel === true) {
-          const new_chan: IChannel = {
-            name: item.room_name,
-            id: item.id,
-            isPrivate: item.is_private,
-            isProtected: item.is_protected,
-            isPublic: item.is_public,
-          };
-          chan.value.push(new_chan);
-        }
+		if (item.isGroupChannel === true)
+		{
+			const new_chan: IChannel = {
+			  name: item.room_name,
+			  id: item.id,
+			  isPrivate: item.is_private,
+			  isProtected: item.is_protected,
+			  isPublic: item.is_public,
+			};
+			chan.value.push(new_chan);
+		}
       });
     };
     if (!chan.value.length) all();
@@ -456,16 +446,17 @@
       const my_channel = computed(() => store.getters.getMyChannel);
       const arrayProxy_m = my_channel.value;
       arrayProxy_m.forEach((item: any) => {
-        if (item.isGroupChannel === true) {
-          const my_chan: IChannel = {
-            name: item.room_name,
-            id: item.id,
-            isPrivate: item.is_private,
-            isProtected: item.is_protected,
-            isPublic: item.is_public,
-          };
-          m_chan.value.push(my_chan);
-        }
+		if (item.isGroupChannel === true)
+		{
+			const my_chan: IChannel = {
+			  name: item.room_name,
+			  id: item.id,
+			  isPrivate: item.is_private,
+			  isProtected: item.is_protected,
+			  isPublic: item.is_public,
+			};
+			m_chan.value.push(my_chan);
+		}
       });
     };
     if (!m_chan.value.length) my();
@@ -555,6 +546,11 @@
 	  },
 	},
 	methods: {
+
+		goToUserProfile(selectedUser: string){
+			// const selectedUser = "aghazi";
+			this.$router.push({name: 'users', params: { username: selectedUser}})
+		},
 	  // showProfilePage(index: any)
 	  showProfilePage() {
 		this.isProfile = !this.isProfile;
@@ -661,7 +657,7 @@
           life: 3000,
         });
       });
-    },
+	},
     listenForMuteEvents() {
       console.log("in listen for mute events");
       store.state.chat.socket.off("muted");
@@ -725,22 +721,24 @@
       console.log(chan.value.messages);
       const val = chan.value.messages;
       val.forEach((item: any) => {
+		console.log(item)
         if (item.senderID === store.getters.getId)
-          this.chatMessage.push({ send: true, chat: item.content });
-        else this.chatMessage.push({ send: false, chat: item.content });
+          this.chatMessage.push({ send: true, chat: item.content, sender: item.sendername });
+        else this.chatMessage.push({ send: false, chat: item.content, sender: item.sendername });
       });
     },
     async displayFriendMessage() {
       this.chatMessage = [];
       await store.dispatch("fetchFriendChan");
       const chan = computed(() => store.getters.getCurrentCahnnel);
-      console.log(chan.value.messages);
-      const val = chan.value.messages;
-	  val.forEach((item: any) => {
-        if (item.senderID === store.getters.getId)
-          this.chatMessage.push({ send: true, chat: item.content });
-        else this.chatMessage.push({ send: false, chat: item.content });
-      });
+	  console.log(chan.value)
+    //   console.log(chan.value.messages);
+    //   const val = chan.value.messages;
+	//   val.forEach((item: any) => {
+    //     if (item.senderID === store.getters.getId)
+    //       this.chatMessage.push({ send: true, chat: item.content, sender: item.sendername });
+    //     else this.chatMessage.push({ send: false, chat: item.content, sender: item.sendername });
+    //   });
     },
     sendMessage() {
       if (this.message) {
@@ -828,17 +826,20 @@
       console.log(localStorage.getItem("currentChanName"));
       console.log("reached update msg event listener");
       if (data) {
+		console.log(data);
         if (
           data.user != store.getters.getUserName &&
           localStorage.getItem("currentChanName") == data.chan
         ) {
-          this.chatMessage.push({ send: false, chat: data.content });
+			console.log("shouldnt come herreee!")
+          this.chatMessage.push({ send: false, chat: data.content, sender: data.user });
           this.isMessageSent = true;
         } else if (
           data.user == store.getters.getUserName &&
           localStorage.getItem("currentChanName") == data.chan
         ) {
-          this.chatMessage.push({ send: true, chat: data.content });
+			console.log("should come herreee!")
+          this.chatMessage.push({ send: true, chat: data.content, sender: data.user  });
           this.isMessageSent = true;
         }
       }
@@ -848,14 +849,14 @@
 	  if (data)
 	  {
 		if (data.frnd == store.getters.getUserName && localStorage.getItem("currentFriend") == data.user){
-			this.chatMessage.push({ send: false, chat: data.content });
+			this.chatMessage.push({ send: false, chat: data.content, sender: data.user });
           	this.isMessageSent = true;
 		}
 		else if (data.user == store.getters.getUserName && localStorage.getItem("currentFriend") == data.frnd){
 			console.log("hellllooooo");
 			console.log(localStorage.getItem("currentFriend"));
 			console.log(data.frnd)
-			this.chatMessage.push({ send: true, chat: data.content });
+			this.chatMessage.push({ send: true, chat: data.content, sender: data.user });
          	this.isMessageSent = true;
 		}
 	  }
@@ -873,21 +874,19 @@
       );
       if (index !== -1) this.my_chan.splice(index, 1);
     });
-    store.state.chat.socket.on("blocked", (friend_name: string) => {
-      const friend_found = this.friends.find(
-        (friend: FriendsList) => friend.user === friend_name,
-      );
-      if (friend_found) friend_found.isBlock = true;
+	store.state.chat.socket.on("blocked", (friend_name: string) => {
+      const friend_found = this.friends.find((friend: FriendsList) => friend.user === friend_name);
+	  if (friend_found)
+		friend_found.isBlock = true;
     });
-    store.state.chat.socket.on("unblocked", (friend_name: string) => {
-      const friend_found = this.friends.find(
-        (friend: FriendsList) => friend.user === friend_name,
-      );
-      if (friend_found) friend_found.isBlock = false;
+	store.state.chat.socket.on("unblocked", (friend_name: string) => {
+      const friend_found = this.friends.find((friend: FriendsList) => friend.user === friend_name);
+	  if (friend_found)
+		friend_found.isBlock = false;
     });
     // this.mute_omar();
     this.listenForMuteEvents();
-    this.notify();
+	this.notify();
   },
 });
 </script>

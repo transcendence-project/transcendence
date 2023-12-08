@@ -12,4 +12,6 @@ export interface IStudent {
   rank: number;
   isAuthenticated: boolean;
   twofa: boolean;
+	achievments: string [];
+  
 }

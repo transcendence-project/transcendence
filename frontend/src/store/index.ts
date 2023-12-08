@@ -36,7 +36,7 @@ const store = createStore({
     },
   },
   getters: {
-    // used to retrieve computed properties or derived state from the store.
+
 
     // GETTERS FOR CHAT
     getAllChannel: (state: any) => state.chat.all_channels,
@@ -209,6 +209,19 @@ const store = createStore({
           console.error("Error fetching my blocked:", error);
         });
     },
+    async achievments(context : any) {
+			await axios.patch(
+				"http://localhost:3000/users/achievments",
+				{
+				  headers: {
+					Authorization: `Bearer ${localStorage.getItem("token")}`,
+				  },
+				}).then((resp: AxiosResponse) => {
+					context.commit('achievments', resp.data);
+				}).catch((error) => {
+					console.error("Error fetching achievments", error);
+				});
+		},
 
     // async fetchFriendChan(context: any){
     // 	const cur = localStorage.getItem('fetchCurrentFriend');
@@ -233,7 +246,6 @@ const store = createStore({
             },
           },
         );
-
         // console.log(response.data.qrCodeDataURL);
         localStorage.setItem("qr", response.data.qrCodeDataURL);
       } catch (error) {

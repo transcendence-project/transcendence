@@ -20,7 +20,6 @@ export class UsersService {
   constructor(
     private seederService: SeederService,
 	private matchesService: MatchesService,
-	private chatService: ChatService,
     @InjectRepository(User) private repo: Repository<User>,
 	// private readonly userRepository: Repository<User>,
 
@@ -49,6 +48,8 @@ export class UsersService {
 	matchesAsPlayerOne: [],
 	matchesAsPlayerTwo: [],
       achievements: [],
+	  wins: 2,
+	  loses: 5,
 	  points: 50,
     });
     return this.repo.save(user2);
@@ -118,7 +119,6 @@ export class UsersService {
       throw new ConflictException("Friend already added");
     }
     user.friends.push(friend);
-	await this.chatService.create_friend_chan(user, friend);
     return this.repo.save(user);
   }
 
