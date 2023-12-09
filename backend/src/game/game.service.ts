@@ -93,7 +93,8 @@ export class GameService {
     private startGame(gameLogic: LogicGame)
     {
         const gameInterval = setInterval(() => {
-            gameLogic.getObjectStatus();
+            gameLogic.updateGame();
+            // gameLogic.getObjectStatus();
             this.socketService.emitToRoom(gameLogic.getGameID(), 'game-data', gameLogic.getObjectStatus());
           }, 1000 / 60);
     }

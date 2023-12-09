@@ -1,8 +1,10 @@
 <template>
-	<div class="game-container">
-		<GameSelect v-if="isGameSelectVisible"/>
-        <canvas v-show="isCanvasVisible" width="900" height="400" ref="game" id="pong"></canvas>
-	</div>
+    <div class="game-container" v-if="isGameSelectVisible">
+            <GameSelect  />
+    </div>
+    <div class="canvas-container" v-show="isCanvasVisible">
+        <canvas width="900" height="600" ref="pongCanvas" id="pong"></canvas>
+    </div>
 </template>
 
 
@@ -45,29 +47,61 @@ import GameSelect from '@/components/GameSelect.vue';
 		}
 	};
     onMounted(() => {
+        const canvas = pongCanvas.value;
         if (instance?.proxy)
         {
             const socket = instance.proxy.$socket.socket;
-            socket.on('game-data', (data: object) => {
-                
+            socket.on('game-data', (data: any) => {
+                console.log(typeof(data))
+                console.log(data['players'][0].paddle);
+                console.log(data['players'][1].paddle);
+                console.log(data.ball);
                 isGameSelectVisible.value = false;
                 isCanvasVisible.value = true;
-                const canvas = pongCanvas.value;
 
             if (canvas)
             {
-                console.log("hereeeee")
-                // pongCanvas.value.width = 900;
-                // pongCanvas.value.height = 400;
                 const ctx = canvas.getContext('2d');
                 if (ctx)
                 {
-                    // ctx.fillStyle = 'red';
+                    const drawRect = (
+                    x: number,
+                    y: number,
+                    w: number,
+                    h: number,
+                    color: string,
+                    side: number
+                    ) => {
+                        let x1;
+                        if (side == 1)
+                            x1 = x * canvas.width;
+                        else if (side == 2)
+                            x1 = (x * canvas.width) -  (w * canvas.width);
+                        else
+                        {
+                            ctx.fillStyle = color;
+                            ctx.fillRect(0, 0, canvas.width, canvas.height);
+                            return ;
+                        }
+                        ctx.fillStyle = color;
+                        ctx.fillRect(x1, y * canvas.height, w * canvas.width, h * canvas.height);
+                    };
+                const drawCircle = (x: number, y: number, r: number, color: string) => {
+                    
+                    ctx.fillStyle = color;
+                    ctx.beginPath();
+                    ctx.arc(x * canvas.width, y * canvas.height, r * Math.min(canvas.width, canvas.height), 0, Math.PI * 2, false);
+                    ctx.closePath();
+                    ctx.fill();
+                };
                     const render = () => { 
                         if (pongCanvas.value)
                         {
-                                ctx.fillStyle = 'red';
-                                // ctx.fillRect(0,0, canvas.width, canvas.height);
+                            drawRect(0, 0, pongCanvas.value.width, pongCanvas.value.height, "white", 0);
+                            drawRect(data['players'][0].paddle.x, data['players'][0].paddle.y, data['players'][0].paddle.width, data['players'][0].paddle.height, data['players'][0].paddle.color,1);
+                            drawRect(data['players'][1].paddle.x, data['players'][1].paddle.y, data['players'][1].paddle.width, data['players'][1].paddle.height, data['players'][1].paddle.color,2);
+                            drawCircle(data.ball.x, data.ball.y, data.ball.radius, data.ball.color)
+
                         }
                     }
                     const game = () => {
@@ -163,12 +197,26 @@ import GameSelect from '@/components/GameSelect.vue';
 </script>
 
 <style>
-/* #pong {
-    background-color: white;
+ /* #pong {
+ padding: 10%;
+ display: flex;
+ justify-content: center;
+ align-items: center;
+ align-self: center;
+ align-content: center;
 } */
+.canvas-container {
+  display: flex;
+  justify-content: center; /* Horizontally center */
+  align-items: center; /* Vertically center */
+  height: 90vh; /* Full viewport height */
+  width: 100%;
+}
+
   .game-container {
 	/* width: fit-content; */
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
 	background: linear-gradient(to right, #451952, #451952, #ae4188);
@@ -177,7 +225,7 @@ import GameSelect from '@/components/GameSelect.vue';
 	padding: 20px;
 	border-radius: 5px;
 	width: 100%;
-	height: 100%;
+	/* height: 100%; */
 	color: white;
   }
   .game {
