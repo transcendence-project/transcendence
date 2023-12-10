@@ -1,13 +1,13 @@
 <template>
 	<div class="game-container">
 		<GameSelect v-if="isGameSelectVisible"/>
-        <canvas v-show="isCanvasVisible" width="900" height="400" ref="game" id="pong"></canvas>
+        <canvas v-show="isCanvasVisible" width="900" height="400" ref="pongCanvas" id="pong"></canvas>
 	</div>
 </template>
 
 
 <script lang="ts" setup>
-import { ref, onMounted , getCurrentInstance, onBeforeUnmount, computed} from 'vue';
+import { ref, onMounted , getCurrentInstance, onBeforeUnmount} from 'vue';
 import WebSocketPlugin from '@/plugins/websocket-plugin';
 import GameSelect from '@/components/GameSelect.vue';
 	const instance = getCurrentInstance();
@@ -45,6 +45,7 @@ import GameSelect from '@/components/GameSelect.vue';
 		}
 	};
     onMounted(() => {
+		const canvas = pongCanvas.value;
         if (instance?.proxy)
         {
             const socket = instance.proxy.$socket.socket;
@@ -52,8 +53,6 @@ import GameSelect from '@/components/GameSelect.vue';
                 
                 isGameSelectVisible.value = false;
                 isCanvasVisible.value = true;
-                const canvas = pongCanvas.value;
-
             if (canvas)
             {
                 console.log("hereeeee")
@@ -66,8 +65,8 @@ import GameSelect from '@/components/GameSelect.vue';
                     const render = () => { 
                         if (pongCanvas.value)
                         {
-                                ctx.fillStyle = 'red';
-                                // ctx.fillRect(0,0, canvas.width, canvas.height);
+                                ctx.fillStyle = 'white';
+                                ctx.fillRect(0,0, canvas.width, canvas.height);
                         }
                     }
                     const game = () => {
@@ -162,7 +161,7 @@ import GameSelect from '@/components/GameSelect.vue';
 	});
 </script>
 
-<style>
+<style scoped>
 /* #pong {
     background-color: white;
 } */
@@ -173,8 +172,10 @@ import GameSelect from '@/components/GameSelect.vue';
     align-items: center;
 	background: linear-gradient(to right, #451952, #451952, #ae4188);
   	box-shadow: 0 4px 4px rgba(0, 0, 0, 0.5); 
-	margin-top: 10%;
+	margin-top: 5%;
 	padding: 20px;
+	padding-bottom: 50px;
+	padding-top: 50px;
 	border-radius: 5px;
 	width: 100%;
 	height: 100%;
