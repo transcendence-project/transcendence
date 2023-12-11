@@ -260,11 +260,6 @@ export default defineComponent({
       }
     },
 
-
-
-
-
-
     async viewFriendRequest() {
       try {
         const response = await axios.get(
@@ -305,17 +300,19 @@ export default defineComponent({
     },
   },
 
-  mounted() {
-    this.viewFriendRequest();
-    this.myFriends();
+  async mounted() {
+	console.log("mounted");
+    await this.viewFriendRequest();
+    await this.myFriends();
     axios
-      .get("http://localhost:3000/users")
-      .then((resp: AxiosResponse<IStudent[]>) => {
-        this.student = resp.data;
-      })
-      .catch((error) => {
-        console.error("Error fetching student data:", error);
-      });
+	.get("http://localhost:3000/users")
+	.then((resp: AxiosResponse<IStudent[]>) => {
+		this.student = resp.data;
+	})
+	.catch((error) => {
+		console.error("Error fetching student data:", error);
+	});
+	console.log("mounted test");
   },
 });
 </script>

@@ -48,8 +48,8 @@ export class UsersService {
 	matchesAsPlayerOne: [],
 	matchesAsPlayerTwo: [],
       achievements: [],
-	  wins: 2,
-	  loses: 5,
+	  wins: 0,
+	  loses: 0,
 	  points: 50,
     });
     return this.repo.save(user2);
@@ -210,6 +210,8 @@ export class UsersService {
 	{
 		loser.points -= 5;
 	}
+	winner.wins += 1;
+	loser.loses += 1;
 	this.repo.save(winner);
 	this.repo.save(loser);
   }

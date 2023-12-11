@@ -14,24 +14,24 @@ import router from "../../router/index";
 import store from "../../store/index";
 export default {
   setup() {
-    onMounted(async () => {
-      try {
-        await store.dispatch("fetchUserData");
-      } catch (err) {
-        console.log(err);
-        localStorage.removeItem("token");
-        await axios.get("http://localhost:3000/auth/logout", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        });
-        router.push("/");
-      }
-    });
+    // onMounted(async () => {
+    //   try {
+    //     await store.dispatch("fetchUserData");
+    //   } catch (err) {
+    //     console.log(err);
+    //     localStorage.clear();
+    //     await axios.get("http://localhost:3000/auth/logout", {
+    //       headers: {
+    //         Authorization: `Bearer ${localStorage.getItem("token")}`,
+    //       },
+    //     });
+    //     router.push("/");
+    //   }
+    // });
   },
   methods: {
     async login42() {
-      // console.log("Button Clickedd");
+    //   console.log("Button Clickedd");
       window.location.href = "http://localhost:3000/auth/42";
     },
   },

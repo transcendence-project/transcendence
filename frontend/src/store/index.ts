@@ -36,8 +36,6 @@ const store = createStore({
     },
   },
   getters: {
-
-
     // GETTERS FOR CHAT
     getAllChannel: (state: any) => state.chat.all_channels,
     getMyChannel: (state: any) => state.chat.my_channels,
@@ -134,10 +132,10 @@ const store = createStore({
           store.commit("setImage", response.data.image);
           //   store.commit("setAuthenticated", response.data.isAuthenticated);
           store.commit("setAuthenticated", true);
-          router.push("/home");
+          // router.push("/home");
         })
         .catch((error) => {
-          console.error("An error occurred while fetching data:", error);
+          console.error("An error occurred while fetching dataaaaaa:", error);
           router.push("/");
         });
     },
@@ -209,19 +207,20 @@ const store = createStore({
           console.error("Error fetching my blocked:", error);
         });
     },
-    async achievments(context : any) {
-			await axios.patch(
-				"http://localhost:3000/users/achievments",
-				{
-				  headers: {
-					Authorization: `Bearer ${localStorage.getItem("token")}`,
-				  },
-				}).then((resp: AxiosResponse) => {
-					context.commit('achievments', resp.data);
-				}).catch((error) => {
-					console.error("Error fetching achievments", error);
-				});
-		},
+    async achievments(context: any) {
+      await axios
+        .patch("http://localhost:3000/users/achievments", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        })
+        .then((resp: AxiosResponse) => {
+          context.commit("achievments", resp.data);
+        })
+        .catch((error) => {
+          console.error("Error fetching achievments", error);
+        });
+    },
 
     // async fetchFriendChan(context: any){
     // 	const cur = localStorage.getItem('fetchCurrentFriend');

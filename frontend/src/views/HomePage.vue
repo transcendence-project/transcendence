@@ -92,7 +92,12 @@
   }
   
   onMounted(() => {
-	store.dispatch("fetchUserData");
+	const accessToken = localStorage.getItem("token");
+	if (accessToken) {
+	//   router.push("/");
+		console.log("token is: ", accessToken);
+	  store.dispatch("fetchUserData");
+	}
   });
   
   const match = ref<Match[]>([
