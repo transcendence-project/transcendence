@@ -5,6 +5,7 @@ import { LogicGame } from './logic/LogicGame'
 import {Paddle, Ball, Computer, } from './interface/game.interface';
 import { Socket } from 'socket.io';
 import { SocketService } from './socket.service'
+import { Client } from 'socket.io/dist/client';
 
 @Injectable()
 export class GameService {
@@ -79,7 +80,7 @@ export class GameService {
                     logic = new LogicGame(player.user.userName, 'computer,', gameInfo.type);
                     player.logicGame = logic;
                     client.join(logic.getGameID());
-                    console.log(player.logicGame);
+                    this.countDown(logic);
                     this.startGame(logic);
                 }
                 // cleint.log(logic.getGameID());
@@ -90,10 +91,29 @@ export class GameService {
             }
         }
     }
+    
+    private countDown(gameLogic: LogicGame)
+    {
+        let countdown = 3;
+        const countdownInterval = setInterval(() => {
+            if (countdown >= 0) {
+                this.socketService.emitToRoom(gameLogic.getGameID(), 'game-count', countdown);
+                // if (player2Socket) {
+                //     this.socketService.emitToPlayer(player2Socket, 'countdown', countdown);
+                // }
+                countdown--;
+            } else {
+                clearInterval(countdownInterval);
+                // Start the actual game
+                // this.startGame(game, p1, p2);
+            }
+        }, 1000);
+    }
+
     private startGame(gameLogic: LogicGame)
     {
         const gameInterval = setInterval(() => {
-            gameLogic.getObjectStatus();
+            gameLogic.updateGame();
             this.socketService.emitToRoom(gameLogic.getGameID(), 'game-data', gameLogic.getObjectStatus());
           }, 1000 / 60);
     }
@@ -180,20 +200,10 @@ export class GameService {
         this.checkCollisionWithPaddle();
         this.computerAI();
     }
-    movePlayerPaddle(direction: string) {
-        const paddleSpeedPerSecond = 3000; 
-        if (direction === 'up')
-        {
-            this.paddle.y -= paddleSpeedPerSecond * this.deltaTime;
-        }
-        else if (direction === 'down')
-        {
-            this.paddle.y += paddleSpeedPerSecond * this.deltaTime;
-        }
-        this.paddle.y = Math.max(
-            0,
-            Math.min(this.paddle.y, this.canvasHeight - this.paddle.height)
-          );
+    movePlayerPaddle(cleint: Socket, direction: string) {
+        const player = this.connected_users.get(cleint.id);
+        console.log(player.user.userName);
+        player.logicGame.updatePaddlePosition(player.user.userName, direction);
     }
     setCanvasDimensions(width: number, height: number) {
         this.canvasWidth = width;

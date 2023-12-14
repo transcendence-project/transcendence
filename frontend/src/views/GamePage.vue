@@ -1,8 +1,32 @@
 <template>
-	<div class="game-container">
-		<GameSelect v-if="isGameSelectVisible"/>
-        <canvas v-show="isCanvasVisible" width="900" height="400" ref="pongCanvas" id="pong"></canvas>
-	</div>
+    <div class="game-container" v-if="isGameSelectVisible">
+            <GameSelect  />
+    </div>
+	<div class="conta-count" v-if="gameCountdown > 0">
+		<div>
+			Game starts in
+		</div>
+		<div >
+			{{ gameCountdown }}
+		</div>
+    </div>
+    <div class="canvas-container" v-show="isCanvasVisible">
+		<div class="score" >
+			<div class="left-side">
+				<div class="login">
+					{{ LoginPlayer1 }}
+				</div>
+				{{ leftPlayer }}
+			</div>
+			<div class="right-side">
+				<div class="login">
+					{{ LoginPlayer2 }}
+				</div>
+				{{ rightPlayer }}
+			</div>
+		</div>
+        <canvas width="900" height="600" ref="pongCanvas" id="pong"></canvas>
+    </div>
 </template>
 
 
@@ -10,74 +34,130 @@
 import { ref, onMounted , getCurrentInstance, onBeforeUnmount} from 'vue';
 import WebSocketPlugin from '@/plugins/websocket-plugin';
 import GameSelect from '@/components/GameSelect.vue';
-	const instance = getCurrentInstance();
-    const canvasWidth = ref(900); // Default width, can be dynamically adjusted
-    const canvasHeight = ref(400); // Default height, can be dynamically adjusted
+import { Socket } from 'socket.io-client';
+    const rightPlayer = ref(0);
+    const leftPlayer = ref(0);
     const playerScore = ref(0);
+	const LoginPlayer1 = ref(null)
+	const LoginPlayer2 = ref(null)
 	const isGameSelectVisible = ref(true);
+	const gameCountdown = ref(0);
 	const isCanvasVisible = ref(false);
     const computerScore = ref(0);
     const pongCanvas =  ref<HTMLCanvasElement | null>(null);
 
-	let keyDownHandler = (event: KeyboardEvent) => {
-		if (event.key === "w" || event.key === "W") {
-			sendPaddleMovement('up');
-		} else if (event.key === "s" || event.key === "S") {
-			sendPaddleMovement('down');
-		}
-	};
+	// let keyDownHandler = (event: KeyboardEvent) => {
+	// 	if (event.key === "w" || event.key === "W") {
+	// 		sendPaddleMovement('up');
+	// 	} else if (event.key === "s" || event.key === "S") {
+	// 		sendPaddleMovement('down');
+	// 	}
+	// };
 
-	let keyUpHandler = (event: KeyboardEvent) => {
-		if (
-			event.key === "w" ||
-			event.key === "W" ||
-			event.key === "s" ||
-			event.key === "S"
-		) {
-			sendPaddleMovement('stop')
-		}
-	};
-	const sendPaddleMovement = (direction: string) => {
-		if (instance?.proxy)
-		{
-			const socket = instance.proxy.$socket.socket;
-			socket.emit('paddleMove', { direction });
-		}
-	};
+	// let keyUpHandler = (event: KeyboardEvent) => {
+	// 	if (
+	// 		event.key === "w" ||
+	// 		event.key === "W" ||
+	// 		event.key === "s" ||
+	// 		event.key === "S"
+	// 	) {
+	// 		sendPaddleMovement('stop')
+	// 	}
+	// };
+	// const sendPaddleMovement = (direction: string) => {
+	// 	if (instance?.proxy)
+	// 	{
+	// 		const socket = instance.proxy.$socket.socket;
+	// 		socket.emit('paddleMove', { direction });
+	// 	}
+	// };
+	let socket: Socket;
+	const handleKeyDown = (event: any) => {
+			if (event.key === "w" || event.key === "W") {
+				// Move left paddle up
+				socket.emit('paddleMove','up');
+			} else if (event.key === "s" || event.key === "S") {
+				// Move left paddle down
+				socket.emit('paddleMove','down');
+			}
+			// Add similar conditions for right paddle if it's a two-player game
+		};
     onMounted(() => {
-		const canvas = pongCanvas.value;
-        if (instance?.proxy)
-        {
-            const socket = instance.proxy.$socket.socket;
-            socket.on('game-data', (data: object) => {
-                
-                isGameSelectVisible.value = false;
-                isCanvasVisible.value = true;
-            if (canvas)
-            {
-                console.log("hereeeee")
-                // pongCanvas.value.width = 900;
-                // pongCanvas.value.height = 400;
-                const ctx = canvas.getContext('2d');
-                if (ctx)
-                {
-                    // ctx.fillStyle = 'red';
-                    const render = () => { 
-                        if (pongCanvas.value)
+		const instance = getCurrentInstance();
+        const canvas = pongCanvas.value;
+		let currentGameData: any;
+		if (canvas)
+		{
+			const ctx = canvas.getContext('2d');
+			if (ctx)
+			{
+				const drawRect = (
+					x: number,
+					y: number,
+					w: number,
+					h: number,
+					color: string,
+					side: number
+					) => {
+						let x1;
+						if (side == 1)
+							x1 = x * canvas.width;
+						else if (side == 2)
+							x1 = (x * canvas.width) -  (w * canvas.width);
+						else
+						{
+							ctx.fillStyle = color;
+							ctx.fillRect(0, 0, canvas.width, canvas.height);
+							return ;
+						}
+						ctx.fillStyle = color;
+						ctx.fillRect(x1, y * canvas.height, w * canvas.width, h * canvas.height);
+					};
+				const drawCircle = (x: number, y: number, r: number, color: string) => {
+					
+					ctx.fillStyle = color;
+					ctx.beginPath();
+					ctx.arc(x * canvas.width, y * canvas.height, r * Math.min(canvas.width, canvas.height), 0, Math.PI * 2, false);
+					ctx.closePath();
+					ctx.fill();
+				};
+				const render = () => { 
+						if (currentGameData && ctx && pongCanvas.value)
                         {
-                                ctx.fillStyle = 'white';
-                                ctx.fillRect(0,0, canvas.width, canvas.height);
+                            drawRect(0, 0, pongCanvas.value.width, pongCanvas.value.height, "white", 0);
+                            drawRect(currentGameData['players'][0].paddle.x, currentGameData['players'][0].paddle.y, currentGameData['players'][0].paddle.width, currentGameData['players'][0].paddle.height, currentGameData['players'][0].paddle.color,1);
+                            drawRect(currentGameData['players'][1].paddle.x, currentGameData['players'][1].paddle.y, currentGameData['players'][1].paddle.width, currentGameData['players'][1].paddle.height, currentGameData['players'][1].paddle.color,2);
+                            drawCircle(currentGameData.ball.x, currentGameData.ball.y, currentGameData.ball.radius, currentGameData.ball.color)
                         }
                     }
-                    const game = () => {
-                            // update();
+					const game = () => {
                             render();
                             requestAnimationFrame(game);
                         };
                         requestAnimationFrame(game);
-                }
-            }
+			}
+		}
+		document.addEventListener('keydown', handleKeyDown);
+        if (instance?.proxy)
+        {
+             socket = instance.proxy.$socket.socket;
+            socket.on('game-data', (data: any) => {
+				currentGameData = data;
+				leftPlayer.value = currentGameData['players'][0].score;
+				rightPlayer.value = currentGameData['players'][1].score;
+				LoginPlayer1.value = currentGameData['players'][0].login
+				LoginPlayer2.value = currentGameData['players'][1].login
 		});
+        socket.on('game-count', (data: any) => {
+				gameCountdown.value = data;
+				console.log(gameCountdown)
+				isGameSelectVisible.value = false;
+				if (gameCountdown.value <= 0 )
+				{
+					isCanvasVisible.value = true;
+				}
+		});
+		
         // socket.value.on('table', (message: any) => {
             // console.log(message);
         //     playerScore.value = message.paddleRe.score;
@@ -155,19 +235,68 @@ import GameSelect from '@/components/GameSelect.vue';
     // }
     // };
 	onBeforeUnmount(() => {
-		window.removeEventListener("keyup", keyUpHandler, false);
-		window.removeEventListener("keydown", keyDownHandler, false);
+		// window.removeEventListener("keyup", keyUpHandler, false);
+		document.addEventListener('keydown', handleKeyDown);
+		socket.off('game-data');
+		socket.off('game-count');
         // appContext.$socket.off()
 	});
 </script>
 
-<style scoped>
-/* #pong {
-    background-color: white;
+<style>
+body {
+	height: 100vh;
+}
+ /* #pong {
+ padding: 10%;
+ display: flex;
+ justify-content: center;
+ align-items: center;
+ align-self: center;
+ align-content: center;
 } */
+.canvas-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Horizontally center */
+  align-items: center; /* Vertically center */
+  /* height: 100vh; Full viewport height */
+  width: 100%;
+  /* margin-top: 2rem; */
+}
+.canvas-container  .score{
+	display: flex;
+	width: 30%;
+	height: 30%;
+	padding: 10px;
+	justify-content: space-around;
+	align-items: center;
+	background-color: #650580;
+	margin-top: 15px;
+	color: white;
+	margin-bottom: 15px;
+}
+.left-side, .right-side {
+	display: flex;
+    flex-direction: column;
+    align-items: center;
+	/* justify-content: center; */
+}
+.conta-count {
+	display: flex;
+	flex-direction: column;
+	background-color: transparent;
+	font-size: 5rem;
+	justify-content: center;
+	align-items: center;
+	margin: 90px auto;
+	width: 50%;
+	height: 50vh;
+}
   .game-container {
 	/* width: fit-content; */
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
 	background: linear-gradient(to right, #451952, #451952, #ae4188);
@@ -178,7 +307,7 @@ import GameSelect from '@/components/GameSelect.vue';
 	padding-top: 50px;
 	border-radius: 5px;
 	width: 100%;
-	height: 100%;
+	/* height: 100%; */
 	color: white;
   }
   .game {
@@ -189,20 +318,6 @@ import GameSelect from '@/components/GameSelect.vue';
     margin-left: 35rem;
     margin-top: 10rem;
   }
-  .score {
-    display: flex;
-    flex-direction: row;
-    width: 100px;
-    justify-content: space-around;
-  }
-  .game-canvas {
-	display: flex;
-	justify-content: center;
-	padding: 0;
-	width: 100%;
-	margin: 0;
-	text-align: center;
-}
 </style>
   
   

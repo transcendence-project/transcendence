@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import {objectStatusDto, PlayerDto} from '../dto/game.dto'
+import {objectStatusDto, PlayerDto, BallDto, PaddleDto} from '../dto/game.dto'
 
 const Paddle_Width = 0.02
 const Paddle_Height = 0.2
 const Paddle_Speed = 0.0175
-const Ball_Radius = 0.03
+const Ball_Radius = 0.027
 const Collision_Angle = 80
-const Ball_XSpeed = 0.0165
+const Ball_XSpeed = 0.010
 const Ball_YSpeed = 0.0
 const Computer_Speed = 0.0075
 
@@ -52,10 +52,8 @@ export class LogicGame {
                 dx: Ball_XSpeed,
                 dy: Math.random() > 0.5 ? Ball_YSpeed : -Ball_YSpeed,
                 radius: Ball_Radius,
-                color: 'white',
+                color: '#19A7CE',
             },
-            // time: 120,
-            // countDown: 3,
         }
     }
 
@@ -67,9 +65,9 @@ export class LogicGame {
     //     return this.game_status.players[0].login
     // }
 
-    // public getPlayer2ID(): string {
-    //     return this.game_status.players[1].login
-    // }
+    public getPlayer2ID(): string {
+        return this.objectGame.players[1].login
+    }
 
     public getGameID(): string {
         return this.gameId
@@ -97,7 +95,7 @@ export class LogicGame {
             score: 0,
             paddle: {
                 x: side == 1 ? Paddle_Width / 2 : 1 - Paddle_Width / 2,
-                y: 0.5,
+                y: 0.45,
                 width: Paddle_Width,
                 height: Paddle_Height,
                 speed: Paddle_Speed,
@@ -199,115 +197,110 @@ export class LogicGame {
     // }
 
     // update the game by updating the ball position and checking for collisions
-    // public updateGame(): void {
-    //     if (this.game_status.countDown > 0) {
-    //         this.game_status.countDown -= 1 / 60
-    //         return
-    //     }
+    public updateGame(): void {
+        // if (this.objectGame.countDown > 0) {
+        //     this.game_status.countDown -= 1 / 60
+        //     return
+        // }
 
-    //     this.updateBall()
-    //     this.updateTimer()
-    //     if (this.getPlayer2ID() === 'Computer') this.updateComputer()
-    // }
+        this.updateBall()
+        // this.updateTimer()
+        // if (this.getPlayer2ID() === 'Computer') this.updateComputer()
+    }
 
     // update the ball position and check for collisions
-    // private updateBall(): void {
-    //     this.moveBall(this.game_status.ball)
-    //     this.checkBallCollision(this.game_status)
-    // }
+    private updateBall(): void {
+        this.moveBall(this.objectGame.ball)
+        this.checkBallCollision(this.objectGame)
+    }
 
     // move the ball to the next position
-    // private moveBall(ball: BallDto): void {
-    //     if (ball.dx > BALL_RADIUS) ball.dx = BALL_RADIUS - 0.001
-    //     ball.x += ball.dx
-    //     ball.y += ball.dy
-    // }
+    private moveBall(ball: BallDto): void {
+        if (ball.dx > Ball_Radius) ball.dx = Ball_Radius - 0.001
+        ball.x += ball.dx
+        ball.y += ball.dy
+    }
+    public updatePaddlePosition(playerID: string, direction: string): void {
+        const player = this.objectGame.players.find(player => player.login === playerID)
+        // if (this.game_status.countDown > 0) return
+        if (direction === 'up') {
+            player.paddle.y -= player.paddle.speed
+            console.log("inside the up")
+        } else if (direction === 'down') {
+            player.paddle.y += player.paddle.speed
+            console.log("inside the down")
+        }
 
+        player.paddle.y = Math.max(
+            0,Math.min(player.paddle.y, 1 - player.paddle.height / 2),
+        )
+    }
     // reset the ball position that is out of bounds to the center
-    // private checkWallCollision(ball: BallDto): void {
-    //     if ((ball.y <= ball.radius && ball.dy < 0) || (ball.y >= 1 - ball.radius && ball.dy > 0)) {
-    //         ball.dy *= -1
-    //         this.events.emit('play-sound', 'ball-hit')
-    //     }
-    // }
+    private checkWallCollision(ball: BallDto): void {
+        if ((ball.y <= ball.radius) || (ball.y >= 1 - ball.radius)) {
+            ball.dy *= -1
+        }
+    }
 
     // check if the ball collided with a player paddle
-    // private checkPlayerCollision(ball: BallDto, paddle: PaddleDto, playerIndex: number): boolean {
-    //     const paddleLeft = playerIndex === 0 ? paddle.x : paddle.x - paddle.width
-    //     const paddleRight = playerIndex === 0 ? paddle.x + paddle.width : paddle.x
-    //     const paddleTop = paddle.y - paddle.height / 2
-    //     const paddleBottom = paddle.y + paddle.height / 2
-    //     return (
-    //         ball.y + ball.radius >= paddleTop &&
-    //         ball.y - ball.radius <= paddleBottom &&
-    //         ball.x + ball.radius >= paddleLeft &&
-    //         ball.x - ball.radius <= paddleRight
-    //     )
-    // }
+    private checkPlayerCollision(ball: BallDto, paddle: PaddleDto, playerIndex: number): boolean {
+        const paddleLeft = playerIndex === 0 ? paddle.x : paddle.x - paddle.width
+        const paddleRight = playerIndex === 0 ? paddle.x + paddle.width : paddle.x
+        const paddleTop = paddle.y
+        const paddleBottom = paddle.y + paddle.height
+        return (
+            ball.y + ball.radius >= paddleTop &&
+            ball.y - ball.radius <= paddleBottom &&
+            ball.x + ball.radius >= paddleLeft &&
+            ball.x - ball.radius <= paddleRight
+        )
+    }
     // check if the ball collided with wall or paddle and update the score if it is out of bounds
-    // private checkBallCollision(game: gameStatusDto): void {
-    //     const { ball, players } = game
+    private checkBallCollision(game: objectStatusDto): void {
+        const { ball, players } = game
 
-    //     this.checkWallCollision(ball)
+        this.checkWallCollision(ball)
+        if (ball.x <= players[0].paddle.x + players[0].paddle.width) {
+            if (this.checkPlayerCollision(ball, players[0].paddle, 0)) {
+                this.reflectBall(ball, players[0].paddle)
+            } else if (ball.x < 0) {
+                players[1].score += 1
+                this.resetBallPosition(ball)
+            }
+        }
+        else if (ball.x >= players[1].paddle.x - players[1].paddle.width) {
+            if (this.checkPlayerCollision(ball, players[1].paddle, 1)) {
+                this.reflectBall(ball, players[1].paddle)
+            } else if (ball.x > 1) {
+                players[0].score += 1
+                this.resetBallPosition(ball)
+            }
+        }
+    }
 
-    //     // Check if the ball is within the horizontal range of the left paddle
-    //     if (ball.x <= players[0].paddle.x + players[0].paddle.width && ball.dx < 0) {
-    //         if (this.checkPlayerCollision(ball, players[0].paddle, 0)) {
-    //             this.analyzePlayer.get(players[0].login).BlockingShot += 1
-    //             this.reflectBall(ball, players[0].paddle)
-    //             this.handleHikenPowerUp(game, 0)
-    //             this.handleShinigamiPowerUp(game, 0)
-    //         } else if (ball.x < 0) {
-    //             // Ball crossed the left boundary
-    //             players[1].score += 1
-    //             this.grantBallWhispererAchievement(ball, players[1])
-    //             this.grantPaddleSamuraiAchievement(players[0])
-    //             this.resetBallPosition(ball)
-    //         }
-    //     }
-    //     // Check if the ball is within the horizontal range of the right paddle
-    //     else if (ball.x >= players[1].paddle.x - players[1].paddle.width && ball.dx > 0) {
-    //         if (this.checkPlayerCollision(ball, players[1].paddle, 1)) {
-    //             this.analyzePlayer.get(players[1].login).BlockingShot += 1
-    //             this.reflectBall(ball, players[1].paddle)
-    //             this.handleHikenPowerUp(game, 1)
-    //             this.handleShinigamiPowerUp(game, 1)
-    //         } else if (ball.x > 1) {
-    //             // Ball crossed the right boundary
-    //             players[0].score += 1
-    //             this.grantBallWhispererAchievement(ball, players[0])
-    //             this.grantPaddleSamuraiAchievement(players[1])
-    //             this.resetBallPosition(ball)
-    //         }
-    //     }
-    // }
-
-    // reflect the ball based on the paddle hit point
-    // private reflectBall(ball: BallDto, paddle: PaddleDto): void {
-    //     ball.dx *= -1
-    //     if (this.gameType == 'classic') ball.dx += ball.dx * 0.005
-    //     const relativePos = ball.y - paddle.y
-    //     const paddleHitPoint = relativePos / (paddle.height / 2 + ball.radius)
-    //     const angle = paddleHitPoint * REFLECT_ANGLE
-    //     const ballSpeed = Math.sqrt(ball.dx ** 2 + ball.dy ** 2)
-    //     ball.dy = ballSpeed * Math.sin(angle * (Math.PI / 180))
-    //     this.events.emit('play-sound', 'ball-hit')
-    // }
+    private reflectBall(ball: BallDto, paddle: PaddleDto): void {
+        ball.dx *= -1
+        const relativePos = ball.y - paddle.y
+        const paddleHitPoint = relativePos / (paddle.height / 2 + ball.radius)
+        const angle = paddleHitPoint * Collision_Angle
+        const ballSpeed = Math.sqrt(ball.dx ** 2 + ball.dy ** 2)
+        ball.dy = ballSpeed * Math.sin(angle * (Math.PI / 180))
+    }
     // reset the ball position to the center
-    // private resetBallPosition(ball: BallDto): void {
-    //     ball.x = 0.5
-    //     ball.y = 0.5
-    //     ball.dx = 0
-    //     if (this.gameType == 'custom') {
-    //         ball.dy = Math.random() * 0.02 - 0.01
-    //     } else {
-    //         ball.dy = 0
-    //     }
-    //     setTimeout(() => {
-    //         ball.dx = Math.random() > 0.5 ? BALL_XSPEED : -BALL_XSPEED
-    //         ball.dy = Math.random() > 0.5 ? BALL_YSPEED : -BALL_YSPEED
-    //     }, 1500)
-    // }
+    private resetBallPosition(ball: BallDto): void {
+        ball.x = 0.5
+        ball.y = 0.5
+        ball.dx = 0
+        if (this.gameType == 'custom') {
+            ball.dy = Math.random() * 0.02 - 0.01
+        } else {
+            ball.dy = 0
+        }
+        setTimeout(() => {
+            ball.dx = Math.random() > 0.5 ? Ball_XSpeed : -Ball_XSpeed
+            ball.dy = Math.random() > 0.5 ? Ball_YSpeed : -Ball_YSpeed
+        }, 1500)
+    }
 
     // update the paddle position of the player based on the direction
     // public updatePaddlePosition(playerID: string, direction: string): void {

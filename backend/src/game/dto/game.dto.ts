@@ -35,7 +35,6 @@ export class PlayerDto {
     @IsOptional()
     gameID?: string
 
-    // powerUps: PowerUp[]
     ready: boolean
 }
 

@@ -1,7 +1,7 @@
 <template>
   <div id="home">
     <Toast />
-    <TopNavBar v-if="!['login'].includes($route.name)" />
+    <TopNavBar v-if="!['login','game'].includes($route.name)" />
     <div class="side-cont">
       <SideNavBar v-if="!['login','game'].includes($route.name)" />
       <router-view />

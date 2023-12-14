@@ -64,9 +64,10 @@ export class GameGateway
     // console.log(data.mode);
   }
   @SubscribeMessage('paddleMove')
-  handlePaddleMove(@ConnectedSocket() client: Socket, @MessageBody() data: { direction: string }) {
-    const playerId = client.id; // Or any other way you identify your player
-    this.gameService.movePlayerPaddle(data.direction);
+  handlePaddleMove(@ConnectedSocket() client: Socket, @MessageBody() data: string) {
+    // const playerId = client.id; // Or any other way you identify your player
+    console.log("from gateway")
+    this.gameService.movePlayerPaddle(client, data);
   }
   private gameInterval;
   private lastUpdateTime: number;
