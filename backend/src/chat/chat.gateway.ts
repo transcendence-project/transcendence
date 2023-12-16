@@ -99,7 +99,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			const user = this.chatService.find_user_with_id(client.id);
 			if (await this.userService.is_blocked(user.userName, frnd_name) === false)
 			{
-				const channel = await this.chatService.frndchan_by_name(frnd_name);
+				const channel = await this.chatService.frndchan_by_name(frnd_name, user);
 				await this.chatService.save_frnd_chan_msg(user, frnd_name, message);
 				const data_to_send = {
 					content: message,
@@ -344,7 +344,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				const add_user = this.chatService.find_user_with_name(user_to_add);
 				if (add_user) {
 					const user_id = this.chatService.find_id(add_user.userName);
-					console.log(user_id);
 					this.server.to(user_id).emit('join_priv_room', room_name);
 				}
 				else {

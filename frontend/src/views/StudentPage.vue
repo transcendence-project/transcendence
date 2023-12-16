@@ -20,6 +20,8 @@
 					</div>
 				<div class="lst-item">{{ item.email }}</div>
 				<div class="lst-item">{{ item.points }}</div>
+				<div class="lst-item">{{ item.wins }}</div>
+				<div class="lst-item">{{ item.loses }}</div>
 			</div>
 		</div>
 	</div>

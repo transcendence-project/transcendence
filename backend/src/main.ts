@@ -15,6 +15,7 @@ async function bootstrap() {
 	});
 	// Initialize Passport
 	app.use(passport.initialize());
+	app.use('/uploads', express.static('uploads'));
 	// Include the authentication router from authService
 	app.useGlobalPipes(
 		new ValidationPipe({

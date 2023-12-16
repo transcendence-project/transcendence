@@ -20,7 +20,7 @@ const routes: Array<RouteRecordRaw> = [
 
   },
   {
-    path: "/users",
+    path: "/users/:username",
     name: "users",
 	alias: '/users',
     component: () => import(/* webpackChunkName: "home" */ "../views/UserProfile.vue"),
@@ -104,6 +104,12 @@ router.beforeEach((to: any, from: any, next: any) => {
 	  }
     next();
     if (to.path == '/home' && to.query.code)
+    {
+          const token = to.query.code;
+          localStorage.setItem('token', token);
+		  store.dispatch('fetchUserData');
+    }
+	if (to.path == '/twofactor' && to.query.code)
     {
           const token = to.query.code;
           localStorage.setItem('token', token);
