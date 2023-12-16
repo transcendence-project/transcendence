@@ -63,16 +63,12 @@
 		  class="bg-gradient-to-r from-[#662549] to-[#451952] flex flex-col items-center justify-between p-[10px] mt-[10px] rounded"
 		>
 		  <h2>Match History</h2>
-		  <ul class="history list-none p-0 w-[80%] text-center">
-			<li
-			  v-for="(matchItem, index) in match"
-			  :key="index"
-			  class="shadow-third bg-gradient-to-r from-[#662549] to-[#ae445a] p-[10px] m-[5px] rounded"
-			>
-			  {{ matchItem.date }} - Opponent: {{ matchItem.opponent }} - Result:
-			  {{ matchItem.result }}
-			</li>
-		  </ul>
+		<ul class="history list-none p-0 w-[80%] text-center">
+	  	<li v-for="(matchItem, index) in match" :key="matchItem.id" class="shadow-third ...">
+	    	Winner: {{ matchItem.playerOne.userName }} - Score: {{ matchItem.winnerScore }} <br>
+	    	Loser: {{ matchItem.playerTwo?.userName }} - Score: {{ matchItem.loserScore }}
+	  	</li>
+		</ul>
 		</div>
 	  </div>
 	</div>
@@ -86,9 +82,11 @@
   
   
   interface Match {
-	date: string;
-	opponent: string;
-	result: string;
+	id: number;
+	winnerId: number;
+	loserId: number;
+	winnerScore: number;
+	loserScore: number;
   }
   
   onMounted(() => {
@@ -97,20 +95,22 @@
 	//   router.push("/");
 		console.log("token is: ", accessToken);
 	  store.dispatch("fetchUserData");
+	  store.dispatch("fetchMatches");
 	}
+
   });
   
-  const match = ref<Match[]>([
-	{ date: "2023-08-15", opponent: "Player A", result: "Win" },
-	{ date: "2023-08-10", opponent: "Player B", result: "Loss" },
-	{ date: "2023-08-05", opponent: "Player C", result: "Draw" },
-	{ date: "2023-08-15", opponent: "Player A", result: "Win" },
-	{ date: "2023-08-10", opponent: "Player B", result: "Loss" },
-	{ date: "2023-08-05", opponent: "Player C", result: "Draw" },
-	{ date: "2023-08-15", opponent: "Player A", result: "Win" },
-	{ date: "2023-08-10", opponent: "Player B", result: "Loss" },
-	{ date: "2023-08-05", opponent: "Player C", result: "Draw" },
-  ]);
+//   const match = ref<Match[]>([
+// 	{ date: "2023-08-15", opponent: "Player A", result: "Win" },
+// 	{ date: "2023-08-10", opponent: "Player B", result: "Loss" },
+// 	{ date: "2023-08-05", opponent: "Player C", result: "Draw" },
+// 	{ date: "2023-08-15", opponent: "Player A", result: "Win" },
+// 	{ date: "2023-08-10", opponent: "Player B", result: "Loss" },
+// 	{ date: "2023-08-05", opponent: "Player C", result: "Draw" },
+// 	{ date: "2023-08-15", opponent: "Player A", result: "Win" },
+// 	{ date: "2023-08-10", opponent: "Player B", result: "Loss" },
+// 	{ date: "2023-08-05", opponent: "Player C", result: "Draw" },
+//   ]);
   
   const data = ref(null);
   const fullname = computed(() => store.getters.getDisplayName);
@@ -128,6 +128,7 @@
   const lose = computed(() => store.getters.getLose);
   const draw = computed(() => store.getters.getDraw);
   const rank = computed(() => store.getters.getRank);
+  const match = computed(() => store.getters.getMatches);
   const avail = ref(true);
   
   const firstmatch = computed(() => store.getters.getFirstMatch);

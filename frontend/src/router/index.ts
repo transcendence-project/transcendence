@@ -117,37 +117,10 @@ const router = createRouter({
 
 router.beforeEach((to: any, from: any, next: any) => {
   const isauth = localStorage.getItem("token");
-  if (!isauth && to.path != "/login") {
-    console.log("isauthhhtesthh: ", isauth);
-    // console.log("isauth: ", isauth);
+  if (!isauth && to.path != "/login" && !to.query.code) {
     next("/login");
+    return;
   }
-  //   if (!isauth && to.path != "/") {
-  //     console.log("isauthhhhh: ", isauth);
-  //     next("/home");
-  //   }
-  //   if ((to.path === "/home" || to.path === "/twofactor") && to.query.code) {
-  //     const token = to.query.code;
-  //     localStorage.setItem("token", token);
-  //     store.dispatch("fetchUserData");
-  //     // console.log("isauth: ", isauth);
-  //     // isAuthenticated = true; // Update the authentication status
-  //   }
-  //   if (to.meta.auth && !isauth) {
-  //     next("/");
-  //   } else {
-  //     next();
-  //   }
-
-  //   const isauth = store.getters.getAuthenticated;
-  //   console.log("isauth: ", isauth);
-  //   const requireAuth = !to.meta.allowAnonymous;
-  //   console.log("isauth: ", isauth);
-  //   const requireAuth = !to.meta.allowAnonymous;
-
-  //   if (to.meta.auth && !isauth) {
-  //     next("/");
-  //   }
 
   if (to.path === "/game") {
     document.body.style.background = "#AE445A";
@@ -156,9 +129,8 @@ router.beforeEach((to: any, from: any, next: any) => {
   } else {
     document.body.style.background =
       "linear-gradient(to bottom, #F39F5A, #451952)";
-    // console.log("isauth: ", isauth);
-    console.log(`Navigating from ${from.fullPath} to ${to.fullPath}`);
   }
+  console.log(`Navigating from ${from.fullPath} to ${to.fullPath}`);
   if (from.fullPath === "/chat" && to.fullPath != "/chat") {
     // Replace 'chatRoute' with your chat route name
     // Clear the channels array or perform any other necessary cleanup
@@ -174,12 +146,14 @@ router.beforeEach((to: any, from: any, next: any) => {
     const token = to.query.code;
     localStorage.setItem("token", token);
     store.dispatch("fetchUserData");
+    next();
+    return;
   }
-  next();
   if (to.path == "/twofactor" && to.query.code) {
     const token = to.query.code;
     localStorage.setItem("token", token);
     store.dispatch("fetchUserData");
   }
+  next();
 });
 export default router;

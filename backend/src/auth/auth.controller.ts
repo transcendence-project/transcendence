@@ -31,7 +31,7 @@ export class AuthController {
 	async callback(@Req() req, @Res() res) {
 		const user = req.user;
 		const token = this.authService.generate_jwt_token(user.userName, user.id);
-		this.authService.authenticate(user, true);
+		// this.authService.authenticate(user, true);
 		// console.log("Token: ", token);
 		if (user.is2FAEnabled == true)
 		{
@@ -54,7 +54,7 @@ export class AuthController {
 	async logout(@Req() req, @Res() res) {
 		
 		// req.logout();
-		this.authService.authenticate(req.user, false);
+		// this.authService.authenticate(req.user, false);
 		// res.redirect('http://localhost:8080');
 	}
 

@@ -29,10 +29,6 @@ export class AuthService{
 		return user;
 	}
 
-	async authenticate(user: User, auth: boolean) {
-		return this.userService.update(user.id, {isAuthenticated: auth});
-	}
-
 	async generateTwoFactorAuthenticationSecret(user: User) {
 		const secret = authenticator.generateSecret();
 	
