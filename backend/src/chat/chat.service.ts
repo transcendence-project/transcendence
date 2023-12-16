@@ -65,13 +65,9 @@ export class ChatService {
 	}
 
 	async frndchan_by_name(frnd_name: string, user: User): Promise<Channel> {
-		console.log(frnd_name);
 		const user_ = await this.usersService.findOne(user.id)
-		// console.log(channels);
 		for (const channel of user_.channels) {
-			// Access each channel and do something
 			const with_members = await this.chan_by_id(channel.id);
-			console.log(with_members);
 		  }
 		const channel = await this.channelRepo.createQueryBuilder("channel")
 		.leftJoinAndSelect("channel.members", "member")
@@ -80,10 +76,7 @@ export class ChatService {
 		.andWhere("channel.isGroupChannel = :is_group", { is_group: false })
 		.getOne();
 		if (channel)
-		{
-			console.log(channel);
 			return channel;
-		}
 	}
 
 		//  ----------------------- CREATE / UPDATE -----------------------------
@@ -185,7 +178,6 @@ export class ChatService {
 				chan.members.push(user);
 				chan.members.push(friend);
 				await this.channelRepo.save(chan);
-				console.log(chan);
 		}
 		// console.log(channel);
 	}
