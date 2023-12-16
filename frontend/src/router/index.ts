@@ -3,13 +3,14 @@ import store from "@/store";
 
 const routes: Array<RouteRecordRaw> = [
   {
-    path: "/",
+    path: "/login",
     name: "login",
+    alias: "/login",
     component: () =>
       import(/* webpackChunkName: "login" */ "../views/LoginPage.vue"),
     meta: {
-      allowAnonymous: true,
       auth: false,
+      allowAnonymous: true,
     },
   },
 
@@ -115,26 +116,21 @@ const router = createRouter({
 });
 
 router.beforeEach((to: any, from: any, next: any) => {
-  const isauth = store.getters.getAuthenticated;
-  console.log("isauth: ", isauth);
-  const requireAuth = !to.meta.allowAnonymous;
-  //   if (requireAuth && !isauth) {
-  //     next("/");
-  //   }
-
-  if (to.meta.auth && !isauth) {
-    next("/");
+  const isauth = localStorage.getItem("token");
+  if (!isauth && to.path != "/login" && !to.query.code) {
+    next("/login");
+    return;
   }
 
   if (to.path === "/game") {
     document.body.style.background = "#AE445A";
-  } else if (to.path === "/") {
+  } else if (to.path === "/login") {
     document.body.style.background = "#AE445A";
   } else {
     document.body.style.background =
       "linear-gradient(to bottom, #F39F5A, #451952)";
-    console.log(`Navigating from ${from.fullPath} to ${to.fullPath}`);
   }
+  console.log(`Navigating from ${from.fullPath} to ${to.fullPath}`);
   if (from.fullPath === "/chat" && to.fullPath != "/chat") {
     // Replace 'chatRoute' with your chat route name
     // Clear the channels array or perform any other necessary cleanup
@@ -146,11 +142,18 @@ router.beforeEach((to: any, from: any, next: any) => {
     store.state.chat.socket.off("update_chan_message");
     store.state.chat.socket.off("update_mem_list");
   }
-  next();
   if (to.path == "/home" && to.query.code) {
     const token = to.query.code;
     localStorage.setItem("token", token);
     store.dispatch("fetchUserData");
+    next();
+    return;
   }
+  if (to.path == "/twofactor" && to.query.code) {
+    const token = to.query.code;
+    localStorage.setItem("token", token);
+    store.dispatch("fetchUserData");
+  }
+  next();
 });
 export default router;

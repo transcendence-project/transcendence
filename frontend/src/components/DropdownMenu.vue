@@ -83,17 +83,17 @@ const logout = () => {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
     });
+	localStorage.clear();
+	router.push('/login');
+  closeDropdown();
     // localStorage.removeItem("token");
-    router.push("/");
+    // router.push("/");
   } catch (error) {
     console.log(error);
   }
   //   store.commit("CLEAR_AUTH_DATA");
   //   router.push("/login");
 	console.log("HELLOOOOOO");
-	localStorage.clear();
-	router.push('/');
-  closeDropdown();
 };
 
 const enable = async () => {
@@ -105,7 +105,7 @@ const disable = async () => {
 };
 
 onMounted(() => {
-  store.dispatch("fetchUserData");
+//   store.dispatch("fetchUserData");
   document.addEventListener("click", closeDropdownOnClickOutside);
 });
 

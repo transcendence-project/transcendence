@@ -141,8 +141,8 @@ export default defineComponent({
   data() {
     return {
       text: "",
-      requestNumber: Number,
-      friendsNumber: Number,
+      requestNumber: 0,
+      friendsNumber: 0,
       myFriendsList: [] as IFriend[],
       friendName: String,
       selectedUser: null,
@@ -220,7 +220,7 @@ export default defineComponent({
             },
           },
         );
-      } catch (error) {
+      }catch (error) {
 		  console.log("Error", error);
 	  }
     },
@@ -235,6 +235,10 @@ export default defineComponent({
             },
           },
         );
+		if (response.status === 200 && response.data) {
+			this.myFriendsList = this.myFriendsList.filter((friend: any) => friend.id !== selectedUser);
+			this.friendsNumber = this.myFriendsList.length;
+		}
       } catch (error) {
         console.log("Error", error);
       }
@@ -260,11 +264,6 @@ export default defineComponent({
       }
     },
 
-
-
-
-
-
     async viewFriendRequest() {
       try {
         const response = await axios.get(
@@ -289,7 +288,13 @@ export default defineComponent({
           `http://localhost:3000/friend-requests/accept/${selectedUser}`,
         );
 
-        console.log("Friend request accepted:", response);
+        console.log("Friend request accepted:", response.data);
+		if (response.status === 200 && response.data) {
+			this.myFriendsList.push(response.data);
+			this.friendsNumber = this.myFriendsList.length;
+			this.friendRequests = this.friendRequests.filter((request: any) => request.id !== selectedUser);
+			this.requestNumber = this.friendRequests.length;
+		}
       } catch (error) {
         console.error("friend accept Error:", error);
       }
@@ -299,25 +304,30 @@ export default defineComponent({
         const response = await axios.patch(
           `http://localhost:3000/friend-requests/${selectedUser}/reject`,
         );
+			this.friendRequests = this.friendRequests.filter((request: any) => request.id !== selectedUser);
+			this.requestNumber = this.friendRequests.length;
       } catch (error) {
         console.error("Error:", error);
       }
     },
   },
 
-  mounted() {
-    this.viewFriendRequest();
-    this.myFriends();
+  async mounted() {
+	console.log("mounted");
+    await this.viewFriendRequest();
+    await this.myFriends();
     axios
-      .get("http://localhost:3000/users")
-      .then((resp: AxiosResponse<IStudent[]>) => {
-        this.student = resp.data;
-      })
-      .catch((error) => {
-        console.error("Error fetching student data:", error);
-      });
+	.get("http://localhost:3000/users")
+	.then((resp: AxiosResponse<IStudent[]>) => {
+		this.student = resp.data;
+	})
+	.catch((error) => {
+		console.error("Error fetching student data:", error);
+	});
+	console.log("mounted test");
   },
-});
+},
+);
 </script>
 <style scoped>
 .relative {

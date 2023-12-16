@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UseGuards, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UseGuards, UploadedFile, UseInterceptors, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { createUserDTO } from '../dtos/createUser.dto'
 import { UsersService } from './users.service';
@@ -20,7 +20,14 @@ export class UsersController {
 	@Patch('/profile-picture')
 	@UseGuards(JwtAuthGuard)
 	@UseInterceptors(FileInterceptor('file', {dest: './uploads'}))
-	async upload_profile_picture(@Req() req, @UploadedFile() file : Express.Multer.File){
+	async upload_profile_picture(@Req() req, @UploadedFile(
+		new ParseFilePipe({
+			validators: [
+				new MaxFileSizeValidator({maxSize: 1000}),
+				new FileTypeValidator({fileType: 'image/png'})
+			]
+		})
+	) file : Express.Multer.File){	
 		// if (file) {
 		// 	return await this.userService.update_profilePic(req.user.id, file.path);
 		//   } else {
@@ -113,7 +120,7 @@ export class UsersController {
 	// @UseGuards(JwtAuthGuard)
 	async save_match(@Body() body: MatchDTO){
 		// console.log(req.user.id);
-		console.log('in save match, body: ', body);
+		// console.log('in save match, body: ', body);
 		return (await this.userService.saveMatch(body.winnerId, body.winnerScore, body.loserId, body.loserScore));
 	}
 

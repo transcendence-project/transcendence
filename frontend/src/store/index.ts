@@ -18,11 +18,10 @@ const store = createStore({
       email: "",
       image: "",
       status: "",
-      win: 0,
-      lose: 0,
+      wins: 0,
+      loses: 0,
       draw: 0,
       rank: 0,
-      isAuthenticated: false,
     },
     chat: {
       socket: null as Socket | null,
@@ -36,8 +35,6 @@ const store = createStore({
     },
   },
   getters: {
-
-
     // GETTERS FOR CHAT
     getAllChannel: (state: any) => state.chat.all_channels,
     getMyChannel: (state: any) => state.chat.my_channels,
@@ -52,11 +49,11 @@ const store = createStore({
     getEmail: (state: any) => state.user.email,
     getImage: (state: any) => state.user.image,
     getStatus: (state: any) => state.user.status,
-    getWin: (state: any) => state.user.win,
-    getLose: (state: any) => state.user.lose,
+    getWin: (state: any) => state.user.wins,
+    getLose: (state: any) => state.user.loses,
     getDraw: (state: any) => state.user.draw,
     getRank: (state: any) => state.user.rank,
-    getAuthenticated: (state: any) => state.user.isAuthenticated,
+    getMatches: (state: any) => state.user.matches,
   },
   mutations: {
     //used to modify the state. synchronous functions, take current state as argument & make changes to it. (i.e setters)
@@ -98,20 +95,26 @@ const store = createStore({
     setStatus(state: any, status: string) {
       state.user.status = status;
     },
-    incremenetWin(state: any, wins: number) {
-      state.user.win++;
-    },
-    incremenetLose(state: any, loses: number) {
-      state.user.lose++;
-    },
-    incremenetDraw(state: any, draw: number) {
-      state.user.draw++;
-    },
+    // incremenetWin(state: any, wins: number) {
+    //   state.user.win++;
+    // },
+    // incremenetLose(state: any, loses: number) {
+    //   state.user.lose++;
+    // },
+    // incremenetDraw(state: any, draw: number) {
+    //   state.user.draw++;
+    // },
     setRank(state: any, rank: number) {
       state.user.rank = rank;
     },
-    setAuthenticated(state: any, auth: boolean) {
-      state.user.isAuthenticated = auth;
+    setWins(state: any, wins: number) {
+      state.user.wins = wins;
+    },
+    setLoses(state: any, loses: number) {
+      state.user.loses = loses;
+    },
+    setMatches(state: any, matches: any) {
+      state.user.matches = matches;
     },
   },
   actions: {
@@ -132,12 +135,14 @@ const store = createStore({
           store.commit("setUserName", response.data.userName);
           store.commit("setEmail", response.data.email);
           store.commit("setImage", response.data.image);
-          //   store.commit("setAuthenticated", response.data.isAuthenticated);
-          store.commit("setAuthenticated", true);
-          router.push("/home");
+          store.commit("setWins", response.data.wins);
+          store.commit("setLoses", response.data.loses);
+          store.commit("setRank", response.data.points);
+          //   store.commit("setAuthenticated", true);
+          // router.push("/home");
         })
         .catch((error) => {
-          console.error("An error occurred while fetching data:", error);
+          console.error("An error occurred while fetching dataaaaaa:", error);
           router.push("/");
         });
     },
@@ -209,19 +214,35 @@ const store = createStore({
           console.error("Error fetching my blocked:", error);
         });
     },
-    async achievments(context : any) {
-			await axios.patch(
-				"http://localhost:3000/users/achievments",
-				{
-				  headers: {
-					Authorization: `Bearer ${localStorage.getItem("token")}`,
-				  },
-				}).then((resp: AxiosResponse) => {
-					context.commit('achievments', resp.data);
-				}).catch((error) => {
-					console.error("Error fetching achievments", error);
-				});
-		},
+    async achievments(context: any) {
+      await axios
+        .patch("http://localhost:3000/users/achievments", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        })
+        .then((resp: AxiosResponse) => {
+          context.commit("achievments", resp.data);
+        })
+        .catch((error) => {
+          console.error("Error fetching achievments", error);
+        });
+    },
+    async fetchMatches(context: any) {
+      await axios
+        .get("http://localhost:3000/matches/my/matches", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        })
+        .then((resp: AxiosResponse) => {
+          context.commit("setMatches", resp.data);
+        })
+        .catch((error) => {
+          console.error("Error fetching matches", error);
+        });
+      console.log("matches: ", store.getters.getMatches);
+    },
 
     // async fetchFriendChan(context: any){
     // 	const cur = localStorage.getItem('fetchCurrentFriend');

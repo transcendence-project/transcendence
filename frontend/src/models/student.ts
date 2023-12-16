@@ -6,12 +6,10 @@ export interface IStudent {
   image: string;
   status: string;
   qr: string;
-  win: number;
-  lose: number;
+  wins: number;
+  loses: number;
   draw: number;
   rank: number;
-  isAuthenticated: boolean;
   twofa: boolean;
-	achievments: string [];
-  
+  achievments: string[];
 }
