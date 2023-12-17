@@ -22,7 +22,7 @@ import { defineComponent, onMounted } from "vue";
 import DropdownMenu from "./DropdownMenu.vue";
 import { computed } from 'vue';
 import store from '@/store';
-
+	
 onMounted(() => {
 	store.dispatch('fetchUserData');
 	});

@@ -11,14 +11,16 @@ export class MatchesService {
   async create(
 	playerOne: User,
 	playerTwo: User,
-	score: string,
+	winnerScore: number,
+	loserScore: number,
 	opponentID: number,
 	winnerID: number,
   ) {
 	const match = this.repo.create({
 	  playerOne,
 	  playerTwo,
-	  score,
+	winnerScore,
+	  loserScore,
 	  opponentID,
 	  winnerID,
 	});
