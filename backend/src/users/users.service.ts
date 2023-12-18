@@ -48,8 +48,8 @@ export class UsersService {
 	matchesAsPlayerOne: [],
 	matchesAsPlayerTwo: [],
       achievements: [],
-	  wins: 2,
-	  loses: 5,
+	  wins: 0,
+	  loses: 0,
 	  points: 50,
     });
     return this.repo.save(user2);
@@ -198,7 +198,7 @@ export class UsersService {
     // console.log("in add achievement, user: ", user);
 	console.log('in add achievement: ', achievement);
     user.achievements.push(achievement);
-    return this.repo.save(user);
+    return await this.repo.save(user);
   }
 
   async updateUserPoints(winnerID: number, loserID: number)
@@ -210,8 +210,12 @@ export class UsersService {
 	{
 		loser.points -= 5;
 	}
-	this.repo.save(winner);
-	this.repo.save(loser);
+	winner.wins += 1;
+	loser.loses += 1;
+	console.log('in update user points, winner: ', winner);
+	console.log('in update user points, loser: ', loser);
+	await this.repo.save(winner);	
+	await this.repo.save(loser);
   }
 
   async findAllUsers() {
@@ -228,7 +232,7 @@ export class UsersService {
 	const achievements: Achievement[] = await this.getAchievements(winner.id);
 
 	// console.log('in check achievements, matches: ', matches);
-	console.log('in check achievements, matches.length: ', matches.length);
+	// console.log('in check achievements, matches.length: ', matches.length);
 	if (matches.length === 1 && !achievements.find((a) => a.title === "First Match")) {
 		this.addAchievement(winner.id, "First Match");
 	}
@@ -256,24 +260,13 @@ export class UsersService {
 	const winner: User = await this.repo.findOne({ where: { id: winnerID}, relations: ["matchesAsPlayerOne"] });
 	const loser: User = await this.repo.findOne({ where: { id: loserID}, relations:  ["matchesAsPlayerTwo"]});
 
-	// console.log('in save match, winner: ', winner);
-	// console.log('in save match, loser: ', loser);
-	const winnerScoreString: string = winnerScore.toString();
-	const loserScoreString: string = loserScore.toString();
-	const score: string = winnerScoreString + '-' + loserScoreString;
 
-	const match = await this.matchesService.create(winner, loser, score, loserID, winnerID);
-	console.log('in save match, loser: ', loser);
-	// console.log('in save match, winner: ', winner);
-	// console.log('in save match, loser: ', loser);
-	// console.log('in save match, match: ', match);
-	// console.log('in save match, winner matches as player one: ', winner.matchesAsPlayerOne);
-	// console.log('in save match, loser matches as player two: ', loser.matchesAsPlayerTwo);
+	const match = await this.matchesService.create(winner, loser, winnerScore, loserScore, loserID, winnerID);
 	winner.matchesAsPlayerOne.push(match);
 	loser.matchesAsPlayerTwo.push(match);
 
-	this.repo.save(winner);
-	this.repo.save(loser);
+	await this.repo.save(winner);
+	await this.repo.save(loser);
 
 	this.updateUserPoints(winnerID, loserID);
 	this.checkAchievements(winner, loser);

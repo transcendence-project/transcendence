@@ -1,36 +1,55 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UseGuards, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Req, UseGuards, UploadedFile, UseInterceptors, ParseFilePipe, MaxFileSizeValidator, FileTypeValidator } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { createUserDTO } from '../dtos/createUser.dto'
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../auth/jwt.guard';
 import { Achievement } from 'entities/achievement.entity';
 import { MatchDTO } from 'dtos/match.dto';
+import { UpdateUserDTO } from 'dtos/UpdateUser.dto';
 import { Express } from 'express';
 
 @Controller('users')
 export class UsersController {
 	
 	constructor(private userService: UsersService){}
-	@Post('/signup')
-	createUser(@Body() body: createUserDTO) {
-		this.userService.create(body.email, body.username, body.fullname, body.image);
-	}
+	// @Post('/signup')
+	// createUser(@Body() body: createUserDTO) {
+	// 	this.userService.create(body.email, body.username, body.fullname, body.image);
+	// }
 
 	@Patch('/profile-picture')
 	@UseGuards(JwtAuthGuard)
 	@UseInterceptors(FileInterceptor('file', {dest: './uploads'}))
-	async upload_profile_picture(@Req() req, @UploadedFile() file : Express.Multer.File){
+	async upload_profile_picture(@Req() req, @UploadedFile(
+		new ParseFilePipe({
+			validators: [
+				new MaxFileSizeValidator({maxSize: 1000}),
+				new FileTypeValidator({fileType: 'image/png'})
+			]
+		})
+	) file : Express.Multer.File){	
+		// if (file) {
+		// 	return await this.userService.update_profilePic(req.user.id, file.path);
+		//   } else {
 		return (await this.userService.update_profilePic(req.user.id, file.path));
+		//   }
 	}
+
+	// @Patch('/update')
+	// @UseGuards(JwtAuthGuard)
+	// @UseInterceptors(FileInterceptor('file', {dest: './uploads'}))
+	// async upload_profile_picture(@Req() req, @UploadedFile() file : Express.Multer.File){
+	// 	return (await this.userService.update_profilePic(req.user.id, file.path));
+	// }
 
 
 
 	@Post('/username')
 	@UseGuards(JwtAuthGuard)
 	async update_username(@Req() req, @Body() body) {
-	  console.log('Received request to update username:', body);
+	//   console.log('Received request to update username:', body);
 	  const user = await this.userService.update_userName(req.user.id, body.username);
-	  console.log('In update username, user: ', user);
+	//   console.log('In update username, user: ', user);
 	  return user;
 	}
 
@@ -101,7 +120,7 @@ export class UsersController {
 	// @UseGuards(JwtAuthGuard)
 	async save_match(@Body() body: MatchDTO){
 		// console.log(req.user.id);
-		console.log('in save match, body: ', body);
+		// console.log('in save match, body: ', body);
 		return (await this.userService.saveMatch(body.winnerId, body.winnerScore, body.loserId, body.loserScore));
 	}
 

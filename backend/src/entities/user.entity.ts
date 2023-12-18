@@ -32,10 +32,10 @@ export class User {
   @Column()
   email: string;
   
-  @Column({default: 9})
+  @Column({default: 0})
   wins: number;
 
-  @Column({default: 2})
+  @Column({default: 0})
   loses: number;
   
   @Column({default: 50})

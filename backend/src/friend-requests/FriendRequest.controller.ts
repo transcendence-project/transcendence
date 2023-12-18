@@ -2,6 +2,7 @@ import { Controller, Get, Param, Patch, Post, Req, UseGuards } from "@nestjs/com
 import { FriendRequestService } from "./FriendRequests.service";
 import { FriendRequest } from "entities/friend-request.entity";
 import { JwtAuthGuard } from "auth/jwt.guard";
+import { User } from "entities/user.entity";
 
 @Controller('friend-requests')
 export class FriendRequestController {
@@ -14,8 +15,8 @@ export class FriendRequestController {
 	}
 
 	@Patch('/accept/:id')
-	async acceptRequest(@Param("id") requestId: number) {
-		await this.friendRequestService.acceptRequest(requestId);
+	async acceptRequest(@Param("id") requestId: number): Promise<User> {
+		return await this.friendRequestService.acceptRequest(requestId);
 	}
 
 	@Patch('/:id/reject')
