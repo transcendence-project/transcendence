@@ -724,7 +724,16 @@
 		console.log(item)
         if (item.senderID === store.getters.getId)
           this.chatMessage.push({ send: true, chat: item.content, sender: item.sendername });
-        else this.chatMessage.push({ send: false, chat: item.content, sender: item.sendername });
+        else
+		{
+			const friend_found = this.friends.find((friend: FriendsList) => friend.user === item.sendername);
+			if (friend_found)
+			{
+				if (friend_found.isBlock === false)
+					this.chatMessage.push({ send: false, chat: item.content, sender: item.sendername });
+			}
+			
+		}
       });
     },
     async displayFriendMessage() {
