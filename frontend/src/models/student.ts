@@ -11,5 +11,5 @@ export interface IStudent {
   draw: number;
   rank: number;
   twofa: boolean;
-  achievments: string[];
+  achievements: string[];
 }

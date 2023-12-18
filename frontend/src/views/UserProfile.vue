@@ -42,7 +42,7 @@
 			</div>
 		  </div>
 		  <div class="bg-gradient-to-r from-[#ae445a] to-[#451952] shadow-third flex flex-col justify-center w-[45%] p-[10px] text-center rounded">
-			<h3 class="text-xl">Achievments</h3>
+			<h3 class="text-xl">Achievements</h3>
 			<div class="shadow-third flex align-center justify-between mb-[5px] px-[50px] pb-[10px] pt-[5px] rounded">
 			  <div>First Match</div>
 			  <div>{{ student.firstmatch }}</div>

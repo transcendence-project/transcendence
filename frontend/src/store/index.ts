@@ -54,6 +54,7 @@ const store = createStore({
     getDraw: (state: any) => state.user.draw,
     getRank: (state: any) => state.user.rank,
     getMatches: (state: any) => state.user.matches,
+    getAchievements: (state: any) => state.user.achievements,
   },
   mutations: {
     //used to modify the state. synchronous functions, take current state as argument & make changes to it. (i.e setters)
@@ -116,6 +117,9 @@ const store = createStore({
     setMatches(state: any, matches: any) {
       state.user.matches = matches;
     },
+    setAchievements(state: any, achievements: any) {
+      state.user.achievements = achievements;
+    },
   },
   actions: {
     // asynchronous functions used to perform operations and commit mutations, like API requests
@@ -138,6 +142,7 @@ const store = createStore({
           store.commit("setWins", response.data.wins);
           store.commit("setLoses", response.data.loses);
           store.commit("setRank", response.data.points);
+          //   store.commit("setAchievments", response.data.achievments);
           //   store.commit("setAuthenticated", true);
           // router.push("/home");
         })
@@ -214,18 +219,19 @@ const store = createStore({
           console.error("Error fetching my blocked:", error);
         });
     },
-    async achievments(context: any) {
-      await axios
-        .patch("http://localhost:3000/users/achievments", {
+    async fetchAchievements(context: any) {
+      return axios
+        .get("http://localhost:3000/users/achievements", {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         })
         .then((resp: AxiosResponse) => {
-          context.commit("achievments", resp.data);
+          context.commit("setAchievements", resp.data);
+          console.log("achievements: ", store.getters.getAchievements);
         })
         .catch((error) => {
-          console.error("Error fetching achievments", error);
+          console.error("Error fetching achievements", error);
         });
     },
     async fetchMatches(context: any) {
