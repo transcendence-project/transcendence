@@ -823,22 +823,24 @@
       }
     });
     store.state.chat.socket.on("update_chan_message", (data: any) => {
-      console.log(localStorage.getItem("currentChanName"));
-      console.log("reached update msg event listener");
       if (data) {
-		console.log(data);
         if (
           data.user != store.getters.getUserName &&
           localStorage.getItem("currentChanName") == data.chan
         ) {
-			console.log("shouldnt come herreee!")
-          this.chatMessage.push({ send: false, chat: data.content, sender: data.user });
-          this.isMessageSent = true;
+			const friend_found = this.friends.find((friend: FriendsList) => friend.user === data.user);
+			if (friend_found)
+			{
+				if (friend_found.isBlock === false)
+				{
+					this.chatMessage.push({ send: false, chat: data.content, sender: data.user });
+					this.isMessageSent = true;
+				}
+			}
         } else if (
           data.user == store.getters.getUserName &&
           localStorage.getItem("currentChanName") == data.chan
         ) {
-			console.log("should come herreee!")
           this.chatMessage.push({ send: true, chat: data.content, sender: data.user  });
           this.isMessageSent = true;
         }
@@ -853,9 +855,6 @@
           	this.isMessageSent = true;
 		}
 		else if (data.user == store.getters.getUserName && localStorage.getItem("currentFriend") == data.frnd){
-			console.log("hellllooooo");
-			console.log(localStorage.getItem("currentFriend"));
-			console.log(data.frnd)
 			this.chatMessage.push({ send: true, chat: data.content, sender: data.user });
          	this.isMessageSent = true;
 		}
