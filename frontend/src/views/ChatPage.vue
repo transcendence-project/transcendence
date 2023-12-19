@@ -602,7 +602,7 @@
       this.msgField = true;
       localStorage.setItem("currentFriend", friend);
         // console.log(localStorage.getItem("currentFriend"));
-      await this.displayFriendMessage();
+      await this.displayFriendMessage(friend);
       this.selectedRoom = friend;
     },
 
@@ -726,28 +726,29 @@
           this.chatMessage.push({ send: true, chat: item.content, sender: item.sendername });
         else
 		{
-			const friend_found = this.friends.find((friend: FriendsList) => friend.user === item.sendername);
-			if (friend_found)
-			{
-				if (friend_found.isBlock === false)
+			// const friend_found = this.friends.find((friend: FriendsList) => friend.user === item.sendername);
+			// if (friend_found)
+			// {
+			// 	if (friend_found.isBlock === false)
 					this.chatMessage.push({ send: false, chat: item.content, sender: item.sendername });
-			}
+			// }
 			
 		}
       });
     },
-    async displayFriendMessage() {
+    async displayFriendMessage(friend_name: string) {
       this.chatMessage = [];
+	  localStorage.setItem("CurrentFriend", friend_name)
       await store.dispatch("fetchFriendChan");
-      const chan = computed(() => store.getters.getCurrentCahnnel);
-	  console.log(chan.value)
-    //   console.log(chan.value.messages);
-    //   const val = chan.value.messages;
-	//   val.forEach((item: any) => {
-    //     if (item.senderID === store.getters.getId)
-    //       this.chatMessage.push({ send: true, chat: item.content, sender: item.sendername });
-    //     else this.chatMessage.push({ send: false, chat: item.content, sender: item.sendername });
-    //   });
+      const chan = computed(() => store.getters.getCurrentFriend);
+	  console.log("chan value is: ", chan.value)
+      console.log("chan messages is: ",chan.value.messages);
+      const val = chan.value.messages;
+	  val.forEach((item: any) => {
+        if (item.senderID === store.getters.getId)
+          this.chatMessage.push({ send: true, chat: item.content, sender: item.sendername });
+        else this.chatMessage.push({ send: false, chat: item.content, sender: item.sendername });
+      });
     },
     sendMessage() {
       if (this.message) {
@@ -837,15 +838,15 @@
           data.user != store.getters.getUserName &&
           localStorage.getItem("currentChanName") == data.chan
         ) {
-			const friend_found = this.friends.find((friend: FriendsList) => friend.user === data.user);
-			if (friend_found)
-			{
-				if (friend_found.isBlock === false)
-				{
+			// const friend_found = this.friends.find((friend: FriendsList) => friend.user === data.user);
+			// if (friend_found)
+			// {
+			// 	if (friend_found.isBlock === false)
+			// 	{
 					this.chatMessage.push({ send: false, chat: data.content, sender: data.user });
 					this.isMessageSent = true;
-				}
-			}
+				// }
+			// }
         } else if (
           data.user == store.getters.getUserName &&
           localStorage.getItem("currentChanName") == data.chan

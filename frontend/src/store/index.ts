@@ -39,6 +39,7 @@ const store = createStore({
     getAllChannel: (state: any) => state.chat.all_channels,
     getMyChannel: (state: any) => state.chat.my_channels,
     getCurrentCahnnel: (state: any) => state.chat.current_channel,
+	getCurrentFriend: (state: any) => state.chat.current_friend,
     getMyFriends: (state: any) => state.chat.my_friends,
     getMyBlocked: (state: any) => state.chat.my_blocked,
 
@@ -72,6 +73,9 @@ const store = createStore({
     setMyFriends(state: any, my_frnds: any) {
       state.chat.my_friends = my_frnds;
     },
+	setCurrentFriend(state: any, cur_frnd: any) {
+		state.chat.current_friend = cur_frnd;
+	},
     setMyBlocked(state: any, my_blckd: string[]) {
       state.chat.my_blocked = my_blckd;
     },
@@ -244,19 +248,19 @@ const store = createStore({
       console.log("matches: ", store.getters.getMatches);
     },
 
-    // async fetchFriendChan(context: any){
-    // 	const cur = localStorage.getItem('fetchCurrentFriend');
-    // 	await axios.get("", {
-    // 		headers: {
-    // 			Authorization: `Bearer ${localStorage.getItem('token')}`,
-    // 		},
-    // 	}).then((resp: AxiosResponse<IChannel[]>) => {
-    // 		// console.log(resp.data);
-    // 		context.commit('setCurrentFriend', resp.data);
-    // 	}).catch((error) => {
-    // 		console.error("Error fetching current channel:", error);
-    // 	});
-    // },
+    async fetchFriendChan(context: any){
+    	const cur = localStorage.getItem('CurrentFriend');
+    	await axios.get(`http://localhost:3000/chat/current_frndchan/${cur}`, {
+    		headers: {
+    			Authorization: `Bearer ${localStorage.getItem('token')}`,
+    		},
+    	}).then((resp: AxiosResponse<IChannel[]>) => {
+    		console.log("the resp data in ffc: ", resp.data);
+    		context.commit('setCurrentFriend', resp.data);
+    	}).catch((error) => {
+    		console.error("Error fetching current channel:", error);
+    	});
+    },
     async TwoFA(context: any) {
       try {
         const response = await axios.get(

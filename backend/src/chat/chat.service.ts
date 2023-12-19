@@ -31,7 +31,7 @@ export class ChatService {
 
 	async chan_by_id(id_: number): Promise<Channel> // or by id
 	{
-		return (await this.channelRepo.findOne({ where: { id: id_, isGroupChannel: false }, relations: ['members'] }));
+		return (await this.channelRepo.findOne({ where: { id: id_, isGroupChannel: false }, relations: ['members', 'messages'] }));
 	}
 
 	async mem_by_chan(chan_name: string): Promise<User[] | undefined> {
@@ -68,15 +68,24 @@ export class ChatService {
 		const user_ = await this.usersService.findOne(user.id)
 		for (const channel of user_.channels) {
 			const with_members = await this.chan_by_id(channel.id);
+			for (const member of with_members.members) {
+				if (member.userName === frnd_name){
+					console.log("the with members is: ", with_members);
+					return with_members;
+				}
+				else
+					console.log("the friend name is: ", frnd_name, "the member name is: ", member.userName);
+			}
+			// const channel = await this.channelRepo.findOne({ where: { id: channel.id, isGroupChannel: false }, relations: ['members'] });
 		  }
-		const channel = await this.channelRepo.createQueryBuilder("channel")
-		.leftJoinAndSelect("channel.members", "member")
-   		.leftJoinAndSelect("channel.messages", "message")
-		.where("member.userName = :frnd_name", { frnd_name })
-		.andWhere("channel.isGroupChannel = :is_group", { is_group: false })
-		.getOne();
-		if (channel)
-			return channel;
+		//   const channel = await this.channelRepo.createQueryBuilder("channel")
+		//   .leftJoinAndSelect("channel.members", "member")
+		//   .leftJoinAndSelect("channel.messages", "message")
+		//   .where("member.userName = :frnd_name", { frnd_name })
+		// .andWhere("channel.isGroupChannel = :is_group", { is_group: false })
+		// .getOne();
+		// if (channel)
+		// 	return channel;
 	}
 
 		//  ----------------------- CREATE / UPDATE -----------------------------
@@ -170,16 +179,16 @@ export class ChatService {
 
 	async create_friend_chan(user: User, friend: User) {
 		const channel = await this.frndchan_by_name(friend.userName, user);
-		console.log(friend);
-		// console.log(user);
+		// console.log("the friend in cfc is: ",friend);
+		// console.log("the user in cfc is: ",user);
 		if (!channel){
 			const chan = this.channelRepo.create({ room_name: "", owner: null, password: "", 
 				members: [], admins: [], messages: [], banned: [], muted: [], isGroupChannel: false, is_protected: true });
 				chan.members.push(user);
 				chan.members.push(friend);
 				await this.channelRepo.save(chan);
+				console.log("the friend chan is: ", chan);
 		}
-		// console.log(channel);
 	}
 
 	async add_chan_admin(user_to_add: string, chan_name: string) {
@@ -226,7 +235,7 @@ export class ChatService {
 	async save_frnd_chan_msg(sender: User, frnd_name: string, content: string) {
 		console.log(`frnd name = ${frnd_name}`);
 		const channel = await this.frndchan_by_name(frnd_name, sender);
-		// console.log(channel)
+		// console.log(""channel)
 		const message = this.messageRepo.create({senderID: sender.id, sendername: sender.userName, sender: sender, channel: channel, content: content, createdAt: null });
 		if (channel.messages) {
 			channel.messages.push(message);
