@@ -3,14 +3,15 @@ import { AuthService } from 'auth/auth.service';
 import { User } from '../entities/user.entity';
 import { LogicGame } from './logic/LogicGame'
 import {Paddle, Ball, Computer, } from './interface/game.interface';
+import {GameSelectDto} from './dto/game.dto'
 import { Socket } from 'socket.io';
 import { SocketService } from './socket.service'
 
 @Injectable()
 export class GameService {
     // private connected_users:Map<string,User> = new Map();
-    private connected_users: Map<string, { user: User, logicGame: LogicGame | null }> = new Map();
-    private classic_queue: string[] = [];
+    private connected_users: Map<Socket, { user: User, logicGame: LogicGame | null }> = new Map();
+    public classic_queue: string[] = [];
     private custom_queue: string[] = [];
     private paddle: Paddle;
     private ball: Ball;
@@ -26,7 +27,7 @@ export class GameService {
     {
         console.log("before",this.connected_users);
         await this.set_online_user(client, token);
-        const oo = this.find_user_with_id(client.id);
+        const oo = this.find_user_with_id(client);
         console.log("after",this.connected_users);
         // console.log(oo);
     }
@@ -57,59 +58,147 @@ export class GameService {
             //     return; 
             // }
             // if (flag == 0)
-                this.connected_users.set(client.id,{user, logicGame: null});
+                this.connected_users.set(client,{user, logicGame: null});
             
 	}
-    find_user_with_id(client_id: string){
+
+    find_user_with_id(client_id: Socket){
 		const user = this.connected_users.get(client_id);
 		return user;
 	}
-    public creatSingleGame(client: Socket, gameInfo: any)
+    public getKeyByValue(map: Map<Socket,{ user: User, logicGame: LogicGame | null }>, searchValue) {
+        const foundEntry = Array.from(map.entries()).find(([key, value]) => value.user.userName === searchValue);
+        return foundEntry ? foundEntry[0] : null;
+    }
+    
+    public creatSingleGame(client: Socket, gameInfo: GameSelectDto)
     {
-        const player = this.connected_users.get(client.id);
-        // const oo = this.connected_users.has(client.id);
+        console.log("From the single game");    
+        const player = this.connected_users.get(client);
+        console.log("this is the player",player)
+        let logic: LogicGame;
         if (player)
         {
-            let logic: LogicGame;
-            if (gameInfo.type === 'classic')
+            console.log("inside the player")
+            if (gameInfo.gameType === 'classic')
             {
                 if (player.logicGame == null)
                 {
-                    logic = new LogicGame(player.user.userName, 'computer,', gameInfo.type);
+
+                    logic = new LogicGame(player.user.userName, 'computer', gameInfo.gameType);
                     player.logicGame = logic;
+
                     client.join(logic.getGameID());
-                    this.countDown(logic);
+                    console.log("fter join them to room");
+                    this.countDown(logic, player, null);
                     this.startGame(logic);
                 }
-                // cleint.log(logic.getGameID());
-                // console.log(player)
-
-                // this.connected_users.set(client.id, {oo,logic_game});
-
+            }
+            else
+            {
+                logic = new LogicGame(player.user.userName, 'computer', gameInfo.gameType);
+                player.logicGame = logic;
             }
         }
     }
     
-    private countDown(gameLogic: LogicGame)
+    public async onlineGame(userSocket: Socket, gameInfo: GameSelectDto) {
+        const player = this.connected_users.get(userSocket);
+        if (this.classic_queue.includes(player.user.userName) || this.custom_queue.includes(player.user.userName))
+            return
+        const opponent = await this.findOpponent(player.user.userName, gameInfo.gameType);
+        console.log("after the opponet function");
+
+        if (opponent) {
+            this.createMultiGame(player, opponent, gameInfo.gameType)
+            console.log("inside the oppent ", player.user.userName);
+            // player.status = 'ingame'
+            // opponent.status = 'ingame'
+        }
+    }
+
+    private createMultiGame(player1: { user: User, logicGame: LogicGame}, player2: { user: User, logicGame: LogicGame},
+                            gameType: string, gameMode?: string,) 
+    {
+        let logic
+        // if (gameType == 'custom') {
+        //     game = new PongGame(
+        //         player1.login,
+        //         player2.login,
+        //         gameType,
+        //         player1.powerUps,
+        //         player2.powerUps,
+        //     )
+        // } else {
+            logic = new LogicGame(player1.user.userName, player2.user.userName, gameType)
+        // }
+
+        player1.logicGame = logic
+        player2.logicGame = logic
+        console.log("from mutl player 2", player2.logicGame);
+        const player1Key = this.getKeyByValue(this.connected_users, player1.user.userName);
+        const player2Key = this.getKeyByValue(this.connected_users, player1.user.userName);
+
+        player1Key.join(logic.getGameID());
+        player2Key.join(logic.getGameID());
+
+        // this.repo.updatePlayerStatus('INGAME', player1.login)
+        // this.repo.updatePlayerStatus('INGAME', player2.login)
+        // player1.status = 'ingame'
+        // player2.status = 'ingame'
+        // this.initiateGame(game, player1, player2)
+        this.countDown(logic, player1, player2);
+        this.startGame(logic);
+    }
+
+    private async findOpponent(userLogin: string, gameType: string): Promise<{ user: User, logicGame: LogicGame | null } | null> {
+        if (gameType == 'classic') {
+            if (this.classic_queue.length > 0) {
+                const opponent = this.classic_queue.shift();
+                const getKey = this.getKeyByValue(this.connected_users, opponent);
+                const player2 = this.connected_users.get(getKey);
+                return player2;
+            } else {
+                this.classic_queue.push(userLogin)
+                return null
+            }
+        } else if (gameType == 'custom') {
+            if (this.custom_queue.length > 0) {
+                const opponent = this.classic_queue.shift();
+                const getKey = this.getKeyByValue(this.connected_users, opponent);
+                const player2 = this.connected_users.get(getKey);
+                return player2;
+            } else {
+                this.custom_queue.push(userLogin)
+                return null
+            }
+        }
+    }
+
+    private countDown(gameLogic: LogicGame, player1: { user: User, logicGame: LogicGame}, 
+                        player2: { user: User, logicGame: LogicGame})
     {
         let countdown = 3;
+        const player1Key = this.getKeyByValue(this.connected_users, player1.user.userName);
+        const player2Key = this.getKeyByValue(this.connected_users, player2.user.userName);
+
+        console.log("this is player one login ", player1.user.userName);
+        console.log("this is player two login ", player2.user.userName);
         const countdownInterval = setInterval(() => {
             if (countdown >= 0) {
-                this.socketService.emitToRoom(gameLogic.getGameID(), 'game-count', countdown);
-                // if (player2Socket) {
-                //     this.socketService.emitToPlayer(player2Socket, 'countdown', countdown);
-                // }
+                player1Key.emit('game-count', countdown);
+                player2Key.emit('game-count', countdown);
+                // this.socketService.emitToRoom(gameLogic.getGameID(), 'game-count', countdown);
                 countdown--;
             } else {
                 clearInterval(countdownInterval);
-                // Start the actual game
-                // this.startGame(game, p1, p2);
             }
         }, 1000);
     }
 
     private startGame(gameLogic: LogicGame)
     {
+        console.log("Start Game function");
         // let lastUpdateTime = Date.now();
         const gameInterval = setInterval(() => {
             // const now = Date.now();
@@ -117,13 +206,44 @@ export class GameService {
             gameLogic.updateGame();
             // lastUpdateTime = now;
             this.socketService.emitToRoom(gameLogic.getGameID(), 'game-data', gameLogic.getObjectStatus());
-          }, 1000 / 50);
+            if (gameLogic.checkWinner())
+            {
+                clearInterval(gameInterval);
+                this.endGame(gameLogic)
+                return;
+            }
+        }, 1000 / 60);
+    }
+
+    public endGame(gameLogic: LogicGame)
+    {
+        this.socketService.emitToRoom(gameLogic.getGameID(), 'game-over',gameLogic.getWinner());
+        const getKeyPlayer1 = this.getKeyByValue(this.connected_users, gameLogic.getPlayer1ID());
+        const player1 = this.connected_users.get(getKeyPlayer1);
+        const getKeyPlayer2 = this.getKeyByValue(this.connected_users, gameLogic.getPlayer2ID());
+        const player2 = this.connected_users.get(getKeyPlayer2);
+
+        if (player1)
+        {
+            player1.logicGame = null;
+            console.debug("this is from the endGame player1", this.classic_queue);
+            // this.classic_queue.pop();
+            getKeyPlayer1.leave(gameLogic.getGameID());
+        }
+        
+        if (player2 && gameLogic.getPlayer2ID() !== 'computer')
+        {
+            player2.logicGame = null;
+            console.debug("this is from the endGame player2", this.classic_queue);
+            getKeyPlayer2.leave(gameLogic.getGameID());
+        }
     }
 
     movePlayerPaddle(cleint: Socket, direction: string) {
-        const player = this.connected_users.get(cleint.id);
+        // const getKeyPlayer1 = this.getKeyByValue(this.connected_users, );
+        const player = this.connected_users.get(cleint);
+        console.log(player.user.userName);
         player.logicGame.updatePaddlePosition(player.user.userName, direction);
     }
-
 }
 

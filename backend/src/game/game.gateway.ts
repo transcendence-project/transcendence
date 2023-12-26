@@ -4,7 +4,7 @@ import { Socket, Server } from 'socket.io';
 import { GameService } from './game.service';
 import { UsersService } from '../users/users.service';
 import { SocketService } from './socket.service'
-
+import { GameSelectDto } from './dto/game.dto';
 @WebSocketGateway({
 	namespace: 'game',
 	cors: {
@@ -39,15 +39,23 @@ export class GameGateway
   }
 
   handleDisconnect(client: any) {
+    console.log(this.gameService.classic_queue);
     console.log("Client disconnected");
   }
-
-
   
   @SubscribeMessage('info')
-  handleInfoGame(@ConnectedSocket() client: Socket, @MessageBody() data: any ) {
-    if (data.mode === 'single')
+   handleInfoGame(@ConnectedSocket() client: Socket, @MessageBody() data: GameSelectDto ) {
+    console.log(data.gameMode);
+    if (data.gameMode === 'single')
+    {
         this.gameService.creatSingleGame(client, data);
+        // console.log("emit to start game");
+    }
+    else if (data.gameMode === 'online')
+    {
+        console.log("from gatway onlone mode");
+      this.gameService.onlineGame(client, data);
+    }
   }
   @SubscribeMessage('paddleMove')
   handlePaddleMove(@ConnectedSocket() client: Socket, @MessageBody() data: string) {

@@ -72,3 +72,22 @@ export class PaddleDto {
     @Length(0, 100)
     color: string
 }
+
+enum gameType {
+    classic = 'classic',
+    custom = 'custom',
+}
+
+enum gameMode {
+    single = 'single',
+    multi = 'online',
+}
+export class GameSelectDto {
+    @IsNotEmpty()
+    @IsEnum(gameType)
+    gameType: gameType
+
+    @IsNotEmpty()
+    @IsEnum(gameMode)
+    gameMode: gameMode
+}

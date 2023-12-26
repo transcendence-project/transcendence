@@ -16,83 +16,241 @@
 				<div class="login">
 					{{ LoginPlayer1 }}
 				</div>
-				{{ leftPlayer }}
+				{{ leftPlayerScore }}
 			</div>
 			<div class="right-side">
 				<div class="login">
 					{{ LoginPlayer2 }}
 				</div>
-				{{ rightPlayer }}
+				{{ rightPlayerScore }}
 			</div>
 		</div>
         <canvas width="900" height="600" ref="pongCanvas" id="pong"></canvas>
     </div>
+	<Result v-if="winnerCompo" :winner="winnerLogin" class="winner">
+	</Result>
 </template>
 
 
 <script lang="ts" setup>
-import { ref, onMounted , getCurrentInstance, onBeforeUnmount} from 'vue';
+import { ref, onMounted , getCurrentInstance, onBeforeUnmount, reactive} from 'vue';
 import WebSocketPlugin from '@/plugins/websocket-plugin';
 import GameSelect from '@/components/GameSelect.vue';
+import Result from '@/components/Result.vue'
+
 import { Socket } from 'socket.io-client';
-    const rightPlayer = ref(0);
-    const leftPlayer = ref(0);
-    const playerScore = ref(0);
-	const LoginPlayer1 = ref(null)
-	const LoginPlayer2 = ref(null)
+    const rightPlayerScore = ref<number | 0>(0);
+    const leftPlayerScore = ref<number | 0>(0);
+    const winnerCompo = ref<boolean | false>(false);
+	const LoginPlayer1 = ref<string | null>(null)
+	const LoginPlayer2 = ref<string | null>(null)
 	const isGameSelectVisible = ref(true);
 	const gameCountdown = ref(0);
 	const isCanvasVisible = ref(false);
-    const computerScore = ref(0);
+    const winnerLogin = ref<string | null>(null);
     const pongCanvas =  ref<HTMLCanvasElement | null>(null);
+	
+	interface Paddle {
+		x: number,
+		y: number,
+		width:number,
+		height:number,
+		speed: number,
+		color: string
+		// Add other player properties here
+	}
+	interface Player {
+		score: number;
+		login: string;
+		paddle: Paddle,
+		game_type:string,
+		status: string,
+		// Add other player properties here
+	}
+	interface GameData {
+		players: Player[];
+		ball: {
+			x:number,
+			y:number,
+			dx:number,
+			dy:number,
+			radius:number,
+			color:string,
+		};
+	}
 	let socket: Socket;
+	const currentGameData = reactive<GameData>({
+		players: [
+			{ score: 0, login: '', game_type: '', status:'' ,paddle: { x: 0, y: 0, width: 0, height: 0, color: '', speed: 0 } },
+			{ score: 0, login: '', game_type: '', status:'' ,paddle: { x: 0, y: 0, width: 0, height: 0, color: '', speed: 0 } },
+		],
+		ball: { x: 0, y: 0, dx: 0, dy: 0, radius: 0, color: '' }
+	});
+	const handleKeyDown = (event: any) => {
+			if (event.key === "w" || event.key === "W") {
+				// Move left paddle up
+				socket.emit('paddleMove','up');
+			} else if (event.key === "s" || event.key === "S") {
+				// Move left paddle down
+				socket.emit('paddleMove','down');
+			}
+	};
+	// Function to add the event listener
+const addEventListener = () => {
+    document.addEventListener('keydown', handleKeyDown);
+};
 
-    const keys: { [key: string]: boolean } = {
-        ArrowUp: false,
-        ArrowDown: false,
-    }
+// Function to remove the event listener
+const removeEventListener = () => {
+    document.removeEventListener('keydown', handleKeyDown);
+};
+	function calculateGameElementPositions(canvas: HTMLCanvasElement, gameData: GameData) {
+    const leftPaddle = gameData.players[0].paddle;
+    const rightPaddle = gameData.players[1].paddle;
+    const ball = gameData.ball;
+    leftPlayerScore.value = gameData.players[0].score;
+    rightPlayerScore.value = gameData.players[1].score;
+    LoginPlayer1.value = gameData.players[0].login;
+    LoginPlayer2.value = gameData.players[1].login;
 
-
-    const handleKeyDown = (event: KeyboardEvent): void => {
-        if (keys.hasOwnProperty(event.key)) {
-            event.preventDefault()
+    // console.log("this is the player1", gameData.players[0].login)
+    // console.log("this is the player2", gameData.players[1].login)
+    return {
+        leftPaddle: {
+            x: leftPaddle.x * canvas.width,
+            y: leftPaddle.y * canvas.height,
+            width: leftPaddle.width * canvas.width,
+            height: leftPaddle.height * canvas.height
+        },
+        rightPaddle: {
+            x: (rightPaddle.x * canvas.width) - (rightPaddle.width * canvas.width),
+            y: rightPaddle.y * canvas.height,
+            width: rightPaddle.width * canvas.width,
+            height: rightPaddle.height * canvas.height
+        },
+        ball: {
+            x: ball.x * canvas.width - ball.radius,
+            y: ball.y * canvas.height - ball.radius,
+            radius: ball.radius * Math.min(canvas.width, canvas.height)
         }
-    }
+    };
+}
 
-    const handleKeyUp = (event: KeyboardEvent): void => {
-        if (keys.hasOwnProperty(event.key)) {
-            event.preventDefault()
-            keys[event.key] = false
-        }
-    }
+// 	const calculateGameElementPositions = (canvas: HTMLCanvasElement, gameData: GameData) => {
+//     const leftPaddle = gameData.players[0].paddle;
+//     const rightPaddle = gameData.players[1].paddle;
+//     const ball = currentGameData.ball;
 
-    const updatePaddleDirection = (): void => {
-        console.log("updatePaddleDirection called", keys);
-        if (keys.ArrowUp) {
-            console.log("Emitting 'paddleMove', 'up'");
-            socket.emit('paddleMove', 'up')
-        } else if (keys.ArrowDown) {
-            console.log("Emitting 'paddleMove', 'down'");
-            socket.emit('paddleMove', 'down')
-        }
-    }
+//     // Update scores and player info
+//     leftPlayerScore.value = gameData.players[0].score;
+//     rightPlayerScore.value = gameData.players[1].score;
+//     LoginPlayer1.value = gameData.players[0].login;
+//     LoginPlayer2.value = gameData.players[1].login;
 
+//     // Update paddle and ball positions and dimensions
+//     leftPaddle.x = leftPaddle.x * canvas.width;
+//     leftPaddle.y = leftPaddle.y * canvas.height;
+//     leftPaddle.width = leftPaddle.width * canvas.width;
+//     leftPaddle.height = leftPaddle.height * canvas.height;
+
+//     rightPaddle.x = (rightPaddle.x * canvas.width) - (rightPaddle.width * canvas.width);
+//     rightPaddle.y = rightPaddle.y * canvas.height;
+//     rightPaddle.width = rightPaddle.width * canvas.width;
+//     rightPaddle.height = rightPaddle.height * canvas.height;
+
+//     ball.x = ball.x * canvas.width - ball.radius;
+//     ball.y = ball.y * canvas.height - ball.radius;
+//     ball.radius = ball.radius * Math.min(canvas.width, canvas.height);
+// };
+
+	const drawRect = (ctx: any, x:number, y:number, width:number, height:number, color:string) => {
+		ctx.fillStyle = color;
+		ctx.fillRect(x, y, width, height);
+	};
+
+	const drawCircle = (ctx: any, x:number, y:number, radius:number, color:string) => {
+		ctx.fillStyle = color;
+		ctx.beginPath();
+		ctx.arc(x, y, radius, 0, Math.PI * 2, false);
+		ctx.closePath();
+		ctx.fill();
+	};
+	let animationFrameId : any;
+
+// document.addEventListener('keydown', handleKeyDown);
     onMounted(() => {
+		addEventListener()
 		const instance = getCurrentInstance();
         const canvas = pongCanvas.value;
-		let currentGameData: any;
-        socket = instance.proxy.$socket.socket;
+		if (canvas)
+		{
+		// 	const aspectRatio = 16 / 9;
+        // let canvasWidth = window.innerWidth;
+        // let canvasHeight = window.innerWidth / aspectRatio;
+
+        // // Ensure the canvas is not larger than the window height
+        // if (canvasHeight > window.innerHeight) {
+        //     canvasHeight = window.innerHeight;
+        //     canvasWidth = canvasHeight * aspectRatio;
+        // }
+
+        // canvas.width = canvasWidth;
+        // canvas.height = canvasHeight;
+            // canvas.width = 800;
+            // canvas.height = 450;
+			const ctx = canvas.getContext('2d');
+			if (ctx)
+			{
+				const render = () => { 
+						if (ctx && pongCanvas.value)
+                        {
+							// ctx.clearRect(0, 0, pongCanvas.value.width, pongCanvas.value.height);
+							// drawRect(ctx, 0, 0, pongCanvas.value.width, pongCanvas.value.height, "white");
+							// drawRect(ctx, currentGameData.players[0].paddle.x, currentGameData.players[0].paddle.y, currentGameData.players[0].paddle.width, currentGameData.players[0].paddle.height,currentGameData.players[0].paddle.color);
+							// // Draw right paddle
+							// drawRect(ctx, currentGameData.players[1].paddle.x, currentGameData.players[1].paddle.y, currentGameData.players[1].paddle.width, currentGameData.players[1].paddle.height, currentGameData.players[1].paddle.color);
+							// // Draw ball
+							// drawCircle(ctx, currentGameData.ball.x, currentGameData.ball.y, currentGameData.ball.radius, currentGameData.ball.color);
+							ctx.clearRect(0, 0, pongCanvas.value.width, pongCanvas.value.height);
+
+							drawRect(ctx, 0, 0, pongCanvas.value.width, pongCanvas.value.height, "white");
+							// Calculate positions
+							const positions = calculateGameElementPositions(pongCanvas.value, currentGameData);
+
+							// Draw left paddle
+							drawRect(ctx, positions.leftPaddle.x, positions.leftPaddle.y, positions.leftPaddle.width, positions.leftPaddle.height,  currentGameData.players[0].paddle.color);
+
+							// Draw right paddle
+							drawRect(ctx, positions.rightPaddle.x, positions.rightPaddle.y, positions.rightPaddle.width, positions.rightPaddle.height, currentGameData.players[1].paddle.color);
+
+							// Draw ball
+							drawCircle(ctx, positions.ball.x, positions.ball.y, positions.ball.radius, currentGameData.ball.color);
+                        }
+                    }
+					const game = () => {
+							calculateGameElementPositions(canvas,currentGameData);
+                            render();
+                            animationFrameId = requestAnimationFrame(game);
+                        };
+                        requestAnimationFrame(game);
+			}
+		}
+		// document.addEventListener('keydown', handleKeyDown);
         if (instance?.proxy)
         {
-            socket.on('game-data', (data: any) => {
-				currentGameData = data;
-				// leftPlayer.value = currentGameData['players'][0].score;
-				// rightPlayer.value = currentGameData['players'][1].score;
-				// LoginPlayer1.value = currentGameData['players'][0].login
-				// LoginPlayer2.value = currentGameData['players'][1].login
+             socket = instance.proxy.$socket.socket;
+            socket.on('game-data', (data: GameData) => {
+                console.log("this is data ", data);
+				Object.assign(currentGameData, data);
+		});
+            socket.on('game-over', (payload:any) => {
+				winnerCompo.value = true;
+				winnerLogin.value = payload.login;
+				isCanvasVisible.value = false;
 		});
         socket.on('game-count', (data: any) => {
 				gameCountdown.value = data;
+				console.log("this is game count",gameCountdown.value)
 				isGameSelectVisible.value = false;
 				if (gameCountdown.value <= 0 )
 				{
@@ -100,65 +258,15 @@ import { Socket } from 'socket.io-client';
 				}
 		});
     }
-		if (canvas)
-		{
-			const ctx = canvas.getContext('2d');
-			if (ctx)
-			{
-				const drawRect = (
-					x: number,
-					y: number,
-					w: number,
-					h: number,
-					color: string,
-					side: number
-					) => {
-						let x1;
-						if (side == 1)
-							x1 = x * canvas.width;
-						else if (side == 2)
-							x1 = (x * canvas.width) -  (w * canvas.width);
-						else
-						{
-							ctx.fillStyle = color;
-							ctx.fillRect(0, 0, canvas.width, canvas.height);
-							return ;
-						}
-						ctx.fillStyle = color;
-						ctx.fillRect(x1, y * canvas.height, w * canvas.width, h * canvas.height);
-					};
-				const drawCircle = (x: number, y: number, r: number, color: string) => {
-					
-					ctx.fillStyle = color;
-					ctx.beginPath();
-					ctx.arc(x * canvas.width, y * canvas.height, r * Math.min(canvas.width, canvas.height), 0, Math.PI * 2, false);
-					ctx.closePath();
-					ctx.fill();
-				};
-                document.addEventListener('keydown', handleKeyDown)
-                document.addEventListener('keyup', handleKeyUp)
-				const render = () => {
-                    updatePaddleDirection();
-						if (currentGameData && ctx && pongCanvas.value)
-                        {
-                            drawRect(0, 0, pongCanvas.value.width, pongCanvas.value.height, "white", 0);
-                            drawRect(currentGameData['players'][0].paddle.x, currentGameData['players'][0].paddle.y, currentGameData['players'][0].paddle.width, currentGameData['players'][0].paddle.height, currentGameData['players'][0].paddle.color,1);
-                            drawRect(currentGameData['players'][1].paddle.x, currentGameData['players'][1].paddle.y, currentGameData['players'][1].paddle.width, currentGameData['players'][1].paddle.height, currentGameData['players'][1].paddle.color,2);
-                            drawCircle(currentGameData.ball.x, currentGameData.ball.y, currentGameData.ball.radius, currentGameData.ball.color)
-                        }
-                    }
-					const game = () => {
-                            render();
-                            requestAnimationFrame(game);
-                    };
-                    requestAnimationFrame(game);
-			}
-		}
     });
 	onBeforeUnmount(() => {
-		document.addEventListener('keydown', handleKeyDown);
+		// document.addEventListener('keydown', handleKeyDown);
+		removeEventListener();
+		cancelAnimationFrame(animationFrameId);
+		console.log("this is call for before onmounted ")
 		socket.off('game-data');
 		socket.off('game-count');
+		socket.off('game-over');
 	});
 </script>
 
@@ -177,11 +285,18 @@ body {
 .canvas-container {
   display: flex;
   flex-direction: column;
-  justify-content: center; /* Horizontally center */
-  align-items: center; /* Vertically center */
-  /* height: 100vh; Full viewport height */
+  justify-content: center; 
+  align-items: center; 
   width: 100%;
-  /* margin-top: 2rem; */
+}
+/* .canvas-container {
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+} */
+.winner {
+	z-index: 3;
 }
 .canvas-container  .score{
 	display: flex;
