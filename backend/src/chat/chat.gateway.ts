@@ -99,7 +99,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			const user = this.chatService.find_user_with_id(client.id);
 			if (await this.userService.is_blocked(user.userName, frnd_name) === false)
 			{
-				const channel = await this.chatService.frndchan_by_name(frnd_name, user);
+				const channel = await this.chatService.frndchan_by_name(frnd_name, user, false);
 				await this.chatService.save_frnd_chan_msg(user, frnd_name, message);
 				const data_to_send = {
 					content: message,

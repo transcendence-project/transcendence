@@ -224,7 +224,7 @@
 						v-if="selectedFriendIndex === index"
 						class="flex items-center justify-between"
 					  >
-						<div v-if="friend.isBlock === true">
+						<div v-if="friend.isBlock === false">
 						  <button
 							class="intbtn px-1 w-[8vh]"
 							@click="showHideBlock(friend)"
@@ -466,9 +466,10 @@
 		const my_friends = computed(() => store.getters.getMyFriends);
 		const my_blocked = computed(() => store.getters.getMyBlocked);
 		const arrayProxy_f = my_friends.value;
-		console.log(my_blocked.value);
+		console.log("teh blocked issssss: ", my_blocked.value);
 		arrayProxy_f.forEach((item: any) => {
-			if (my_blocked.value.includes(item.userName))
+			console.log("the item is: ", item)
+			if (my_blocked.value.find((friend: any) => friend.userName === item.userName))
 			{
 				console.log("goes inside for blocked is true")
 				const my_frnds: FriendsList = {
@@ -726,12 +727,15 @@
           this.chatMessage.push({ send: true, chat: item.content, sender: item.sendername });
         else
 		{
-			// const friend_found = this.friends.find((friend: FriendsList) => friend.user === item.sendername);
-			// if (friend_found)
-			// {
-			// 	if (friend_found.isBlock === false)
+			const friend_found = this.friends.find((friend: FriendsList) => friend.user === item.sendername);
+			console.log(" the friend_found is: ", friend_found, " and the item.sendername is: ", item.sendername)
+			if (friend_found)
+			{
+				if (friend_found.isBlock === false)
 					this.chatMessage.push({ send: false, chat: item.content, sender: item.sendername });
-			// }
+			}
+			else
+				this.chatMessage.push({ send: false, chat: item.content, sender: item.sendername });
 			
 		}
       });
@@ -838,15 +842,20 @@
           data.user != store.getters.getUserName &&
           localStorage.getItem("currentChanName") == data.chan
         ) {
-			// const friend_found = this.friends.find((friend: FriendsList) => friend.user === data.user);
-			// if (friend_found)
-			// {
-			// 	if (friend_found.isBlock === false)
-			// 	{
+
+			const friend_found = this.friends.find((friend: FriendsList) => friend.user === data.user);
+			console.log("the friendsss are: ", this.friends)
+			if (friend_found)
+			{
+				console.log("the friend_found issss: ", friend_found)
+				if (friend_found.isBlock === false)
+				{
 					this.chatMessage.push({ send: false, chat: data.content, sender: data.user });
 					this.isMessageSent = true;
-				// }
-			// }
+				}
+			}
+			else
+				this.chatMessage.push({ send: false, chat: data.content, sender: data.user });
         } else if (
           data.user == store.getters.getUserName &&
           localStorage.getItem("currentChanName") == data.chan
