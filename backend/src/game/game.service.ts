@@ -5,7 +5,6 @@ import { LogicGame } from './logic/LogicGame'
 import {Paddle, Ball, Computer, } from './interface/game.interface';
 import { Socket } from 'socket.io';
 import { SocketService } from './socket.service'
-import { Client } from 'socket.io/dist/client';
 
 @Injectable()
 export class GameService {
@@ -21,7 +20,6 @@ export class GameService {
     private deltaTime: number;
 
     constructor(private readonly authService: AuthService, private socketService: SocketService,) {
-        this.initializeGameEntities()
     };
 
     public async addConnectUser(client : Socket, token: any)
@@ -112,127 +110,20 @@ export class GameService {
 
     private startGame(gameLogic: LogicGame)
     {
+        // let lastUpdateTime = Date.now();
         const gameInterval = setInterval(() => {
+            // const now = Date.now();
+            // const deltaTime = (now - lastUpdateTime) / 1000; 
             gameLogic.updateGame();
+            // lastUpdateTime = now;
             this.socketService.emitToRoom(gameLogic.getGameID(), 'game-data', gameLogic.getObjectStatus());
-          }, 1000 / 60);
-    }
-    private initializeGameEntities() {
-        this.paddle = { x: 0, y: 0, width: 20, height: 100, score: 0 };
-        this.computer = { x: 0, y: 0, width: 20, height: 100, score: 0 };
-        this.ball = { x: 0, y: 0, radius: 10, speed: 1, dirx: 0, diry: 0};
+          }, 1000 / 50);
     }
 
-    checkCollisionWithPaddle() {
-        let selectedPaddle = this.ball.x < this.canvasWidth / 2 ? this.paddle : this.computer;
-    
-        // Define the edges of the ball and paddle
-        let paddleTopEdge = selectedPaddle.y;
-        let paddleBottomEdge = selectedPaddle.y + selectedPaddle.height;
-        let paddleLeftEdge = selectedPaddle.x;
-        let paddleRightEdge = selectedPaddle.x + selectedPaddle.width;
-    
-        let ballTopEdge = this.ball.y - this.ball.radius;
-        let ballBottomEdge = this.ball.y + this.ball.radius;
-        let ballLeftEdge = this.ball.x - this.ball.radius;
-        let ballRightEdge = this.ball.x + this.ball.radius;
-    
-        // Check for collision
-        if (ballRightEdge > paddleLeftEdge && ballLeftEdge < paddleRightEdge &&
-            ballBottomEdge > paddleTopEdge && ballTopEdge < paddleBottomEdge) {
-    
-          // Determine which side the ball hit
-          let hitTop = Math.abs(ballBottomEdge - paddleTopEdge);
-          let hitBottom = Math.abs(ballTopEdge - paddleBottomEdge);
-          let hitLeft = Math.abs(ballRightEdge - paddleLeftEdge);
-          let hitRight = Math.abs(ballLeftEdge - paddleRightEdge);
-    
-          let minHit = Math.min(hitTop, hitBottom, hitLeft, hitRight);
-    
-          if (minHit === hitTop || minHit === hitBottom) {
-            this.ball.diry = -this.ball.diry; // Reverse vertical direction
-          } else {
-            this.ball.dirx = -this.ball.dirx; // Reverse horizontal direction
-          }
-    
-          return true; // Collision occurred
-        }
-        return false; // No collision
-    }
-    computerAI()
-    {
-        const paddleSpeedPerSecond = 450; 
-        const middleOfPaddle = this.computer.y + this.computer.height / 2;
-        
-        if (this.ball.dirx > 0 && this.ball.x > this.canvasWidth / 2) {
-            if (middleOfPaddle < this.ball.y) {
-                this.computer.y += paddleSpeedPerSecond * this.deltaTime;
-            } else if (middleOfPaddle > this.ball.y) {
-                this.computer.y -= paddleSpeedPerSecond * this.deltaTime;
-            }
-        } 
-        this.computer.y = Math.max(0, Math.min(this.computer.y, this.canvasHeight - this.computer.height));
-    }
-    updateGame(deltaTime: number)
-    {
-        if (this.ball.x - this.ball.radius < 0) {
-            // Ball has passed the left edge, point for computer
-            this.computer.score += 1;
-            // Reset ball to the center
-            this.ball.x = this.canvasWidth / 2;
-            this.ball.y = this.canvasHeight / 2;
-          } else if (this.ball.x + this.ball.radius > this.canvasWidth) {
-            // Ball has passed the right edge, point for player
-            this.paddle.score += 1;
-            // Reset ball to the center
-            this.ball.x = this.canvasWidth / 2;
-            this.ball.y = this.canvasHeight / 2;
-        }
-        this.deltaTime = deltaTime;
-        this.ball.x += this.ball.dirx;
-        this.ball.y += this.ball.diry;
-        if (
-            this.ball.y + this.ball.radius > this.canvasHeight ||
-            this.ball.y - this.ball.radius < 0
-        ) {
-            this.ball.diry = -this.ball.diry;
-        }
-        this.checkCollisionWithPaddle();
-        this.computerAI();
-    }
     movePlayerPaddle(cleint: Socket, direction: string) {
         const player = this.connected_users.get(cleint.id);
-        console.log(player.user.userName);
         player.logicGame.updatePaddlePosition(player.user.userName, direction);
     }
-    setCanvasDimensions(width: number, height: number) {
-        this.canvasWidth = width;
-        this.canvasHeight = height;
-    }
-    getCurrentGameState() {
-        return {
-            paddleRe: this.paddle,
-            compRe: this.computer,
-            ball: this.ball,
-        };
-    }
-    init_table()
-    {
-        const PLAYER_WIDTH_PX = 20;  // Paddle width in pixels
-        const PLAYER_HEIGHT_PX = 100; // Paddle height in pixels
 
-        // const paddleWidth = (PLAYER_WIDTH_PX / canvasWidth) * 100;
-        // const paddleHeight = (PLAYER_HEIGHT_PX / canvasHeight) * 100;
-
-        this.paddle = {
-            x: 0, y: this.canvasHeight / 2 - PLAYER_HEIGHT_PX / 2, width: PLAYER_WIDTH_PX, height: PLAYER_HEIGHT_PX, score: 0,
-        }
-        this.computer = {
-            x: this.canvasWidth - PLAYER_WIDTH_PX, y: this.canvasHeight / 2 - PLAYER_HEIGHT_PX / 2, width: PLAYER_WIDTH_PX, height: PLAYER_HEIGHT_PX, score: 0,
-        }
-        this.ball = {
-            x: this.canvasWidth / 2, y: this.canvasHeight / 2, radius: 10, speed: 1, dirx: 5, diry: 5 
-        }
-    }
 }
 

@@ -15,7 +15,7 @@ export class LogicGame {
     private objectGame: objectStatusDto
     private gameId: string
     private gameType: string
-    private winner: string
+    private winner: number
     public leaver: string
     // public events: EventEmitter
     // public analyzePlayer = new Map<string, gameAnalyzer>()
@@ -198,13 +198,7 @@ export class LogicGame {
 
     // update the game by updating the ball position and checking for collisions
     public updateGame(): void {
-        // if (this.objectGame.countDown > 0) {
-        //     this.game_status.countDown -= 1 / 60
-        //     return
-        // }
-
         this.updateBall()
-        // this.updateTimer()
         // if (this.getPlayer2ID() === 'Computer') this.updateComputer()
     }
 
@@ -222,13 +216,13 @@ export class LogicGame {
     }
     public updatePaddlePosition(playerID: string, direction: string): void {
         const player = this.objectGame.players.find(player => player.login === playerID)
-        // if (this.game_status.countDown > 0) return
+
+        // const movementAmount = Paddle_Speed * this.winner;
+        console.log("this is the direction", direction)
         if (direction === 'up') {
-            player.paddle.y -= player.paddle.speed
-            console.log("inside the up")
+            player.paddle.y -= player.paddle.speed;
         } else if (direction === 'down') {
-            player.paddle.y += player.paddle.speed
-            console.log("inside the down")
+            player.paddle.y += player.paddle.speed;
         }
 
         player.paddle.y = Math.max(

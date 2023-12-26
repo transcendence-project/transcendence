@@ -45,47 +45,61 @@ import { Socket } from 'socket.io-client';
 	const isCanvasVisible = ref(false);
     const computerScore = ref(0);
     const pongCanvas =  ref<HTMLCanvasElement | null>(null);
-
-	// let keyDownHandler = (event: KeyboardEvent) => {
-	// 	if (event.key === "w" || event.key === "W") {
-	// 		sendPaddleMovement('up');
-	// 	} else if (event.key === "s" || event.key === "S") {
-	// 		sendPaddleMovement('down');
-	// 	}
-	// };
-
-	// let keyUpHandler = (event: KeyboardEvent) => {
-	// 	if (
-	// 		event.key === "w" ||
-	// 		event.key === "W" ||
-	// 		event.key === "s" ||
-	// 		event.key === "S"
-	// 	) {
-	// 		sendPaddleMovement('stop')
-	// 	}
-	// };
-	// const sendPaddleMovement = (direction: string) => {
-	// 	if (instance?.proxy)
-	// 	{
-	// 		const socket = instance.proxy.$socket.socket;
-	// 		socket.emit('paddleMove', { direction });
-	// 	}
-	// };
 	let socket: Socket;
-	const handleKeyDown = (event: any) => {
-			if (event.key === "w" || event.key === "W") {
-				// Move left paddle up
-				socket.emit('paddleMove','up');
-			} else if (event.key === "s" || event.key === "S") {
-				// Move left paddle down
-				socket.emit('paddleMove','down');
-			}
-			// Add similar conditions for right paddle if it's a two-player game
-		};
+
+    const keys: { [key: string]: boolean } = {
+        ArrowUp: false,
+        ArrowDown: false,
+    }
+
+
+    const handleKeyDown = (event: KeyboardEvent): void => {
+        if (keys.hasOwnProperty(event.key)) {
+            event.preventDefault()
+        }
+    }
+
+    const handleKeyUp = (event: KeyboardEvent): void => {
+        if (keys.hasOwnProperty(event.key)) {
+            event.preventDefault()
+            keys[event.key] = false
+        }
+    }
+
+    const updatePaddleDirection = (): void => {
+        console.log("updatePaddleDirection called", keys);
+        if (keys.ArrowUp) {
+            console.log("Emitting 'paddleMove', 'up'");
+            socket.emit('paddleMove', 'up')
+        } else if (keys.ArrowDown) {
+            console.log("Emitting 'paddleMove', 'down'");
+            socket.emit('paddleMove', 'down')
+        }
+    }
+
     onMounted(() => {
 		const instance = getCurrentInstance();
         const canvas = pongCanvas.value;
 		let currentGameData: any;
+        socket = instance.proxy.$socket.socket;
+        if (instance?.proxy)
+        {
+            socket.on('game-data', (data: any) => {
+				currentGameData = data;
+				// leftPlayer.value = currentGameData['players'][0].score;
+				// rightPlayer.value = currentGameData['players'][1].score;
+				// LoginPlayer1.value = currentGameData['players'][0].login
+				// LoginPlayer2.value = currentGameData['players'][1].login
+		});
+        socket.on('game-count', (data: any) => {
+				gameCountdown.value = data;
+				isGameSelectVisible.value = false;
+				if (gameCountdown.value <= 0 )
+				{
+					isCanvasVisible.value = true;
+				}
+		});
+    }
 		if (canvas)
 		{
 			const ctx = canvas.getContext('2d');
@@ -121,7 +135,10 @@ import { Socket } from 'socket.io-client';
 					ctx.closePath();
 					ctx.fill();
 				};
-				const render = () => { 
+                document.addEventListener('keydown', handleKeyDown)
+                document.addEventListener('keyup', handleKeyUp)
+				const render = () => {
+                    updatePaddleDirection();
 						if (currentGameData && ctx && pongCanvas.value)
                         {
                             drawRect(0, 0, pongCanvas.value.width, pongCanvas.value.height, "white", 0);
@@ -133,113 +150,15 @@ import { Socket } from 'socket.io-client';
 					const game = () => {
                             render();
                             requestAnimationFrame(game);
-                        };
-                        requestAnimationFrame(game);
+                    };
+                    requestAnimationFrame(game);
 			}
 		}
-		document.addEventListener('keydown', handleKeyDown);
-        if (instance?.proxy)
-        {
-             socket = instance.proxy.$socket.socket;
-            socket.on('game-data', (data: any) => {
-				currentGameData = data;
-				leftPlayer.value = currentGameData['players'][0].score;
-				rightPlayer.value = currentGameData['players'][1].score;
-				LoginPlayer1.value = currentGameData['players'][0].login
-				LoginPlayer2.value = currentGameData['players'][1].login
-		});
-        socket.on('game-count', (data: any) => {
-				gameCountdown.value = data;
-				console.log(gameCountdown)
-				isGameSelectVisible.value = false;
-				if (gameCountdown.value <= 0 )
-				{
-					isCanvasVisible.value = true;
-				}
-		});
-		
-        // socket.value.on('table', (message: any) => {
-            // console.log(message);
-        //     playerScore.value = message.paddleRe.score;
-        //     computerScore.value = message.compRe.score;
-        // if (pongCanvas.value)
-        // {
-        //     const ctx = pongCanvas.value.getContext('2d');
-            // if (ctx)
-            // {
-            //     const drawRect = (
-            //         x: number,
-            //         y: number,
-            //         w: number,
-            //         h: number,
-            //         color: string
-            //         ) => {
-            //         ctx.fillStyle = color;
-            //         ctx.fillRect(x, y, w, h);
-            //     };
-            //     const drawCircle = (x: number, y: number, r: number, color: string) => {
-            //         ctx.fillStyle = color;
-            //         ctx.beginPath();
-            //         ctx.arc(x, y, r, 0, Math.PI * 2, false);
-            //         ctx.closePath();
-            //         ctx.fill();
-            //     };
-            //     const render = () => { 
-			// 		if (pongCanvas.value)
-			// 		{
-			// 			drawRect(0, 0, pongCanvas.value.width, pongCanvas.value.height, "#F6F1F1");
-			// 			drawRect(0, message.paddleRe.y,message.paddleRe.width, message.paddleRe.height,"#9336B4");
-			// 			drawRect(message.compRe.x, message.compRe.y,message.compRe.width, message.compRe.height,"#9336B4");
-			// 			drawCircle(message.ball.x, message.ball.y, message.ball.radius, "#19A7CE")
-			// 		}
-            //     }
-			// 	document.addEventListener("keydown", keyDownHandler);
-			// 	document.addEventListener("keyup", keyUpHandler);
-            //     const game = () => {
-            //         // update();
-            //         render();
-            //         requestAnimationFrame(game);
-            //     };
-            //     requestAnimationFrame(game);
-            // }
-        // }
-        // });
-    }
     });
-    // const startGame = () => {
-    //     // if (socket) {
-    //     //     console.log(canvas.value.offsetWidth);
-    //     //     const canvasDimensions = {
-    //     //         width: canvas.value.offsetWidth,
-    //     //         height: canvas.offsetHeight,
-    //     //     };
-    //     //     socket.emit('start-game', canvasDimensions);
-    //     // }
-    // if (pongCanvas.value) 
-    // {
-	// 	console.log(pongCanvas.value.offsetWidth);
-    //     const canvasDimensions = {
-    //         width: pongCanvas.value.offsetWidth,
-    //         height: pongCanvas.value.offsetHeight,
-    //     };
-	// 	if (instance?.proxy)
-	// 	{
-    //     	const socket = instance.proxy.$socket.socket;
-	// 		socket.emit('start-game', canvasDimensions);
-
-	// 	}
-    // } 
-    // else 
-    // {
-    //     console.log('Canvas element not found in startGame');
-    // }
-    // };
 	onBeforeUnmount(() => {
-		// window.removeEventListener("keyup", keyUpHandler, false);
 		document.addEventListener('keydown', handleKeyDown);
 		socket.off('game-data');
 		socket.off('game-count');
-        // appContext.$socket.off()
 	});
 </script>
 
