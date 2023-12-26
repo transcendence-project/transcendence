@@ -14,7 +14,7 @@
         class="w-[50vw] h-[2rem] px-4 rounded-full focus:border-0 focus:outline-none text-black"
       />
     </div>
-    <div v-if="filteredStudents.length > 0">
+    <div v-if="filteredStudents.length > 0 && isDropdownVisible">
       <ul
         class="flex flex-col justify-center m-0 p-0 w-[80vw] rounded-md absolute"
       >
@@ -147,35 +147,17 @@ export default defineComponent({
       friendName: String,
       selectedUser: null,
       student: [] as IStudent[],
-      isDropdownVisible: true,
+      isDropdownVisible: false,
       friendRequests: [] as IFriend[],
     };
   },
-
-
-
-//   computed: {
-//     ...mapState(['friendsNumber', 'myFriendsList']),
-//   },
-//   methods: {
-//     ...mapActions(['fetchMyFriends']),
-//     // You can call fetchMyFriends in your component
-//     // and access friendsNumber and myFriendsList from the store
-//   },
-//   async created() {
-//     await this.Friends();
-//   },
-
-
-
-
 
   setup() {
     const username = computed(() => store.getters.getUserName);
 
     onMounted(() => {
       store.dispatch("fetchUserData");
-    });
+    })
 
     return {
       username,
@@ -205,10 +187,19 @@ export default defineComponent({
       this.isDropdownVisible = true;
     },
     hideDropdown() {
+		console.log("hideDropdown");
       setTimeout(() => {
         this.isDropdownVisible = false;
       }, 200);
     },
+	// handleOutsideClick(e: any) {
+	// 	const dropdown = this.$refs.dropdown;
+	// 	const inputElement = this.$refs.searchElement;
+	// 	if (dropdown && !dropdown.contains(e.target) && inputElement && !inputElement.contains(e.target)) {
+	// 		this.isDropdownVisible = false;
+	// 	}
+	// },
+
     async sendFriendRequest(selectedUser: any) {
       try {
         const response = await axios.post(
@@ -220,6 +211,7 @@ export default defineComponent({
             },
           },
         );
+		this.hideDropdown();
       }catch (error) {
 		  console.log("Error", error);
 	  }
