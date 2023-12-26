@@ -29,13 +29,6 @@ import { ref, getCurrentInstance, computed, onMounted} from 'vue';
     const gameType = ref('');
     const gameMode = ref('');
     const instance = getCurrentInstance();
-	// const socket = appContext.config.globalProperties.$socket;
-    // const instance = getCurrentInstance();
-    // const socket = instance?.proxy?.$socket;
-    // const socket = computed(() => {
-    //   return instance && instance.proxy ? instance.proxy.$socket : null;
-    // });
-
     const selectGameType = (type: string) => {
       gameType.value = type;
       gameMode.value = '';
@@ -46,7 +39,6 @@ import { ref, getCurrentInstance, computed, onMounted} from 'vue';
     };
 
     const sendToServer = () => {
-      // console.log("this is the value",instance && instance.proxy && instance.proxy.$socket)
       if (instance?.proxy) 
       {
         const gameInfo = {

@@ -4,7 +4,7 @@ import { Socket, Server } from 'socket.io';
 import { GameService } from './game.service';
 import { UsersService } from '../users/users.service';
 import { SocketService } from './socket.service'
-
+import { GameSelectDto } from './dto/game.dto';
 @WebSocketGateway({
 	namespace: 'game',
 	cors: {
@@ -41,25 +41,17 @@ export class GameGateway
   handleDisconnect(client: any) {
     console.log("Client disconnected");
   }
-
-  @SubscribeMessage('start-game')
-  start_game(@ConnectedSocket() client: Socket,@MessageBody() payload: any)
-  {
-    //   console.log(payload);
-    this.gameService.setCanvasDimensions(payload.width, payload.height);
-    this.gameService.init_table();
-    this.startGameUpdates();
-    // console.log(tableData);
-    // client.emit('table', tableData);
-    //   this.gameService.draw_table(payload.width,payload.height);
-    // return {event:'table' ,data: this.gameService.init_table(client)};
-  }
   
   @SubscribeMessage('info')
-  handleInfoGame(@ConnectedSocket() client: Socket, @MessageBody() data: any ) {
-    if (data.mode === 'single')
+  async handleInfoGame(@ConnectedSocket() client: Socket, @MessageBody() data: GameSelectDto ) {
+    if (data.gameMode === 'single')
     {
         this.gameService.creatSingleGame(client, data);
+        // console.log("emit to start game");
+    }
+    else if (data.gameMode === 'online')
+    {
+      // await this.gameService.onlineGame()
     }
     // console.log(data.mode);
   }
@@ -68,21 +60,6 @@ export class GameGateway
     // const playerId = client.id; // Or any other way you identify your player
     console.log("from gateway")
     this.gameService.movePlayerPaddle(client, data);
-  }
-  private gameInterval;
-  private lastUpdateTime: number;
-  startGameUpdates() {
-    if (this.gameInterval) {
-      clearInterval(this.gameInterval);
-    }
-    this.lastUpdateTime = Date.now();
-    this.gameInterval = setInterval(() => {
-      const currentTime = Date.now();
-      const deltaTime = (currentTime - this.lastUpdateTime) / 1000;
-      this.gameService.updateGame(deltaTime);
-      this.server.emit('table', this.gameService.getCurrentGameState());
-      this.lastUpdateTime = currentTime;
-    }, 1000 / 60);
   }
   
   inviteUser(client: Socket, receiver: string): void {

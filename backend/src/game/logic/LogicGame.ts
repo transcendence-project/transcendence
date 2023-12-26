@@ -17,9 +17,7 @@ export class LogicGame {
     private gameType: string
     private winner: string
     public leaver: string
-    // public events: EventEmitter
-    // public analyzePlayer = new Map<string, gameAnalyzer>()
-    // public isDeuce = false
+
     constructor(
         player1Login: string,
         Player2Login: string,
@@ -61,9 +59,9 @@ export class LogicGame {
         return this.objectGame
     }
 
-    // public getPlayer1ID(): string {
-    //     return this.game_status.players[0].login
-    // }
+    public getPlayer1ID(): string {
+        return this.objectGame.players[0].login
+    }
 
     public getPlayer2ID(): string {
         return this.objectGame.players[1].login
@@ -72,18 +70,6 @@ export class LogicGame {
     public getGameID(): string {
         return this.gameId
     }
-
-    // public getGameType(): string {
-    //     return this.gameType
-    // }
-
-    // public getPlayer1Score(): number {
-    //     return this.game_status.players[0].score
-    // }
-
-    // public getPlayer2Score(): number {
-    //     return this.game_status.players[1].score
-    // }
 
     private generateGameId(): string {
         return crypto.randomUUID()
@@ -102,110 +88,56 @@ export class LogicGame {
                 color: '#9336B4',
             },
             gameID: this.gameId,
-            ready: login == 'Computer' ? true :  false,
+            ready: login == 'computer' ? true :  false,
         }
     }
 
-    // public setPlayerReady(playerLogin: string): void {
-    //     const player = this.game_status.players.find(player => player.login === playerLogin)
-    //     if (player) player.ready = true
-    // }
+    public checkWinner(): boolean {
+        if (this.winner) return true
+        const player1Score = this.objectGame.players[0].score
+        const player2Score = this.objectGame.players[1].score
+            if (player1Score === 7) {
+                this.winner = this.objectGame.players[0].login
+                return true
+            }
+            if (player2Score === 7) {
+                this.winner = this.objectGame.players[1].login
+                return true
+            }
+        return false
+    }
 
-    // public isPlayersReady(playerLogin?: string): boolean {
-    //     if (playerLogin) {
-    //         const player = this.game_status.players.find(player => player.login === playerLogin)
-    //         if (player) return player.ready
-    //     }
-    //     const players = this.game_status.players
-    //     return players[0].ready && players[1].ready
-    // }
+    public getWinner(): PlayerDto {
+        return this.objectGame.players.find(player => player.login === this.winner);
+    }
 
-    // public setWinner(playerLogin: string): void {
-    //     const playerIndex = this.game_status.players.findIndex(
-    //         player => player.login === playerLogin,
-    //     )
-    //     if (playerIndex !== -1) {
-    //         this.winner = this.game_status.players[playerIndex].login
-    //     }
-    // }
+    public updateComputer(): void {
+        const computer = this.objectGame.players.find(player => player.login === 'computer')
+        const ball = this.objectGame.ball
+        const paddle = computer.paddle
+        if (computer) {
+            if (ball.dx < 0) return
 
-    // public setLoser(playerLogin: string): void {
-    //     const playerIndex = this.game_status.players.findIndex(
-    //         player => player.login === playerLogin,
-    //     )
+            const distance = Math.abs(1 - ball.x)
+            const timeToReachPaddle = distance / Math.abs(ball.dx)
+            const predictedBallY = ball.y + ball.dy * timeToReachPaddle
 
-    //     if (playerIndex !== -1) {
-    //         const opponentIndex = playerIndex === 0 ? 1 : 0
-    //         this.winner = this.game_status.players[opponentIndex].login
-    //     }
-    // }
+            let targetY = predictedBallY
 
-    // public checkWinner(): boolean {
-    //     if (this.winner) return true
-    //     const player1Score = this.game_status.players[0].score
-    //     const player2Score = this.game_status.players[1].score
-    //     // if (player1Score === 10 && player2Score === 10 && !this.isDeuce) {
-    //     //     this.isDeuce = true
-    //     //     this.events.emit('Game-Deuce')
-    //     // }
-    //     if (this.isDeuce) {
-    //         if (player1Score - player2Score === 2 || player2Score - player1Score === 2) {
-    //             this.winner =
-    //                 player1Score > player2Score
-    //                     ? this.game_status.players[0].login
-    //                     : this.game_status.players[1].login
-    //             return true
-    //         }
-    //     } else {
-    //         if (player1Score === 11) {
-    //             this.winner = this.game_status.players[0].login
-    //             return true
-    //         }
-    //         if (player2Score === 11) {
-    //             this.winner = this.game_status.players[1].login
-    //             return true
-    //         }
-    //     }
-    //     return false
-    // }
+            targetY = Math.max(paddle.height / 2, Math.min(1 - paddle.height / 2, targetY))
 
-    // public getWinner(): PlayerDto {
-    //     return this.game_status.players.find(player => player.login === this.winner)
-    // }
-
-    // public updateComputer(): void {
-    //     const computer = this.game_status.players.find(player => player.login === 'Computer')
-    //     const ball = this.game_status.ball
-    //     const paddle = computer.paddle
-    //     if (computer) {
-    //         if (ball.dx < 0) return
-
-    //         const distance = Math.abs(1 - ball.x)
-    //         const timeToReachPaddle = distance / Math.abs(ball.dx)
-    //         const predictedBallY = ball.y + ball.dy * timeToReachPaddle
-
-    //         let targetY = predictedBallY
-
-    //         targetY = Math.max(paddle.height / 2, Math.min(1 - paddle.height / 2, targetY))
-
-    //         if (paddle.y < targetY) {
-    //             paddle.y += Math.min(COMPUTER_SPEED, targetY - paddle.y)
-    //         } else if (paddle.y > targetY) {
-    //             paddle.y -= Math.min(COMPUTER_SPEED, paddle.y - targetY)
-    //         }
-    //     }
-    // }
+            if (paddle.y < targetY) {
+                paddle.y += Math.min(Computer_Speed, targetY - paddle.y)
+            } else if (paddle.y > targetY) {
+                paddle.y -= Math.min(Computer_Speed, paddle.y - targetY)
+            }
+        }
+    }
 
     // update the game by updating the ball position and checking for collisions
     public updateGame(): void {
-        // if (this.objectGame.countDown > 0) {
-        //     this.game_status.countDown -= 1 / 60
-        //     return
-        // }
-
         this.updateBall()
-        // this.updateTimer()
-        // if (this.getPlayer2ID() === 'Computer') this.updateComputer()
+        if (this.getPlayer2ID() === 'computer') this.updateComputer()
     }
 
     // update the ball position and check for collisions
@@ -301,28 +233,4 @@ export class LogicGame {
             ball.dy = Math.random() > 0.5 ? Ball_YSpeed : -Ball_YSpeed
         }, 1500)
     }
-
-    // update the paddle position of the player based on the direction
-    // public updatePaddlePosition(playerID: string, direction: string): void {
-    //     const player = this.game_status.players.find(player => player.login === playerID)
-    //     if (this.game_status.countDown > 0) return
-    //     if (direction === 'up') {
-    //         player.paddle.y -= player.paddle.speed
-    //     } else if (direction === 'down') {
-    //         player.paddle.y += player.paddle.speed
-    //     }
-
-    //     player.paddle.y = Math.max(
-    //         0 + player.paddle.height / 2,
-    //         Math.min(1 - player.paddle.height / 2, player.paddle.y),
-    //     )
-    // }
-
-    // public updateTimer(): void {
-    //     if (this.game_status.time > 0) {
-    //         this.game_status.time -= 1 / 60
-    //     } else {
-    //         this.game_status.time = 0
-    //     }
-    // }
 }
