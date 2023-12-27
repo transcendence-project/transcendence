@@ -14,21 +14,25 @@
       </div>
     </div>
 
-    <div v-if="gameMode" class="shadow-third flex-col align-center justify-between mb-[5px] px-[50px] pb-[10px] pt-[5px] rounded">
+    <div v-if="gameMode" class="shadow-third flex-col align-center justify-start mb-[5px] px-[50px] pb-[10px] pt-[5px] rounded">
       <h3 class="font-bold my-2">You selected: {{ gameMode }} Mode</h3>
       <h3 class="font-bold my-2">You selected: {{ gameType }} Game</h3>
-      <button @click="sendToServer" class="text-white font-light text-sm">Play Game</button>
+          <button @click="sendToServer" class="text-white font-light text-sm" v-if="gameMode === 'single'">Play Game</button>
+          <button @click="sendToServer" class="text-white font-light text-sm" v-if="gameMode === 'online'">Find Match</button>
     </div>
   </div>
 </template>
 
 
 <script lang="ts" setup>
-import { ref, getCurrentInstance, computed, onMounted} from 'vue';
+import { ref, getCurrentInstance, computed, defineEmits} from 'vue';
 
     const gameType = ref('');
     const gameMode = ref('');
+    const loading = ref(false)
     const instance = getCurrentInstance();
+    // Define emit function
+const emit = defineEmits(['updateGameMode']);
     const selectGameType = (type: string) => {
       gameType.value = type;
       gameMode.value = '';
@@ -38,17 +42,21 @@ import { ref, getCurrentInstance, computed, onMounted} from 'vue';
       gameMode.value = mode;
     };
 
+    const isOnlineGame = computed(() => gameMode.value === 'online');
+
     const sendToServer = () => {
+        loading.value = true
       if (instance?.proxy) 
       {
         const gameInfo = {
             gameType: gameType.value,
             gameMode: gameMode.value
         };
+        emit('updateGameMode', gameMode.value === 'online');
         const socket = instance.proxy.$socket.socket;
         socket.emit('info', gameInfo);
       } 
-      else 
+      else  
       {
           console.log("Socket is not connected or something is wrong in the component");
       }
@@ -56,3 +64,8 @@ import { ref, getCurrentInstance, computed, onMounted} from 'vue';
 </script>
 
 
+<style scoped>
+.containrrr {
+    display: flex;
+}
+</style>

@@ -25,10 +25,10 @@ export class GameService {
 
     public async addConnectUser(client : Socket, token: any)
     {
-        console.log("before",this.connected_users);
+        // console.log("before",this.connected_users);
         await this.set_online_user(client, token);
         const oo = this.find_user_with_id(client);
-        console.log("after",this.connected_users);
+        // console.log("after",this.connected_users);
         // console.log(oo);
     }
     async set_online_user(client: Socket ,token: any){
@@ -134,10 +134,11 @@ export class GameService {
         // }
 
         player1.logicGame = logic
-        player2.logicGame = logic
-        console.log("from mutl player 2", player2.logicGame);
+        player2.logicGame = logic   
+        console.log("from mutl player 1", player1.logicGame, player1.user.userName);
+        console.log("from mutl player 2", player2.logicGame, player2.user.userName);
         const player1Key = this.getKeyByValue(this.connected_users, player1.user.userName);
-        const player2Key = this.getKeyByValue(this.connected_users, player1.user.userName);
+        const player2Key = this.getKeyByValue(this.connected_users, player2.user.userName);
 
         player1Key.join(logic.getGameID());
         player2Key.join(logic.getGameID());
@@ -154,9 +155,14 @@ export class GameService {
     private async findOpponent(userLogin: string, gameType: string): Promise<{ user: User, logicGame: LogicGame | null } | null> {
         if (gameType == 'classic') {
             if (this.classic_queue.length > 0) {
+                console.log("this is inside the oppent function before the shift", this.classic_queue);
                 const opponent = this.classic_queue.shift();
+                console.log("this is inside the oppent function after the shift", this.classic_queue);
+                // console.log("this is inside the oppent function before the shift");
                 const getKey = this.getKeyByValue(this.connected_users, opponent);
+                console.log("this is the key", getKey);
                 const player2 = this.connected_users.get(getKey);
+                console.log("this is the userName for the key", player2.user.userName)
                 return player2;
             } else {
                 this.classic_queue.push(userLogin)
@@ -182,8 +188,8 @@ export class GameService {
         const player1Key = this.getKeyByValue(this.connected_users, player1.user.userName);
         const player2Key = this.getKeyByValue(this.connected_users, player2.user.userName);
 
-        console.log("this is player one login ", player1.user.userName);
-        console.log("this is player two login ", player2.user.userName);
+        // console.log("this is player one login ", player1.user.userName);
+        // console.log("this is player two login ", player2.user.userName);
         const countdownInterval = setInterval(() => {
             if (countdown >= 0) {
                 player1Key.emit('game-count', countdown);

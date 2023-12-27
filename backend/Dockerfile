@@ -8,13 +8,13 @@ WORKDIR /app/backend
 RUN apt-get update && apt-get install -y build-essential
 
 # Copy package.json and package-lock.json before other files
-COPY package*.json ./
+# COPY package*.json ./
 
 # Install dependencies
-RUN npm install
+# RUN npm install
 
 # Copy all files
-COPY . .
+# COPY . .
 
 # Create a non-root user
 RUN useradd -m appuser
@@ -29,4 +29,4 @@ USER appuser
 EXPOSE 3000
 
 # Command to run the application
-CMD ["npm", "run", "start:dev"]
+# CMD ["npm", "run", "start:dev"]

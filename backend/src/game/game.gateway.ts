@@ -40,6 +40,7 @@ export class GameGateway
 
   handleDisconnect(client: any) {
     console.log(this.gameService.classic_queue);
+    this.gameService.classic_queue.pop();
     console.log("Client disconnected");
   }
   
@@ -57,6 +58,7 @@ export class GameGateway
       this.gameService.onlineGame(client, data);
     }
   }
+  
   @SubscribeMessage('paddleMove')
   handlePaddleMove(@ConnectedSocket() client: Socket, @MessageBody() data: string) {
     // const playerId = client.id; // Or any other way you identify your player

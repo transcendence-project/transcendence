@@ -1,6 +1,9 @@
 <template>
     <div class="game-container" v-if="isGameSelectVisible">
-            <GameSelect  />
+            <GameSelect @updateGameMode="handleGameModeUpdate" />
+    </div>
+    <div class="loading-container" v-if="isOnlineGame">
+            <LoadingComponent ></LoadingComponent>
     </div>
 	<div class="conta-count" v-if="gameCountdown > 0">
 		<div>
@@ -29,6 +32,7 @@
     </div>
 	<Result v-if="winnerCompo" :winner="winnerLogin" class="winner">
 	</Result>
+    <!-- <LoadingComponent v-if="isOnlineGame"></LoadingComponent> -->
 </template>
 
 
@@ -36,21 +40,31 @@
 import { ref, onMounted , getCurrentInstance, onBeforeUnmount, reactive} from 'vue';
 import WebSocketPlugin from '@/plugins/websocket-plugin';
 import GameSelect from '@/components/GameSelect.vue';
+import LoadingComponent from '@/components/LoadingComponent.vue';
 import Result from '@/components/Result.vue'
 
 import { Socket } from 'socket.io-client';
+
+    const isOnlineGame = ref<Boolean | false>(false);
     const rightPlayerScore = ref<number | 0>(0);
     const leftPlayerScore = ref<number | 0>(0);
     const winnerCompo = ref<boolean | false>(false);
 	const LoginPlayer1 = ref<string | null>(null)
+	const color_map = ref<string | null>(null)
 	const LoginPlayer2 = ref<string | null>(null)
 	const isGameSelectVisible = ref(true);
 	const gameCountdown = ref(0);
-	const isCanvasVisible = ref(false);
+	const isCanvasVisible = ref(false); 
     const winnerLogin = ref<string | null>(null);
     const pongCanvas =  ref<HTMLCanvasElement | null>(null);
-	
-	interface Paddle {
+    color_map.value = "white";
+    function handleGameModeUpdate(isOnline:Boolean) {
+        console.log("this is the value ",isOnline);
+        isOnlineGame.value = isOnline;
+        isGameSelectVisible.value = false;
+        color_map.value = "#200E3A";
+    }
+	interface Paddle { 
 		x: number,
 		y: number,
 		width:number,
@@ -136,33 +150,6 @@ const removeEventListener = () => {
     };
 }
 
-// 	const calculateGameElementPositions = (canvas: HTMLCanvasElement, gameData: GameData) => {
-//     const leftPaddle = gameData.players[0].paddle;
-//     const rightPaddle = gameData.players[1].paddle;
-//     const ball = currentGameData.ball;
-
-//     // Update scores and player info
-//     leftPlayerScore.value = gameData.players[0].score;
-//     rightPlayerScore.value = gameData.players[1].score;
-//     LoginPlayer1.value = gameData.players[0].login;
-//     LoginPlayer2.value = gameData.players[1].login;
-
-//     // Update paddle and ball positions and dimensions
-//     leftPaddle.x = leftPaddle.x * canvas.width;
-//     leftPaddle.y = leftPaddle.y * canvas.height;
-//     leftPaddle.width = leftPaddle.width * canvas.width;
-//     leftPaddle.height = leftPaddle.height * canvas.height;
-
-//     rightPaddle.x = (rightPaddle.x * canvas.width) - (rightPaddle.width * canvas.width);
-//     rightPaddle.y = rightPaddle.y * canvas.height;
-//     rightPaddle.width = rightPaddle.width * canvas.width;
-//     rightPaddle.height = rightPaddle.height * canvas.height;
-
-//     ball.x = ball.x * canvas.width - ball.radius;
-//     ball.y = ball.y * canvas.height - ball.radius;
-//     ball.radius = ball.radius * Math.min(canvas.width, canvas.height);
-// };
-
 	const drawRect = (ctx: any, x:number, y:number, width:number, height:number, color:string) => {
 		ctx.fillStyle = color;
 		ctx.fillRect(x, y, width, height);
@@ -213,7 +200,7 @@ const removeEventListener = () => {
 							// drawCircle(ctx, currentGameData.ball.x, currentGameData.ball.y, currentGameData.ball.radius, currentGameData.ball.color);
 							ctx.clearRect(0, 0, pongCanvas.value.width, pongCanvas.value.height);
 
-							drawRect(ctx, 0, 0, pongCanvas.value.width, pongCanvas.value.height, "white");
+							drawRect(ctx, 0, 0, pongCanvas.value.width, pongCanvas.value.height, color_map.value);
 							// Calculate positions
 							const positions = calculateGameElementPositions(pongCanvas.value, currentGameData);
 
@@ -252,6 +239,7 @@ const removeEventListener = () => {
 				gameCountdown.value = data;
 				console.log("this is game count",gameCountdown.value)
 				isGameSelectVisible.value = false;
+                isOnlineGame.value = false;
 				if (gameCountdown.value <= 0 )
 				{
 					isCanvasVisible.value = true;
@@ -341,8 +329,24 @@ body {
 	padding-top: 50px;
 	border-radius: 5px;
 	width: 100%;
-	/* height: 100%; */
 	color: white;
+}
+.loading-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(to right, #451952, #451952, #ae4188);
+        box-shadow: 0 4px 4px rgba(0, 0, 0, 0.5); 
+      margin-top: 5%;
+      padding: 20px;
+      padding-bottom: 50px;
+      padding-top: 50px;
+      border-radius: 5px;
+      width: 100%;
+      height: 50vh;
+      color: white;
+
   }
   .game {
     display: flex;
