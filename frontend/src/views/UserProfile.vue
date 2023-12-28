@@ -96,7 +96,7 @@ export default defineComponent({
 	},
 	mounted() {
 		this.username = this.$route.params.username;
-		const apiUrl = `http://localhost:3000/users/friend/${this.username}`;
+		const apiUrl = process.env.VUE_APP_BACKEND_URL + `/users/friend/${this.username}`;
 
 		axios
 			.get(apiUrl)

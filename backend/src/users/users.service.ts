@@ -13,6 +13,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Achievement } from "entities/achievement.entity";
 import { SeederService } from "../achievements/achievement.seed";
 import { MatchesService } from "matches/matches.service";
+import {ConfigService} from "@nestjs/config";
 import { ChatService } from "chat/chat.service";
 
 @Injectable()
@@ -20,6 +21,7 @@ export class UsersService {
   constructor(
     private seederService: SeederService,
 	private matchesService: MatchesService,
+	private configService: ConfigService,
     @InjectRepository(User) private repo: Repository<User>,
 	// private readonly userRepository: Repository<User>,
 

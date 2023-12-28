@@ -32,7 +32,8 @@ export default {
   methods: {
     async login42() {
     //   console.log("Button Clickedd");
-      window.location.href = "http://localhost:3000/auth/42";
+		console.log('the backned url is: ', process.env.VUE_APP_BACKEND_URL)
+      window.location.href = process.env.VUE_APP_BACKEND_URL + "/auth/42";
     },
   },
 };

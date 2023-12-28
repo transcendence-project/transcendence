@@ -7,12 +7,14 @@ import {
 } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
 import { ChatService } from "../chat/chat.service";
+import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import { Channel } from "entities/channel.entity";
 import { UsersService } from '../users/users.service';
 
+const configService = new ConfigService();
 @WebSocketGateway({
-	cors: { origin: "http://localhost:8080" },
+	cors: { origin: configService.get('FRONTEND_URL') },
 	namespace: "chat",
 })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {

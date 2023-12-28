@@ -23,16 +23,12 @@ export class UsersController {
 	async upload_profile_picture(@Req() req, @UploadedFile(
 		new ParseFilePipe({
 			validators: [
-				new MaxFileSizeValidator({maxSize: 1000}),
+				new MaxFileSizeValidator({maxSize: 5000}),
 				new FileTypeValidator({fileType: 'image/png'})
 			]
 		})
 	) file : Express.Multer.File){	
-		// if (file) {
-		// 	return await this.userService.update_profilePic(req.user.id, file.path);
-		//   } else {
 		return (await this.userService.update_profilePic(req.user.id, file.path));
-		//   }
 	}
 
 	// @Patch('/update')

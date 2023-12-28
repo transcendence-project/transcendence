@@ -9,6 +9,7 @@ import { FriendRequestService } from 'friend-requests/FriendRequests.service';
 import { FriendRequest } from 'entities/friend-request.entity';
 import { Achievement } from 'entities/achievement.entity';
 import { SeederService } from '../achievements/achievement.seed';
+import { ConfigService } from '@nestjs/config';
 // import { MatchesService } from 'matches/matches.service';
 // import { Match } from 'entities/match.entity';
 import { MatchModule } from 'matches/matches.module';
@@ -21,15 +22,15 @@ import { ChatModule } from 'chat/chat.module';
 		MulterModule.register({
 			storage: diskStorage({
 				destination: (req, file, cb) => {
-					console.log('in multer destination, file: ', file);
+					// console.log('in multer destination, file: ', file);
 					cb(null, './uploads')},
 				filename: (req, file, cb) => {
-					console.log('in multer filename, file: ', file);
+					// console.log('in multer filename, file: ', file);
 					cb(null, file.originalname);
 				}
 			}),
 		})],
-	providers: [UsersService, FriendRequestService, SeederService],
+	providers: [UsersService, FriendRequestService, SeederService, ConfigService],
 	controllers: [UsersController, FriendRequestController],
 	exports: [UsersService, SeederService]
 })

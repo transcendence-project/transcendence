@@ -1,7 +1,7 @@
 import { Controller, Get, UseGuards, Req, Res, Param, Post, Header, HttpCode, Body, UnauthorizedException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
-import { ConfigService } from '@nestjs/config';
+import {ConfigService} from '@nestjs/config';
 import { User } from '../entities/user.entity';
 import { FortyTwoStrategy } from './strategy.42';
 import { FortyTwoAuthGuard } from './guard.42';
@@ -9,7 +9,7 @@ import { JwtAuthGuard } from './jwt.guard';
 
 @Controller('auth')
 export class AuthController {
-	constructor(private authService: AuthService) {
+	constructor(private authService: AuthService, private configService: ConfigService) {
 	}
 	@Get('42')
 	@UseGuards(AuthGuard('42'))
@@ -36,14 +36,14 @@ export class AuthController {
 		if (user.is2FAEnabled == true)
 		{
 			// redirect to 2fa page and then take them to homepage
-			const url = new URL('http://localhost:8080/twofactor');
+			const url = new URL('FRONTEND_URL/twofactor');
 			url.searchParams.set('code', token);
 			return res.status(200).redirect(url.href);
 		}
 		else{
 			// the one below
 		}
-		const url = new URL('http://localhost:8080/home');
+		const url = new URL(this.configService.get('FRONTEND_URL') + '/home');
 		url.searchParams.set('code', token);
 		// url.searchParams.delete('code');
 		return res.status(200).redirect(url.href);
@@ -55,7 +55,6 @@ export class AuthController {
 		
 		// req.logout();
 		// this.authService.authenticate(req.user, false);
-		// res.redirect('http://localhost:8080');
 	}
 
 	@Get('2fa/generate') // GET just for testing, will later be POST
@@ -89,8 +88,6 @@ export class AuthController {
 		else
 		{
 			console.log("! COOODEE SUCCESSFUULLLLLLL !");
-			// const url = new URL('http://localhost:8080/home');
-			// res.redirect('http://localhost:8080/home')
 			// url.searchParams.set('code', token);
 			// return res.status(200).redirect(url.href);
 			return "verified";

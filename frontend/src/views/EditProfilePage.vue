@@ -59,7 +59,7 @@ export default {
 
 				try {
 					const profilePicResponse = await axios.patch(
-						"http://localhost:3000/users/profile-picture",
+						process.env.VUE_APP_BACKEND_URL + "/users/profile-picture",
 						formData,
 						{
 							headers: {
@@ -91,7 +91,7 @@ export default {
 
 				try {
 					const usernameResponse = await axios.post(
-						`http://localhost:3000/users/username`,
+						process.env.VUE_APP_BACKEND_URL + `/users/username`,
 						{ username: username.value },
 						{
 							headers: {
