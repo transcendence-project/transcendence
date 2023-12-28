@@ -27,22 +27,34 @@ export class LogicGame {
         this.gameId = this.generateGameId()
         this.winner = null
         if (gameType == 'classic')
-            this.objectGame = this.instanciateGame(player1Login, Player2Login)
+        {
+            const colorBall = "#19A7CE";
+            const coloPaddle = "#9336B4";
+            this.objectGame = this.instanciateGame(player1Login, Player2Login, colorBall, coloPaddle);
+        }
         else
+        {
+            const colorBall = "white";
+            const coloPaddle = "#7BD3EA";
             this.objectGame = this.instanciateGame(
                 player1Login,
                 Player2Login,
+                colorBall,
+                coloPaddle,
             )
+        }
     }
 
     private instanciateGame(
         player1Login: string,
         Player2Login: string,
+        ballColor : string,
+        paddleColor : string,
     ): objectStatusDto {
         return {
             players: [
-                this.createPlayer(player1Login, 1),
-                this.createPlayer(Player2Login, 2),
+                this.createPlayer(player1Login, 1, paddleColor),
+                this.createPlayer(Player2Login, 2, paddleColor),
             ],
             ball: {
                 x: 0.5,
@@ -50,7 +62,7 @@ export class LogicGame {
                 dx: Ball_XSpeed,
                 dy: Math.random() > 0.5 ? Ball_YSpeed : -Ball_YSpeed,
                 radius: Ball_Radius,
-                color: '#19A7CE',
+                color: ballColor,
             },
         }
     }
@@ -75,7 +87,7 @@ export class LogicGame {
         return crypto.randomUUID()
     }
 
-    private createPlayer(login: string, side: number): PlayerDto {
+    private createPlayer(login: string, side: number, paddleColor: string): PlayerDto {
         return {
             login,
             score: 0,
@@ -85,7 +97,7 @@ export class LogicGame {
                 width: Paddle_Width,
                 height: Paddle_Height,
                 speed: Paddle_Speed,
-                color: '#9336B4',
+                color: paddleColor,
             },
             gameID: this.gameId,
             ready: login == 'computer' ? true :  false,
@@ -218,16 +230,14 @@ export class LogicGame {
         const ballSpeed = Math.sqrt(ball.dx ** 2 + ball.dy ** 2)
         ball.dy = ballSpeed * Math.sin(angle * (Math.PI / 180))
     }
+    
     // reset the ball position to the center
     private resetBallPosition(ball: BallDto): void {
         ball.x = 0.5
         ball.y = 0.5
         ball.dx = 0
-        if (this.gameType == 'custom') {
-            ball.dy = Math.random() * 0.02 - 0.01
-        } else {
-            ball.dy = 0
-        }
+        ball.dy = 0
+
         setTimeout(() => {
             ball.dx = Math.random() > 0.5 ? Ball_XSpeed : -Ball_XSpeed
             ball.dy = Math.random() > 0.5 ? Ball_YSpeed : -Ball_YSpeed

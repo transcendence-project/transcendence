@@ -40,7 +40,9 @@ export class GameGateway
 
   handleDisconnect(client: any) {
     console.log(this.gameService.classic_queue);
-    this.gameService.classic_queue.pop();
+    this.gameService.removeFromQueue(client);
+    // this.gameService.classic_queue.pop();
+    // this.gameService.custom_queue.pop();
     console.log("Client disconnected");
   }
   
@@ -54,7 +56,6 @@ export class GameGateway
     }
     else if (data.gameMode === 'online')
     {
-        console.log("from gatway onlone mode");
       this.gameService.onlineGame(client, data);
     }
   }
@@ -62,7 +63,6 @@ export class GameGateway
   @SubscribeMessage('paddleMove')
   handlePaddleMove(@ConnectedSocket() client: Socket, @MessageBody() data: string) {
     // const playerId = client.id; // Or any other way you identify your player
-    console.log("from gateway 454556546554656d4s5c4sc465sd45csdc65dsc654cd54c65c4654c65c64c65sd65c6sc465ds4c65sdc465ds54c6dsc")
     this.gameService.movePlayerPaddle(client, data);
   }
   
