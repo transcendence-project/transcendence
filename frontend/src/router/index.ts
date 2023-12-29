@@ -82,6 +82,13 @@ scrollBehavior (to, from , savedPosition){
 });
 
 router.beforeEach((to: any, from: any, next: any) => {
+      // Check if the user has a token and if the WebSocket is not connected
+      const token = localStorage.getItem('token');
+      const { connectSocket, socket } = useWebSocket();
+      if (token && !socket.socket) {
+          // Establish the WebSocket connection
+          connectSocket();
+      }
     if(to.path === '/game')
     {
         document.body.style.background = '#AE445A';
@@ -111,7 +118,6 @@ router.beforeEach((to: any, from: any, next: any) => {
       localStorage.setItem('token', token);
 		  store.dispatch('fetchUserData');
       const { connectSocket } = useWebSocket();
-      // const { socketState } = useWebSocket();
       connectSocket();
     }
   });

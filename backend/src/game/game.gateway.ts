@@ -44,7 +44,7 @@ export class GameGateway
     this.gameService.removeFromQueue(client);
     // this.gameService.classic_queue.pop();
     // this.gameService.custom_queue.pop();
-    console.log("Client disconnected");
+    // console.log("Client disconnected");
   }
   
   @SubscribeMessage('info')
