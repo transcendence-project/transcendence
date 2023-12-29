@@ -66,9 +66,18 @@ export class GameService {
 		const user = this.connected_users.get(client_id);
 		return user;
 	}
-    public getKeyByValue(map: Map<Socket,{ user: User, logicGame: LogicGame | null }>, searchValue) {
-        const foundEntry = Array.from(map.entries()).find(([key, value]) => value.user.userName === searchValue);
-        return foundEntry ? foundEntry[0] : null;
+
+    // public getKeyByValue(map: Map<Socket,{ user: User, logicGame: LogicGame | null }>, searchValue) {
+    //     const foundEntry = Array.from(map.entries()).find(([key, value]) => value.user.userName === searchValue);
+    //     return foundEntry ? foundEntry[0] : null;
+    // }
+    public getKeyByValue(map: Map<Socket, { user: User, logicGame: LogicGame | null }>, searchValue: string): Socket | null {
+        for (const [key, value] of map.entries()) {
+            if (value && value.user && value.user.userName === searchValue) {
+                return key;
+            }
+        }
+        return null;
     }
     
     public creatSingleGame(client: Socket, gameInfo: GameSelectDto)
@@ -86,10 +95,9 @@ export class GameService {
                 {
 
                     logic = new LogicGame(player.user.userName, 'computer', gameInfo.gameType);
-                    player.logicGame = logic;
 
+                    player.logicGame = logic;
                     client.join(logic.getGameID());
-                    console.log("fter join them to room");
                     this.countDown(logic, player, null);
                     this.startGame(logic);
                 }
@@ -186,16 +194,26 @@ export class GameService {
                         player2: { user: User, logicGame: LogicGame})
     {
         let countdown = 3;
-        const player1Key = this.getKeyByValue(this.connected_users, player1.user.userName);
-        const player2Key = this.getKeyByValue(this.connected_users, player2.user.userName);
+        let player1Key:Socket;
+        let player2Key;
+        if (player1)
+        {
+             player1Key = this.getKeyByValue(this.connected_users, player1.user.userName);
+        }
+        if (player2)
+        {
+            player2Key = this.getKeyByValue(this.connected_users, player2.user.userName);
+        }
 
-        console.log("this is player one login ", player1.logicGame);
-        console.log("this is player two login ", player2.logicGame);
+        // console.log("this is player one login ", player1.logicGame);
+        // console.log("this is player two login ", player2.logicGame);
         // console.log("this is player two login ", player2.user.userName);
         const countdownInterval = setInterval(() => {
             if (countdown >= 0) {
-                player1Key.emit('game-count', countdown);
-                player2Key.emit('game-count', countdown);
+                if (player1Key)
+                    player1Key.emit('game-count', countdown);
+                if (player2Key)
+                    player2Key.emit('game-count', countdown);
                 // this.socketService.emitToRoom(gameLogic.getGameID(), 'game-count', countdown);
                 countdown--;
             } else {
@@ -270,6 +288,10 @@ export class GameService {
             // else if (player.status == 'ingame')
             // {
             // }
+            console.log(player.logicGame);
+            console.log(this.classic_queue);
+            console.log(this.custom_queue);
+            this.connected_users.delete(socket);
         }
     }
 
