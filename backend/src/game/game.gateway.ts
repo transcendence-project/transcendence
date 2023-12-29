@@ -31,15 +31,16 @@ export class GameGateway
   }
 
   async handleConnection(client: Socket, ...args: any[]) {
+      console.log("Connected");
     const header = client.handshake.headers;
 
     const token = header.token;
     this.gameService.addConnectUser(client, token);
-    console.log("Connected");
   }
 
   handleDisconnect(client: any) {
     console.log(this.gameService.classic_queue);
+    console.log("Client Disconnected!");
     this.gameService.removeFromQueue(client);
     // this.gameService.classic_queue.pop();
     // this.gameService.custom_queue.pop();

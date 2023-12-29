@@ -82,7 +82,6 @@ export class GameService {
     
     public creatSingleGame(client: Socket, gameInfo: GameSelectDto)
     {
-        console.log("From the single game");    
         const player = this.connected_users.get(client);
         console.log("this is the player",player)
         let logic: LogicGame;
@@ -97,6 +96,7 @@ export class GameService {
                     logic = new LogicGame(player.user.userName, 'computer', gameInfo.gameType);
 
                     player.logicGame = logic;
+                    player.status = 'ingame';
                     client.join(logic.getGameID());
                     this.countDown(logic, player, null);
                     this.startGame(logic);
@@ -227,12 +227,10 @@ export class GameService {
         console.log("Start Game function");
         // let lastUpdateTime = Date.now();
         const gameInterval = setInterval(() => {
-            // const now = Date.now();
-            // const deltaTime = (now - lastUpdateTime) / 1000; 
             gameLogic.updateGame();
             // lastUpdateTime = now;
             this.socketService.emitToRoom(gameLogic.getGameID(), 'game-data', gameLogic.getObjectStatus());
-            if (gameLogic.checkWinner())
+            if (gameLogic.checkWinner(  ))
             {
                 clearInterval(gameInterval);
                 this.endGame(gameLogic)
@@ -285,12 +283,10 @@ export class GameService {
                 if (this.custom_queue.includes(player.user.userName))
                     this.custom_queue.splice(this.custom_queue.indexOf(player.user.userName), 1);
             }
-            // else if (player.status == 'ingame')
-            // {
-            // }
             console.log(player.logicGame);
             console.log(this.classic_queue);
             console.log(this.custom_queue);
+            player.logicGame = null;
             this.connected_users.delete(socket);
         }
     }

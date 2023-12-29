@@ -99,6 +99,12 @@ import { Socket } from 'socket.io-client';
 			color:string,
 		};
 	}
+    
+    const keys: { [key: string]: boolean } = {
+        ArrowUp: false,
+        ArrowDown: false,
+    }
+
 	let socket: Socket;
 	const currentGameData = reactive<GameData>({
 		players: [
@@ -108,17 +114,37 @@ import { Socket } from 'socket.io-client';
 		ball: { x: 0, y: 0, dx: 0, dy: 0, radius: 0, color: '' }
 	});
 	const handleKeyDown = (event: any) => {
-			if (event.key === "w" || event.key === "W") {
+        console.log(event);
+			if (event.key === 'ArrowUp' || event.key === "ArrowUp") {
 				// Move left paddle up
-				socket.emit('paddleMove','up');
-			} else if (event.key === "s" || event.key === "S") {
+				// socket.emit('paddleMove','up');
+                keys[event.key] = true;
+                console.log("arrowUp set true");
+			} else if (event.key === 'ArrowDown' || event.key === "ArrowDown") {
 				// Move left paddle down
-				socket.emit('paddleMove','down');
+				// socket.emit('paddleMove','down');
+                keys[event.key] = true;
+                console.log("arrowDown set true");
+			}
+	};
+
+    const handleKeyUp = (event: any) => {
+        console.log(event);
+			if (event.key === 'ArrowUp' || event.key === "ArrowUp") {
+				// Move left paddle up
+				// socket.emit('paddleMove','up');
+                keys[event.key] = false;
+                console.log("arrowUp set false.");
+			} else if (event.key === 'ArrowDown' || event.key === "ArrowDown") {
+				// Move left paddle down
+				// socket.emit('paddleMove','down');
+                keys[event.key] = false;
 			}
 	};
 	// Function to add the event listener
 const addEventListener = () => {
     document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('keyup', handleKeyUp);
 };
 
 // Function to remove the event listener
@@ -238,6 +264,7 @@ const removeEventListener = () => {
                  socket.on('game-data', (data: GameData) => {
                      console.log("this is data ", data);
                      Object.assign(currentGameData, data);
+                     movePaddle();
              });
                  socket.on('game-over', (payload:any) => {
                      winnerCompo.value = true;
@@ -266,6 +293,17 @@ const removeEventListener = () => {
 		socket.off('game-count');
 		socket.off('game-over');
 	});
+
+    const movePaddle = () => {
+        console.log("Test");
+        console.log(keys);
+        if (keys.ArrowUp) {
+            console.log("Test2");
+            socket.emit('paddleMove','up');
+        } else if (keys.ArrowDown) {
+            socket.emit('paddleMove','down');
+        }
+    }
 </script>
 
 <style>
