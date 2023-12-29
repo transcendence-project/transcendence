@@ -148,15 +148,14 @@ export class LogicGame {
 
     // move the ball to the next position
     private moveBall(ball: BallDto): void {
-        if (ball.dx > Ball_Radius) ball.dx = Ball_Radius - 0.001
+        // if (ball.dx > Ball_Radius) ball.dx = Ball_Radius - 0.001
         ball.x += ball.dx
         ball.y += ball.dy
     }
+    
     public updatePaddlePosition(playerID: string, direction: string): void {
         const player = this.objectGame.players.find(player => player.login === playerID)
 
-        // const movementAmount = Paddle_Speed * this.winner;
-        console.log("this is the direction", direction)
         if (direction === 'up') {
             player.paddle.y -= player.paddle.speed;
         } else if (direction === 'down') {
