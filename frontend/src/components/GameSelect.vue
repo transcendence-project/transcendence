@@ -32,7 +32,8 @@ import { ref, getCurrentInstance, computed, defineEmits} from 'vue';
     const loading = ref(false)
     const instance = getCurrentInstance();
     // Define emit function
-const emit = defineEmits(['updateGameMode']);
+const emit = defineEmits(['updateGameMode', 'updateGameType']);
+
     const selectGameType = (type: string) => {
       gameType.value = type;
       gameMode.value = '';
@@ -53,8 +54,10 @@ const emit = defineEmits(['updateGameMode']);
             gameMode: gameMode.value
         };
         emit('updateGameMode', gameMode.value === 'online');
+        emit('updateGameType', gameType.value === 'custom');
         const socket = instance.proxy.$socket.socket;
-        socket.emit('info', gameInfo);
+        if (socket)
+            socket.emit('info', gameInfo);
       } 
       else  
       {

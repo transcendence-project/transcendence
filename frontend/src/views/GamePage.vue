@@ -1,6 +1,6 @@
 <template>
     <div class="game-container" v-if="isGameSelectVisible">
-            <GameSelect @updateGameMode="handleGameModeUpdate" />
+            <GameSelect @updateGameMode="handleGameModeUpdate" @updateGameType="handleGameTypeUpdate"/>
     </div>
     <div class="loading-container" v-if="isOnlineGame">
             <LoadingComponent ></LoadingComponent>
@@ -50,19 +50,26 @@ import { Socket } from 'socket.io-client';
     const leftPlayerScore = ref<number | 0>(0);
     const winnerCompo = ref<boolean | false>(false);
 	const LoginPlayer1 = ref<string | null>(null)
-	const color_map = ref<string | null>(null)
+	const color_map = ref<string | null>(null);
 	const LoginPlayer2 = ref<string | null>(null)
 	const isGameSelectVisible = ref(true);
 	const gameCountdown = ref(0);
 	const isCanvasVisible = ref(false); 
     const winnerLogin = ref<string | null>(null);
     const pongCanvas =  ref<HTMLCanvasElement | null>(null);
-    color_map.value = "white";
+    // color_map.value = "white";
+
     function handleGameModeUpdate(isOnline:Boolean) {
         console.log("this is the value ",isOnline);
         isOnlineGame.value = isOnline;
         isGameSelectVisible.value = false;
-        color_map.value = "#200E3A";
+    }
+    function handleGameTypeUpdate(isOnline:Boolean) {
+        if (isOnline)
+        {
+            color_map.value = "#200E3A";
+            console.log("from insde the ggame type");
+        }
     }
 	interface Paddle { 
 		x: number,
@@ -200,7 +207,7 @@ const removeEventListener = () => {
 							// drawCircle(ctx, currentGameData.ball.x, currentGameData.ball.y, currentGameData.ball.radius, currentGameData.ball.color);
 							ctx.clearRect(0, 0, pongCanvas.value.width, pongCanvas.value.height);
 
-							drawRect(ctx, 0, 0, pongCanvas.value.width, pongCanvas.value.height, color_map.value);
+							drawRect(ctx, 0, 0, pongCanvas.value.width, pongCanvas.value.height, color_map.value || "white");
 							// Calculate positions
 							const positions = calculateGameElementPositions(pongCanvas.value, currentGameData);
 
@@ -226,25 +233,28 @@ const removeEventListener = () => {
         if (instance?.proxy)
         {
              socket = instance.proxy.$socket.socket;
-            socket.on('game-data', (data: GameData) => {
-                console.log("this is data ", data);
-				Object.assign(currentGameData, data);
-		});
-            socket.on('game-over', (payload:any) => {
-				winnerCompo.value = true;
-				winnerLogin.value = payload.login;
-				isCanvasVisible.value = false;
-		});
-        socket.on('game-count', (data: any) => {
-				gameCountdown.value = data;
-				console.log("this is game count",gameCountdown.value)
-				isGameSelectVisible.value = false;
-                isOnlineGame.value = false;
-				if (gameCountdown.value <= 0 )
-				{
-					isCanvasVisible.value = true;
-				}
-		});
+             if (socket)
+             {
+                 socket.on('game-data', (data: GameData) => {
+                     console.log("this is data ", data);
+                     Object.assign(currentGameData, data);
+             });
+                 socket.on('game-over', (payload:any) => {
+                     winnerCompo.value = true;
+                     winnerLogin.value = payload.login;
+                     isCanvasVisible.value = false;
+             });
+             socket.on('game-count', (data: any) => {
+                     gameCountdown.value = data;
+                     console.log("this is game count",gameCountdown.value)
+                     isGameSelectVisible.value = false;
+                     isOnlineGame.value = false;
+                     if (gameCountdown.value <= 0 )
+                     {
+                         isCanvasVisible.value = true;
+                     }
+             });
+             }
     }
     });
 	onBeforeUnmount(() => {

@@ -10,9 +10,9 @@ import { SocketService } from './socket.service'
 @Injectable()
 export class GameService {
     // private connected_users:Map<string,User> = new Map();
-    private connected_users: Map<Socket, { user: User, logicGame: LogicGame | null }> = new Map();
+    private connected_users: Map<Socket, { user: User, logicGame: LogicGame | null , status: string}> = new Map();
     public classic_queue: string[] = [];
-    private custom_queue: string[] = [];
+    public custom_queue: string[] = [];
     private paddle: Paddle;
     private ball: Ball;
     private computer: Computer;
@@ -58,7 +58,7 @@ export class GameService {
             //     return; 
             // }
             // if (flag == 0)
-                this.connected_users.set(client,{user, logicGame: null});
+                this.connected_users.set(client,{user, logicGame: null, status: 'online'});
             
 	}
 
@@ -106,18 +106,21 @@ export class GameService {
         const player = this.connected_users.get(userSocket);
         if (this.classic_queue.includes(player.user.userName) || this.custom_queue.includes(player.user.userName))
             return
+        player.status = 'inqueue';
         const opponent = await this.findOpponent(player.user.userName, gameInfo.gameType);
         console.log("after the opponet function");
 
         if (opponent) {
-            this.createMultiGame(player, opponent, gameInfo.gameType)
+            this.createMultiGame(player, opponent, gameInfo.gameType);
+            player.status = 'ingame';
+            opponent.status = 'ingame';
             console.log("inside the oppent ", player.user.userName);
             // player.status = 'ingame'
             // opponent.status = 'ingame'
         }
     }
 
-    private createMultiGame(player1: { user: User, logicGame: LogicGame}, player2: { user: User, logicGame: LogicGame},
+    private createMultiGame(player1: { user: User, logicGame: LogicGame,status: string}, player2: { user: User, logicGame: LogicGame, status: string},
                             gameType: string, gameMode?: string,) 
     {
         let logic
@@ -135,8 +138,6 @@ export class GameService {
 
         player1.logicGame = logic
         player2.logicGame = logic   
-        console.log("from mutl player 1", player1.logicGame, player1.user.userName);
-        console.log("from mutl player 2", player2.logicGame, player2.user.userName);
         const player1Key = this.getKeyByValue(this.connected_users, player1.user.userName);
         const player2Key = this.getKeyByValue(this.connected_users, player2.user.userName);
 
@@ -152,7 +153,7 @@ export class GameService {
         this.startGame(logic);
     }
 
-    private async findOpponent(userLogin: string, gameType: string): Promise<{ user: User, logicGame: LogicGame | null } | null> {
+    private async findOpponent(userLogin: string, gameType: string): Promise<{ user: User, logicGame: LogicGame | null, status: string } | null> {
         if (gameType == 'classic') {
             if (this.classic_queue.length > 0) {
                 console.log("this is inside the oppent function before the shift", this.classic_queue);
@@ -170,7 +171,7 @@ export class GameService {
             }
         } else if (gameType == 'custom') {
             if (this.custom_queue.length > 0) {
-                const opponent = this.classic_queue.shift();
+                const opponent = this.custom_queue.shift();
                 const getKey = this.getKeyByValue(this.connected_users, opponent);
                 const player2 = this.connected_users.get(getKey);
                 return player2;
@@ -188,7 +189,8 @@ export class GameService {
         const player1Key = this.getKeyByValue(this.connected_users, player1.user.userName);
         const player2Key = this.getKeyByValue(this.connected_users, player2.user.userName);
 
-        // console.log("this is player one login ", player1.user.userName);
+        console.log("this is player one login ", player1.logicGame);
+        console.log("this is player two login ", player2.logicGame);
         // console.log("this is player two login ", player2.user.userName);
         const countdownInterval = setInterval(() => {
             if (countdown >= 0) {
@@ -251,5 +253,33 @@ export class GameService {
         console.log(player.user.userName);
         player.logicGame.updatePaddlePosition(player.user.userName, direction);
     }
+
+    public removeFromQueue(socket: Socket)
+    {
+        const player = this.connected_users.get(socket);
+        console.log("from the gateway", player.logicGame);
+        if (player)
+        {
+            if (player.status == 'inqueue')
+            {
+                if (this.classic_queue.includes(player.user.userName))
+                    this.classic_queue.splice(this.classic_queue.indexOf(player.user.userName), 1);
+                if (this.custom_queue.includes(player.user.userName))
+                    this.custom_queue.splice(this.custom_queue.indexOf(player.user.userName), 1);
+            }
+            // else if (player.status == 'ingame')
+            // {
+            // }
+        }
+    }
+
+    // public giveUp(socket: Socket) {
+    //     // const player = this.connected_users.find(user => user.socket == userSocket)
+    //     const player = this.connected_users.get(socket);
+    //     if (player && player.status == 'ingame') {
+    //         // player.logicGame.setLoser(player.login)
+    //         player.game.leaver = player.login
+    //     }
+    // }
 }
 
