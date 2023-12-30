@@ -6,10 +6,9 @@ services:
     ports:
       - "3000:3000"
     volumes:
-       - ./backend:/app/backend
-      #  - ./backend/uploads:/app/uploads
-    working_dir: /app/backend # This  maps your host's ./backend/src directory to /app/backend/src in the container
-    command: ['sh', '-c', 'npm install && npm run start:dev']
+       - ./backend/src:/app/backend/src
+       - ./backend/uploads:/app/uploads
+    working_dir: /app/backend # This maps your host's ./backend/src directory to /app/backend/src in the container
   database:
     image: postgres:13
     environment:
@@ -25,38 +24,5 @@ services:
     ports:
       - "8080:8080"
     volumes:
-       - ./frontend:/app/frontend  # This maps your host's ./frontend/src directory to /app/frontend/src in the container
+       - ./frontend/src:/app/frontend/src  # This maps your host's ./frontend/src directory to /app/frontend/src in the container
     working_dir: /app/frontend
-    command: ['sh', '-c', 'npm install -g npm@10.2.5 && npm run serve']
-# version: '3'
-# services:
-#   backend:
-#     build: ./backend  # Docker will look for Dockerfile in this directory
-#     container_name: backend
-#     ports:
-#       - "3000:3000"
-#     volumes:
-#        - ./backend:/app/backend
-#        - /app/backend/node_modules
-#       #  - ./backend/uploads:/app/uploads
-#     working_dir: /app/backend # This  maps your host's ./backend/src directory to /app/backend/src in the container
-#     # command: ['sh', '-c', 'npm install && npm run start:dev']
-#   database:
-#     image: postgres:13
-#     environment:
-#       POSTGRES_USER: postgres
-#       POSTGRES_PASSWORD: 123
-#       POSTGRES_DB: postgres
-#     ports:
-#       - "5432:5432"
-
-#   frontend:
-#     build: ./frontend  # Docker will look for Dockerfile in this directory
-#     container_name: frontend
-#     ports:
-#       - "8080:8080"
-#     volumes:
-#        - ./frontend:/app/frontend
-#        - /app/frontend/node_modules  # This maps your host's ./frontend/src directory to /app/frontend/src in the container
-#     working_dir: /app/frontend
-#     # command: ['sh', '-c', 'npm install && npm run serve']
