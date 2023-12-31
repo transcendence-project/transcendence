@@ -45,6 +45,7 @@ import LoadingComponent from '@/components/LoadingComponent.vue';
 import Result from '@/components/Result.vue'
 
 import { Socket } from 'socket.io-client';
+import { faL } from '@fortawesome/free-solid-svg-icons';
 
     const isOnlineGame = ref<Boolean | false>(false);
     const rightPlayerScore = ref<number | 0>(0);
@@ -55,7 +56,7 @@ import { Socket } from 'socket.io-client';
 	const LoginPlayer2 = ref<string | null>(null)
 	const isGameSelectVisible = ref(true);
 	const gameCountdown = ref(0);
-	const isCanvasVisible = ref(true); 
+	const isCanvasVisible = ref(false); 
     const winnerLogin = ref<string | null>(null);
     const pongCanvas =  ref<HTMLCanvasElement | null>(null);
 	let socket: Socket;
@@ -66,6 +67,7 @@ import { Socket } from 'socket.io-client';
 		{
 			isOnlineGame.value = false;
 			isGameSelectVisible.value = true;
+            socket.emit('leave-queue');
 		}
     }
 
@@ -216,33 +218,12 @@ const removeEventListener = () => {
         const canvas = pongCanvas.value;
 		if (canvas)
 		{
-		// 	const aspectRatio = 16 / 9;
-        // let canvasWidth = window.innerWidth;
-        // let canvasHeight = window.innerWidth / aspectRatio;
-
-        // // Ensure the canvas is not larger than the window height
-        // if (canvasHeight > window.innerHeight) {
-        //     canvasHeight = window.innerHeight;
-        //     canvasWidth = canvasHeight * aspectRatio;
-        // }
-
-        // canvas.width = canvasWidth;
-        // canvas.height = canvasHeight;
-            // canvas.width = 800;
-            // canvas.height = 450;
 			const ctx = canvas.getContext('2d');
 			if (ctx)
 			{
 				const render = () => { 
 						if (ctx && pongCanvas.value)
                         {
-							// ctx.clearRect(0, 0, pongCanvas.value.width, pongCanvas.value.height);
-							// drawRect(ctx, 0, 0, pongCanvas.value.width, pongCanvas.value.height, "white");
-							// drawRect(ctx, currentGameData.players[0].paddle.x, currentGameData.players[0].paddle.y, currentGameData.players[0].paddle.width, currentGameData.players[0].paddle.height,currentGameData.players[0].paddle.color);
-							// // Draw right paddle
-							// drawRect(ctx, currentGameData.players[1].paddle.x, currentGameData.players[1].paddle.y, currentGameData.players[1].paddle.width, currentGameData.players[1].paddle.height, currentGameData.players[1].paddle.color);
-							// // Draw ball
-							// drawCircle(ctx, currentGameData.ball.x, currentGameData.ball.y, currentGameData.ball.radius, currentGameData.ball.color);
 							ctx.clearRect(0, 0, pongCanvas.value.width, pongCanvas.value.height);
 
 							drawRect(ctx, 0, 0, pongCanvas.value.width, pongCanvas.value.height, color_map.value || "white");
@@ -297,10 +278,10 @@ const removeEventListener = () => {
     }
     });
 	onBeforeUnmount(() => {
-		// document.addEventListener('keydown', handleKeyDown);
 		removeEventListener();
 		cancelAnimationFrame(animationFrameId);
-		console.log("this is call for before onmounted ")
+		console.log("this is call for before onmounted ");
+        socket.emit('route-leave');
 		socket.off('game-data');
 		socket.off('game-count');
 		socket.off('game-over');

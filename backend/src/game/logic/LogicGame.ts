@@ -3,7 +3,7 @@ import {objectStatusDto, PlayerDto, BallDto, PaddleDto} from '../dto/game.dto'
 
 const Paddle_Width = 0.02
 const Paddle_Height = 0.2
-const Paddle_Speed = 0.0175
+const Paddle_Speed = 0.0170
 const Ball_Radius = 0.027
 const Collision_Angle = 80
 const Ball_XSpeed = 0.010

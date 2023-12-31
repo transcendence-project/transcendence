@@ -98,6 +98,10 @@ export class GameService {
             {
                 logic = new LogicGame(player.user.userName, 'computer', gameInfo.gameType);
                 player.logicGame = logic;
+                player.status = 'ingame';
+                client.join(logic.getGameID());
+                this.countDown(logic, player, null);
+                this.startGame(logic);
             }
         }
     }
@@ -241,7 +245,7 @@ export class GameService {
         if (player2 && gameLogic.getPlayer2ID() !== 'computer')
         {
             player2.logicGame = null;
-            console.debug("this is from the endGame player2", this.classic_queue);
+            // console.debug("this is from the endGame player2", this.classic_queue);
             getKeyPlayer2.leave(gameLogic.getGameID());
         }
     }
@@ -253,7 +257,7 @@ export class GameService {
         player.logicGame.updatePaddlePosition(player.user.userName, direction);
     }
 
-    public removePlayer(socket: Socket)
+    public removePlayer(socket: Socket, deleteUser: number)
     {
         const player = this.connected_users.get(socket);
         if (player)
@@ -267,20 +271,29 @@ export class GameService {
             }
             else if (player.status === 'ingame')
             {
-                player.logicGame.setLoser(player.user.userName);
-                this.endGame(player.logicGame);
+                if (player.logicGame)
+                {
+                    player.logicGame.setLoser(player.user.userName);
+                    this.endGame(player.logicGame);
+                }
             }
-            this.connected_users.delete(socket);
+            if (deleteUser === 1)
+            {
+                this.connected_users.delete(socket);
+                console.log("the player is removed from the user connected");
+            }
         }
     }
 
-    // public giveUp(socket: Socket) {
-    //     // const player = this.connected_users.find(user => user.socket == userSocket)
-    //     const player = this.connected_users.get(socket);
-    //     if (player && player.status == 'ingame') {
-    //         // player.logicGame.setLoser(player.login)
-    //         player.game.leaver = player.login
-    //     }
-    // }
+    public removePlayerFromQueue(socket: Socket) {
+        const player = this.connected_users.get(socket);
+        if (player.status === 'inqueue')
+        {
+            if (this.classic_queue.includes(player.user.userName))
+                this.classic_queue.splice(this.classic_queue.indexOf(player.user.userName), 1);
+            if (this.custom_queue.includes(player.user.userName))
+                this.custom_queue.splice(this.custom_queue.indexOf(player.user.userName), 1);
+        }
+    }
 }
 

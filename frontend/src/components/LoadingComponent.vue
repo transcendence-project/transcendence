@@ -7,7 +7,7 @@
   :size="65"
   color="#ff1d5e"
 />
-<button @click="leaveQueue">Back to home</button>
+<button @click="leaveQueue">Leave Queue</button>
 </template>
 
 

@@ -41,7 +41,7 @@ export class GameGateway
   handleDisconnect(client: any) {
     // console.log(this.gameService.classic_queue);
     console.log("Client Disconnected!");
-    this.gameService.removePlayer(client);
+    this.gameService.removePlayer(client, 1);
     // this.gameService.classic_queue.pop();
     // this.gameService.custom_queue.pop();
     // console.log("Client disconnected");
@@ -60,11 +60,29 @@ export class GameGateway
       this.gameService.onlineGame(client, data);
     }
   }
+
+  @SubscribeMessage('leave-queue')
+   leaveQueue(@ConnectedSocket() client: Socket) {
+    this.gameService.removePlayerFromQueue(client);
+  }
+
+  @SubscribeMessage('route-leave')
+   routeLeaver(@ConnectedSocket() client: Socket) {
+    console.log("the player is route away from the game page");
+    this.gameService.removePlayer(client, 2);
+  }
   
   @SubscribeMessage('paddleMove')
   handlePaddleMove(@ConnectedSocket() client: Socket, @MessageBody() data: string) {
     // const playerId = client.id; // Or any other way you identify your player
     this.gameService.movePlayerPaddle(client, data);
+  }
+
+  @SubscribeMessage('invite')
+  handleInvite(@ConnectedSocket() client: Socket, @MessageBody() data: string) {
+    // const playerId = client.id; // Or any other way you identify your player
+    // this.gameService.movePlayerPaddle(client, data);
+    console.log("this is from the game socket and this is the user invite", data)
   }
   
   inviteUser(client: Socket, receiver: string): void {
