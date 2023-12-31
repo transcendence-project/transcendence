@@ -21,6 +21,7 @@
 				</div>
 				{{ leftPlayerScore }}
 			</div>
+			<font-awesome-icon icon="fa-solid fa-person-running" class="cursor-pointer"  @click=""/>
 			<div class="right-side">
 				<div class="login">
 					{{ LoginPlayer2 }}
@@ -54,7 +55,7 @@ import { Socket } from 'socket.io-client';
 	const LoginPlayer2 = ref<string | null>(null)
 	const isGameSelectVisible = ref(true);
 	const gameCountdown = ref(0);
-	const isCanvasVisible = ref(false); 
+	const isCanvasVisible = ref(true); 
     const winnerLogin = ref<string | null>(null);
     const pongCanvas =  ref<HTMLCanvasElement | null>(null);
     // color_map.value = "white";
@@ -64,6 +65,7 @@ import { Socket } from 'socket.io-client';
         isOnlineGame.value = isOnline;
         isGameSelectVisible.value = false;
     }
+
     function handleGameTypeUpdate(isOnline:Boolean) {
         if (isOnline)
         {
@@ -71,6 +73,8 @@ import { Socket } from 'socket.io-client';
             console.log("from insde the ggame type");
         }
     }
+
+	
 	interface Paddle { 
 		x: number,
 		y: number,

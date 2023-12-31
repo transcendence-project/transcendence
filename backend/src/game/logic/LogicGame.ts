@@ -123,6 +123,14 @@ export class LogicGame {
         return this.objectGame.players.find(player => player.login === this.winner);
     }
 
+    public setLoser(playerLogin: string) : void 
+    {
+        if (this.getPlayer1ID() === playerLogin)
+            this.winner = this.getPlayer2ID();
+        else
+            this.winner = this.getPlayer1ID();
+    }
+
     public updateComputer(): void {
         const computer = this.objectGame.players.find(player => player.login === 'computer')
         const ball = this.objectGame.ball

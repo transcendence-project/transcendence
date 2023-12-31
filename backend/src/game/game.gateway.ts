@@ -39,9 +39,9 @@ export class GameGateway
   }
 
   handleDisconnect(client: any) {
-    console.log(this.gameService.classic_queue);
+    // console.log(this.gameService.classic_queue);
     console.log("Client Disconnected!");
-    this.gameService.removeFromQueue(client);
+    this.gameService.removePlayer(client);
     // this.gameService.classic_queue.pop();
     // this.gameService.custom_queue.pop();
     // console.log("Client disconnected");

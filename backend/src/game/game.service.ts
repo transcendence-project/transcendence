@@ -11,8 +11,8 @@ import { SocketService } from './socket.service'
 export class GameService {
     // private connected_users:Map<string,User> = new Map();
     private connected_users: Map<Socket, { user: User, logicGame: LogicGame | null , status: string}> = new Map();
-    public classic_queue: string[] = [];
-    public custom_queue: string[] = [];
+    private classic_queue: string[] = [];
+    private custom_queue: string[] = [];
     private paddle: Paddle;
     private ball: Ball;
     private computer: Computer;
@@ -31,33 +31,25 @@ export class GameService {
         // console.log("after",this.connected_users);
         // console.log(oo);
     }
+
     async set_online_user(client: Socket ,token: any){
 		const _token = token;
-        // let flag = 0;
+        let flag = 0;
             const user = await this.authService.user_by_token(_token);
             // console.log(this.connected_users.has(user.userName));
-            // if (this.connected_users != undefined)
-            // {
-            //     this.connected_users.forEach((value, key, map) =>{
-            //         if (user.userName === value.user.userName)
-            //         {
-            //             console.log("ehre");
-            //             this.connected_users.delete(client.id);
-            //             client.disconnect(true);
-            //              flag = 1;
-            //             // console.log(key, value.userName);
-            //         }
-            //     });
+            if (this.connected_users != undefined)
+            {
+                this.connected_users.forEach((value, key, map) =>{
+                    if (value && value.user && user.userName === value.user.userName)
+                    {
+                        this.connected_users.delete(client);
+                        client.disconnect(true);
+                         flag = 1;
+                    }
+                });
 
-            // }
-            // console.log(this.connected_users.);
-            // if (this.connected_users.has(user.userName))
-            // {
-            //     console.log('this user try to connecte again ' ,user);
-            //     client.disconnect(true);
-            //     return; 
-            // }
-            // if (flag == 0)
+            }
+            if (flag == 0)
                 this.connected_users.set(client,{user, logicGame: null, status: 'online'});
             
 	}
@@ -120,8 +112,8 @@ export class GameService {
 
         if (opponent) {
             this.createMultiGame(player, opponent, gameInfo.gameType);
-            player.status = 'ingame';
-            opponent.status = 'ingame';
+            // player.status = 'ingame';
+            // opponent.status = 'ingame';
             console.log("inside the oppent ", player.user.userName);
             // player.status = 'ingame'
             // opponent.status = 'ingame'
@@ -131,21 +123,13 @@ export class GameService {
     private createMultiGame(player1: { user: User, logicGame: LogicGame,status: string}, player2: { user: User, logicGame: LogicGame, status: string},
                             gameType: string, gameMode?: string,) 
     {
-        let logic
-        // if (gameType == 'custom') {
-        //     game = new PongGame(
-        //         player1.login,
-        //         player2.login,
-        //         gameType,
-        //         player1.powerUps,
-        //         player2.powerUps,
-        //     )
-        // } else {
-            logic = new LogicGame(player1.user.userName, player2.user.userName, gameType)
-        // }
+        let logic : LogicGame;
 
-        player1.logicGame = logic
-        player2.logicGame = logic   
+        logic = new LogicGame(player1.user.userName, player2.user.userName, gameType);
+
+        player1.logicGame = logic;
+        player2.logicGame = logic;
+
         const player1Key = this.getKeyByValue(this.connected_users, player1.user.userName);
         const player2Key = this.getKeyByValue(this.connected_users, player2.user.userName);
 
@@ -154,9 +138,8 @@ export class GameService {
 
         // this.repo.updatePlayerStatus('INGAME', player1.login)
         // this.repo.updatePlayerStatus('INGAME', player2.login)
-        // player1.status = 'ingame'
-        // player2.status = 'ingame'
-        // this.initiateGame(game, player1, player2)
+        player1.status = 'ingame'
+        player2.status = 'ingame'
         this.countDown(logic, player1, player2);
         this.startGame(logic);
     }
@@ -270,23 +253,23 @@ export class GameService {
         player.logicGame.updatePaddlePosition(player.user.userName, direction);
     }
 
-    public removeFromQueue(socket: Socket)
+    public removePlayer(socket: Socket)
     {
         const player = this.connected_users.get(socket);
-        console.log("from the gateway", player.logicGame);
         if (player)
         {
-            if (player.status == 'inqueue')
+            if (player.status === 'inqueue')
             {
                 if (this.classic_queue.includes(player.user.userName))
                     this.classic_queue.splice(this.classic_queue.indexOf(player.user.userName), 1);
                 if (this.custom_queue.includes(player.user.userName))
                     this.custom_queue.splice(this.custom_queue.indexOf(player.user.userName), 1);
             }
-            console.log(player.logicGame);
-            console.log(this.classic_queue);
-            console.log(this.custom_queue);
-            player.logicGame = null;
+            else if (player.status === 'ingame')
+            {
+                player.logicGame.setLoser(player.user.userName);
+                this.endGame(player.logicGame);
+            }
             this.connected_users.delete(socket);
         }
     }
