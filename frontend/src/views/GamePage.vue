@@ -3,7 +3,7 @@
             <GameSelect @updateGameMode="handleGameModeUpdate" @updateGameType="handleGameTypeUpdate"/>
     </div>
     <div class="loading-container" v-if="isOnlineGame">
-            <LoadingComponent ></LoadingComponent>
+            <LoadingComponent @leave-queue="handleLeave"></LoadingComponent>
     </div>
 	<div class="conta-count" v-if="gameCountdown > 0">
 		<div>
@@ -58,7 +58,16 @@ import { Socket } from 'socket.io-client';
 	const isCanvasVisible = ref(true); 
     const winnerLogin = ref<string | null>(null);
     const pongCanvas =  ref<HTMLCanvasElement | null>(null);
+	let socket: Socket;
     // color_map.value = "white";
+
+    function handleLeave(isOnline:Boolean) {
+		if (isOnline)
+		{
+			isOnlineGame.value = false;
+			isGameSelectVisible.value = true;
+		}
+    }
 
     function handleGameModeUpdate(isOnline:Boolean) {
         console.log("this is the value ",isOnline);
@@ -74,7 +83,7 @@ import { Socket } from 'socket.io-client';
         }
     }
 
-	
+
 	interface Paddle { 
 		x: number,
 		y: number,
@@ -109,7 +118,6 @@ import { Socket } from 'socket.io-client';
         ArrowDown: false,
     }
 
-	let socket: Socket;
 	const currentGameData = reactive<GameData>({
 		players: [
 			{ score: 0, login: '', game_type: '', status:'' ,paddle: { x: 0, y: 0, width: 0, height: 0, color: '', speed: 0 } },
