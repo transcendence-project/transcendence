@@ -1,4 +1,11 @@
 <template>
+    <Dialog v-model:visible="invitationModalVisible" header="Game Invitation" class="dialog-container" @hide="handleDialogClose">
+        <p>You have been invited to a game by {{ inviterName }}.</p>
+        <template #footer>
+        <Button class="dialog-button" label="Accept" @click="acceptInvitation" />
+        <!-- <Button class="dialog-button" label="Reject" @click="rejectInvitation" /> -->
+        </template>
+    </Dialog>
 	<div
 	  class="prof_page flex flex-wrap justify-between bg-gradient-to-r from-[#451952] via-[#451952] to-[#ae4188] shadow-custom text-white w-full min-h-[85.9vh] m-5 rounded-md p-2.5 text-center"
 	>
@@ -381,7 +388,12 @@
   import io from "socket.io-client";
   import store from "@/store";
   import { IChannel } from "@/models/channel";
-  
+  import { useWebSocket } from "@/plugins/websocket-plugin";
+  import Dialog from "primevue/dialog";
+  import Button from 'primevue/button';
+import { fas } from "@fortawesome/free-solid-svg-icons";
+
+  const { socket } = useWebSocket();
   const chan = ref([] as IChannel[]);
   const m_chan = ref([] as IChannel[]);
   const m_frnd = ref([] as FriendsList[]);
@@ -394,6 +406,8 @@
   export default defineComponent({
 	data() {
 	  return {
+        invitationModalVisible: false,
+      inviterName: '',
 		channels: chan,
 		my_chan: m_chan,
 		src_friend: "" as string,
@@ -429,6 +443,8 @@
 		isBlock: true,
 		isChangePassword: false,
 		friends: m_frnd,
+        dialog: false,
+        invitationAccepted: false, 
 	// 	friends: [
 	// 	  {
 	// 		user: "one",
@@ -551,6 +567,8 @@
 	  AddMember,
 	  ChangePassword,
 	  ProfilePage,
+      Dialog,
+      Button
 	},
 	computed: {
 	  searchFriends(): FriendsList[] {
@@ -596,6 +614,38 @@
 	},
 	methods: {
 	  // showProfilePage(index: any)
+      handleEvent() {
+      // Event handling logic
+      // ...
+
+      // Navigate to another page
+      this.$router.push({ name: 'game' });
+    },
+      showInvitationModal(inviter:string) {
+      this.inviterName = inviter;
+      this.invitationModalVisible = true;
+    },
+    acceptInvitation() {
+        this.invitationAccepted = true;
+      this.invitationModalVisible = false;
+      socket.socket?.emit('response-status', true);
+      console.log("accept ");
+    },
+    rejectInvitation() {
+      this.invitationModalVisible = false;
+      socket.socket?.emit('response-status', false);
+      console.log("rejected ")
+      // Handle rejection logic
+    },
+    handleDialogClose() {
+        if (!this.invitationAccepted) {
+        // Only reject if the invitation wasn't explicitly accepted
+        console.log("Dialog closed without explicit acceptance, considered as rejection.");
+        this.rejectInvitation();
+      }
+      // Reset the flag for future invitations
+      this.invitationAccepted = false;
+    },
 	  showProfilePage() {
 		this.isProfile = !this.isProfile;
 	  },
@@ -816,6 +866,30 @@
         },
       });
     }
+    socket.socket?.on("invite-status", (data:string) => {
+            // this.invitationToastVisible = true;
+            // const toast = this.$toast.add({
+            // severity: "info",
+            // summary: "Game Invitation",
+            // detail: `You have been invited to a game by ${data}.`,
+            // life: 8000, // Toast will disappear after 5 seconds
+            // closable: false // Prevent manual closing
+            // });
+            this.showInvitationModal(data);
+    });
+    socket.socket?.on("busy-invite", (data:string) => {
+            const toast = this.$toast.add({
+            severity: "warn",
+            summary: "Game Invitation",
+            detail: `This user is busy you can not invite him right now ${data}.`,
+            life: 5000, // Toast will disappear after 5 seconds
+            closable: false // Prevent manual closing
+            });
+    });
+    socket.socket?.on("route-to-game", () =>{
+        this.handleEvent();
+        console.log("this is from the route-to-game");
+    });
     store.state.chat.socket.on("create_room_success", (data: any) => {
       console.log("Room created successfully and back in front end", data);
       if (data) {
@@ -927,6 +1001,12 @@
     this.listenForMuteEvents();
 	this.notify();
   },
+
+  unmounted() {
+    // Cleanup
+    socket.socket?.off("invite-status");
+    socket.socket?.off("route-to-game");
+  }
 });
 </script>
 
@@ -935,7 +1015,16 @@
   display: flex;
   flex-direction: column;
 }
+.dialog-container{
+  background-color: #451952 !important; /* Set your desired background color */
+  padding: 20px; /* Add padding inside the dialog */
+  border-radius: 10px; /* Optional: for rounded corners */
+}
 
+.dialog-button {
+  margin: 10px; /* Margin around buttons */
+  /* Further button styling */
+}
 .container {
   margin: 1%;
   flex: 1;

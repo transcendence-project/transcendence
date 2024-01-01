@@ -36,7 +36,7 @@
 
               <div v-if="selectedMemberIndex === index" class="my-2 opt">
                 <div v-if="friend.owner === true">
-                  <button class="intbtn p-2 mx-2">Invite</button>
+                  <button class="intbtn p-2 mx-2" @click="send_invite(friend.user)">Invite</button>
                 </div>
                 <div v-else-if="friend.admins === true">
                   <button class="intbtn p-2 mx-2">Invite</button>
@@ -58,7 +58,7 @@
                   class="intbtn p-2 mx- 2"
                   @click="send_invite(friend.user)"
                   >
-                  Invite33
+                  Invite
                 </button>
                   <button
                     class="intbtn p-2 mx-2"
@@ -172,6 +172,7 @@ export default defineComponent({
     store.state.chat.socket.off("update_mem_list");
     store.state.chat.socket.off("update_admin");
     store.state.chat.socket.off("not_admin");
+    socket.socket?.on
     store.state.chat.socket.on("update_mem_list", (data: any) => {
       if (data) {
         if (

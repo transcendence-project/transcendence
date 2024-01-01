@@ -1,6 +1,12 @@
 <template>
   <div id="home">
     <Toast />
+    <!-- <Dialog v-model:visible="invitationModalVisible" header="Game Invitation" class="dialog-container" @hide="handleDialogClose">
+        <p>You have been invited to a game by {{ inviterName }}.</p>
+        <template #footer>
+        <Button class="dialog-button" label="Accept" @click="acceptInvitation" />
+        </template>
+    </Dialog> -->
     <TopNavBar v-if="!['login','game'].includes($route.name)" />
     <div class="side-cont">
       <SideNavBar v-if="!['login','game'].includes($route.name)" />
@@ -9,20 +15,54 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from "vue";
+<script lang="ts" setup>
+import { defineComponent, ref, onMounted } from "vue";
 import TopNavBar from "@/components/TopNavBar.vue";
 import SideNavBar from "@/components/SideNavBar.vue";
 import Toast from "primevue/toast";
+import Dialog from "primevue/dialog";
+import Button from 'primevue/button';
+import { useWebSocket } from "@/plugins/websocket-plugin";
 
-export default defineComponent({
-  name: "homePage",
-  components: {
-    TopNavBar,
-    SideNavBar,
-    Toast,
-  },
-});
+
+// const { socket} = useWebSocket();
+
+// const invitationModalVisible = ref(false);
+// const dialog = ref(false);
+// const invitationAccepted = ref(false);
+// const inviterName = ref<string | null>(null);
+
+//     const showInvitationModal = (inviter:string) => {
+//       inviterName.value = inviter;
+//       invitationModalVisible.value = true;
+//     };
+//     const acceptInvitation = () => {
+//         invitationAccepted.value = true;
+//       invitationModalVisible.value = false;
+//       socket.socket?.emit('response-status', true);
+//       console.log("accept ");
+//     };
+//     const rejectInvitation = () => {
+//       invitationModalVisible.value = false;
+//       console.log("rejected ")
+//       // Handle rejection logic
+//     };
+//     const handleDialogClose = ()  => {
+//         if (!invitationAccepted.value) {
+//         // Only reject if the invitation wasn't explicitly accepted
+//         console.log("Dialog closed without explicit acceptance, considered as rejection.");
+//         rejectInvitation();
+//       }
+//       // Reset the flag for future invitations
+//       invitationAccepted.value = false;
+//     };
+//     onMounted(() => {
+//         console.log("before listen");
+//         socket.socket?.on('invite-status', (data: string) => {
+//             console.log("here from the frontend invite-status")
+//         showInvitationModal(data);
+//     });
+//     });
 </script>
 
 <style scoped>

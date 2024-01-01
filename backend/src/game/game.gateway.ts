@@ -1,5 +1,5 @@
 import { Logger } from '@nestjs/common';
-import { OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect ,SubscribeMessage, WebSocketGateway ,WebSocketServer, MessageBody, ConnectedSocket } from '@nestjs/websockets';
+import { OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect ,SubscribeMessage, WebSocketGateway ,WebSocketServer, MessageBody, ConnectedSocket , WsException} from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
 import { GameService } from './game.service';
 import { UsersService } from '../users/users.service';
@@ -78,12 +78,38 @@ export class GameGateway
     this.gameService.movePlayerPaddle(client, data);
   }
 
-  @SubscribeMessage('invite')
+    // socketError(error: string) {
+    //     this.logger.error(error)
+    //     throw new WsException(error)
+    // }
+  @SubscribeMessage('invite')   
   handleInvite(@ConnectedSocket() client: Socket, @MessageBody() data: string) {
     // const playerId = client.id; // Or any other way you identify your player
     // this.gameService.movePlayerPaddle(client, data);
-    console.log("this is from the game socket and this is the user invite", data)
+    const inviter = this.gameService.find_user_with_id(client);
+
+    if (inviter.user.userName === data)
+    {
+
+        // return this.socketError(`You can't invite yourself`);
+    }
+    else {
+        this.gameService.responeInvite(client, data);
+        console.log("from the game socket for invite")
+    }
+    // console.log("this is from the game socket and this is the user invite", data, inviter.user.userName);
   }
+
+  @SubscribeMessage('response-status')   
+  handleInviteStatus(@ConnectedSocket() client: Socket, @MessageBody() data: Boolean) {
+    this.gameService.responeInviteStatus(client, data);
+  }
+
+//   @SubscribeMessage('try')   
+//   try(@ConnectedSocket() client: Socket, @MessageBody() data: Boolean) {
+//     // this.gameService.responeInviteStatus(client, data);
+//     console.log("try route")
+//   }
   
   inviteUser(client: Socket, receiver: string): void {
     client.to(receiver).emit("invite", client.id);

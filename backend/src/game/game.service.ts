@@ -10,7 +10,7 @@ import { SocketService } from './socket.service'
 @Injectable()
 export class GameService {
     // private connected_users:Map<string,User> = new Map();
-    private connected_users: Map<Socket, { user: User, logicGame: LogicGame | null , status: string}> = new Map();
+    private connected_users: Map<Socket, { user: User, logicGame: LogicGame | null , status: string, pendingInvitations: string}> = new Map();
     private classic_queue: string[] = [];
     private custom_queue: string[] = [];
     private paddle: Paddle;
@@ -50,7 +50,7 @@ export class GameService {
 
             }
             if (flag == 0)
-                this.connected_users.set(client,{user, logicGame: null, status: 'online'});
+                this.connected_users.set(client,{user, logicGame: null, status: 'online', pendingInvitations: null});
             
 	}
 
@@ -63,7 +63,7 @@ export class GameService {
     //     const foundEntry = Array.from(map.entries()).find(([key, value]) => value.user.userName === searchValue);
     //     return foundEntry ? foundEntry[0] : null;
     // }
-    public getKeyByValue(map: Map<Socket, { user: User, logicGame: LogicGame | null }>, searchValue: string): Socket | null {
+    public getKeyByValue(map: Map<Socket, { user: User, logicGame: LogicGame | null, pendingInvitations: string }>, searchValue: string): Socket | null {
         for (const [key, value] of map.entries()) {
             if (value && value.user && value.user.userName === searchValue) {
                 return key;
@@ -124,7 +124,8 @@ export class GameService {
         }
     }
 
-    private createMultiGame(player1: { user: User, logicGame: LogicGame,status: string}, player2: { user: User, logicGame: LogicGame, status: string},
+    private createMultiGame(player1: { user: User, logicGame: LogicGame, status: string, pendingInvitations: string}, 
+                            player2: { user: User, logicGame: LogicGame, status: string, pendingInvitations: string},
                             gameType: string, gameMode?: string,) 
     {
         let logic : LogicGame;
@@ -140,6 +141,7 @@ export class GameService {
         player1Key.join(logic.getGameID());
         player2Key.join(logic.getGameID());
 
+        // console.log("")
         // this.repo.updatePlayerStatus('INGAME', player1.login)
         // this.repo.updatePlayerStatus('INGAME', player2.login)
         player1.status = 'ingame'
@@ -148,7 +150,7 @@ export class GameService {
         this.startGame(logic);
     }
 
-    private async findOpponent(userLogin: string, gameType: string): Promise<{ user: User, logicGame: LogicGame | null, status: string } | null> {
+    private async findOpponent(userLogin: string, gameType: string): Promise<{ user: User, logicGame: LogicGame | null, status: string, pendingInvitations: string} | null> {
         if (gameType == 'classic') {
             if (this.classic_queue.length > 0) {
                 console.log("this is inside the oppent function before the shift", this.classic_queue);
@@ -237,6 +239,7 @@ export class GameService {
         if (player1)
         {
             player1.logicGame = null;
+            player1.pendingInvitations = null;
             console.debug("this is from the endGame player1", this.classic_queue);
             // this.classic_queue.pop();
             getKeyPlayer1.leave(gameLogic.getGameID());
@@ -245,6 +248,7 @@ export class GameService {
         if (player2 && gameLogic.getPlayer2ID() !== 'computer')
         {
             player2.logicGame = null;
+            player2.pendingInvitations = null;
             // console.debug("this is from the endGame player2", this.classic_queue);
             getKeyPlayer2.leave(gameLogic.getGameID());
         }
@@ -293,6 +297,60 @@ export class GameService {
                 this.classic_queue.splice(this.classic_queue.indexOf(player.user.userName), 1);
             if (this.custom_queue.includes(player.user.userName))
                 this.custom_queue.splice(this.custom_queue.indexOf(player.user.userName), 1);
+        }
+    }
+
+    public responeInvite(Ininviter: Socket, loginInvited: string)
+    {
+        const invitedKey = this.getKeyByValue(this.connected_users, loginInvited);
+        if (invitedKey)
+        {
+            const invited = this.connected_users.get(invitedKey);
+            const inviter = this.connected_users.get(Ininviter);
+
+            if (invited.status !== 'busy' && inviter.status !== 'busy')
+            {
+                invited.status = 'busy';
+                inviter.status = 'busy';
+                inviter.pendingInvitations = loginInvited;
+                invited.pendingInvitations = inviter.user.userName;
+                console.log("here before the invite-sttaus");
+                invitedKey.emit('invite-status' , inviter.user.userName);
+            }
+            else if (invited.status !== 'busy')
+                invitedKey.emit('busy-invite',inviter.user.userName);
+            else
+                Ininviter.emit('busy-invite', invited.user.userName);
+        }
+        else 
+        {
+            // the user does not connect
+        }
+    }
+
+    public responeInviteStatus(Ininvited: Socket, status: Boolean)
+    {
+        if (status)
+        {
+            const invited = this.connected_users.get(Ininvited);
+            const inviterLoginKey = this.getKeyByValue(this.connected_users, invited.pendingInvitations);
+            const inviter = this.connected_users.get(inviterLoginKey);
+
+            Ininvited.emit('route-to-game');
+            inviterLoginKey.emit('route-to-game');
+            this.createMultiGame(inviter, invited, 'classic');
+        }
+        else
+        {
+            const invited = this.connected_users.get(Ininvited);
+            const inviterLoginKey = this.getKeyByValue(this.connected_users, invited.pendingInvitations);
+            const inviter = this.connected_users.get(inviterLoginKey);
+
+            if (invited.status === 'busy' || inviter.status === 'busy')
+            {
+                invited.status = null;
+                inviter.status = null;
+            }
         }
     }
 }
