@@ -3,11 +3,14 @@ import { OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect ,SubscribeMessa
 import { Socket, Server } from 'socket.io';
 import { GameService } from './game.service';
 import { UsersService } from '../users/users.service';
+import { ConfigService } from '@nestjs/config';
+
+const configService = new ConfigService();
 
 @WebSocketGateway({
 	namespace: 'game',
 	cors: {
-		origin: 'http://localhost:8080',
+		origin: configService.get('FRONTEND_URL'),
 		credentials: true,
 	},
 

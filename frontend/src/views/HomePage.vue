@@ -43,36 +43,24 @@
 			</div>
 		  </div>
 		  <div class="bg-gradient-to-r from-[#ae445a] to-[#451952] shadow-third flex flex-col justify-center w-[45%] p-[10px] text-center rounded">
-			<h3 class="text-xl">Achievments</h3>
-			<div class="shadow-third flex align-center justify-between mb-[5px] px-[50px] pb-[10px] pt-[5px] rounded">
-			  <div>First Match</div>
-			  <div>{{ firstmatch }}</div>
-			</div>
-			<div class="shadow-third flex align-center justify-between mb-[5px] px-[50px] pb-[10px] pt-[5px] rounded">
-			  <div>First Win</div>
-			  <div>{{ firstwin }}</div>
-			</div>
-	
-			<div class="shadow-third flex align-center justify-between mb-[5px] px-[50px] pb-[10px] pt-[5px] rounded">
-			  <div>Played 3 Matches</div>
-			  <div>{{ played3matches }}</div>
-			</div>
+			<h3 class="text-xl">Achievements</h3>
+	  		  <div v-for="achievement in allAchievements" :key="achievement.id" class="shadow-third flex align-center justify-between mb-[5px] px-[50px] pb-[10px] pt-[5px] rounded">
+	    		<div>{{ achievement.title }}</div>
+	    		<div v-if="achievements.some(a => a.id === achievement.id)">🏆</div>
+	    		<div v-else>&nbsp;</div>
+	  			</div>
 		  </div>
 		</div>
 		<div
 		  class="bg-gradient-to-r from-[#662549] to-[#451952] flex flex-col items-center justify-between p-[10px] mt-[10px] rounded"
 		>
 		  <h2>Match History</h2>
-		  <ul class="history list-none p-0 w-[80%] text-center">
-			<li
-			  v-for="(matchItem, index) in match"
-			  :key="index"
-			  class="shadow-third bg-gradient-to-r from-[#662549] to-[#ae445a] p-[10px] m-[5px] rounded"
-			>
-			  {{ matchItem.date }} - Opponent: {{ matchItem.opponent }} - Result:
-			  {{ matchItem.result }}
-			</li>
-		  </ul>
+		<ul class="history list-none p-0 w-[80%] text-center">
+	  	<li v-for="(matchItem, index) in match" :key="matchItem.id" class="shadow-third ...">
+	    	Winner: {{ matchItem.playerOne.userName }} - Score: {{ matchItem.winnerScore }} <br>
+	    	Loser: {{ matchItem.playerTwo?.userName }} - Score: {{ matchItem.loserScore }}
+	  	</li>
+		</ul>
 		</div>
 	  </div>
 	</div>
@@ -85,27 +73,31 @@
   import store from "@/store";
   
   
-  interface Match {
-	date: string;
-	opponent: string;
-	result: string;
-  }
+//   interface Match {
+// 	id: number;
+// 	winnerId: number;
+// 	loserId: number;
+// 	winnerScore: number;
+// 	loserScore: number;
+//   }
+
+const allAchievements = [
+	{id: 1, title: "First Match"},
+	{id: 2, title: "First Win"},
+	{id: 3, title: "Played 3 Matches"},
+  ];
   
-  onMounted(() => {
-	store.dispatch("fetchUserData");
+  onMounted(async () => {
+	const accessToken = localStorage.getItem("token");
+	if (accessToken) {
+	//   router.push("/");
+		console.log("token is: ", accessToken);
+	  store.dispatch("fetchUserData");
+	  store.dispatch("fetchMatches");
+	 await store.dispatch("fetchAchievements");
+	  console.log("Achievements in home: ", store.getters.getAchievements);
+	}
   });
-  
-  const match = ref<Match[]>([
-	{ date: "2023-08-15", opponent: "Player A", result: "Win" },
-	{ date: "2023-08-10", opponent: "Player B", result: "Loss" },
-	{ date: "2023-08-05", opponent: "Player C", result: "Draw" },
-	{ date: "2023-08-15", opponent: "Player A", result: "Win" },
-	{ date: "2023-08-10", opponent: "Player B", result: "Loss" },
-	{ date: "2023-08-05", opponent: "Player C", result: "Draw" },
-	{ date: "2023-08-15", opponent: "Player A", result: "Win" },
-	{ date: "2023-08-10", opponent: "Player B", result: "Loss" },
-	{ date: "2023-08-05", opponent: "Player C", result: "Draw" },
-  ]);
   
   const data = ref(null);
   const fullname = computed(() => store.getters.getDisplayName);
@@ -123,11 +115,13 @@
   const lose = computed(() => store.getters.getLose);
   const draw = computed(() => store.getters.getDraw);
   const rank = computed(() => store.getters.getRank);
+  const match = computed(() => store.getters.getMatches);
+  const achievements = computed(() => store.getters.getAchievements || []);
   const avail = ref(true);
   
-  const firstmatch = computed(() => store.getters.getFirstMatch);
-  const firstwin = computed(() => store.getters.getFirstWin);
-  const played3matches = computed(() => store.getters.getPlayed3Matches);
+//   const firstmatch = computed(() => store.getters.getFirstMatch);
+//   const firstwin = computed(() => store.getters.getFirstWin);
+//   const played3matches = computed(() => store.getters.getPlayed3Matches);
   
   
   </script>
