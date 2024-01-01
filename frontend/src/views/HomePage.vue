@@ -71,6 +71,7 @@
   import StatusUser from "@/components/StatusUser.vue";
   import axios from "axios";
   import store from "@/store";
+  import { getCurrentInstance } from 'vue';
   
   
 //   interface Match {
@@ -89,12 +90,23 @@ const allAchievements = [
   
   onMounted(async () => {
 	const accessToken = localStorage.getItem("token");
-	if (accessToken) {
-	//   router.push("/");
-		console.log("token is: ", accessToken);
-	  store.dispatch("fetchUserData");
-	  store.dispatch("fetchMatches");
-	 await store.dispatch("fetchAchievements");
+	 const instance = getCurrentInstance();
+	 if (accessToken) {
+		 //   router.push("/");
+		 console.log("token is: ", accessToken);
+		 store.dispatch("fetchUserData");
+		 store.dispatch("fetchMatches");
+		 await store.dispatch("fetchAchievements");
+		 const response = await axios.get(process.env.VUE_APP_BACKEND_URL + "/users/check-is-first-login", {
+		headers: {
+				Authorization: `Bearer ${localStorage.getItem("token")}`,
+			},
+		});
+		if (response.data.isFirstLogin) {
+			if (instance && instance.proxy.$toast) {
+				instance.proxy.$toast.add({ severity: 'info', summary: 'Update Profile', detail: 'Be sure to update your profile!', life: 5000 });
+			}
+	  	}
 	  console.log("Achievements in home: ", store.getters.getAchievements);
 	}
   });
