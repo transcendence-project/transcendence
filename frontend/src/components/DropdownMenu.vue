@@ -78,7 +78,7 @@ const closeDropdown = () => {
 const logout = () => {
   console.log("logout jwt token: ", localStorage.getItem("token"));
   try {
-    const response = axios.get("http://localhost:3000/auth/logout", {
+    const response = axios.get(process.env.VUE_APP_BACKEND_URL + "/auth/logout", {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
       },

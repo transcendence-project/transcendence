@@ -14,7 +14,7 @@
         class="w-[50vw] h-[2rem] px-4 rounded-full focus:border-0 focus:outline-none text-black"
       />
     </div>
-    <div v-if="filteredStudents.length > 0">
+    <div v-if="filteredStudents.length > 0 && isDropdownVisible">
       <ul
         class="flex flex-col justify-center m-0 p-0 w-[80vw] rounded-md absolute"
       >
@@ -147,35 +147,17 @@ export default defineComponent({
       friendName: String,
       selectedUser: null,
       student: [] as IStudent[],
-      isDropdownVisible: true,
+      isDropdownVisible: false,
       friendRequests: [] as IFriend[],
     };
   },
-
-
-
-//   computed: {
-//     ...mapState(['friendsNumber', 'myFriendsList']),
-//   },
-//   methods: {
-//     ...mapActions(['fetchMyFriends']),
-//     // You can call fetchMyFriends in your component
-//     // and access friendsNumber and myFriendsList from the store
-//   },
-//   async created() {
-//     await this.Friends();
-//   },
-
-
-
-
 
   setup() {
     const username = computed(() => store.getters.getUserName);
 
     onMounted(() => {
       store.dispatch("fetchUserData");
-    });
+    })
 
     return {
       username,
@@ -205,14 +187,23 @@ export default defineComponent({
       this.isDropdownVisible = true;
     },
     hideDropdown() {
+		console.log("hideDropdown");
       setTimeout(() => {
         this.isDropdownVisible = false;
       }, 200);
     },
+	// handleOutsideClick(e: any) {
+	// 	const dropdown = this.$refs.dropdown;
+	// 	const inputElement = this.$refs.searchElement;
+	// 	if (dropdown && !dropdown.contains(e.target) && inputElement && !inputElement.contains(e.target)) {
+	// 		this.isDropdownVisible = false;
+	// 	}
+	// },
+
     async sendFriendRequest(selectedUser: any) {
       try {
         const response = await axios.post(
-          `http://localhost:3000/friend-requests/${selectedUser.id}`,
+          process.env.VUE_APP_BACKEND_URL + `/friend-requests/${selectedUser.id}`,
           null,
           {
             headers: {
@@ -220,6 +211,7 @@ export default defineComponent({
             },
           },
         );
+		this.hideDropdown();
       }catch (error) {
 		  console.log("Error", error);
 	  }
@@ -228,7 +220,7 @@ export default defineComponent({
       console.log("in remove friend: ", selectedUser);
       try {
         const response = await axios.delete(
-          `http://localhost:3000/users/my/friends/${selectedUser}`,
+          process.env.VUE_APP_BACKEND_URL + `/users/my/friends/${selectedUser}`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -249,7 +241,7 @@ export default defineComponent({
     async myFriends() {
       try {
         const response = await axios.get(
-          `http://localhost:3000/users/my/friends`,
+          process.env.VUE_APP_BACKEND_URL + `/users/my/friends`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -267,7 +259,7 @@ export default defineComponent({
     async viewFriendRequest() {
       try {
         const response = await axios.get(
-          `http://localhost:3000/friend-requests/my-friend-requests`,
+          process.env.VUE_APP_BACKEND_URL + `/friend-requests/my-friend-requests`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -285,7 +277,7 @@ export default defineComponent({
     async acceptFriendRequest(selectedUser: any) {
       try {
         const response = await axios.patch(
-          `http://localhost:3000/friend-requests/accept/${selectedUser}`,
+          process.env.VUE_APP_BACKEND_URL + `/friend-requests/accept/${selectedUser}`,
         );
 
         console.log("Friend request accepted:", response.data);
@@ -302,7 +294,7 @@ export default defineComponent({
     async rejectFriendRequest(selectedUser: any) {
       try {
         const response = await axios.patch(
-          `http://localhost:3000/friend-requests/${selectedUser}/reject`,
+          process.env.VUE_APP_BACKEND_URL + `/friend-requests/${selectedUser}/reject`,
         );
 			this.friendRequests = this.friendRequests.filter((request: any) => request.id !== selectedUser);
 			this.requestNumber = this.friendRequests.length;
@@ -317,7 +309,7 @@ export default defineComponent({
     await this.viewFriendRequest();
     await this.myFriends();
     axios
-	.get("http://localhost:3000/users")
+	.get(process.env.VUE_APP_BACKEND_URL + "/users")
 	.then((resp: AxiosResponse<IStudent[]>) => {
 		this.student = resp.data;
 	})

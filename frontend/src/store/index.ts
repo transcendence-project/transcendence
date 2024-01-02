@@ -55,6 +55,7 @@ const store = createStore({
     getDraw: (state: any) => state.user.draw,
     getRank: (state: any) => state.user.rank,
     getMatches: (state: any) => state.user.matches,
+    getAchievements: (state: any) => state.user.achievements,
   },
   mutations: {
     //used to modify the state. synchronous functions, take current state as argument & make changes to it. (i.e setters)
@@ -120,6 +121,9 @@ const store = createStore({
     setMatches(state: any, matches: any) {
       state.user.matches = matches;
     },
+    setAchievements(state: any, achievements: any) {
+      state.user.achievements = achievements;
+    },
   },
   actions: {
     // asynchronous functions used to perform operations and commit mutations, like API requests
@@ -127,7 +131,7 @@ const store = createStore({
     fetchUserData(context: any) {
       console.log("inside fetch user data");
       axios
-        .get("http://localhost:3000/auth/me", {
+        .get(process.env.VUE_APP_BACKEND_URL + "/auth/me", {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
@@ -142,6 +146,7 @@ const store = createStore({
           store.commit("setWins", response.data.wins);
           store.commit("setLoses", response.data.loses);
           store.commit("setRank", response.data.points);
+          //   store.commit("setAchievments", response.data.achievments);
           //   store.commit("setAuthenticated", true);
           // router.push("/home");
         })
@@ -151,7 +156,9 @@ const store = createStore({
         });
     },
     async fetchAllChan(context: any) {
-      const resp = await axios.get("http://localhost:3000/chat/all_channels");
+      const resp = await axios.get(
+        process.env.VUE_APP_BACKEND_URL + "/chat/all_channels",
+      );
       const all_chan = resp.data;
       context.commit("setAllChannel", all_chan);
       // const get_chan =  store.getters.getAllChannel;
@@ -161,7 +168,7 @@ const store = createStore({
     async fetchMyChan(context: any) {
       console.log("inside fetch my chan");
       const resp = await axios
-        .get("http://localhost:3000/users/my/channels", {
+        .get(process.env.VUE_APP_BACKEND_URL + "/users/my/channels", {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
@@ -177,7 +184,7 @@ const store = createStore({
     async fetchCurrentChan(context: any) {
       const cur = localStorage.getItem("currentChanName");
       await axios
-        .get(`http://localhost:3000/chat/current_chan/${cur}`, {
+        .get(process.env.VUE_APP_BACKEND_URL + `/chat/current_chan/${cur}`, {
           params: { chan_name: cur },
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -192,7 +199,7 @@ const store = createStore({
     },
     async fetchMyFriends(context: any) {
       await axios
-        .get("http://localhost:3000/users/my/friends", {
+        .get(process.env.VUE_APP_BACKEND_URL + "/users/my/friends", {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
@@ -206,7 +213,7 @@ const store = createStore({
     },
     async fetchMyBlocked(context: any) {
       await axios
-        .get("http://localhost:3000/users/my/blocked", {
+        .get(process.env.VUE_APP_BACKEND_URL + "/users/my/blocked", {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
@@ -218,23 +225,24 @@ const store = createStore({
           console.error("Error fetching my blocked:", error);
         });
     },
-    async achievments(context: any) {
-      await axios
-        .patch("http://localhost:3000/users/achievments", {
+    async fetchAchievements(context: any) {
+      return axios
+        .get(process.env.VUE_APP_BACKEND_URL + "/users/achievements", {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         })
         .then((resp: AxiosResponse) => {
-          context.commit("achievments", resp.data);
+          context.commit("setAchievements", resp.data);
+          console.log("achievements: ", store.getters.getAchievements);
         })
         .catch((error) => {
-          console.error("Error fetching achievments", error);
+          console.error("Error fetching achievements", error);
         });
     },
     async fetchMatches(context: any) {
       await axios
-        .get("http://localhost:3000/matches/my/matches", {
+        .get(process.env.VUE_APP_BACKEND_URL + "/matches/my/matches", {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
@@ -264,7 +272,7 @@ const store = createStore({
     async TwoFA(context: any) {
       try {
         const response = await axios.get(
-          "http://localhost:3000/auth/2fa/generate",
+          process.env.VUE_APP_BACKEND_URL + "/auth/2fa/generate",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -282,11 +290,14 @@ const store = createStore({
       const code = localStorage.getItem("2FACode");
       console.log("reached the store to send verification store");
       await axios
-        .get(`http://localhost:3000/auth/2fa/authenticate/${code}`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
+        .get(
+          process.env.VUE_APP_BACKEND_URL + `/auth/2fa/authenticate/${code}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
           },
-        })
+        )
         .then((resp: AxiosResponse) => {
           // if (resp)
           console.log(resp.data);
@@ -298,7 +309,7 @@ const store = createStore({
     async enabl2FA(context: any) {
       try {
         const response = await axios.get(
-          "http://localhost:3000/auth/2fa/enable",
+          process.env.VUE_APP_BACKEND_URL + "/auth/2fa/enable",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -312,7 +323,7 @@ const store = createStore({
     async disabl2FA(context: any) {
       try {
         const response = await axios.get(
-          "http://localhost:3000/auth/2fa/disable",
+          process.env.VUE_APP_BACKEND_URL + "/auth/2fa/disable",
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,

@@ -13,6 +13,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Achievement } from "entities/achievement.entity";
 import { SeederService } from "../achievements/achievement.seed";
 import { MatchesService } from "matches/matches.service";
+import {ConfigService} from "@nestjs/config";
 import { ChatService } from "chat/chat.service";
 
 @Injectable()
@@ -20,6 +21,7 @@ export class UsersService {
   constructor(
     private seederService: SeederService,
 	private matchesService: MatchesService,
+	private configService: ConfigService,
     @InjectRepository(User) private repo: Repository<User>,
 	// private readonly userRepository: Repository<User>,
 
@@ -34,7 +36,7 @@ export class UsersService {
     // const user = await this.findAll(userName);
     const user = await this.findOneByEmail(email);
     if (user) return user;
-    const user2 = this.repo.create({
+    const user2 = await this.repo.create({
       email,
       fullname,
       userName,
@@ -52,7 +54,7 @@ export class UsersService {
 	  loses: 0,
 	  points: 50,
     });
-    return this.repo.save(user2);
+    return await this.repo.save(user2);
   }
   findOne(id: number) {
 	return (this.repo.findOne({where: {id}, relations: ['channels']}))
@@ -119,7 +121,7 @@ export class UsersService {
       throw new ConflictException("Friend already added");
     }
     user.friends.push(friend);
-    return this.repo.save(user);
+    return await this.repo.save(user);
   }
 
   async isFriend(userId: number, friendId: number): Promise<boolean> {
@@ -157,7 +159,7 @@ export class UsersService {
     friend.friends = friend.friends.filter((friend) => friend.id !== userId);
 
     await this.repo.save(friend);
-    return this.repo.save(user);
+    return await this.repo.save(user);
   }
 
   async getFriends(userId: number): Promise<User[]> {
