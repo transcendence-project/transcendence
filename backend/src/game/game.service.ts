@@ -325,6 +325,7 @@ export class GameService {
         else 
         {
             // the user does not connect
+            Ininviter.emit('offline-status', loginInvited);
         }
     }
 

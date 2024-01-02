@@ -867,21 +867,31 @@ import { fas } from "@fortawesome/free-solid-svg-icons";
       });
     }
     socket.socket?.on("invite-status", (data:string) => {
-            // this.invitationToastVisible = true;
-            // const toast = this.$toast.add({
-            // severity: "info",
-            // summary: "Game Invitation",
-            // detail: `You have been invited to a game by ${data}.`,
-            // life: 8000, // Toast will disappear after 5 seconds
-            // closable: false // Prevent manual closing
-            // });
             this.showInvitationModal(data);
+    });
+    socket.socket?.on("error-status", (data:string) => {
+        const toast = this.$toast.add({
+            severity: "error",
+            summary: "Game Invitation",
+            detail: `You can not invite yourself.`,
+            life: 5000, // Toast will disappear after 5 seconds
+            closable: false // Prevent manual closing
+        });
     });
     socket.socket?.on("busy-invite", (data:string) => {
             const toast = this.$toast.add({
             severity: "warn",
             summary: "Game Invitation",
             detail: `This user is busy you can not invite him right now ${data}.`,
+            life: 5000, // Toast will disappear after 5 seconds
+            closable: false // Prevent manual closing
+            });
+    });
+    socket.socket?.on("offline-status", (data:string) => {
+            const toast = this.$toast.add({
+            severity: "warn",
+            summary: "Game Invitation",
+            detail: `${data} is offline you can not invite him.`,
             life: 5000, // Toast will disappear after 5 seconds
             closable: false // Prevent manual closing
             });
@@ -1006,6 +1016,8 @@ import { fas } from "@fortawesome/free-solid-svg-icons";
     // Cleanup
     socket.socket?.off("invite-status");
     socket.socket?.off("route-to-game");
+    socket.socket?.off("busy-invite");
+    socket.socket?.off("offline-status");
   }
 });
 </script>

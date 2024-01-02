@@ -31,7 +31,7 @@ export class GameGateway
   }
 
   async handleConnection(client: Socket, ...args: any[]) {
-      console.log("Connected");
+      console.log("Connected Game Gatway");
     const header = client.handshake.headers;
 
     const token = header.token;
@@ -39,12 +39,8 @@ export class GameGateway
   }
 
   handleDisconnect(client: any) {
-    // console.log(this.gameService.classic_queue);
     console.log("Client Disconnected!");
     this.gameService.removePlayer(client, 1);
-    // this.gameService.classic_queue.pop();
-    // this.gameService.custom_queue.pop();
-    // console.log("Client disconnected");
   }
   
   @SubscribeMessage('info')
@@ -53,7 +49,6 @@ export class GameGateway
     if (data.gameMode === 'single')
     {
         this.gameService.creatSingleGame(client, data);
-        // console.log("emit to start game");
     }
     else if (data.gameMode === 'online')
     {
@@ -74,7 +69,6 @@ export class GameGateway
   
   @SubscribeMessage('paddleMove')
   handlePaddleMove(@ConnectedSocket() client: Socket, @MessageBody() data: string) {
-    // const playerId = client.id; // Or any other way you identify your player
     this.gameService.movePlayerPaddle(client, data);
   }
 
@@ -89,10 +83,7 @@ export class GameGateway
     const inviter = this.gameService.find_user_with_id(client);
 
     if (inviter.user.userName === data)
-    {
-
-        // return this.socketError(`You can't invite yourself`);
-    }
+        client.emit('error-status');
     else {
         this.gameService.responeInvite(client, data);
         console.log("from the game socket for invite")
