@@ -12,11 +12,14 @@ export class AuthService{
 	async validate(user: createUserDTO): Promise<User> {
 		// console.log('in validate, user: ', user);
 		const user1 = await this.userService.create(user.email, user.username, user.fullname, user.image);
-		console.log(user1.userName);
 		return user1;
 	}
-	generate_jwt_token(username: string, id: number ){
+	generate_jwt_token(username: string, id: number){
 		return this.jwtService.sign({ sub: id, username: username, expiresIn: '1h' });
+	}
+
+	update_isFirstLogin(id: number, isFirstLogin: boolean){
+		return this.userService.update(id, {isFirstLogin: isFirstLogin});
 	}
 
 	decode_token(token: string) {

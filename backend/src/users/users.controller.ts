@@ -54,6 +54,14 @@ export class UsersController {
 		return await this.userService.findAllRankedUser();
 	}
 
+	@Get('/check-is-first-login')
+	@UseGuards(JwtAuthGuard)
+	async check_isFirstLogin(@Req() req)
+	{
+		const isFirstLogin = await this.userService.check_isFirstLogin(req.user.id);
+		return { isFirstLogin: isFirstLogin };
+	}
+
 
 	// @Get('/:id')
 	// findUser(@Param('id') id: string){

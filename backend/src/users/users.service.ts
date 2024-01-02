@@ -56,8 +56,8 @@ export class UsersService {
     });
     return await this.repo.save(user2);
   }
-  findOne(id: number) {
-	return (this.repo.findOne({where: {id}, relations: ['channels']}))
+  async findOne(id: number) {
+	return await (this.repo.findOne({where: {id}, relations: ['channels']}))
   }
   async findOneByUserName(userName: string) {
     const user = await this.repo.findOne({ where: {userName}, relations: ['blocked'] });
@@ -79,6 +79,18 @@ export class UsersService {
 	if (!user) return NotFoundException;
 	Object.assign(user, attrs);
 	return await this.repo.save(user);
+  }
+
+  async check_isFirstLogin(id: number) {
+	const user = await this.repo.findOne({ where: { id } });
+	if (!user) return NotFoundException;
+	if (user.isFirstLogin === true)
+	{
+		await this.update(id, {isFirstLogin: false});
+		return true;
+	}
+	else
+		return false;
   }
 
   async update_userName(id: number, userName: string): Promise<User> {

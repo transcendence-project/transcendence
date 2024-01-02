@@ -30,7 +30,14 @@ export class AuthController {
 	// @Header('Cache-Control', 'no-store, no-cache, must-revalidate')
 	async callback(@Req() req, @Res() res) {
 		const user = req.user;
+		console.log("req.user: ", req.user);
 		const token = this.authService.generate_jwt_token(user.userName, user.id);
+
+		// if (!this.authService.find_auth_user(user.id))
+		// {
+			
+		// }
+
 		// this.authService.authenticate(user, true);
 		// console.log("Token: ", token);
 		if (user.is2FAEnabled == true)
