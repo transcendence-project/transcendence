@@ -27,7 +27,7 @@ export class AuthController {
 	
 	@Get('42/callback')
 	@UseGuards(AuthGuard('42'))
-	// @Header('Cache-Control', 'no-store, no-cache, must-revalidate')
+	@Header('Cache-Control', 'no-store, no-cache, must-revalidate')
 	async callback(@Req() req, @Res() res) {
 		const user = req.user;
 		console.log("req.user: ", req.user);
