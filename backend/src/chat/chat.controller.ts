@@ -25,9 +25,9 @@ export class ChatController {
 	@Get('current_frndchan/:frnd_name')
 	@UseGuards(JwtAuthGuard)
 	async frnd_chan(@Param("frnd_name") frnd_name: string, @Req() req){
-		console.log(frnd_name);
+		console.log("the friend name is: ",frnd_name);
 		const user = req.user;
-		const chan_ = await this.chatService.frndchan_by_name(frnd_name, user);
+		const chan_ = await this.chatService.frndchan_by_name(frnd_name, user, false);
 		console.log(chan_);
 		return (chan_)
 	}

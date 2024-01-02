@@ -1,4 +1,4 @@
-# Use Node.js v16 as the base image
+# Use Node.js v19 as the base image
 FROM node:19
 
 # Set the working directory

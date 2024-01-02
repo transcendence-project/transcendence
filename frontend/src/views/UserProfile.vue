@@ -84,6 +84,7 @@ import Vue from "vue";
 import { defineComponent } from "vue";
 import axios, { AxiosResponse } from "axios";
 import { IStudent } from "@/models/student";
+import store from "@/store";
 
 
 export default defineComponent({
@@ -96,6 +97,7 @@ export default defineComponent({
 	},
 	mounted() {
 		this.username = this.$route.params.username;
+		// this.username = store.state.username;
 		const apiUrl = process.env.VUE_APP_BACKEND_URL + `/users/friend/${this.username}`;
 
 		axios
