@@ -7,12 +7,14 @@ import {
 } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
 import { ChatService } from "../chat/chat.service";
+import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import { Channel } from "entities/channel.entity";
 import { UsersService } from '../users/users.service';
 
+const configService = new ConfigService();
 @WebSocketGateway({
-	cors: { origin: "http://localhost:8080" },
+	cors: { origin: configService.get('FRONTEND_URL') },
 	namespace: "chat",
 })
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
@@ -62,6 +64,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('send_msg_to_chan')
 	async send_message_chan(client: any, payload: any) {
+		console.log('payload', payload);
 		if (this.chatService.user_exist(client.id))
 		{
 			const user = this.chatService.find_user_with_id(client.id);
@@ -74,7 +77,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					user: user.userName,
 					chan: room_name,
 				};
-				this.server.emit('update_chan_message', data_to_send);
+				this.server.to(room_name).emit('update_chan_message', data_to_send);
 			}
 			else
 				client.emit('mute_message');
@@ -99,7 +102,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			const user = this.chatService.find_user_with_id(client.id);
 			if (await this.userService.is_blocked(user.userName, frnd_name) === false)
 			{
-				const channel = await this.chatService.frndchan_by_name(frnd_name);
+				const channel = await this.chatService.frndchan_by_name(frnd_name, user, false);
 				await this.chatService.save_frnd_chan_msg(user, frnd_name, message);
 				const data_to_send = {
 					content: message,
@@ -344,7 +347,6 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				const add_user = this.chatService.find_user_with_name(user_to_add);
 				if (add_user) {
 					const user_id = this.chatService.find_id(add_user.userName);
-					console.log(user_id);
 					this.server.to(user_id).emit('join_priv_room', room_name);
 				}
 				else {

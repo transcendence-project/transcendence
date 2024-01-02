@@ -20,6 +20,8 @@
 					</div>
 				<div class="lst-item">{{ item.email }}</div>
 				<div class="lst-item">{{ item.points }}</div>
+				<div class="lst-item">{{ item.wins }}</div>
+				<div class="lst-item">{{ item.loses }}</div>
 			</div>
 		</div>
 	</div>
@@ -41,7 +43,7 @@ export default defineComponent({
 	},
 	mounted() {
 		axios
-			.get("http://localhost:3000/users")
+			.get(process.env.VUE_APP_BACKEND_URL + "/users")
 			.then((resp: AxiosResponse<IStudent[]>) => {
 				this.student = resp.data;
 			})

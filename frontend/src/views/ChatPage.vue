@@ -231,7 +231,7 @@
 						v-if="selectedFriendIndex === index"
 						class="flex items-center justify-between"
 					  >
-						<div v-if="friend.isBlock === true">
+						<div v-if="friend.isBlock === false">
 						  <button
 							class="intbtn px-1 w-[8vh]"
 							@click="showHideBlock(friend)"
@@ -248,14 +248,10 @@
 						  </button>
 						</div>
 						<button class="intbtn px-2">Invite</button>
-						<!-- <button class="intbtn px-2" @click="showProfilePage"> -->
-						<button class="intbtn px-2" @click="">
+						<button class="intbtn px-2" @click="goToUserProfile(friend.user)">
 						  <router-link to="/users">Profile</router-link>
-  
-						  <!-- Profile -->
-						</button>
+  						</button>
 					  </div>
-					  <!-- <ProfilePage v-if="isProfile" @close="showProfilePage" /> -->
 					</li>
 				  </div>
 				</ul>
@@ -283,15 +279,18 @@
 					v-if="message.send === true"
 					class="bg-blue-400 text-grey-500 py-2 px-4 inline-block mx-5 my-1 rounded-md"
 				  >
-					{{ message.chat }}
-				  </div>
-				  <div v-else class="my-5 mx-5" style="text-align: left">
-					<span
-					  class="bg-blue-200 text-grey-500 py-2 px-3 inline rounded-md"
-					>
-					  {{ message.chat }}
+				  {{ message.chat }}
+				</div>
+				<div v-else class="my-5 mx-5" style="text-align: left">
+					<span class="bg-blue-200 text-grey-500 py-2 px-3 inline rounded-md" style="display:inline-block;">
+						<span class="text-xs">
+							{{ message.sender }}
+						</span>
+						<br>
+						<hr>
+						{{ message.chat }}
 					</span>
-				  </div>
+				</div>
 				</div>
 			  </div>
 			</div>
@@ -417,7 +416,7 @@ import { fas } from "@fortawesome/free-solid-svg-icons";
 		isSearchChannelVisible: false,
 		selectedItem: null as IChannel | null,
 		isMessageSent: false,
-		chatMessage: [] as { send: boolean; chat: string }[],
+		chatMessage: [] as { send: boolean; chat: string; sender: string }[],
 		isPrivate: false,
 		isOptions: false,
 		searchQuery: "" as string,
@@ -432,61 +431,10 @@ import { fas } from "@fortawesome/free-solid-svg-icons";
 		addPrivateMember: false,
 		isProfile: false,
   
-		// for testing
-		message1: "" as string,
-		testMessage: "" as String,
-		testMessages: [] as string[],
-		allMessages: [] as string[],
-		userInput1: "" as string,
-		userInput2: "" as string,
-		sndrcvmsg: [] as string[],
-		isBlock: true,
 		isChangePassword: false,
 		friends: m_frnd,
         dialog: false,
         invitationAccepted: false, 
-	// 	friends: [
-	// 	  {
-	// 		user: "one",
-	// 		status: true,
-	// 		isBlock: true,
-	// 	  },
-	// 	  {
-	// 		user: "two",
-	// 		status: false,
-	// 		isBlock: false,
-	// 	  },
-	// 	  {
-	// 		user: "three",
-	// 		status: true,
-	// 		isBlock: false,
-	// 	  },
-	// 	  {
-	// 		user: "four",
-	// 		status: false,
-	// 		isBlock: false,
-	// 	  },
-	// 	  {
-	// 		user: "five",
-	// 		status: true,
-	// 		isBlock: true,
-	// 	  },
-	// 	  {
-	// 		user: "one",
-	// 		status: true,
-	// 		isBlock: false,
-	// 	  },
-	// 	  {
-	// 		user: "two",
-	// 		status: false,
-	// 		isBlock: false,
-	// 	  },
-	// 	  {
-	// 		user: "three",
-	// 		status: true,
-	// 		isBlock: false,
-    //     },
-    //   ] as FriendsList[],
     };
   },
   setup() {
@@ -534,9 +482,12 @@ import { fas } from "@fortawesome/free-solid-svg-icons";
 		const my_friends = computed(() => store.getters.getMyFriends);
 		const my_blocked = computed(() => store.getters.getMyBlocked);
 		const arrayProxy_f = my_friends.value;
+		console.log("teh blocked issssss: ", my_blocked.value);
 		arrayProxy_f.forEach((item: any) => {
-			if (my_blocked.value.includes(item.userName))
+			console.log("the item is: ", item)
+			if (my_blocked.value.find((friend: any) => friend.userName === item.userName))
 			{
+				console.log("goes inside for blocked is true")
 				const my_frnds: FriendsList = {
 					user: item.userName,
 					status: false,
@@ -546,6 +497,7 @@ import { fas } from "@fortawesome/free-solid-svg-icons";
 			}
 			else
 			{
+				console.log("goes inside for blocked is false")
 				const my_frnds: FriendsList = {
 					user: item.userName,
 					status: false,
@@ -613,6 +565,11 @@ import { fas } from "@fortawesome/free-solid-svg-icons";
 	  },
 	},
 	methods: {
+
+		goToUserProfile(selectedUser: string){
+			// const selectedUser = "aghazi";
+			this.$router.push({name: 'users', params: { username: selectedUser}})
+		},
 	  // showProfilePage(index: any)
       handleEvent() {
       // Event handling logic
@@ -654,9 +611,9 @@ import { fas } from "@fortawesome/free-solid-svg-icons";
 		this.isChangePassword = !this.isChangePassword;
 	  },
 	  showHideBlock(friend: FriendsList) {
-		if (friend.isBlock === false) 
+		if (friend.isBlock === true) 
 			this.unblock_friend(friend.user);
-		else if (friend.isBlock === true)
+		else if (friend.isBlock === false)
 			this.block_frnd(friend.user);
 		friend.isBlock = !friend.isBlock;
 	  },
@@ -696,7 +653,7 @@ import { fas } from "@fortawesome/free-solid-svg-icons";
       this.msgField = true;
       localStorage.setItem("currentFriend", friend);
         // console.log(localStorage.getItem("currentFriend"));
-      await this.displayFriendMessage();
+      await this.displayFriendMessage(friend);
       this.selectedRoom = friend;
     },
 
@@ -815,21 +772,36 @@ import { fas } from "@fortawesome/free-solid-svg-icons";
       console.log(chan.value.messages);
       const val = chan.value.messages;
       val.forEach((item: any) => {
+		console.log(item)
         if (item.senderID === store.getters.getId)
-          this.chatMessage.push({ send: true, chat: item.content });
-        else this.chatMessage.push({ send: false, chat: item.content });
+          this.chatMessage.push({ send: true, chat: item.content, sender: item.sendername });
+        else
+		{
+			const friend_found = this.friends.find((friend: FriendsList) => friend.user === item.sendername);
+			console.log(" the friend_found is: ", friend_found, " and the item.sendername is: ", item.sendername)
+			if (friend_found)
+			{
+				if (friend_found.isBlock === false)
+					this.chatMessage.push({ send: false, chat: item.content, sender: item.sendername });
+			}
+			else
+				this.chatMessage.push({ send: false, chat: item.content, sender: item.sendername });
+			
+		}
       });
     },
-    async displayFriendMessage() {
+    async displayFriendMessage(friend_name: string) {
       this.chatMessage = [];
+	  localStorage.setItem("CurrentFriend", friend_name)
       await store.dispatch("fetchFriendChan");
-      const chan = computed(() => store.getters.getCurrentCahnnel);
-      console.log(chan.value.messages);
+      const chan = computed(() => store.getters.getCurrentFriend);
+	  console.log("chan value is: ", chan.value)
+      console.log("chan messages is: ",chan.value.messages);
       const val = chan.value.messages;
 	  val.forEach((item: any) => {
         if (item.senderID === store.getters.getId)
-          this.chatMessage.push({ send: true, chat: item.content });
-        else this.chatMessage.push({ send: false, chat: item.content });
+          this.chatMessage.push({ send: true, chat: item.content, sender: item.sendername });
+        else this.chatMessage.push({ send: false, chat: item.content, sender: item.sendername });
       });
     },
     sendMessage() {
@@ -860,7 +832,7 @@ import { fas } from "@fortawesome/free-solid-svg-icons";
   created() {
     if (!store.state.chat.socket) {
       console.log("establishing connection again");
-      store.state.chat.socket = io("http://localhost:3000/chat", {
+      store.state.chat.socket = io(process.env.VUE_APP_BACKEND_URL + "/chat", {
         auth: {
           token: localStorage.getItem("token"),
         },
@@ -949,20 +921,30 @@ import { fas } from "@fortawesome/free-solid-svg-icons";
       }
     });
     store.state.chat.socket.on("update_chan_message", (data: any) => {
-      console.log(localStorage.getItem("currentChanName"));
-      console.log("reached update msg event listener");
       if (data) {
         if (
           data.user != store.getters.getUserName &&
           localStorage.getItem("currentChanName") == data.chan
         ) {
-          this.chatMessage.push({ send: false, chat: data.content });
-          this.isMessageSent = true;
+
+			const friend_found = this.friends.find((friend: FriendsList) => friend.user === data.user);
+			console.log("the friendsss are: ", this.friends)
+			if (friend_found)
+			{
+				console.log("the friend_found issss: ", friend_found)
+				if (friend_found.isBlock === false)
+				{
+					this.chatMessage.push({ send: false, chat: data.content, sender: data.user });
+					this.isMessageSent = true;
+				}
+			}
+			else
+				this.chatMessage.push({ send: false, chat: data.content, sender: data.user });
         } else if (
           data.user == store.getters.getUserName &&
           localStorage.getItem("currentChanName") == data.chan
         ) {
-          this.chatMessage.push({ send: true, chat: data.content });
+          this.chatMessage.push({ send: true, chat: data.content, sender: data.user  });
           this.isMessageSent = true;
         }
       }
@@ -972,14 +954,11 @@ import { fas } from "@fortawesome/free-solid-svg-icons";
 	  if (data)
 	  {
 		if (data.frnd == store.getters.getUserName && localStorage.getItem("currentFriend") == data.user){
-			this.chatMessage.push({ send: false, chat: data.content });
+			this.chatMessage.push({ send: false, chat: data.content, sender: data.user });
           	this.isMessageSent = true;
 		}
 		else if (data.user == store.getters.getUserName && localStorage.getItem("currentFriend") == data.frnd){
-			console.log("hellllooooo");
-			console.log(localStorage.getItem("currentFriend"));
-			console.log(data.frnd)
-			this.chatMessage.push({ send: true, chat: data.content });
+			this.chatMessage.push({ send: true, chat: data.content, sender: data.user });
          	this.isMessageSent = true;
 		}
 	  }

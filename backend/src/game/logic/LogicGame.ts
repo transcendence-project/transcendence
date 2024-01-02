@@ -108,11 +108,11 @@ export class LogicGame {
         if (this.winner) return true
         const player1Score = this.objectGame.players[0].score
         const player2Score = this.objectGame.players[1].score
-            if (player1Score === 7) {
+            if (player1Score === 11) {
                 this.winner = this.objectGame.players[0].login
                 return true
             }
-            if (player2Score === 7) {
+            if (player2Score === 11) {
                 this.winner = this.objectGame.players[1].login
                 return true
             }

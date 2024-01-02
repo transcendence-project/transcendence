@@ -14,7 +14,10 @@ export class Match {
 	playerTwo: User
 
 	@Column()
-	score: string
+	winnerScore: number
+
+	@Column()
+	loserScore: number
 
 	@Column()
 	opponentID: number

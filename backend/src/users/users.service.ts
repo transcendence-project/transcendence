@@ -13,6 +13,7 @@ import { InjectRepository } from "@nestjs/typeorm";
 import { Achievement } from "entities/achievement.entity";
 import { SeederService } from "../achievements/achievement.seed";
 import { MatchesService } from "matches/matches.service";
+import {ConfigService} from "@nestjs/config";
 import { ChatService } from "chat/chat.service";
 
 @Injectable()
@@ -20,8 +21,10 @@ export class UsersService {
   constructor(
     private seederService: SeederService,
 	private matchesService: MatchesService,
-	private chatService: ChatService,
+	private configService: ConfigService,
     @InjectRepository(User) private repo: Repository<User>,
+	// private readonly userRepository: Repository<User>,
+
   ) {}
 
   async create(
@@ -31,9 +34,9 @@ export class UsersService {
     image: string,
   ) {
     // const user = await this.findAll(userName);
-    const user = await this.findOneByUserName(userName);
+    const user = await this.findOneByEmail(email);
     if (user) return user;
-    const user2 = this.repo.create({
+    const user2 = await this.repo.create({
       email,
       fullname,
       userName,
@@ -47,9 +50,11 @@ export class UsersService {
 	matchesAsPlayerOne: [],
 	matchesAsPlayerTwo: [],
       achievements: [],
+	  wins: 0,
+	  loses: 0,
 	  points: 50,
     });
-    return this.repo.save(user2);
+    return await this.repo.save(user2);
   }
   findOne(id: number) {
 	return (this.repo.findOne({where: {id}, relations: ['channels']}))
@@ -69,8 +74,32 @@ export class UsersService {
     return user.channels;
   }
 
-  update(id: number, attrs: Partial<User>) {
-    return this.repo.update(id, attrs);
+  async update(id: number, attrs: Partial<User>) {
+	const user = await this.repo.findOne({ where: { id } });
+	if (!user) return NotFoundException;
+	Object.assign(user, attrs);
+	return await this.repo.save(user);
+  }
+
+  async update_userName(id: number, userName: string): Promise<User> {
+	const user = await this.repo.findOne({ where: { id } });
+	if (!user) throw new NotFoundException;
+
+	const user_list = await this.repo.find();
+	if (user_list.find((u) => u.userName === userName)){
+		throw new BadRequestException("Username already exists");
+	}
+
+	user.userName = userName;
+	return await this.repo.save(user);
+  }
+
+  async update_profilePic(id: number, file_path: string) {
+	const user = await this.repo.findOne({ where: { id } });
+	if (!user) return NotFoundException;
+	user.image = this.configService.get('BACKEND_URL') + '/' + file_path;
+	console.log('in update profile pic, user.image: ', user.image);
+	return await this.repo.save(user);
   }
 
   async remove(id: number) {
@@ -92,8 +121,7 @@ export class UsersService {
       throw new ConflictException("Friend already added");
     }
     user.friends.push(friend);
-	await this.chatService.create_friend_chan(user, friend);
-    return this.repo.save(user);
+    return await this.repo.save(user);
   }
 
   async isFriend(userId: number, friendId: number): Promise<boolean> {
@@ -131,7 +159,7 @@ export class UsersService {
     friend.friends = friend.friends.filter((friend) => friend.id !== userId);
 
     await this.repo.save(friend);
-    return this.repo.save(user);
+    return await this.repo.save(user);
   }
 
   async getFriends(userId: number): Promise<User[]> {
@@ -172,7 +200,7 @@ export class UsersService {
     // console.log("in add achievement, user: ", user);
 	console.log('in add achievement: ', achievement);
     user.achievements.push(achievement);
-    return this.repo.save(user);
+    return await this.repo.save(user);
   }
 
   async updateUserPoints(winnerID: number, loserID: number)
@@ -184,8 +212,12 @@ export class UsersService {
 	{
 		loser.points -= 5;
 	}
-	this.repo.save(winner);
-	this.repo.save(loser);
+	winner.wins += 1;
+	loser.loses += 1;
+	console.log('in update user points, winner: ', winner);
+	console.log('in update user points, loser: ', loser);
+	await this.repo.save(winner);	
+	await this.repo.save(loser);
   }
 
   async findAllUsers() {
@@ -202,6 +234,7 @@ export class UsersService {
 	const achievements: Achievement[] = await this.getAchievements(winner.id);
 
 	// console.log('in check achievements, matches: ', matches);
+	// console.log('in check achievements, matches.length: ', matches.length);
 	if (matches.length === 1 && !achievements.find((a) => a.title === "First Match")) {
 		this.addAchievement(winner.id, "First Match");
 	}
@@ -229,23 +262,13 @@ export class UsersService {
 	const winner: User = await this.repo.findOne({ where: { id: winnerID}, relations: ["matchesAsPlayerOne"] });
 	const loser: User = await this.repo.findOne({ where: { id: loserID}, relations:  ["matchesAsPlayerTwo"]});
 
-	// console.log('in save match, winner: ', winner);
-	// console.log('in save match, loser: ', loser);
-	const winnerScoreString: string = winnerScore.toString();
-	const loserScoreString: string = loserScore.toString();
-	const score: string = winnerScoreString + '-' + loserScoreString;
 
-	const match = await this.matchesService.create(winner, loser, score, loserID, winnerID);
-	// console.log('in save match, winner: ', winner);
-	// console.log('in save match, loser: ', loser);
-	// console.log('in save match, match: ', match);
-	// console.log('in save match, winner matches as player one: ', winner.matchesAsPlayerOne);
-	// console.log('in save match, loser matches as player two: ', loser.matchesAsPlayerTwo);
+	const match = await this.matchesService.create(winner, loser, winnerScore, loserScore, loserID, winnerID);
 	winner.matchesAsPlayerOne.push(match);
 	loser.matchesAsPlayerTwo.push(match);
 
-	this.repo.save(winner);
-	this.repo.save(loser);
+	await this.repo.save(winner);
+	await this.repo.save(loser);
 
 	this.updateUserPoints(winnerID, loserID);
 	this.checkAchievements(winner, loser);
@@ -295,7 +318,6 @@ export class UsersService {
 	// 	relations: ["blocked"],
 	// });
 	const user = await this.findOneByUserName(user_name);
-	console.log(user);
 	const isBlocked = user.blocked.some((friend: User) => friend.userName === friend_name);
 	if (isBlocked)
 		return true;
