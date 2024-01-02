@@ -97,7 +97,7 @@ export class UsersService {
   async update_profilePic(id: number, file_path: string) {
 	const user = await this.repo.findOne({ where: { id } });
 	if (!user) return NotFoundException;
-	user.image = "http://localhost:3000/" + file_path;
+	user.image = this.configService.get(BACKEND_URL) + '/' + file_path;
 	console.log('in update profile pic, user.image: ', user.image);
 	return await this.repo.save(user);
   }

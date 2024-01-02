@@ -64,6 +64,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('send_msg_to_chan')
 	async send_message_chan(client: any, payload: any) {
+		console.log('payload', payload);
 		if (this.chatService.user_exist(client.id))
 		{
 			const user = this.chatService.find_user_with_id(client.id);
@@ -76,7 +77,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					user: user.userName,
 					chan: room_name,
 				};
-				this.server.emit('update_chan_message', data_to_send);
+				this.server.to(room_name).emit('update_chan_message', data_to_send);
 			}
 			else
 				client.emit('mute_message');

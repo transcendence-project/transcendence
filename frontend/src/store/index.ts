@@ -258,7 +258,7 @@ const store = createStore({
 
     async fetchFriendChan(context: any){
     	const cur = localStorage.getItem('CurrentFriend');
-    	await axios.get(`http://localhost:3000/chat/current_frndchan/${cur}`, {
+    	await axios.get(process.env.VUE_APP_BACKEND_URL + `/chat/current_frndchan/${cur}`, {
     		headers: {
     			Authorization: `Bearer ${localStorage.getItem('token')}`,
     		},
