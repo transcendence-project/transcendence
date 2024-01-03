@@ -282,8 +282,10 @@ export default defineComponent({
 
         console.log("Friend request accepted:", response.data);
 		if (response.status === 200 && response.data) {
-			this.myFriendsList.push(response.data);
-			this.friendsNumber = this.myFriendsList.length;
+			console.log("selectedUser: ", selectedUser);
+			// this.myFriendsList.push(response.data);
+			// this.friendsNumber = this.myFriendsList.length;
+			this.myFriends();
 			this.friendRequests = this.friendRequests.filter((request: any) => request.id !== selectedUser);
 			this.requestNumber = this.friendRequests.length;
 		}

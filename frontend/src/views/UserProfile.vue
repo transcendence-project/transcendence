@@ -92,12 +92,12 @@ export default defineComponent({
 	data() {
 		return {
 			student: [] as IStudent[],
-			username: null,
+			username: "",
 		};
 	},
 	mounted() {
-		// this.username = this.$route.params.username;
-		this.username = store.state.username;
+		this.username = this.$route.params.username as string;
+		// this.username = store.state.username;
 		const apiUrl = process.env.VUE_APP_BACKEND_URL + `/users/friend/${this.username}`;
 
 		axios

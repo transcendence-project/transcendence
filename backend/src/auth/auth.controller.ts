@@ -43,7 +43,7 @@ export class AuthController {
 		if (user.is2FAEnabled == true)
 		{
 			// redirect to 2fa page and then take them to homepage
-			const url = new URL('FRONTEND_URL/twofactor');
+			const url = new URL(this.configService.get('FRONTEND_URL') + '/twofactor');
 			url.searchParams.set('code', token);
 			return res.status(200).redirect(url.href);
 		}
