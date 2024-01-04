@@ -15,10 +15,10 @@
 			  />
 			</div>
 			<div v-if="avail">
-			  <StatusUser :isFriend="true" class="mt-12" />
+			  <StatusUser :isFriend="avail" class="mt-12" />
 			</div>
-			<div v-else>
-			  <StatusUser :isFriend="false" class="mt-12" />
+			<div v-else-if="avail">
+			  <StatusUser :isFriend="avail" class="mt-12" />
 			</div>
 			<div>
 			  <p class="mt-[40px] ml-[20px]">{{ student.fullname }}</p>
@@ -79,26 +79,43 @@
   
 
 
-  <script lang="ts">
+<script lang="ts">
 import Vue from "vue";
 import { defineComponent } from "vue";
 import axios, { AxiosResponse } from "axios";
 import { IStudent } from "@/models/student";
 import store from "@/store";
+import StatusUser from "@/components/StatusUser.vue";
+import { useWebSocket } from "@/plugins/websocket-plugin";
 
-
+const { socket } = useWebSocket();
 export default defineComponent({
 	name: "StudentList",
 	data() {
 		return {
 			student: [] as IStudent[],
-			username: null,
+			username: "",
+            avail: '',
 		};
 	},
+    components: {
+        StatusUser,
+	},
 	mounted() {
-		// this.username = this.$route.params.username;
-		this.username = store.state.username;
+        this.username = this.$route.params.username as string;
+        socket.socket?.emit('user-profile-status', this.username);
+        socket.socket?.on('user-status', (status: string) => {
+            console.log("this is the status ", status);
+            if (status === 'online')
+                this.avail = 'online';
+            else if (status === 'ingame')
+                this.avail = 'ingame'
+            else
+                this.avail = 'offline'
+        });
+		// this.username = store.state.username;
 		const apiUrl = process.env.VUE_APP_BACKEND_URL + `/users/friend/${this.username}`;
+        
 
 		axios
 			.get(apiUrl)

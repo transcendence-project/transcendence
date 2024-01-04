@@ -6,6 +6,8 @@ import {Paddle, Ball, Computer, } from './interface/game.interface';
 import {GameSelectDto} from './dto/game.dto'
 import { Socket } from 'socket.io';
 import { SocketService } from './socket.service'
+import { use } from 'passport';
+import { emit } from 'process';
 
 @Injectable()
 export class GameService {
@@ -43,6 +45,7 @@ export class GameService {
                     if (value && value.user && user.userName === value.user.userName)
                     {
                         this.connected_users.delete(client);
+                        client.emit('multi-login');
                         client.disconnect(true);
                          flag = 1;
                     }
@@ -50,7 +53,10 @@ export class GameService {
 
             }
             if (flag == 0)
+            {
                 this.connected_users.set(client,{user, logicGame: null, status: 'online', pendingInvitations: null});
+                this.socketService.emitToServer('user-status', 'online');
+            }
             
 	}
 
@@ -71,7 +77,25 @@ export class GameService {
         }
         return null;
     }
-    
+
+    public getUserStatus(client: Socket, userLogin: string)
+    {
+        const userKey = this.getKeyByValue(this.connected_users, userLogin);
+        const user = this.connected_users.get(userKey);
+
+        console.log("this is the user from get function ", user)
+        if (user)
+        {
+            if (user.status === 'online')
+                client.emit('user-status', user.status);
+            else if (user.status === 'busy')
+                client.emit('user-status', user.status);
+
+        }
+        else
+            client.emit('user-status', 'offline');
+    }
+
     public creatSingleGame(client: Socket, gameInfo: GameSelectDto)
     {
         const player = this.connected_users.get(client);
@@ -89,6 +113,7 @@ export class GameService {
 
                     player.logicGame = logic;
                     player.status = 'ingame';
+                    this.socketService.emitToServer('user-status', 'ingame');
                     client.join(logic.getGameID());
                     this.countDown(logic, player, null);
                     this.startGame(logic);
@@ -141,11 +166,9 @@ export class GameService {
         player1Key.join(logic.getGameID());
         player2Key.join(logic.getGameID());
 
-        // console.log("")
-        // this.repo.updatePlayerStatus('INGAME', player1.login)
-        // this.repo.updatePlayerStatus('INGAME', player2.login)
         player1.status = 'ingame'
         player2.status = 'ingame'
+        this.socketService.emitToServer('user-status', 'ingame');
         this.countDown(logic, player1, player2);
         this.startGame(logic);
     }
@@ -183,8 +206,9 @@ export class GameService {
                         player2: { user: User, logicGame: LogicGame})
     {
         let countdown = 3;
-        let player1Key:Socket;
-        let player2Key;
+        let player1Key: Socket;
+        let player2Key: Socket;
+
         if (player1)
         {
              player1Key = this.getKeyByValue(this.connected_users, player1.user.userName);
@@ -194,16 +218,12 @@ export class GameService {
             player2Key = this.getKeyByValue(this.connected_users, player2.user.userName);
         }
 
-        // console.log("this is player one login ", player1.logicGame);
-        // console.log("this is player two login ", player2.logicGame);
-        // console.log("this is player two login ", player2.user.userName);
         const countdownInterval = setInterval(() => {
             if (countdown >= 0) {
                 if (player1Key)
                     player1Key.emit('game-count', countdown);
                 if (player2Key)
                     player2Key.emit('game-count', countdown);
-                // this.socketService.emitToRoom(gameLogic.getGameID(), 'game-count', countdown);
                 countdown--;
             } else {
                 clearInterval(countdownInterval);
@@ -213,13 +233,10 @@ export class GameService {
 
     private startGame(gameLogic: LogicGame)
     {
-        console.log("Start Game function");
-        // let lastUpdateTime = Date.now();
         const gameInterval = setInterval(() => {
             gameLogic.updateGame();
-            // lastUpdateTime = now;
             this.socketService.emitToRoom(gameLogic.getGameID(), 'game-data', gameLogic.getObjectStatus());
-            if (gameLogic.checkWinner(  ))
+            if (gameLogic.checkWinner())
             {
                 clearInterval(gameInterval);
                 this.endGame(gameLogic)
@@ -243,6 +260,8 @@ export class GameService {
             console.debug("this is from the endGame player1", this.classic_queue);
             // this.classic_queue.pop();
             getKeyPlayer1.leave(gameLogic.getGameID());
+            this.socketService.emitToServer('user-status', 'online');
+            player1.status = 'online';
         }
         
         if (player2 && gameLogic.getPlayer2ID() !== 'computer')
@@ -251,6 +270,7 @@ export class GameService {
             player2.pendingInvitations = null;
             // console.debug("this is from the endGame player2", this.classic_queue);
             getKeyPlayer2.leave(gameLogic.getGameID());
+            player2.status = 'online';
         }
     }
 
@@ -283,6 +303,7 @@ export class GameService {
             }
             if (deleteUser === 1)
             {
+                this.socketService.emitToServer('user-status', 'offline');
                 this.connected_users.delete(socket);
                 console.log("the player is removed from the user connected");
             }
@@ -347,10 +368,13 @@ export class GameService {
             const inviterLoginKey = this.getKeyByValue(this.connected_users, invited.pendingInvitations);
             const inviter = this.connected_users.get(inviterLoginKey);
 
-            if (invited.status === 'busy' || inviter.status === 'busy')
+            if (invited && inviter)   // i will remove this when the UserProfile page finish 
             {
-                invited.status = null;
-                inviter.status = null;
+                if (invited.status === 'busy' || inviter.status === 'busy')
+                {
+                    invited.status = null;
+                    inviter.status = null;
+                }
             }
         }
     }

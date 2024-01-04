@@ -12,4 +12,9 @@ export class SocketService {
     emitToRoom(group: string, event: string, data: any): void {
         this.server.to(group).emit(event, data)
     }
+
+    emitToServer(event: string, data: string)
+    {
+        this.server.emit(event, data);
+    }
 }

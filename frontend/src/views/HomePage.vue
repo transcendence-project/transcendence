@@ -16,11 +16,11 @@
 			  />
 			</div>
 			<div v-if="avail">
-			  <StatusUser :isFriend="true" class="mt-12" />
+			  <StatusUser :isFriend="avail" class="mt-12" />
 			</div>
-			<div v-else>
-			  <StatusUser :isFriend="false" class="mt-12" />
-			</div>
+			<!-- <div v-else>
+			  <StatusUser :isFriend="avail" class="mt-12" />
+			</div> -->
 			<div>
 			  <p class="mt-[40px] ml-[20px]">{{ fullname }}</p>
 			</div>
@@ -67,12 +67,13 @@
   </template>
   
   <script lang="ts" setup>
-  import { ref, onMounted, computed } from "vue";
+  import { ref, onMounted, computed, getCurrentInstance } from "vue";
   import StatusUser from "@/components/StatusUser.vue";
   import axios from "axios";
   import store from "@/store";
+  import { useWebSocket } from "@/plugins/websocket-plugin";
   
-  
+  const { socket } = useWebSocket();
 //   interface Match {
 // 	id: number;
 // 	winnerId: number;
@@ -88,7 +89,16 @@ const allAchievements = [
   ];
   
   onMounted(async () => {
+    const instance = getCurrentInstance();
 	const accessToken = localStorage.getItem("token");
+    socket.socket?.on('multi-login', () => {
+        instance?.proxy?.$toast.add({
+          severity: "info",
+          summary: "User Muted",
+          detail: `you are loggined in another session.`,
+          life: 3000,
+        });
+    });
 	if (accessToken) {
 	//   router.push("/");
 		console.log("token is: ", accessToken);
@@ -117,7 +127,7 @@ const allAchievements = [
   const rank = computed(() => store.getters.getRank);
   const match = computed(() => store.getters.getMatches);
   const achievements = computed(() => store.getters.getAchievements || []);
-  const avail = ref(true);
+  const avail = ref<string | null>("online");
   
 //   const firstmatch = computed(() => store.getters.getFirstMatch);
 //   const firstwin = computed(() => store.getters.getFirstWin);

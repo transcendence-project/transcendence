@@ -78,7 +78,6 @@ export function useWebSocket() {
     connectSocket: () => {
       const _token = localStorage.getItem('token');
       if (_token && !socketState.socket) {
-        // console.log('Token:', _token);
         const headers = {
           extraHeaders: { token: _token },
         };

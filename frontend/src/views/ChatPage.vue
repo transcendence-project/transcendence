@@ -1,6 +1,9 @@
 <template>
     <Dialog v-model:visible="invitationModalVisible" header="Game Invitation" class="dialog-container" @hide="handleDialogClose">
         <p>You have been invited to a game by {{ inviterName }}.</p>
+        <div class="progress-container">
+            <div class="progress-bar" :style="{ width: progressBarWidth + '%' }"></div>
+        </div>
         <template #footer>
         <Button class="dialog-button" label="Accept" @click="acceptInvitation" />
         <!-- <Button class="dialog-button" label="Reject" @click="rejectInvitation" /> -->
@@ -391,11 +394,14 @@
   import Dialog from "primevue/dialog";
   import Button from 'primevue/button';
 import { fas } from "@fortawesome/free-solid-svg-icons";
+import { numberLiteralTypeAnnotation } from "@babel/types";
 
   const { socket } = useWebSocket();
   const chan = ref([] as IChannel[]);
   const m_chan = ref([] as IChannel[]);
   const m_frnd = ref([] as FriendsList[]);
+//   const progressBarWidth = ref(100); // Start at 100%
+    let countdown:any;
   interface FriendsList {
 	user: string;
 	status: Boolean;
@@ -434,7 +440,8 @@ import { fas } from "@fortawesome/free-solid-svg-icons";
 		isChangePassword: false,
 		friends: m_frnd,
         dialog: false,
-        invitationAccepted: false, 
+        invitationAccepted: false,
+        progressBarWidth: 100,
     };
   },
   setup() {
@@ -581,6 +588,21 @@ import { fas } from "@fortawesome/free-solid-svg-icons";
       showInvitationModal(inviter:string) {
       this.inviterName = inviter;
       this.invitationModalVisible = true;
+      this.progressBarWidth = 100;
+      this.startCountdown();
+    },
+    startCountdown() {
+      const duration = 30; // Duration in seconds
+      const interval = 1000; // Update interval in milliseconds
+      const step = 100 / duration;
+
+       countdown = setInterval(() => {
+        this.progressBarWidth -= step;
+        if (this.progressBarWidth <= 0) {
+          clearInterval(countdown);
+          this.handleDialogClose();
+        }
+      }, interval);
     },
     acceptInvitation() {
         this.invitationAccepted = true;
@@ -993,15 +1015,31 @@ import { fas } from "@fortawesome/free-solid-svg-icons";
 
   unmounted() {
     // Cleanup
+    this.rejectInvitation();
     socket.socket?.off("invite-status");
     socket.socket?.off("route-to-game");
     socket.socket?.off("busy-invite");
     socket.socket?.off("offline-status");
+    clearInterval(countdown);
   }
 });
 </script>
 
 <style scoped>
+.progress-container {
+    width: 100%; /* Full width of the container */
+    background-color: #ddd; /* Background of the bar */
+    border-radius: 5px; /* Optional: for rounded corners */
+    margin-top: 10px; /* Spacing */
+}
+
+.progress-bar {
+    height: 10px; /* Height of the progress bar */
+    background-color: #4CAF50; /* Color of the progress bar */
+    border-radius: 5px; /* Optional: for rounded corners */
+    width: 100%; /* Initial width */
+}
+
 .main-cont {
   display: flex;
   flex-direction: column;

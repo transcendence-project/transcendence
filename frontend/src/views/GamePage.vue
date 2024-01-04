@@ -21,7 +21,7 @@
 				</div>
 				{{ leftPlayerScore }}
 			</div>
-			<font-awesome-icon icon="fa-solid fa-person-running" class="cursor-pointer"  @click=""/>
+			<font-awesome-icon icon="fa-solid fa-person-running" class="cursor-pointer"  @click="handleEventExit"/>
 			<div class="right-side">
 				<div class="login">
 					{{ LoginPlayer2 }}
@@ -127,6 +127,9 @@ import { faL } from '@fortawesome/free-solid-svg-icons';
 		],
 		ball: { x: 0, y: 0, dx: 0, dy: 0, radius: 0, color: '' }
 	});
+    const handleEventExit = () => {
+        socket.emit('route-leave', 2);
+    };
 	const handleKeyDown = (event: any) => {
         console.log(event);
 			if (event.key === 'ArrowUp' || event.key === "ArrowUp") {
@@ -266,7 +269,6 @@ const removeEventListener = () => {
              });
              socket.on('game-count', (data: any) => {
                      gameCountdown.value = data;
-                     console.log("this is game count",gameCountdown.value)
                      isGameSelectVisible.value = false;
                      isOnlineGame.value = false;
                      if (gameCountdown.value <= 0 )

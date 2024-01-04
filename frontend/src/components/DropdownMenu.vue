@@ -41,7 +41,9 @@ import { ref, onMounted, onBeforeUnmount, computed } from "vue";
 import store from "@/store";
 import axios from "axios";
 import router from "@/router";
+import { useWebSocket } from "@/plugins/websocket-plugin";
 
+const { socket } = useWebSocket();
 const showDropdown = ref(false);
 const dropdownsRef = ref<HTMLElement | null>(null);
 const showTwoFactorButtons = ref(false);
@@ -84,6 +86,7 @@ const logout = () => {
       },
     });
 	localStorage.clear();
+    socket.socket?.emit('logout');
 	router.push('/login');
   closeDropdown();
     // localStorage.removeItem("token");

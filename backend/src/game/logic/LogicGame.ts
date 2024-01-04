@@ -24,7 +24,7 @@ export class LogicGame {
         gameType: string,
     ) {
         this.gameType = gameType
-        this.gameId = this.generateGameId()
+        this.gameId = this.generateGameId();
         this.winner = null
         if (gameType == 'classic')
         {
@@ -162,15 +162,14 @@ export class LogicGame {
 
     // update the ball position and check for collisions
     private updateBall(): void {
-        this.moveBall(this.objectGame.ball)
+        this.moveBall(this.objectGame.ball);
         this.checkBallCollision(this.objectGame)
     }
 
     // move the ball to the next position
     private moveBall(ball: BallDto): void {
-        // if (ball.dx > Ball_Radius) ball.dx = Ball_Radius - 0.001
-        ball.x += ball.dx
-        ball.y += ball.dy
+        ball.x += ball.dx;
+        ball.y += ball.dy;
     }
     
     public updatePaddlePosition(playerID: string, direction: string): void {
@@ -206,17 +205,17 @@ export class LogicGame {
             ball.x - ball.radius <= paddleRight
         )
     }
-    // check if the ball collided with wall or paddle and update the score if it is out of bounds
+    // check if the ball collided with wall or paddle and update the score if it is out of bounds    printf("", %d,)
     private checkBallCollision(game: objectStatusDto): void {
-        const { ball, players } = game
+        const { ball, players } = game 
 
         this.checkWallCollision(ball)
         if (ball.x <= players[0].paddle.x + players[0].paddle.width) {
             if (this.checkPlayerCollision(ball, players[0].paddle, 0)) {
-                this.reflectBall(ball, players[0].paddle)
+                this.reflectBall(ball, players[0].paddle);
             } else if (ball.x < 0) {
-                players[1].score += 1
-                this.resetBallPosition(ball)
+                players[1].score += 1;
+                this.resetBallPosition(ball);
             }
         }
         else if (ball.x >= players[1].paddle.x - players[1].paddle.width) {

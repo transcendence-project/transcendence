@@ -65,7 +65,13 @@ export class GameGateway
     this.gameService.removePlayerFromQueue(client);
   }
 
-  @SubscribeMessage('route-leave')
+  @SubscribeMessage('user-profile-status')
+   UserStatus(@ConnectedSocket() client: Socket, @MessageBody() status: string) {
+    console.log("this is the user profile name ", status);
+    this.gameService.getUserStatus(client, status);
+  }
+
+  @SubscribeMessage('route-leave')  
    routeLeaver(@ConnectedSocket() client: Socket) {
     console.log("the player is route away from the game page");
     this.gameService.removePlayer(client, 2);
@@ -100,11 +106,10 @@ export class GameGateway
     this.gameService.responeInviteStatus(client, data);
   }
 
-//   @SubscribeMessage('try')   
-//   try(@ConnectedSocket() client: Socket, @MessageBody() data: Boolean) {
-//     // this.gameService.responeInviteStatus(client, data);
-//     console.log("try route")
-//   }
+  @SubscribeMessage('logout')   
+  handleLogout(@ConnectedSocket() client: Socket, @MessageBody() data: Boolean) {
+    this.gameService.removePlayer(client, 1);
+  }
   
   inviteUser(client: Socket, receiver: string): void {
     client.to(receiver).emit("invite", client.id);
