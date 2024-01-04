@@ -44,7 +44,6 @@ export class GameService {
                 this.connected_users.forEach((value, key, map) =>{
                     if (value && value.user && user.userName === value.user.userName)
                     {
-                        this.connected_users.delete(client);
                         client.emit('multi-login');
                         client.disconnect(true);
                          flag = 1;

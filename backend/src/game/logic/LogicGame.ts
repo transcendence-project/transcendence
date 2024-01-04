@@ -205,7 +205,7 @@ export class LogicGame {
             ball.x - ball.radius <= paddleRight
         )
     }
-    // check if the ball collided with wall or paddle and update the score if it is out of bounds    printf("", %d,)
+    // check if the ball collided with wall or paddle and update the score if it is out of bounds
     private checkBallCollision(game: objectStatusDto): void {
         const { ball, players } = game 
 

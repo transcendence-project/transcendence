@@ -92,10 +92,11 @@ const allAchievements = [
     const instance = getCurrentInstance();
 	const accessToken = localStorage.getItem("token");
     socket.socket?.on('multi-login', () => {
+        console.log("this is from the multi-login");
         instance?.proxy?.$toast.add({
-          severity: "info",
-          summary: "User Muted",
-          detail: `you are loggined in another session.`,
+          severity: "error",
+          summary: "Cannot Connect to Game",
+          detail: `User already logged in another session.`,
           life: 3000,
         });
     });

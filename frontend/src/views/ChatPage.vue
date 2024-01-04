@@ -592,7 +592,7 @@ import { numberLiteralTypeAnnotation } from "@babel/types";
       this.startCountdown();
     },
     startCountdown() {
-      const duration = 30; // Duration in seconds
+      const duration = 10; // Duration in seconds
       const interval = 1000; // Update interval in milliseconds
       const step = 100 / duration;
 
