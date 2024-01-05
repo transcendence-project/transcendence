@@ -183,7 +183,7 @@ export class UsersService {
 
   async addAchievement(userId: number, achievementTitle: string) {
     // console.log("in add achievement, userId: ", userId);
-    console.log("in add achievement, achievementTitle: (", achievementTitle, ")");
+    // console.log("in add achievement, achievementTitle: (", achievementTitle, ")");
     const user = await this.repo.findOne({
       where: { id: userId },
       relations: ["achievements"],
@@ -198,7 +198,7 @@ export class UsersService {
     // console.log("in add achievement, achievement: ", achievement);
     // console.log("in add achievement, user.achievements: ", user.achievements);
     // console.log("in add achievement, user: ", user);
-	console.log('in add achievement: ', achievement);
+	// console.log('in add achievement: ', achievement);
     user.achievements.push(achievement);
     return await this.repo.save(user);
   }

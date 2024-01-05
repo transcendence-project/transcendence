@@ -79,6 +79,14 @@ export class LogicGame {
         return this.objectGame.players[1].login
     }
 
+    public getPlayer1Info(): PlayerDto {
+        return this.objectGame.players[0]
+    }
+
+    public getPlayer2Info(): PlayerDto {
+        return this.objectGame.players[1]
+    }
+
     public getGameID(): string {
         return this.gameId
     }
@@ -100,6 +108,7 @@ export class LogicGame {
                 color: paddleColor,
             },
             gameID: this.gameId,
+
             ready: login == 'computer' ? true :  false,
         }
     }
@@ -123,12 +132,22 @@ export class LogicGame {
         return this.objectGame.players.find(player => player.login === this.winner);
     }
 
-    public setLoser(playerLogin: string) : void 
+    public setLoser(loserLogin: string) : void 
     {
-        if (this.getPlayer1ID() === playerLogin)
-            this.winner = this.getPlayer2ID();
+        if (this.getPlayer1ID() === loserLogin)
+        {
+            const winner = this.getPlayer2Info();
+
+            winner.score = 11;
+            this.winner = this.getPlayer2ID();   
+        }
         else
+        {
+            const winner = this.getPlayer1Info();
+
+            winner.score = 11;
             this.winner = this.getPlayer1ID();
+        }
     }
 
     public updateComputer(): void {
@@ -181,10 +200,14 @@ export class LogicGame {
             player.paddle.y += player.paddle.speed;
         }
 
+        
         player.paddle.y = Math.max(
             0,Math.min(player.paddle.y, 1 - player.paddle.height / 2),
         )
     }
+
+    
+    
     // reset the ball position that is out of bounds to the center
     private checkWallCollision(ball: BallDto): void {
         if ((ball.y <= ball.radius) || (ball.y >= 1 - ball.radius)) {

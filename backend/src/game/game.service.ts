@@ -6,6 +6,7 @@ import {Paddle, Ball, Computer, } from './interface/game.interface';
 import {GameSelectDto} from './dto/game.dto'
 import { Socket } from 'socket.io';
 import { SocketService } from './socket.service'
+import { UsersService } from 'users/users.service';
 import { use } from 'passport';
 import { emit } from 'process';
 
@@ -22,11 +23,11 @@ export class GameService {
     private canvasHeight: number;
     private deltaTime: number;
 
-    constructor(private readonly authService: AuthService, private socketService: SocketService,) {
+    constructor(private readonly authService: AuthService, private socketService: SocketService, private userService: UsersService) {
     };
 
     public async addConnectUser(client : Socket, token: any)
-    {
+    {  
         // console.log("before",this.connected_users);
         await this.set_online_user(client, token);
         const oo = this.find_user_with_id(client);
@@ -251,6 +252,9 @@ export class GameService {
         const player1 = this.connected_users.get(getKeyPlayer1);
         const getKeyPlayer2 = this.getKeyByValue(this.connected_users, gameLogic.getPlayer2ID());
         const player2 = this.connected_users.get(getKeyPlayer2);
+        const winner = gameLogic.getWinner();
+
+        // console.log("this is the winner ", winner);
 
         if (player1)
         {
@@ -265,6 +269,24 @@ export class GameService {
         
         if (player2 && gameLogic.getPlayer2ID() !== 'computer')
         {
+            if (player1.user.userName === winner.login)
+            {
+                const loser = gameLogic.getPlayer2Info();
+                console.log("the winner is : ", winner, player1.user.id);
+                console.log("the loser is : ", loser, player2.user.id);
+                console.log("the winner is score : ", winner.score);
+                console.log("the loser is score : ", loser.score);
+                this.userService.saveMatch(player1.user.id, winner.score, player2.user.id, loser.score);
+            }
+            else
+            {
+                const loser = gameLogic.getPlayer1Info();
+                console.log("the winner is : ", winner, player2.user.id);
+                console.log("the loser is : ", loser, player1.user.id);
+                console.log("the winner is score : ", winner.score);
+                console.log("the loser is score : ", loser.score);
+                this.userService.saveMatch(player2.user.id, winner.score, player1.user.id, loser.score);
+            }
             player2.logicGame = null;
             player2.pendingInvitations = null;
             // console.debug("this is from the endGame player2", this.classic_queue);
