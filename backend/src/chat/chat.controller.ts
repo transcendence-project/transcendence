@@ -11,11 +11,13 @@ export class ChatController {
 
 	// all channels
 	@Get('all_channels')
+	@UseGuards(JwtAuthGuard)
 	async all_channels(){
 		return (await this.chatService.get_all_chan());
 	}
 
 	@Get('current_chan/:chan_name')
+	@UseGuards(JwtAuthGuard)
 	async cur_chan(@Param("chan_name") chan_name: string){
 		console.log(chan_name);
 		const chan_ = await this.chatService.chan_by_name(chan_name);

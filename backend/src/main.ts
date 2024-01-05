@@ -6,6 +6,7 @@ import { AuthService } from './auth/auth.service';
 import { ConfigService } from '@nestjs/config';
 import express from 'express';
 import passport from 'passport';
+import { JwtAuthGuard } from 'auth/jwt.guard';
 
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule);
@@ -21,6 +22,7 @@ async function bootstrap() {
 	// Initialize Passport
 	app.use(passport.initialize());
 	app.use('/uploads', express.static('uploads'));
+	// app.useGlobalGuards(new JwtAuthGuard())
 	// Include the authentication router from authService
 	app.useGlobalPipes(
 		new ValidationPipe({

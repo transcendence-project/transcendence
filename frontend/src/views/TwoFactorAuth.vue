@@ -31,10 +31,10 @@
   const v_code = ref('');
   const factor = ref('');
   
-
+console.log("test 2FAAAAA");
   onMounted(async () => {
 	// console.log("localStorage:", localStorage);
-
+	// console.log("test 2FA");
   try {
     await store.dispatch("TwoFA");
     const qrCodeUrl = localStorage.getItem("qr");

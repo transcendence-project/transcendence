@@ -12,6 +12,7 @@
     "primevue": "^3.0.0",
     "primeicons": "^4.0.0",
     "socket.io-client": "^4.7.2",
+	"jwt-decode": "^4.0.0",
     "vue": "^3.3.4",
     "vue-axios": "^3.5.2",
     "vue-class-component": "^8.0.0-0",

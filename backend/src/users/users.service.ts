@@ -60,7 +60,7 @@ export class UsersService {
 	return await (this.repo.findOne({where: {id}, relations: ['channels']}))
   }
   async findOneByUserName(userName: string) {
-    const user = await this.repo.findOne({ where: {userName}, relations: ['blocked'] });
+    const user = await this.repo.findOne({ where: {userName}, relations: ['blocked', 'achievements'] });
     return user;
   }
 
@@ -189,12 +189,11 @@ export class UsersService {
       relations: ["achievements"],
     });
     if (!user) throw new NotFoundException("User not found");
-    console.log("in get achievements, user achievements: ", user.achievements);
+    // console.log("in get achievements, user achievements: ", user.achievements);
     return user.achievements;
   }
 
   async addAchievement(userId: number, achievementTitle: string) {
-    // console.log("in add achievement, userId: ", userId);
     console.log("in add achievement, achievementTitle: (", achievementTitle, ")");
     const user = await this.repo.findOne({
       where: { id: userId },

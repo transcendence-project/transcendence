@@ -86,8 +86,6 @@ const logout = () => {
 	localStorage.clear();
 	router.push('/login');
   closeDropdown();
-    // localStorage.removeItem("token");
-    // router.push("/");
   } catch (error) {
     console.log(error);
   }

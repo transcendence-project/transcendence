@@ -44,11 +44,10 @@
 		  </div>
 		  <div class="bg-gradient-to-r from-[#ae445a] to-[#451952] shadow-third flex flex-col justify-center w-[45%] p-[10px] text-center rounded">
 			<h3 class="text-xl">Achievements</h3>
-	  		  <div v-for="achievement in allAchievements" :key="achievement.id" class="shadow-third flex align-center justify-between mb-[5px] px-[50px] pb-[10px] pt-[5px] rounded">
-	    		<div>{{ achievement.title }}</div>
-	    		<div v-if="achievements.some(a => a.id === achievement.id)">🏆</div>
-	    		<div v-else>&nbsp;</div>
-	  			</div>
+	    		<div v-for="achievement in achievements" :key="achievement.id" class="shadow-third flex align-center justify-between mb-[5px] px-[50px] pb-[10px] pt-[5px] rounded">
+	      			<div>{{ achievement.title }}</div>
+	      		<div>🏆</div>
+	    		</div>
 		  </div>
 		</div>
 		<div
@@ -81,12 +80,6 @@
 // 	winnerScore: number;
 // 	loserScore: number;
 //   }
-
-const allAchievements = [
-	{id: 1, title: "First Match"},
-	{id: 2, title: "First Win"},
-	{id: 3, title: "Played 3 Matches"},
-  ];
   
   onMounted(async () => {
 	const accessToken = localStorage.getItem("token");
@@ -114,15 +107,11 @@ const allAchievements = [
   const data = ref(null);
   const fullname = computed(() => store.getters.getDisplayName);
   const userimage = computed(() => {
-	//   const backend = "http://localhost:3000";
 	const image = store.getters.getImage;
 	console.log(`the image is: ${image}`);
 	return image;
   });
-  // const userimage = computed(() => store.getters.getImage);
   
-  // const imgname = ref("head.svg");
-  // const imgname = computed(() => store.getters.getImage);
   const win = computed(() => store.getters.getWin);
   const lose = computed(() => store.getters.getLose);
   const draw = computed(() => store.getters.getDraw);
@@ -130,11 +119,6 @@ const allAchievements = [
   const match = computed(() => store.getters.getMatches);
   const achievements = computed(() => store.getters.getAchievements || []);
   const avail = ref(true);
-  
-//   const firstmatch = computed(() => store.getters.getFirstMatch);
-//   const firstwin = computed(() => store.getters.getFirstWin);
-//   const played3matches = computed(() => store.getters.getPlayed3Matches);
-  
   
   </script>
   

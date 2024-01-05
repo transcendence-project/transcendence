@@ -50,6 +50,7 @@ export class UsersController {
 	}
 
 	@Get('leaderboard')
+	@UseGuards(JwtAuthGuard)
 	async get_leaderboard() {
 		return await this.userService.findAllRankedUser();
 	}
@@ -69,21 +70,22 @@ export class UsersController {
 	// }
 
 	@Get('friend/:name')
+	@UseGuards(JwtAuthGuard)
 	getFriend(@Param("name") name: string){
-		console.log(name);
 		const frnd = this.userService.findOneByUserName(name);
 		return (frnd);
 	}
 
 	@Get()
+	@UseGuards(JwtAuthGuard)
 	findAllUsers(){
 		return (this.userService.findAllUsers())
 	}
 
-	@Delete('/:id')
-	deleteUser(@Param('id') id: string){
-		return (this.userService.remove(parseInt(id)))
-	}
+	// @Delete('/:id')
+	// deleteUser(@Param('id') id: string){
+	// 	return (this.userService.remove(parseInt(id)))
+	// }
 
 	// @Delete('/:id/friends/:friendId')
 	// deleteFriend(@Param('id') id: string, @Param('friendId') fId: string){
@@ -94,8 +96,8 @@ export class UsersController {
 	@UseGuards(JwtAuthGuard)
 	async getAchievements(@Req() req): Promise<Achievement[]>{
 		// console.log('test log')
-		console.log('in get achievements, req.user: ', req.user);
-		console.log('in get achievements, req.user.id: ', req.user.id);
+		// console.log('in get achievements, req.user: ', req.user);
+		// console.log('in get achievements, req.user.id: ', req.user.id);
 		return (await this.userService.getAchievements(req.user.id))
 	}
 
@@ -121,7 +123,7 @@ export class UsersController {
 	// }
 
 	@Post('save/match')
-	// @UseGuards(JwtAuthGuard)
+	@UseGuards(JwtAuthGuard)
 	async save_match(@Body() body: MatchDTO){
 		// console.log(req.user.id);
 		// console.log('in save match, body: ', body);
