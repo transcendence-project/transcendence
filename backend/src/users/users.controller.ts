@@ -125,8 +125,6 @@ export class UsersController {
 	@Post('save/match')
 	@UseGuards(JwtAuthGuard)
 	async save_match(@Body() body: MatchDTO){
-		// console.log(req.user.id);
-		// console.log('in save match, body: ', body);
 		return (await this.userService.saveMatch(body.winnerId, body.winnerScore, body.loserId, body.loserScore));
 	}
 
