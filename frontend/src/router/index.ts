@@ -33,7 +33,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: "/users/:username",
     name: "users",
-    alias: "/users",
+    // alias: "/users",
     component: () =>
       import(/* webpackChunkName: "home" */ "../views/UserProfile.vue"),
     meta: {
@@ -164,6 +164,7 @@ router.beforeEach((to: any, from: any, next: any) => {
   }
   if (to.path == "/home" && to.query.code) {
     const token = to.query.code;
+    console.log("home route, the token is: ", token);
     localStorage.setItem("token", token);
     store.dispatch("fetchUserData");
     next();

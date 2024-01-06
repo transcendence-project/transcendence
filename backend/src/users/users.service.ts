@@ -200,7 +200,7 @@ export class UsersService {
       relations: ["achievements"],
     });
     if (!user) throw new NotFoundException("User not found");
-    if (user.achievements.find((a) => a.title === achievementTitle))
+    if (user.achievements.find((a) => a.title.toLowerCase().trim() == achievementTitle.toLowerCase().trim()))
       throw new ConflictException("Achievement already added");
     const achievement = await this.seederService.getAchievementByTitle(
       achievementTitle,
