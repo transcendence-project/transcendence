@@ -73,7 +73,7 @@ export class GameGateway
 
   @SubscribeMessage('route-leave')  
    routeLeaver(@ConnectedSocket() client: Socket) {
-    console.log("the player is route away from the game page");
+    console.log('the player is route away from the game page');
     this.gameService.removePlayer(client, 2);
   }
   

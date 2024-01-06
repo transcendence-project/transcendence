@@ -15,11 +15,13 @@ export class FriendRequestController {
 	}
 
 	@Patch('/accept/:id')
+	@UseGuards(JwtAuthGuard)
 	async acceptRequest(@Param("id") requestId: number): Promise<User> {
 		return await this.friendRequestService.acceptRequest(requestId);
 	}
 
 	@Patch('/:id/reject')
+	@UseGuards(JwtAuthGuard)
 	async rejectRequest(@Param("id") requestId: number){
 		this.friendRequestService.rejectRequest(requestId);
 	}

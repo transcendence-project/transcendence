@@ -56,11 +56,11 @@ export class UsersService {
     });
     return await this.repo.save(user2);
   }
-  findOne(id: number) {
-	return (this.repo.findOne({where: {id}, relations: ['channels']}))
+  async findOne(id: number) {
+	return await (this.repo.findOne({where: {id}, relations: ['channels']}))
   }
   async findOneByUserName(userName: string) {
-    const user = await this.repo.findOne({ where: {userName}, relations: ['blocked'] });
+    const user = await this.repo.findOne({ where: {userName}, relations: ['blocked', 'achievements'] });
     return user;
   }
 
@@ -79,6 +79,18 @@ export class UsersService {
 	if (!user) return NotFoundException;
 	Object.assign(user, attrs);
 	return await this.repo.save(user);
+  }
+
+  async check_isFirstLogin(id: number) {
+	const user = await this.repo.findOne({ where: { id } });
+	if (!user) return NotFoundException;
+	if (user.isFirstLogin === true)
+	{
+		await this.update(id, {isFirstLogin: false});
+		return true;
+	}
+	else
+		return false;
   }
 
   async update_userName(id: number, userName: string): Promise<User> {
@@ -177,36 +189,36 @@ export class UsersService {
       relations: ["achievements"],
     });
     if (!user) throw new NotFoundException("User not found");
-    console.log("in get achievements, user achievements: ", user.achievements);
+    // console.log("in get achievements, user achievements: ", user.achievements);
     return user.achievements;
   }
 
   async addAchievement(userId: number, achievementTitle: string) {
-    // console.log("in add achievement, userId: ", userId);
-    // console.log("in add achievement, achievementTitle: (", achievementTitle, ")");
     const user = await this.repo.findOne({
-      where: { id: userId },
-      relations: ["achievements"],
+        where: { id: userId },
+        relations: ["achievements"],
     });
-    if (!user) throw new NotFoundException("User not found");
-    if (user.achievements.find((a) => a.title === achievementTitle))
-      throw new ConflictException("Achievement already added");
-    const achievement = await this.seederService.getAchievementByTitle(
-      achievementTitle,
-    );
-    if (!achievement) throw new NotFoundException("Achievement not found");
-    // console.log("in add achievement, achievement: ", achievement);
-    // console.log("in add achievement, user.achievements: ", user.achievements);
-    // console.log("in add achievement, user: ", user);
-	// console.log('in add achievement: ', achievement);
+    if (!user) {
+        throw new NotFoundException("User not found");
+    }
+    // Normalize the input achievement title for comparison
+    const normalizedInputTitle = achievementTitle.trim().toLowerCase();
+    // Check if the user already has the achievement
+    const alreadyHasAchievement = user.achievements.some(achievement => {
+        return achievement.title.trim().toLowerCase() === normalizedInputTitle;
+    });
+    if (alreadyHasAchievement) {
+        throw new ConflictException("Achievement already added");
+    }
+    const achievement = await this.seederService.getAchievementByTitle(achievementTitle);
+    if (!achievement) {
+        throw new NotFoundException("Achievement not found");
+    }
     user.achievements.push(achievement);
     return await this.repo.save(user);
-  }
-
-  async updateUserPoints(winnerID: number, loserID: number)
+}
+  async updateUserPoints(winner: User, loser: User)
   {
-	const winner: User = await this.findOne(winnerID);
-	const loser: User = await this.findOne(loserID);
 	winner.points += 10;
 	if (loser.points >= 5)
 	{
@@ -214,10 +226,10 @@ export class UsersService {
 	}
 	winner.wins += 1;
 	loser.loses += 1;
-	console.log('in update user points, winner: ', winner);
-	console.log('in update user points, loser: ', loser);
-	await this.repo.save(winner);	
-	await this.repo.save(loser);
+	// console.log('in update user points, winner: ', winner);
+	// console.log('in update user points, loser: ', loser);
+	// await this.repo.save(winner);	
+	// await this.repo.save(loser);
   }
 
   async findAllUsers() {
@@ -234,8 +246,9 @@ export class UsersService {
 	const achievements: Achievement[] = await this.getAchievements(winner.id);
 
 	// console.log('in check achievements, matches: ', matches);
-	// console.log('in check achievements, matches.length: ', matches.length);
+	console.log('in check achievements, matches.length for the winner: ', matches.length);
 	if (matches.length === 1 && !achievements.find((a) => a.title === "First Match")) {
+		console.log('in check achievements, adding first match to winner');
 		this.addAchievement(winner.id, "First Match");
 	}
 	if (winner.matchesAsPlayerOne.length === 1 && !achievements.find((a) => a.title === "First Win")) {
@@ -261,17 +274,19 @@ export class UsersService {
 
 	const winner: User = await this.repo.findOne({ where: { id: winnerID}, relations: ["matchesAsPlayerOne"] });
 	const loser: User = await this.repo.findOne({ where: { id: loserID}, relations:  ["matchesAsPlayerTwo"]});
-
+    if (!winner || !loser)
+        return;
 
 	const match = await this.matchesService.create(winner, loser, winnerScore, loserScore, loserID, winnerID);
 	winner.matchesAsPlayerOne.push(match);
 	loser.matchesAsPlayerTwo.push(match);
 
+	
+	await this.updateUserPoints(winner, loser);
+	await this.checkAchievements(winner, loser);
+
 	await this.repo.save(winner);
 	await this.repo.save(loser);
-
-	this.updateUserPoints(winnerID, loserID);
-	this.checkAchievements(winner, loser);
   }
 
   async getMatches(userId: number) {

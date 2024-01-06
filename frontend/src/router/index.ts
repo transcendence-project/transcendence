@@ -3,6 +3,12 @@ import store from '@/store';
 // Import the WebSocket plugin's connect method
 import { useWebSocket } from '@/plugins/websocket-plugin';
 
+import { jwtDecode } from "jwt-decode";
+export interface jwtDecoded {
+  sub: number;
+  username: string;
+  Is2FAEnabled: boolean;
+}
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -122,12 +128,26 @@ router.beforeEach((to: any, from: any, next: any) => {
       // Check if the user has a token and if the WebSocket is not connected
       const { connectSocket, socket } = useWebSocket();
       const isauth = localStorage.getItem("token");
+  const is2fa = localStorage.getItem("Is2FAEnabled") == "true";
+  const is2FAVerified = localStorage.getItem("Is2FAVerified") == "true";
+  console.log("is2fa: ", is2fa, "is2FAVerified: ", is2FAVerified);
+  //   if (isauth) {
+  //     const decoded = jwtDecode<jwtDecoded>(isauth || "");
+  //     console.log("the 2fa is bool: ", decoded.Is2FAEnabled);
+  //     if (decoded) {
+  //     }
+  //   }
       if (isauth && !socket.socket) {
           // Establish the WebSocket connection
           connectSocket();
       }
   if (!isauth && to.path != "/login" && !to.query.code) {
     next("/login");
+    return;
+  }
+  if (isauth && is2fa && !is2FAVerified && to.path != "/twofactor") {
+    console.log("force 2fa: ", is2fa, is2FAVerified);
+    next("/twofactor");
     return;
   }
 
@@ -161,9 +181,14 @@ router.beforeEach((to: any, from: any, next: any) => {
     return;
   }
   if (to.path == "/twofactor" && to.query.code) {
+    console.log("twofactor route");
     const token = to.query.code;
     localStorage.setItem("token", token);
+    // localStorage.setItem("2fa", "true");
     store.dispatch("fetchUserData");
+    next();
+    return;
+    // store.dispatch("fetchUserData");
   }
   next();
 });

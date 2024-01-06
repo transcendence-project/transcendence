@@ -52,6 +52,9 @@ export class User {
   @Column({ default: false })
   isTwoFactorAuthenticated: boolean;
 
+  @Column({ default: true })
+  isFirstLogin: boolean;
+  
   @ManyToMany(() => User, (user) => user.friends)
   @JoinTable({
     name: "friends",

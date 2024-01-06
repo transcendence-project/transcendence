@@ -121,12 +121,15 @@ export class GameService {
             }
             else
             {
-                logic = new LogicGame(player.user.userName, 'computer', gameInfo.gameType);
-                player.logicGame = logic;
-                player.status = 'ingame';
-                client.join(logic.getGameID());
-                this.countDown(logic, player, null);
-                this.startGame(logic);
+                if (player.logicGame == null)
+                {
+                    logic = new LogicGame(player.user.userName, 'computer', gameInfo.gameType);
+                    player.logicGame = logic;
+                    player.status = 'ingame';
+                    client.join(logic.getGameID());
+                    this.countDown(logic, player, null);
+                    this.startGame(logic);
+                }
             }
         }
     }
@@ -154,14 +157,17 @@ export class GameService {
                             gameType: string, gameMode?: string,) 
     {
         let logic : LogicGame;
+        const player1Key = this.getKeyByValue(this.connected_users, player1.user.userName);
+        const player2Key = this.getKeyByValue(this.connected_users, player2.user.userName);
 
-        logic = new LogicGame(player1.user.userName, player2.user.userName, gameType);
+        // if (player1.logicGame == null && player2.logicGame === null)
+        // {
+            logic = new LogicGame(player1.user.userName, player2.user.userName, gameType);
+        // }
 
         player1.logicGame = logic;
         player2.logicGame = logic;
 
-        const player1Key = this.getKeyByValue(this.connected_users, player1.user.userName);
-        const player2Key = this.getKeyByValue(this.connected_users, player2.user.userName);
 
         player1Key.join(logic.getGameID());
         player2Key.join(logic.getGameID());
@@ -231,21 +237,21 @@ export class GameService {
         }, 1000);
     }
 
-    private startGame(gameLogic: LogicGame)
+    private async startGame(gameLogic: LogicGame)
     {
-        const gameInterval = setInterval(() => {
+        const gameInterval = setInterval(async () => {
             gameLogic.updateGame();
             this.socketService.emitToRoom(gameLogic.getGameID(), 'game-data', gameLogic.getObjectStatus());
             if (gameLogic.checkWinner())
             {
                 clearInterval(gameInterval);
-                this.endGame(gameLogic)
+                await this.endGame(gameLogic)
                 return;
             }
         }, 1000 / 60);
     }
 
-    public endGame(gameLogic: LogicGame)
+    public async endGame(gameLogic: LogicGame)
     {
         this.socketService.emitToRoom(gameLogic.getGameID(), 'game-over',gameLogic.getWinner());
         const getKeyPlayer1 = this.getKeyByValue(this.connected_users, gameLogic.getPlayer1ID());
@@ -254,14 +260,13 @@ export class GameService {
         const player2 = this.connected_users.get(getKeyPlayer2);
         const winner = gameLogic.getWinner();
 
-        // console.log("this is the winner ", winner);
+        if (!player1 || player1.status !== 'ingame') {
+            return; // Player is not in a game, so return early. 
+        }
 
-        if (player1)
+        if (player1 )
         {
-            player1.logicGame = null;
-            player1.pendingInvitations = null;
-            console.debug("this is from the endGame player1", this.classic_queue);
-            // this.classic_queue.pop();
+            console.debug("this is from the endGame player1 ", player1.user.userName);
             getKeyPlayer1.leave(gameLogic.getGameID());
             this.socketService.emitToServer('user-status', 'online');
             player1.status = 'online';
@@ -269,14 +274,14 @@ export class GameService {
         
         if (player2 && gameLogic.getPlayer2ID() !== 'computer')
         {
-            if (player1.user.userName === winner.login)
+            if (player1.user.userName === winner.login) 
             {
                 const loser = gameLogic.getPlayer2Info();
                 console.log("the winner is : ", winner, player1.user.id);
                 console.log("the loser is : ", loser, player2.user.id);
                 console.log("the winner is score : ", winner.score);
-                console.log("the loser is score : ", loser.score);
-                this.userService.saveMatch(player1.user.id, winner.score, player2.user.id, loser.score);
+                console.log("the loser is score : ", loser.score); 
+                await this.userService.saveMatch(player1.user.id, winner.score, player2.user.id, loser.score);
             }
             else
             {
@@ -285,10 +290,12 @@ export class GameService {
                 console.log("the loser is : ", loser, player1.user.id);
                 console.log("the winner is score : ", winner.score);
                 console.log("the loser is score : ", loser.score);
-                this.userService.saveMatch(player2.user.id, winner.score, player1.user.id, loser.score);
+                await this.userService.saveMatch(player2.user.id, winner.score, player1.user.id, loser.score);
             }
             player2.logicGame = null;
             player2.pendingInvitations = null;
+            player1.logicGame = null;
+            player1.pendingInvitations = null;
             // console.debug("this is from the endGame player2", this.classic_queue);
             getKeyPlayer2.leave(gameLogic.getGameID());
             player2.status = 'online';
@@ -302,9 +309,10 @@ export class GameService {
         player.logicGame.updatePaddlePosition(player.user.userName, direction);
     }
 
-    public removePlayer(socket: Socket, deleteUser: number)
+    public  removePlayer(socket: Socket, deleteUser: number)
     {
         const player = this.connected_users.get(socket);
+        console.log("this is the player who left the page ", player.user.userName," and this is the logic for him ", player.logicGame, "and this is the number ", deleteUser)
         if (player)
         {
             if (player.status === 'inqueue')
@@ -325,7 +333,7 @@ export class GameService {
             if (deleteUser === 1)
             {
                 this.socketService.emitToServer('user-status', 'offline');
-                this.connected_users.delete(socket);
+                this.connected_users.delete(socket); 
                 console.log("the player is removed from the user connected");
             }
         }

@@ -24,7 +24,8 @@ import { computed } from 'vue';
 import store from '@/store';
 	
 onMounted(() => {
-	store.dispatch('fetchUserData');
+	if (localStorage.getItem('token') && !store.getters.getUserName)
+		store.dispatch('fetchUserData');
 	});
 
 const username = computed(() => store.getters.getUserName);

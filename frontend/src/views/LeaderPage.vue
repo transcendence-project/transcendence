@@ -39,7 +39,10 @@
 	methods: {
 	  async fetchLeaderboard() {
 		try {
-		  const response = await axios.get(process.env.VUE_APP_BACKEND_URL + "/users/leaderboard");
+		  const response = await axios.get(process.env.VUE_APP_BACKEND_URL + "/users/leaderboard", 
+		  { 
+			headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } 
+		});
 		  this.student = response.data;
 		} catch (error) {
 		  console.error("Error fetching student data:", error);

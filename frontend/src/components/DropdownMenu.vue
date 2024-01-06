@@ -89,8 +89,6 @@ const logout = () => {
     socket.socket?.emit('logout');
 	router.push('/login');
   closeDropdown();
-    // localStorage.removeItem("token");
-    // router.push("/");
   } catch (error) {
     console.log(error);
   }

@@ -1,5 +1,5 @@
 <template>
-	<div
+	<div v-if="student"
 	  class="flex flex-col items-center bg-gradient-to-r from-[#451952] via-[#451952] to-[#ae4188] shadow-custom m-5 p-5 rounded w-full h-full text-white"
 	>
 	  <div class="p-0 w-full m-0 text-center">
@@ -43,35 +43,11 @@
 		  </div>
 		  <div class="bg-gradient-to-r from-[#ae445a] to-[#451952] shadow-third flex flex-col justify-center w-[45%] p-[10px] text-center rounded">
 			<h3 class="text-xl">Achievements</h3>
-			<div class="shadow-third flex align-center justify-between mb-[5px] px-[50px] pb-[10px] pt-[5px] rounded">
-			  <div>First Match</div>
-			  <div>{{ student.firstmatch }}</div>
-			</div>
-			<div class="shadow-third flex align-center justify-between mb-[5px] px-[50px] pb-[10px] pt-[5px] rounded">
-			  <div>First Win</div>
-			  <div>{{ student.firstwin }}</div>
-			</div>
-	
-			<div class="shadow-third flex align-center justify-between mb-[5px] px-[50px] pb-[10px] pt-[5px] rounded">
-			  <div>Played 3 Matches</div>
-			  <div>{{ student.played3matches }}</div>
-			</div>
+	    <div v-for="achievement in student.achievements" :key="achievement.id" class="shadow-third flex align-center justify-between mb-[5px] px-[50px] pb-[10px] pt-[5px] rounded">
+	      <div>{{ achievement.title }}</div>
+	      <div>🏆</div>
+	    </div>
 		  </div>
-		</div>
-		<div
-		  class="bg-gradient-to-r from-[#662549] to-[#451952] flex flex-col items-center justify-between p-[10px] mt-[10px] rounded"
-		>
-		  <h2>Match History</h2>
-		  <ul class="history list-none p-0 w-[80%] text-center">
-			<li
-			  v-for="(matchItem, index) in match"
-			  :key="index"
-			  class="shadow-third bg-gradient-to-r from-[#662549] to-[#ae445a] p-[10px] m-[5px] rounded"
-			>
-			  {{ matchItem.date }} - Opponent: {{ matchItem.opponent }} - Result:
-			  {{ matchItem.result }}
-			</li>
-		  </ul>
 		</div>
 	  </div>
 	</div>
@@ -93,15 +69,40 @@ export default defineComponent({
 	name: "StudentList",
 	data() {
 		return {
-			student: [] as IStudent[],
+			student: null as IStudent | null,
 			username: "",
             avail: '',
 		};
 	},
-    components: {
-        StatusUser,
+	watch: {
+		'$route.params.username': {
+			immediate: true,
+			handler(NewUserName) {
+				this.FetchUserProfile(NewUserName);
+			}
+		}
+	},
+	
+	methods: {
+		FetchUserProfile ( NewUserName: string ){
+
+			const apiUrl = process.env.VUE_APP_BACKEND_URL + `/users/friend/${NewUserName}`;
+	
+			axios
+				.get(apiUrl, {
+					headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+				})
+				.then((resp: AxiosResponse<IStudent>) => {
+					this.student = resp.data;
+					console.log("the student in view: ",this.student.achievements);
+				})
+				.catch((error) => {
+					console.error("Error fetching student data:", error);
+				});
+		}
 	},
 	mounted() {
+		this.FetchUserProfile(this.$route.params.username as string);
         this.username = this.$route.params.username as string;
         socket.socket?.emit('user-profile-status', this.username);
         socket.socket?.on('user-status', (status: string) => {
@@ -113,18 +114,6 @@ export default defineComponent({
             else
                 this.avail = 'offline'
         });
-		// this.username = store.state.username;
-		const apiUrl = process.env.VUE_APP_BACKEND_URL + `/users/friend/${this.username}`;
-        
-
-		axios
-			.get(apiUrl)
-			.then((resp: AxiosResponse<IStudent[]>) => {
-				this.student = resp.data;
-			})
-			.catch((error) => {
-				console.error("Error fetching student data:", error);
-			});
 	},
 });
 </script>

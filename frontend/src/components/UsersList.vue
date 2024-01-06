@@ -65,7 +65,10 @@ export default defineComponent({
   },
   mounted() {
     axios
-      .get(process.env.VUE_APP_BACKEND_URL + "/users")
+      .get(process.env.VUE_APP_BACKEND_URL + "/users",
+	  {
+		headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+	  })
       .then((resp: AxiosResponse<IStudent[]>) => {
         this.student = resp.data;
       })

@@ -27,21 +27,22 @@ export class AuthController {
 	
 	@Get('42/callback')
 	@UseGuards(AuthGuard('42'))
-	// @Header('Cache-Control', 'no-store, no-cache, must-revalidate')
+	@Header('Cache-Control', 'no-store, no-cache, must-revalidate')
 	async callback(@Req() req, @Res() res) {
 		const user = req.user;
-		const token = this.authService.generate_jwt_token(user.userName, user.id);
-		// this.authService.authenticate(user, true);
-		// console.log("Token: ", token);
+		console.log("req.user: ", req.user);
+		const token = this.authService.generate_jwt_token(user.userName, user.id, user.is2FAEnabled);
 		if (user.is2FAEnabled == true)
 		{
+			console.log("2FA ENABLED !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 			// redirect to 2fa page and then take them to homepage
-			const url = new URL('FRONTEND_URL/twofactor');
+			const url = new URL(this.configService.get('FRONTEND_URL') + '/twofactor');
 			url.searchParams.set('code', token);
 			return res.status(200).redirect(url.href);
 		}
 		else{
-			// the one below
+
+			// the one below	
 		}
 		const url = new URL(this.configService.get('FRONTEND_URL') + '/home');
 		url.searchParams.set('code', token);
@@ -88,9 +89,14 @@ export class AuthController {
 		else
 		{
 			console.log("! COOODEE SUCCESSFUULLLLLLL !");
+			return res.status(200).json({ req: req.user });
+			// console.log("req.user in 2fa: ", req.user);
+			// return res.redirect(this.configService.get('FRONTEND_URL') + '/home');
+			// const url = new URL(this.configService.get('FRONTEND_URL') + '/home');
 			// url.searchParams.set('code', token);
 			// return res.status(200).redirect(url.href);
-			return "verified";
+			// const str: string = "verified"
+			// return str;
 		}
 	}
 
