@@ -7,6 +7,9 @@ import { IStudent } from "../models/student";
 import { computed } from "vue";
 import { IFriend } from "@/models/friend";
 import router from "@/router";
+import { jwtDecode } from "jwt-decode";
+import { jwtDecoded } from "@/router";
+import axiosInstance from "../axiosconfig";
 
 const store = createStore({
   state: {
@@ -39,7 +42,7 @@ const store = createStore({
     getAllChannel: (state: any) => state.chat.all_channels,
     getMyChannel: (state: any) => state.chat.my_channels,
     getCurrentCahnnel: (state: any) => state.chat.current_channel,
-	getCurrentFriend: (state: any) => state.chat.current_friend,
+    getCurrentFriend: (state: any) => state.chat.current_friend,
     getMyFriends: (state: any) => state.chat.my_friends,
     getMyBlocked: (state: any) => state.chat.my_blocked,
 
@@ -74,9 +77,9 @@ const store = createStore({
     setMyFriends(state: any, my_frnds: any) {
       state.chat.my_friends = my_frnds;
     },
-	setCurrentFriend(state: any, cur_frnd: any) {
-		state.chat.current_friend = cur_frnd;
-	},
+    setCurrentFriend(state: any, cur_frnd: any) {
+      state.chat.current_friend = cur_frnd;
+    },
     setMyBlocked(state: any, my_blckd: string[]) {
       state.chat.my_blocked = my_blckd;
     },
@@ -130,14 +133,10 @@ const store = createStore({
     // axios requests to database / backend
     fetchUserData(context: any) {
       console.log("inside fetch user data");
-      axios
-        .get(process.env.VUE_APP_BACKEND_URL + "/auth/me", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        })
+      axiosInstance
+        .get(process.env.VUE_APP_BACKEND_URL + "/auth/me")
         .then((response) => {
-          console.log("response data: ", response.data);
+          console.log("response dataaaaa: ", response.data);
           store.commit("setId", response.data.id);
           store.commit("setDisplayName", response.data.fullname);
           store.commit("setUserName", response.data.userName);
@@ -146,6 +145,14 @@ const store = createStore({
           store.commit("setWins", response.data.wins);
           store.commit("setLoses", response.data.loses);
           store.commit("setRank", response.data.points);
+          localStorage.setItem(
+            "Is2FAEnabled",
+            response.data.is2FAEnabled.toString(),
+          );
+          console.log(
+            "the is2fa in fetchuser: ",
+            response.data.is2FAEnabled.toString(),
+          );
           //   store.commit("setAchievments", response.data.achievments);
           //   store.commit("setAuthenticated", true);
           // router.push("/home");
@@ -156,7 +163,7 @@ const store = createStore({
         });
     },
     async fetchAllChan(context: any) {
-      const resp = await axios.get(
+      const resp = await axiosInstance.get(
         process.env.VUE_APP_BACKEND_URL + "/chat/all_channels",
       );
       const all_chan = resp.data;
@@ -167,12 +174,8 @@ const store = createStore({
     },
     async fetchMyChan(context: any) {
       console.log("inside fetch my chan");
-      const resp = await axios
-        .get(process.env.VUE_APP_BACKEND_URL + "/users/my/channels", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        })
+      const resp = await axiosInstance
+        .get(process.env.VUE_APP_BACKEND_URL + "/users/my/channels")
         .then((resp: AxiosResponse<IChannel[]>) => {
           const my_channels = resp.data;
           context.commit("setMyChannel", my_channels);
@@ -183,12 +186,9 @@ const store = createStore({
     },
     async fetchCurrentChan(context: any) {
       const cur = localStorage.getItem("currentChanName");
-      await axios
+      await axiosInstance
         .get(process.env.VUE_APP_BACKEND_URL + `/chat/current_chan/${cur}`, {
           params: { chan_name: cur },
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
         })
         .then((resp: AxiosResponse) => {
           context.commit("setCurrentChannel", resp.data);
@@ -198,12 +198,8 @@ const store = createStore({
         });
     },
     async fetchMyFriends(context: any) {
-      await axios
-        .get(process.env.VUE_APP_BACKEND_URL + "/users/my/friends", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        })
+      await axiosInstance
+        .get(process.env.VUE_APP_BACKEND_URL + "/users/my/friends")
         .then((resp: AxiosResponse) => {
           context.commit("setMyFriends", resp.data);
         })
@@ -212,12 +208,8 @@ const store = createStore({
         });
     },
     async fetchMyBlocked(context: any) {
-      await axios
-        .get(process.env.VUE_APP_BACKEND_URL + "/users/my/blocked", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        })
+      await axiosInstance
+        .get(process.env.VUE_APP_BACKEND_URL + "/users/my/blocked")
         .then((resp: AxiosResponse) => {
           context.commit("setMyBlocked", resp.data);
         })
@@ -226,12 +218,8 @@ const store = createStore({
         });
     },
     async fetchAchievements(context: any) {
-      return axios
-        .get(process.env.VUE_APP_BACKEND_URL + "/users/achievements", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        })
+      return axiosInstance
+        .get(process.env.VUE_APP_BACKEND_URL + "/users/achievements")
         .then((resp: AxiosResponse) => {
           context.commit("setAchievements", resp.data);
           console.log("achievements: ", store.getters.getAchievements);
@@ -241,12 +229,8 @@ const store = createStore({
         });
     },
     async fetchMatches(context: any) {
-      await axios
-        .get(process.env.VUE_APP_BACKEND_URL + "/matches/my/matches", {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        })
+      await axiosInstance
+        .get(process.env.VUE_APP_BACKEND_URL + "/matches/my/matches")
         .then((resp: AxiosResponse) => {
           context.commit("setMatches", resp.data);
         })
@@ -255,81 +239,80 @@ const store = createStore({
         });
       console.log("matches: ", store.getters.getMatches);
     },
+    // async fetchWins(context: any) {
+    // 	await axiosInstance
+    // }
 
-    async fetchFriendChan(context: any){
-    	const cur = localStorage.getItem('CurrentFriend');
-    	await axios.get(process.env.VUE_APP_BACKEND_URL + `/chat/current_frndchan/${cur}`, {
-    		headers: {
-    			Authorization: `Bearer ${localStorage.getItem('token')}`,
-    		},
-    	}).then((resp: AxiosResponse<IChannel[]>) => {
-    		console.log("the resp data in ffc: ", resp.data);
-    		context.commit('setCurrentFriend', resp.data);
-    	}).catch((error) => {
-    		console.error("Error fetching current channel:", error);
-    	});
+    async fetchFriendChan(context: any) {
+      const cur = localStorage.getItem("CurrentFriend");
+      await axiosInstance
+        .get(process.env.VUE_APP_BACKEND_URL + `/chat/current_frndchan/${cur}`)
+        .then((resp: AxiosResponse<IChannel[]>) => {
+          console.log("the resp data in ffc: ", resp.data);
+          context.commit("setCurrentFriend", resp.data);
+        })
+        .catch((error) => {
+          console.error("Error fetching current channel:", error);
+        });
+    },
+    async disabl2FA(context: any) {
+      try {
+        const response = await axiosInstance.get(
+          process.env.VUE_APP_BACKEND_URL + "/auth/2fa/disable",
+        );
+        localStorage.setItem("Is2FAEnabled", "false");
+      } catch (error) {
+        console.error("Error:", error);
+      }
     },
     async TwoFA(context: any) {
       try {
-        const response = await axios.get(
+        const response = await axiosInstance.get(
           process.env.VUE_APP_BACKEND_URL + "/auth/2fa/generate",
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          },
         );
+        // console.log("response 2fa: ", response.data);
         // console.log(response.data.qrCodeDataURL);
         localStorage.setItem("qr", response.data.qrCodeDataURL);
       } catch (error) {
         // Handle errors here
+
         console.error("Error:", error);
       }
     },
     async ValidateTwoFA(context: any) {
       const code = localStorage.getItem("2FACode");
       console.log("reached the store to send verification store");
-      await axios
-        .get(
-          process.env.VUE_APP_BACKEND_URL + `/auth/2fa/authenticate/${code}`,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          },
-        )
-        .then((resp: AxiosResponse) => {
-          // if (resp)
-          console.log(resp.data);
-        })
-        .catch((error) => {
-          console.error("Error fetching current channel:", error);
-        });
-    },
-    async enabl2FA(context: any) {
       try {
-        const response = await axios.get(
-          process.env.VUE_APP_BACKEND_URL + "/auth/2fa/enable",
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          },
+        const response = await axiosInstance.get(
+          process.env.VUE_APP_BACKEND_URL + `/auth/2fa/authenticate/${code}`,
         );
+        if (response.data) {
+          localStorage.setItem("Is2FAEnabled", "false");
+          localStorage.setItem("Is2FAVerified", "true");
+          router.push("/home");
+        }
       } catch (error) {
         console.error("Error:", error);
       }
     },
-    async disabl2FA(context: any) {
+    async enabl2FA(context: any) {
       try {
-        const response = await axios.get(
-          process.env.VUE_APP_BACKEND_URL + "/auth/2fa/disable",
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          },
+        const response = await axiosInstance.get(
+          process.env.VUE_APP_BACKEND_URL + "/auth/2fa/enable",
         );
+        const token = localStorage.getItem("token");
+        if (token) {
+          try {
+            const decoded = jwtDecode<jwtDecoded>(token);
+            localStorage.setItem(
+              "Is2FAEnabled",
+              decoded.Is2FAEnabled.toString(),
+            );
+          } catch (error) {
+            console.error("Error:", error);
+          }
+          //   router.push("/home");
+        }
       } catch (error) {
         console.error("Error:", error);
       }

@@ -10,8 +10,17 @@ import "primevue/resources/themes/saga-blue/theme.css"; // theme
 import "primevue/resources/primevue.min.css"; // core css
 import "primeicons/primeicons.css";
 
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { faPersonRunning } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+
+
+library.add(faPersonRunning)
+
 const app = createApp(App);
 
+
+app.component('font-awesome-icon', FontAwesomeIcon)
 app.use(store);
 app.use(router);
 app.use(PrimeVue);

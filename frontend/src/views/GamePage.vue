@@ -1,64 +1,416 @@
 <template>
-	  <canvas ref="game" id="pong"></canvas>
-      <button @click="startGame">Start Game</button>    
+    <div class="game-container" v-if="isGameSelectVisible">
+            <GameSelect @updateGameMode="handleGameModeUpdate" @updateGameType="handleGameTypeUpdate"/>
+    </div>
+    <div class="loading-container" v-if="isOnlineGame">
+            <LoadingComponent @leave-queue="handleLeave"></LoadingComponent>
+    </div>
+	<div class="conta-count" v-if="gameCountdown > 0">
+		<div>
+			Game starts in
+		</div>
+		<div >
+			{{ gameCountdown }}
+		</div>
+    </div>
+    <div class="canvas-container" v-show="isCanvasVisible">
+		<div class="score" >
+			<div class="left-side">
+				<div class="login">
+					{{ LoginPlayer1 }}
+				</div>
+				{{ leftPlayerScore }}
+			</div>
+			<font-awesome-icon icon="fa-solid fa-person-running" class="cursor-pointer"  @click="handleEventExit"/>
+			<div class="right-side">
+				<div class="login">
+					{{ LoginPlayer2 }}
+				</div>
+				{{ rightPlayerScore }}
+			</div>
+		</div>
+        <canvas width="900" height="600" ref="pongCanvas" id="pong"></canvas>
+    </div>
+	<Result v-if="winnerCompo" :winner="winnerLogin" class="winner">
+	</Result>
+    <!-- <LoadingComponent v-if="isOnlineGame"></LoadingComponent> -->
 </template>
-  
+
+
 <script lang="ts" setup>
-    import { ref, onMounted,getCurrentInstance, reactive} from 'vue';
-    const { appContext } = getCurrentInstance();
-    const socket = appContext.config.globalProperties.$socket;
-    const game = ref<HTMLCanvasElement | null>(null);
-    const startGame = () => {
-        if (socket) {
-            socket.emit('start-game', 'This izs from the client to the server game');
+import { ref, onMounted , getCurrentInstance, onBeforeUnmount, reactive} from 'vue';
+import WebSocketPlugin from '@/plugins/websocket-plugin';
+import GameSelect from '@/components/GameSelect.vue';
+import LoadingComponent from '@/components/LoadingComponent.vue';
+import Result from '@/components/Result.vue'
+
+import { Socket } from 'socket.io-client';
+import { faL } from '@fortawesome/free-solid-svg-icons';
+
+    const isOnlineGame = ref<Boolean | false>(false);
+    const rightPlayerScore = ref<number | 0>(0);
+    const leftPlayerScore = ref<number | 0>(0);
+    const winnerCompo = ref<boolean | false>(false);
+	const LoginPlayer1 = ref<string | null>(null)
+	const color_map = ref<string | null>(null);
+	const LoginPlayer2 = ref<string | null>(null)
+	const isGameSelectVisible = ref(true);
+	const gameCountdown = ref(0);
+	const isCanvasVisible = ref(false); 
+    const winnerLogin = ref<string | null>(null);
+    const pongCanvas =  ref<HTMLCanvasElement | null>(null);
+	let socket: Socket;
+    // color_map.value = "white";
+
+    function handleLeave(isOnline:Boolean) {
+		if (isOnline)
+		{
+			isOnlineGame.value = false;
+			isGameSelectVisible.value = true;
+            socket.emit('leave-queue');
+		}
+    }
+
+    function handleGameModeUpdate(isOnline:Boolean) {
+        console.log("this is the value ",isOnline);
+        isOnlineGame.value = isOnline;
+        isGameSelectVisible.value = false;
+    }
+
+    function handleGameTypeUpdate(isOnline:Boolean) {
+        if (isOnline)
+        {
+            color_map.value = "#200E3A";
+            console.log("from insde the ggame type");
+        }
+    }
+
+
+	interface Paddle { 
+		x: number,
+		y: number,
+		width:number,
+		height:number,
+		speed: number,
+		color: string
+		// Add other player properties here
+	}
+	interface Player {
+		score: number;
+		login: string;
+		paddle: Paddle,
+		game_type:string,
+		status: string,
+		// Add other player properties here
+	}
+	interface GameData {
+		players: Player[];
+		ball: {
+			x:number,
+			y:number,
+			dx:number,
+			dy:number,
+			radius:number,
+			color:string,
+		};
+	}
+    
+    const keys: { [key: string]: boolean } = {
+        ArrowUp: false,
+        ArrowDown: false,
+    }
+
+	const currentGameData = reactive<GameData>({
+		players: [
+			{ score: 0, login: '', game_type: '', status:'' ,paddle: { x: 0, y: 0, width: 0, height: 0, color: '', speed: 0 } },
+			{ score: 0, login: '', game_type: '', status:'' ,paddle: { x: 0, y: 0, width: 0, height: 0, color: '', speed: 0 } },
+		],
+		ball: { x: 0, y: 0, dx: 0, dy: 0, radius: 0, color: '' }
+	});
+    const handleEventExit = () => {
+        socket.emit('route-leave', 2);
+    };
+	const handleKeyDown = (event: any) => {
+        console.log(event);
+			if (event.key === 'ArrowUp' || event.key === "ArrowUp") {
+				// Move left paddle up
+				// socket.emit('paddleMove','up');
+                keys[event.key] = true;
+                console.log("arrowUp set true");
+			} else if (event.key === 'ArrowDown' || event.key === "ArrowDown") {
+				// Move left paddle down
+				// socket.emit('paddleMove','down');
+                keys[event.key] = true;
+                console.log("arrowDown set true");
+			}
+	};
+
+    const handleKeyUp = (event: any) => {
+        console.log(event);
+			if (event.key === 'ArrowUp' || event.key === "ArrowUp") {
+				// Move left paddle up
+				// socket.emit('paddleMove','up');
+                keys[event.key] = false;
+                console.log("arrowUp set false.");
+			} else if (event.key === 'ArrowDown' || event.key === "ArrowDown") {
+				// Move left paddle down
+				// socket.emit('paddleMove','down');
+                keys[event.key] = false;
+			}
+	};
+	// Function to add the event listener
+const addEventListener = () => {
+    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('keyup', handleKeyUp);
+};
+
+// Function to remove the event listener
+const removeEventListener = () => {
+    document.removeEventListener('keydown', handleKeyDown);
+};
+	function calculateGameElementPositions(canvas: HTMLCanvasElement, gameData: GameData) {
+    const leftPaddle = gameData.players[0].paddle;
+    const rightPaddle = gameData.players[1].paddle;
+    const ball = gameData.ball;
+    leftPlayerScore.value = gameData.players[0].score;
+    rightPlayerScore.value = gameData.players[1].score;
+    LoginPlayer1.value = gameData.players[0].login;
+    LoginPlayer2.value = gameData.players[1].login;
+
+    // console.log("this is the player1", gameData.players[0].login)
+    // console.log("this is the player2", gameData.players[1].login)
+    return {
+        leftPaddle: {
+            x: leftPaddle.x * canvas.width,
+            y: leftPaddle.y * canvas.height,
+            width: leftPaddle.width * canvas.width,
+            height: leftPaddle.height * canvas.height
+        },
+        rightPaddle: {
+            x: (rightPaddle.x * canvas.width) - (rightPaddle.width * canvas.width),
+            y: rightPaddle.y * canvas.height,
+            width: rightPaddle.width * canvas.width,
+            height: rightPaddle.height * canvas.height
+        },
+        ball: {
+            x: ball.x * canvas.width - ball.radius,
+            y: ball.y * canvas.height - ball.radius,
+            radius: ball.radius * Math.min(canvas.width, canvas.height)
         }
     };
+}
 
+	const drawRect = (ctx: any, x:number, y:number, width:number, height:number, color:string) => {
+		ctx.fillStyle = color;
+		ctx.fillRect(x, y, width, height);
+	};
+
+	const drawCircle = (ctx: any, x:number, y:number, radius:number, color:string) => {
+		ctx.fillStyle = color;
+		ctx.beginPath();
+		ctx.arc(x, y, radius, 0, Math.PI * 2, false);
+		ctx.closePath();
+		ctx.fill();
+	};
+	let animationFrameId : any;
+
+// document.addEventListener('keydown', handleKeyDown);
     onMounted(() => {
-            if (socket) {
-                socket.on('table', (message: any[]) => {
-            if (game.value)
-            {
-                const context = game.value.getContext('2d');
-                game.value.width = message[0];
-                game.value.height = message[1];
-                if (context) {
-					context.fillStyle = 'red';
-                    // context
-                    context.fillRect(0,0,game.value.width,game.value.height)
-                }
-            }
-        });
+		addEventListener()
+		const instance = getCurrentInstance();
+        const canvas = pongCanvas.value;
+		if (canvas)
+		{
+			const ctx = canvas.getContext('2d');
+			if (ctx)
+			{
+				const render = () => { 
+						if (ctx && pongCanvas.value)
+                        {
+							ctx.clearRect(0, 0, pongCanvas.value.width, pongCanvas.value.height);
+
+							drawRect(ctx, 0, 0, pongCanvas.value.width, pongCanvas.value.height, color_map.value || "white");
+							// Calculate positions
+							const positions = calculateGameElementPositions(pongCanvas.value, currentGameData);
+
+							// Draw left paddle
+							drawRect(ctx, positions.leftPaddle.x, positions.leftPaddle.y, positions.leftPaddle.width, positions.leftPaddle.height,  currentGameData.players[0].paddle.color);
+
+							// Draw right paddle
+							drawRect(ctx, positions.rightPaddle.x, positions.rightPaddle.y, positions.rightPaddle.width, positions.rightPaddle.height, currentGameData.players[1].paddle.color);
+
+							// Draw ball
+							drawCircle(ctx, positions.ball.x, positions.ball.y, positions.ball.radius, currentGameData.ball.color);
+                        }
+                    }
+					const game = () => {
+							calculateGameElementPositions(canvas,currentGameData);
+                            render();
+                            animationFrameId = requestAnimationFrame(game);
+                        };
+                        requestAnimationFrame(game);
+			}
+		}
+		// document.addEventListener('keydown', handleKeyDown);
+        if (instance?.proxy)
+        {
+             socket = instance.proxy.$socket.socket;
+             if (socket)
+             {
+                 socket.on('game-data', (data: GameData) => {
+                    //  console.log("this is data ", data);
+                     Object.assign(currentGameData, data);
+                     movePaddle();
+             });
+                 socket.on('game-over', (payload:any) => {
+                     winnerCompo.value = true;
+                     winnerLogin.value = payload.login;
+                     isCanvasVisible.value = false;
+             });
+             socket.on('game-count', (data: any) => {
+                     gameCountdown.value = data;
+                     isGameSelectVisible.value = false;
+                     isOnlineGame.value = false;
+                     if (gameCountdown.value <= 0 )
+                     {
+                         isCanvasVisible.value = true;
+                     }
+             });
+             }
+    }
+    });
+
+	import store  from '@/store';
+	
+	onBeforeUnmount(() => {
+		removeEventListener();
+		cancelAnimationFrame(animationFrameId);
+		console.log("this is call for before onmounted ");
+        socket.emit('route-leave');
+
+		// socket.on('game-over', (payload: any) => {
+		// 	winnerCompo.value = true;
+		// 	winnerLogin.value = payload.login;
+		// 	isCanvasVisible.value = false;
+		// });
+		socket.off('game-data');
+		socket.off('game-count');
+		socket.off('game-over');
+		// store.dispatch("fetchUserData");
+		// store.dispatch("fetchMatches");
+		// store.dispatch("fetchAchievements");
+	});
+
+    const movePaddle = () => {
+        console.log("Test");
+        console.log(keys);
+        if (keys.ArrowUp) {
+            console.log("Test2");
+            socket.emit('paddleMove','up');
+        } else if (keys.ArrowDown) {
+            socket.emit('paddleMove','down');
         }
-    }); 
+    }
 </script>
 
-   
-  
 <style>
-
+body {
+	height: 100vh;
+}
+ /* #pong {
+ padding: 10%;
+ display: flex;
+ justify-content: center;
+ align-items: center;
+ align-self: center;
+ align-content: center;
+} */
+.canvas-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center; 
+  align-items: center; 
+  width: 100%;
+}
+/* .canvas-container {
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+} */
+.winner {
+	z-index: 3;
+}
+.canvas-container  .score{
+	display: flex;
+	width: 30%;
+	height: 30%;
+	padding: 10px;
+	justify-content: space-around;
+	align-items: center;
+	background-color: #650580;
+	margin-top: 15px;
+	color: white;
+	margin-bottom: 15px;
+}
+.left-side, .right-side {
+	display: flex;
+    flex-direction: column;
+    align-items: center;
+	/* justify-content: center; */
+}
+.conta-count {
+	display: flex;
+	flex-direction: column;
+	background-color: transparent;
+	font-size: 5rem;
+	justify-content: center;
+	align-items: center;
+	margin: 90px auto;
+	width: 50%;
+	height: 50vh;
+}
   .game-container {
 	/* width: fit-content; */
     display: flex;
+    flex-direction: column;
     justify-content: center;
+    align-items: center;
 	background: linear-gradient(to right, #451952, #451952, #ae4188);
-	box-shadow: 0 4px 4px rgba(0, 0, 0, 0.5);
-	margin: 20px;
+  	box-shadow: 0 4px 4px rgba(0, 0, 0, 0.5); 
+	margin-top: 5%;
 	padding: 20px;
+	padding-bottom: 50px;
+	padding-top: 50px;
 	border-radius: 5px;
 	width: 100%;
-	height: 100%;
 	color: white;
 }
+.loading-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(to right, #451952, #451952, #ae4188);
+        box-shadow: 0 4px 4px rgba(0, 0, 0, 0.5); 
+      margin-top: 5%;
+      padding: 20px;
+      padding-bottom: 50px;
+      padding-top: 50px;
+      border-radius: 5px;
+      width: 100%;
+      height: 50vh;
+      color: white;
 
-.game-canvas {
-	display: flex;
-	justify-content: center;
-	padding: 0;
-	width: 100%;
-	margin: 0;
-	text-align: center;
-}
+  }
+  .game {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    margin-left: 35rem;
+    margin-top: 10rem;
+  }
 </style>
   
   
@@ -76,11 +428,7 @@
   
   
 
-  <!-- <template>
-	<div class="game-container">
-	  <canvas ref="canvas" id="pong" width="900" height="400"></canvas>
-	</div>
-  </template>
+  <!--
   
   <script setup lang="ts">
   import { ref, onMounted } from "vue";

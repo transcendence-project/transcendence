@@ -16,10 +16,7 @@
 			  />
 			</div>
 			<div v-if="avail">
-			  <StatusUser :isFriend="true" class="mt-12" />
-			</div>
-			<div v-else>
-			  <StatusUser :isFriend="false" class="mt-12" />
+			  <StatusUser :isFriend="avail" class="mt-12" />
 			</div>
 			<div>
 			  <p class="mt-[40px] ml-[20px]">{{ fullname }}</p>
@@ -44,11 +41,10 @@
 		  </div>
 		  <div class="bg-gradient-to-r from-[#ae445a] to-[#451952] shadow-third flex flex-col justify-center w-[45%] p-[10px] text-center rounded">
 			<h3 class="text-xl">Achievements</h3>
-	  		  <div v-for="achievement in allAchievements" :key="achievement.id" class="shadow-third flex align-center justify-between mb-[5px] px-[50px] pb-[10px] pt-[5px] rounded">
-	    		<div>{{ achievement.title }}</div>
-	    		<div v-if="achievements.some(a => a.id === achievement.id)">🏆</div>
-	    		<div v-else>&nbsp;</div>
-	  			</div>
+	    		<div v-for="achievement in achievements" :key="achievement.id" class="shadow-third flex align-center justify-between mb-[5px] px-[50px] pb-[10px] pt-[5px] rounded">
+	      			<div>{{ achievement.title }}</div>
+	      		<div>🏆</div>
+	    		</div>
 		  </div>
 		</div>
 		<div
@@ -67,62 +63,57 @@
   </template>
   
   <script lang="ts" setup>
-  import { ref, onMounted, computed } from "vue";
+  import { ref, onMounted, computed, getCurrentInstance } from "vue";
   import StatusUser from "@/components/StatusUser.vue";
   import axios from "axios";
   import store from "@/store";
-  import { getCurrentInstance } from 'vue';
-  
-  
-//   interface Match {
-// 	id: number;
-// 	winnerId: number;
-// 	loserId: number;
-// 	winnerScore: number;
-// 	loserScore: number;
-//   }
+  import { useWebSocket } from "@/plugins/websocket-plugin";
+  const { socket } = useWebSocket();
 
-const allAchievements = [
-	{id: 1, title: "First Match"},
-	{id: 2, title: "First Win"},
-	{id: 3, title: "Played 3 Matches"},
-  ];
-  
-  onMounted(async () => {
+onMounted(async () => {
+	const instance = getCurrentInstance();
 	const accessToken = localStorage.getItem("token");
-	 const instance = getCurrentInstance();
-	 if (accessToken) {
-		 //   router.push("/");
-		 console.log("token is: ", accessToken);
-		 store.dispatch("fetchUserData");
-		 store.dispatch("fetchMatches");
-		 await store.dispatch("fetchAchievements");
+    socket.socket?.on('multi-login', () => {
+		console.log("this is from the multi-login");
+        instance?.proxy?.$toast.add({
+			severity: "error",
+			summary: "Cannot Connect to Game",
+			detail: `User already logged in another session.`,
+			life: 3000,
+        });
+    });
+	socket.socket?.on('game-over', (data: string) => {
+		store.dispatch("fetchUserData");
+		store.dispatch("fetchMatches");
+		store.dispatch("fetchAchievements");
+	});
+
+	if (accessToken) {
+		store.dispatch("fetchUserData");
+  		store.dispatch("fetchMatches");
+  		store.dispatch("fetchAchievements");
+		
 		 const response = await axios.get(process.env.VUE_APP_BACKEND_URL + "/users/check-is-first-login", {
-		headers: {
-				Authorization: `Bearer ${localStorage.getItem("token")}`,
-			},
-		});
-		if (response.data.isFirstLogin) {
-			if (instance && instance.proxy.$toast) {
-				instance.proxy.$toast.add({ severity: 'info', summary: 'Update Profile', detail: 'Be sure to update your profile!', life: 5000 });
+		  headers: {
+			  		Authorization: `Bearer ${localStorage.getItem("token")}`,
+			  	},
+			  });
+			  if (response.data.isFirstLogin) {
+				  	if (instance && instance.proxy?.$toast) {
+					  		instance.proxy.$toast.add({ severity: 'info', summary: 'Update Profile', detail: 'Be sure to update your profile!', life: 5000 });
 			}
-	  	}
-	  console.log("Achievements in home: ", store.getters.getAchievements);
+		}
 	}
   });
   
   const data = ref(null);
   const fullname = computed(() => store.getters.getDisplayName);
   const userimage = computed(() => {
-	//   const backend = "http://localhost:3000";
 	const image = store.getters.getImage;
 	console.log(`the image is: ${image}`);
 	return image;
   });
-  // const userimage = computed(() => store.getters.getImage);
   
-  // const imgname = ref("head.svg");
-  // const imgname = computed(() => store.getters.getImage);
   const win = computed(() => store.getters.getWin);
   const lose = computed(() => store.getters.getLose);
   const draw = computed(() => store.getters.getDraw);
@@ -130,11 +121,6 @@ const allAchievements = [
   const match = computed(() => store.getters.getMatches);
   const achievements = computed(() => store.getters.getAchievements || []);
   const avail = ref(true);
-  
-//   const firstmatch = computed(() => store.getters.getFirstMatch);
-//   const firstwin = computed(() => store.getters.getFirstWin);
-//   const played3matches = computed(() => store.getters.getPlayed3Matches);
-  
   
   </script>
   

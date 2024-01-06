@@ -1,5 +1,14 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 import store from "@/store";
+// Import the WebSocket plugin's connect method
+import { useWebSocket } from "@/plugins/websocket-plugin";
+
+import { jwtDecode } from "jwt-decode";
+export interface jwtDecoded {
+  sub: number;
+  username: string;
+  Is2FAEnabled: boolean;
+}
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -27,7 +36,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: "/users/:username",
     name: "users",
-    alias: "/users",
+    // alias: "/users",
     component: () =>
       import(/* webpackChunkName: "home" */ "../views/UserProfile.vue"),
     meta: {
@@ -116,9 +125,22 @@ const router = createRouter({
 });
 
 router.beforeEach((to: any, from: any, next: any) => {
+  // Check if the user has a token and if the WebSocket is not connected
+  const { connectSocket, socket } = useWebSocket();
   const isauth = localStorage.getItem("token");
+  const is2fa = localStorage.getItem("Is2FAEnabled") == "true";
+  const is2FAVerified = localStorage.getItem("Is2FAVerified") == "true";
+  if (isauth && !socket.socket) {
+    // Establish the WebSocket connection
+    connectSocket();
+  }
   if (!isauth && to.path != "/login" && !to.query.code) {
     next("/login");
+    return;
+  }
+  if (isauth && is2fa && !is2FAVerified && to.path != "/twofactor") {
+    console.log("force 2fa: ", is2fa, is2FAVerified);
+    next("/twofactor");
     return;
   }
 
@@ -144,15 +166,23 @@ router.beforeEach((to: any, from: any, next: any) => {
   }
   if (to.path == "/home" && to.query.code) {
     const token = to.query.code;
+    console.log("home route, the token is: ", token);
     localStorage.setItem("token", token);
     store.dispatch("fetchUserData");
+    const { connectSocket } = useWebSocket();
+    connectSocket();
     next();
     return;
   }
   if (to.path == "/twofactor" && to.query.code) {
+    console.log("twofactor route");
     const token = to.query.code;
     localStorage.setItem("token", token);
+    // localStorage.setItem("2fa", "true");
     store.dispatch("fetchUserData");
+    next();
+    return;
+    // store.dispatch("fetchUserData");
   }
   next();
 });

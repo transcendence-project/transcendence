@@ -276,14 +276,22 @@ export default defineComponent({
 
     async acceptFriendRequest(selectedUser: any) {
       try {
+		// console.log("token in acceptFriendRequest: ", localStorage.getItem("token"));
         const response = await axios.patch(
-          process.env.VUE_APP_BACKEND_URL + `/friend-requests/accept/${selectedUser}`,
+          process.env.VUE_APP_BACKEND_URL + `/friend-requests/accept/${selectedUser}`, {}, 
+		  {
+			headers: {
+			  Authorization: `Bearer ${localStorage.getItem("token")}`,
+			},
+		  }
         );
 
         console.log("Friend request accepted:", response.data);
 		if (response.status === 200 && response.data) {
-			this.myFriendsList.push(response.data);
-			this.friendsNumber = this.myFriendsList.length;
+			console.log("selectedUser: ", selectedUser);
+			// this.myFriendsList.push(response.data);
+			// this.friendsNumber = this.myFriendsList.length;
+			this.myFriends();
 			this.friendRequests = this.friendRequests.filter((request: any) => request.id !== selectedUser);
 			this.requestNumber = this.friendRequests.length;
 		}
@@ -291,10 +299,16 @@ export default defineComponent({
         console.error("friend accept Error:", error);
       }
     },
+
     async rejectFriendRequest(selectedUser: any) {
       try {
         const response = await axios.patch(
-          process.env.VUE_APP_BACKEND_URL + `/friend-requests/${selectedUser}/reject`,
+          process.env.VUE_APP_BACKEND_URL + `/friend-requests/${selectedUser}/reject`, {},
+		  {
+			headers: {
+			  Authorization: `Bearer ${localStorage.getItem("token")}`,
+			},
+		  }
         );
 			this.friendRequests = this.friendRequests.filter((request: any) => request.id !== selectedUser);
 			this.requestNumber = this.friendRequests.length;
@@ -309,7 +323,11 @@ export default defineComponent({
     await this.viewFriendRequest();
     await this.myFriends();
     axios
-	.get(process.env.VUE_APP_BACKEND_URL + "/users")
+	.get(process.env.VUE_APP_BACKEND_URL + "/users", {
+		headers: {
+		Authorization: `Bearer ${localStorage.getItem("token")}`,
+		},
+	})
 	.then((resp: AxiosResponse<IStudent[]>) => {
 		this.student = resp.data;
 	})

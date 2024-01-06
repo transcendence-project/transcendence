@@ -1,4 +1,14 @@
 <template>
+    <Dialog v-model:visible="invitationModalVisible" header="Game Invitation" class="dialog-container" @hide="handleDialogClose">
+        <p>You have been invited to a game by {{ inviterName }}.</p>
+        <div class="progress-container">
+            <div class="progress-bar" :style="{ width: progressBarWidth + '%' }"></div>
+        </div>
+        <template #footer>
+        <Button class="dialog-button" label="Accept" @click="acceptInvitation" />
+        <!-- <Button class="dialog-button" label="Reject" @click="rejectInvitation" /> -->
+        </template>
+    </Dialog>
 	<div
 	  class="prof_page flex flex-wrap justify-between bg-gradient-to-r from-[#451952] via-[#451952] to-[#ae4188] shadow-custom text-white w-full min-h-[85.9vh] m-5 rounded-md p-2.5 text-center"
 	>
@@ -380,10 +390,18 @@
   import io from "socket.io-client";
   import store from "@/store";
   import { IChannel } from "@/models/channel";
-  
+  import { useWebSocket } from "@/plugins/websocket-plugin";
+  import Dialog from "primevue/dialog";
+  import Button from 'primevue/button';
+import { fas } from "@fortawesome/free-solid-svg-icons";
+import { numberLiteralTypeAnnotation } from "@babel/types";
+
+  const { socket } = useWebSocket();
   const chan = ref([] as IChannel[]);
   const m_chan = ref([] as IChannel[]);
   const m_frnd = ref([] as FriendsList[]);
+//   const progressBarWidth = ref(100); // Start at 100%
+    let countdown:any;
   interface FriendsList {
 	user: string;
 	status: Boolean;
@@ -393,6 +411,8 @@
   export default defineComponent({
 	data() {
 	  return {
+        invitationModalVisible: false,
+      inviterName: '',
 		channels: chan,
 		my_chan: m_chan,
 		src_friend: "" as string,
@@ -419,6 +439,9 @@
   
 		isChangePassword: false,
 		friends: m_frnd,
+        dialog: false,
+        invitationAccepted: false,
+        progressBarWidth: 100,
     };
   },
   setup() {
@@ -503,6 +526,8 @@
 	  AddMember,
 	  ChangePassword,
 	  ProfilePage,
+      Dialog,
+      Button
 	},
 	computed: {
 	  searchFriends(): FriendsList[] {
@@ -553,6 +578,53 @@
 			this.$router.push({name: 'users', params: { username: selectedUser}})
 		},
 	  // showProfilePage(index: any)
+      handleEvent() {
+      // Event handling logic
+      // ...
+
+      // Navigate to another page
+      this.$router.push({ name: 'game' });
+    },
+      showInvitationModal(inviter:string) {
+      this.inviterName = inviter;
+      this.invitationModalVisible = true;
+      this.progressBarWidth = 100;
+      this.startCountdown();
+    },
+    startCountdown() {
+      const duration = 10; // Duration in seconds
+      const interval = 1000; // Update interval in milliseconds
+      const step = 100 / duration;
+
+       countdown = setInterval(() => {
+        this.progressBarWidth -= step;
+        if (this.progressBarWidth <= 0) {
+          clearInterval(countdown);
+          this.handleDialogClose();
+        }
+      }, interval);
+    },
+    acceptInvitation() {
+        this.invitationAccepted = true;
+      this.invitationModalVisible = false;
+      socket.socket?.emit('response-status', true);
+      console.log("accept ");
+    },
+    rejectInvitation() {
+      this.invitationModalVisible = false;
+      socket.socket?.emit('response-status', false);
+      console.log("rejected ")
+      // Handle rejection logic
+    },
+    handleDialogClose() {
+        if (!this.invitationAccepted) {
+        // Only reject if the invitation wasn't explicitly accepted
+        console.log("Dialog closed without explicit acceptance, considered as rejection.");
+        this.rejectInvitation();
+      }
+      // Reset the flag for future invitations
+      this.invitationAccepted = false;
+    },
 	  showProfilePage() {
 		this.isProfile = !this.isProfile;
 	  },
@@ -788,6 +860,40 @@
         },
       });
     }
+    socket.socket?.on("invite-status", (data:string) => {
+            this.showInvitationModal(data);
+    });
+    socket.socket?.on("error-status", (data:string) => {
+        const toast = this.$toast.add({
+            severity: "error",
+            summary: "Game Invitation",
+            detail: `You can not invite yourself.`,
+            life: 5000, // Toast will disappear after 5 seconds
+            closable: false // Prevent manual closing
+        });
+    });
+    socket.socket?.on("busy-invite", (data:string) => {
+            const toast = this.$toast.add({
+            severity: "warn",
+            summary: "Game Invitation",
+            detail: `This user is busy you can not invite him right now ${data}.`,
+            life: 5000, // Toast will disappear after 5 seconds
+            closable: false // Prevent manual closing
+            });
+    });
+    socket.socket?.on("offline-status", (data:string) => {
+            const toast = this.$toast.add({
+            severity: "warn",
+            summary: "Game Invitation",
+            detail: `${data} is offline you can not invite him.`,
+            life: 5000, // Toast will disappear after 5 seconds
+            closable: false // Prevent manual closing
+            });
+    });
+    socket.socket?.on("route-to-game", () =>{
+        this.handleEvent();
+        console.log("this is from the route-to-game");
+    });
     store.state.chat.socket.on("create_room_success", (data: any) => {
       console.log("Room created successfully and back in front end", data);
       if (data) {
@@ -906,15 +1012,48 @@
     this.listenForMuteEvents();
 	this.notify();
   },
+
+  unmounted() {
+    // Cleanup
+    this.rejectInvitation();
+    socket.socket?.off("invite-status");
+    socket.socket?.off("route-to-game");
+    socket.socket?.off("busy-invite");
+    socket.socket?.off("offline-status");
+    clearInterval(countdown);
+  }
 });
 </script>
 
 <style scoped>
+.progress-container {
+    width: 100%; /* Full width of the container */
+    background-color: #ddd; /* Background of the bar */
+    border-radius: 5px; /* Optional: for rounded corners */
+    margin-top: 10px; /* Spacing */
+}
+
+.progress-bar {
+    height: 10px; /* Height of the progress bar */
+    background-color: #4CAF50; /* Color of the progress bar */
+    border-radius: 5px; /* Optional: for rounded corners */
+    width: 100%; /* Initial width */
+}
+
 .main-cont {
   display: flex;
   flex-direction: column;
 }
+.dialog-container{
+  background-color: #451952 !important; /* Set your desired background color */
+  padding: 20px; /* Add padding inside the dialog */
+  border-radius: 10px; /* Optional: for rounded corners */
+}
 
+.dialog-button {
+  margin: 10px; /* Margin around buttons */
+  /* Further button styling */
+}
 .container {
   margin: 1%;
   flex: 1;

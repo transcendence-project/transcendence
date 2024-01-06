@@ -36,7 +36,7 @@
 
               <div v-if="selectedMemberIndex === index" class="my-2 opt">
                 <div v-if="friend.owner === true">
-                  <button class="intbtn p-2 mx-2">Invite</button>
+                  <button class="intbtn p-2 mx-2" @click="send_invite(friend.user)">Invite</button>
                 </div>
                 <div v-else-if="friend.admins === true">
                   <button class="intbtn p-2 mx-2">Invite</button>
@@ -54,7 +54,12 @@
                   </button>
                 </div>
                 <div v-else>
-                  <button class="intbtn p-2 mx- 2">Invite</button>
+                  <button 
+                  class="intbtn p-2 mx- 2"
+                  @click="send_invite(friend.user)"
+                  >
+                  Invite
+                </button>
                   <button
                     class="intbtn p-2 mx-2"
                     @click="make_admin(friend.user)"
@@ -90,9 +95,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed } from "vue";
+import { defineComponent, ref, computed, inject} from "vue";
 import store from "@/store";
+import { Socket } from "engine.io-client";
+import { useWebSocket } from "@/plugins/websocket-plugin";
 
+const { socket } = useWebSocket();
 interface FriendsList {
   user: string;
   owner: boolean;
@@ -113,6 +121,7 @@ export default defineComponent({
     };
   },
   setup() {
+    // const socket = inject('socket');
     const mem = async () => {
       await store.dispatch("fetchCurrentChan");
       const chan = computed(() => store.getters.getCurrentCahnnel);
@@ -163,6 +172,7 @@ export default defineComponent({
     store.state.chat.socket.off("update_mem_list");
     store.state.chat.socket.off("update_admin");
     store.state.chat.socket.off("not_admin");
+    socket.socket?.on
     store.state.chat.socket.on("update_mem_list", (data: any) => {
       if (data) {
         if (
@@ -257,6 +267,12 @@ export default defineComponent({
         room_name: localStorage.getItem("currentChanName"),
       });
     },
+    send_invite(member: string)
+    {
+        socket.socket?.emit('invite', member);
+        console.log(this.$socket);
+        console.log("this is the members ", member);
+    },
     mute_mem(member: string) {
       store.state.chat.socket.emit("mute_user", {
         user_to_mute: member,
@@ -279,26 +295,10 @@ export default defineComponent({
         });
       });
     },
-    // async showUserList() {
-    //   this.userList = [];
-    //   await store.dispatch("fetchCurrentChan");
-    //   const chan = computed(() => store.getters.getCurrentCahnnel);
-    //   const val = chan.value.members;
-    //   console.log(val);
-    //   val.forEach((item: any) => {
-    //     this.userList.push(item.userName);
-    //   });
-    // //   await this.displayMessage();
-    // },
-    // getUserList(channel: string): /* string[] */ {
-    //   const selectedChannel = this.channels.find(
-    //     (item: any) => item.channel === channel
-    //   );
-    //   return selectedChannel ? selectedChannel.user : [];
-    // },
   },
 });
 </script>
+
 <style scoped>
 .src-chn {
   position: absolute;

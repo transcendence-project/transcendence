@@ -1,5 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from "typeorm";
 import { User } from "./user.entity";
+import { Socket } from "dgram";
 
 @Entity()
 export class Match {
@@ -23,4 +24,6 @@ export class Match {
 
 	@Column()
 	winnerID: number
+
+    
 }

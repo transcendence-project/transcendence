@@ -1,12 +1,14 @@
 import { Logger } from '@nestjs/common';
-import { OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect ,SubscribeMessage, WebSocketGateway ,WebSocketServer, MessageBody, ConnectedSocket } from '@nestjs/websockets';
+import { OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect ,SubscribeMessage, WebSocketGateway ,WebSocketServer, MessageBody, ConnectedSocket , WsException} from '@nestjs/websockets';
 import { Socket, Server } from 'socket.io';
 import { GameService } from './game.service';
 import { UsersService } from '../users/users.service';
 import { ConfigService } from '@nestjs/config';
 
-const configService = new ConfigService();
+import { SocketService } from './socket.service'
+import { GameSelectDto } from './dto/game.dto';
 
+const configService = new ConfigService();
 @WebSocketGateway({
 	namespace: 'game',
 	cors: {
@@ -19,34 +21,97 @@ export class GameGateway
   implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect
 {
   @WebSocketServer()
- private server: Server;
+  server: Server;
+
   private readonly logger = new Logger("GameGateway");
+
   constructor(
     private readonly gameService: GameService,
     private readonly userService: UsersService,
+    private readonly socketService: SocketService,
   ) {}
-  afterInit(): void {
-    this.logger.log("WebSocket Gateay Game created");
+  afterInit(server : Server): void {
+    this.socketService.setServer(server);
   }
-  private clientCount = 0;
-  handleConnection(client: Socket, ...args: any[]) {
-    client.emit('connected', 'Successfully connected to the server');
-    console.log("Client connected");
+
+  async handleConnection(client: Socket, ...args: any[]) {
+      console.log("Connected Game Gatway");
+    const header = client.handshake.headers;
+
+    const token = header.token;
+    this.gameService.addConnectUser(client, token);
   }
 
   handleDisconnect(client: any) {
-    this.clientCount--;
-    console.log("Client disconnected");
-    client.emit('disconnected', this.clientCount);
+    console.log("Client Disconnected!");
+    this.gameService.removePlayer(client, 1);
+  }
+  
+  @SubscribeMessage('info')
+   handleInfoGame(@ConnectedSocket() client: Socket, @MessageBody() data: GameSelectDto ) {
+    console.log(data.gameMode);
+    if (data.gameMode === 'single')
+    {
+        this.gameService.creatSingleGame(client, data);
+    }
+    else if (data.gameMode === 'online')
+    {
+      this.gameService.onlineGame(client, data);
+    }
   }
 
-  @SubscribeMessage('start-game')
-  start_game(@ConnectedSocket() client: Socket,@MessageBody() payload: any): { event: string; data: number[] }
-  {
-      console.log("start-game working");
-    return {event:'table' ,data: this.gameService.init_table(client)};
+  @SubscribeMessage('leave-queue')
+   leaveQueue(@ConnectedSocket() client: Socket) {
+    this.gameService.removePlayerFromQueue(client);
   }
-inviteUser(client: Socket, receiver: string): void {
+
+  @SubscribeMessage('user-profile-status')
+   UserStatus(@ConnectedSocket() client: Socket, @MessageBody() status: string) {
+    console.log("this is the user profile name ", status);
+    this.gameService.getUserStatus(client, status);
+  }
+
+  @SubscribeMessage('route-leave')  
+   routeLeaver(@ConnectedSocket() client: Socket) {
+    console.log('the player is route away from the game page');
+    this.gameService.removePlayer(client, 2);
+  }
+  
+  @SubscribeMessage('paddleMove')
+  handlePaddleMove(@ConnectedSocket() client: Socket, @MessageBody() data: string) {
+    this.gameService.movePlayerPaddle(client, data);
+  }
+
+    // socketError(error: string) {
+    //     this.logger.error(error)
+    //     throw new WsException(error)
+    // }
+  @SubscribeMessage('invite')   
+  handleInvite(@ConnectedSocket() client: Socket, @MessageBody() data: string) {
+    // const playerId = client.id; // Or any other way you identify your player
+    // this.gameService.movePlayerPaddle(client, data);
+    const inviter = this.gameService.find_user_with_id(client);
+
+    if (inviter.user.userName === data)
+        client.emit('error-status');
+    else {
+        this.gameService.responeInvite(client, data);
+        console.log("from the game socket for invite")
+    }
+    // console.log("this is from the game socket and this is the user invite", data, inviter.user.userName);
+  }
+
+  @SubscribeMessage('response-status')   
+  handleInviteStatus(@ConnectedSocket() client: Socket, @MessageBody() data: Boolean) {
+    this.gameService.responeInviteStatus(client, data);
+  }
+
+  @SubscribeMessage('logout')   
+  handleLogout(@ConnectedSocket() client: Socket, @MessageBody() data: Boolean) {
+    this.gameService.removePlayer(client, 1);
+  }
+  
+  inviteUser(client: Socket, receiver: string): void {
     client.to(receiver).emit("invite", client.id);
   }
 
