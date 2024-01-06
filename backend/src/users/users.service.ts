@@ -198,22 +198,17 @@ export class UsersService {
         where: { id: userId },
         relations: ["achievements"],
     });
-    if (!user) {
-        throw new NotFoundException("User not found");
-    }
-    // Normalize the input achievement title for comparison
-    const normalizedInputTitle = achievementTitle.trim().toLowerCase();
-    // Check if the user already has the achievement
-    const alreadyHasAchievement = user.achievements.some(achievement => {
-        return achievement.title.trim().toLowerCase() === normalizedInputTitle;
-    });
-    if (alreadyHasAchievement) {
-        throw new ConflictException("Achievement already added");
-    }
-    const achievement = await this.seederService.getAchievementByTitle(achievementTitle);
-    if (!achievement) {
-        throw new NotFoundException("Achievement not found");
-    }
+    if (!user) throw new NotFoundException("User not found");
+    if (user.achievements.find((a) => a.title.toLowerCase().trim() == achievementTitle.toLowerCase().trim()))
+      throw new ConflictException("Achievement already added");
+    const achievement = await this.seederService.getAchievementByTitle(
+      achievementTitle,
+    );
+    if (!achievement) throw new NotFoundException("Achievement not found");
+    // console.log("in add achievement, achievement: ", achievement);
+    // console.log("in add achievement, user.achievements: ", user.achievements);
+    // console.log("in add achievement, user: ", user);
+	console.log('in add achievement: ', achievement);
     user.achievements.push(achievement);
     return await this.repo.save(user);
 }
