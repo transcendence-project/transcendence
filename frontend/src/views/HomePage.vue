@@ -18,9 +18,6 @@
 			<div v-if="avail">
 			  <StatusUser :isFriend="avail" class="mt-12" />
 			</div>
-			<!-- <div v-else>
-			  <StatusUser :isFriend="avail" class="mt-12" />
-			</div> -->
 			<div>
 			  <p class="mt-[40px] ml-[20px]">{{ fullname }}</p>
 			</div>
@@ -71,45 +68,41 @@
   import axios from "axios";
   import store from "@/store";
   import { useWebSocket } from "@/plugins/websocket-plugin";
-  
   const { socket } = useWebSocket();
-//   interface Match {
-// 	id: number;
-// 	winnerId: number;
-// 	loserId: number;
-// 	winnerScore: number;
-// 	loserScore: number;
-//   }
-  
-  onMounted(async () => {
-    const instance = getCurrentInstance();
+
+onMounted(async () => {
+	const instance = getCurrentInstance();
 	const accessToken = localStorage.getItem("token");
     socket.socket?.on('multi-login', () => {
-        console.log("this is from the multi-login");
+		console.log("this is from the multi-login");
         instance?.proxy?.$toast.add({
-          severity: "error",
-          summary: "Cannot Connect to Game",
-          detail: `User already logged in another session.`,
-          life: 3000,
+			severity: "error",
+			summary: "Cannot Connect to Game",
+			detail: `User already logged in another session.`,
+			life: 3000,
         });
     });
-	 if (accessToken) {
-		 //   router.push("/");
-		 console.log("token is: ", accessToken);
-		 store.dispatch("fetchUserData");
-		 store.dispatch("fetchMatches");
-		 await store.dispatch("fetchAchievements");
+	socket.socket?.on('game-over', (data: string) => {
+		store.dispatch("fetchUserData");
+		store.dispatch("fetchMatches");
+		store.dispatch("fetchAchievements");
+	});
+
+	if (accessToken) {
+		store.dispatch("fetchUserData");
+  		store.dispatch("fetchMatches");
+  		store.dispatch("fetchAchievements");
+		
 		 const response = await axios.get(process.env.VUE_APP_BACKEND_URL + "/users/check-is-first-login", {
-		headers: {
-				Authorization: `Bearer ${localStorage.getItem("token")}`,
-			},
-		});
-		if (response.data.isFirstLogin) {
-			if (instance && instance.proxy?.$toast) {
-				instance.proxy.$toast.add({ severity: 'info', summary: 'Update Profile', detail: 'Be sure to update your profile!', life: 5000 });
+		  headers: {
+			  		Authorization: `Bearer ${localStorage.getItem("token")}`,
+			  	},
+			  });
+			  if (response.data.isFirstLogin) {
+				  	if (instance && instance.proxy?.$toast) {
+					  		instance.proxy.$toast.add({ severity: 'info', summary: 'Update Profile', detail: 'Be sure to update your profile!', life: 5000 });
 			}
-	  	}
-	  console.log("Achievements in home: ", store.getters.getAchievements);
+		}
 	}
   });
   

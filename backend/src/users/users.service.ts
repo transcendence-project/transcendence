@@ -199,8 +199,8 @@ export class UsersService {
         relations: ["achievements"],
     });
     if (!user) throw new NotFoundException("User not found");
-    if (user.achievements.find((a) => a.title.toLowerCase().trim() == achievementTitle.toLowerCase().trim()))
-      throw new ConflictException("Achievement already added");
+    // if (user.achievements.find((a) => a.title.toLowerCase().trim() == achievementTitle.toLowerCase().trim()))
+    //   throw new ConflictException("Achievement already added");
     const achievement = await this.seederService.getAchievementByTitle(
       achievementTitle,
     );
@@ -244,18 +244,18 @@ export class UsersService {
 	console.log('in check achievements, matches.length for the winner: ', matches.length);
 	if (matches.length === 1 && !achievements.find((a) => a.title === "First Match")) {
 		console.log('in check achievements, adding first match to winner');
-		this.addAchievement(winner.id, "First Match");
+		await this.addAchievement(winner.id, "First Match");
 	}
 	if (winner.matchesAsPlayerOne.length === 1 && !achievements.find((a) => a.title === "First Win")) {
-		this.addAchievement(winner.id, "First Win");
+		await this.addAchievement(winner.id, "First Win");
 	}
 	if (matches.length === 3 && !achievements.find((a) => a.title === "Played 3 Matches")) {
-		this.addAchievement(winner.id, "Played 3 Matches");
+		await this.addAchievement(winner.id, "Played 3 Matches");
 	}
 
 	const loserMatches: Match[] = await this.matchesService.findMatches(loser.id);
 	const loserAchievements: Achievement[] = await this.getAchievements(loser.id);
-
+	console.log('in check achievements, loserMatches.length: ', loserMatches.length);
 	if (loserMatches.length === 1 && !loserAchievements.find((a) => a.title === "First Match")) {
 		this.addAchievement(loser.id, "First Match");
 	}
@@ -275,6 +275,8 @@ export class UsersService {
 	const match = await this.matchesService.create(winner, loser, winnerScore, loserScore, loserID, winnerID);
 	winner.matchesAsPlayerOne.push(match);
 	loser.matchesAsPlayerTwo.push(match);
+	await this.repo.save(winner);
+	await this.repo.save(loser);
 
 	
 	await this.updateUserPoints(winner, loser);

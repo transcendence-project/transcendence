@@ -253,7 +253,6 @@ export class GameService {
 
     public async endGame(gameLogic: LogicGame)
     {
-        this.socketService.emitToRoom(gameLogic.getGameID(), 'game-over',gameLogic.getWinner());
         const getKeyPlayer1 = this.getKeyByValue(this.connected_users, gameLogic.getPlayer1ID());
         const player1 = this.connected_users.get(getKeyPlayer1);
         const getKeyPlayer2 = this.getKeyByValue(this.connected_users, gameLogic.getPlayer2ID());
@@ -267,7 +266,7 @@ export class GameService {
         if (player1 )
         {
             console.debug("this is from the endGame player1 ", player1.user.userName);
-            getKeyPlayer1.leave(gameLogic.getGameID());
+            // getKeyPlayer1.leave(gameLogic.getGameID());
             this.socketService.emitToServer('user-status', 'online');
             player1.status = 'online';
         }
@@ -297,7 +296,10 @@ export class GameService {
             player1.logicGame = null;
             player1.pendingInvitations = null;
             // console.debug("this is from the endGame player2", this.classic_queue);
+			this.socketService.emitToRoom(gameLogic.getGameID(), 'game-over',gameLogic.getWinner());
+			getKeyPlayer1.leave(gameLogic.getGameID());
             getKeyPlayer2.leave(gameLogic.getGameID());
+			console.log("the player2 is leave the room");
             player2.status = 'online';
         }
     }
@@ -312,7 +314,7 @@ export class GameService {
     public  removePlayer(socket: Socket, deleteUser: number)
     {
         const player = this.connected_users.get(socket);
-        console.log("this is the player who left the page ", player.user.userName," and this is the logic for him ", player.logicGame, "and this is the number ", deleteUser)
+        // console.log("this is the player who left the page ", player.user.userName," and this is the logic for him ", player.logicGame, "and this is the number ", deleteUser)
         if (player)
         {
             if (player.status === 'inqueue')

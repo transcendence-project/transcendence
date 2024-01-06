@@ -258,7 +258,7 @@ const removeEventListener = () => {
              if (socket)
              {
                  socket.on('game-data', (data: GameData) => {
-                     console.log("this is data ", data);
+                    //  console.log("this is data ", data);
                      Object.assign(currentGameData, data);
                      movePaddle();
              });
@@ -279,14 +279,26 @@ const removeEventListener = () => {
              }
     }
     });
+
+	import store  from '@/store';
+	
 	onBeforeUnmount(() => {
 		removeEventListener();
 		cancelAnimationFrame(animationFrameId);
 		console.log("this is call for before onmounted ");
         socket.emit('route-leave');
+
+		// socket.on('game-over', (payload: any) => {
+		// 	winnerCompo.value = true;
+		// 	winnerLogin.value = payload.login;
+		// 	isCanvasVisible.value = false;
+		// });
 		socket.off('game-data');
 		socket.off('game-count');
 		socket.off('game-over');
+		// store.dispatch("fetchUserData");
+		// store.dispatch("fetchMatches");
+		// store.dispatch("fetchAchievements");
 	});
 
     const movePaddle = () => {

@@ -1,7 +1,7 @@
 import Vue from "vue";
 import { createStore } from "vuex";
 import { IChannel } from "@/models/channel";
-import { AxiosResponse } from "axios";
+import axios, { AxiosResponse } from "axios";
 import { Socket } from "socket.io-client";
 import { IStudent } from "../models/student";
 import { computed } from "vue";
@@ -136,7 +136,7 @@ const store = createStore({
       axiosInstance
         .get(process.env.VUE_APP_BACKEND_URL + "/auth/me")
         .then((response) => {
-          console.log("response data: ", response.data);
+          console.log("response dataaaaa: ", response.data);
           store.commit("setId", response.data.id);
           store.commit("setDisplayName", response.data.fullname);
           store.commit("setUserName", response.data.userName);
@@ -239,6 +239,9 @@ const store = createStore({
         });
       console.log("matches: ", store.getters.getMatches);
     },
+    // async fetchWins(context: any) {
+    // 	await axiosInstance
+    // }
 
     async fetchFriendChan(context: any) {
       const cur = localStorage.getItem("CurrentFriend");
