@@ -37,13 +37,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, computed } from "vue";
+import { ref, onMounted, onBeforeUnmount, computed, getCurrentInstance } from "vue";
 import store from "@/store";
 import axios from "axios";
 import router from "@/router";
 import { useWebSocket } from "@/plugins/websocket-plugin";
 
 const { socket } = useWebSocket();
+const instance = getCurrentInstance();
 const showDropdown = ref(false);
 const dropdownsRef = ref<HTMLElement | null>(null);
 const showTwoFactorButtons = ref(false);
@@ -92,21 +93,32 @@ const logout = () => {
   } catch (error) {
     console.log(error);
   }
-  //   store.commit("CLEAR_AUTH_DATA");
-  //   router.push("/login");
-	console.log("HELLOOOOOO");
 };
 
 const enable = async () => {
+	        instance?.proxy?.$toast.add({
+		severity: "success",
+		summary: "2FA Enabled",
+		detail: `Two-factor authentication has been enabled.`,
+		life: 3000,
+	});
   store.dispatch("enabl2FA");
 };
 
 const disable = async () => {
+	instance?.proxy?.$toast.add({
+		severity: "success",
+		summary: "2FA Disabled",
+		detail: `Two-factor authentication has been disabled.`,
+		life: 3000,
+	});
+
   store.dispatch("disabl2FA");
 };
 
 onMounted(() => {
 //   store.dispatch("fetchUserData");
+const instance = getCurrentInstance();
   document.addEventListener("click", closeDropdownOnClickOutside);
 });
 
