@@ -262,7 +262,7 @@ const removeEventListener = () => {
                      Object.assign(currentGameData, data);
                      movePaddle();
              });
-                 socket.on('game-over', (payload:any) => {
+            socket.on('game-over', (payload:any) => {
                      winnerCompo.value = true;
                      winnerLogin.value = payload.login;
                      isCanvasVisible.value = false;
@@ -279,14 +279,12 @@ const removeEventListener = () => {
              }
     }
     });
-
-	import store  from '@/store';
 	
 	onBeforeUnmount(() => {
 		removeEventListener();
 		cancelAnimationFrame(animationFrameId);
 		console.log("this is call for before onmounted ");
-        socket.emit('route-leave');
+        socket.emit('route-leave', 2);
 
 		// socket.on('game-over', (payload: any) => {
 		// 	winnerCompo.value = true;

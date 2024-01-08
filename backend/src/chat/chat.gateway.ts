@@ -242,14 +242,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				client.emit('create_room_success', data_to_send);
 				client.emit('notify', data_to_send);
 			}
-			else {
-				const data_to_send = {
-					severity: "error",
-					summary: "Cannot Create Channel",
-					detail: `Channel ${chan_name} already exists.`
-				}
-				client.emit('notify', data_to_send);
-			}
+			// else {
+			// 	const data_to_send = {
+			// 		severity: "error",
+			// 		summary: "Cannot Create Channel",
+			// 		detail: `Channel ${chan_name} already exists.`
+			// 	}
+			// 	client.emit('notify', data_to_send);
+			// }
 		}
 		else
 		{
@@ -338,7 +338,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 	@SubscribeMessage('add_user_to_priv')
-	add_priv_user(client: any, payload: any) {
+	async add_priv_user(client: any, payload: any) {
 		if (this.chatService.user_exist(client.id))
 		{
 			const { user_to_add, room_name } = payload;
@@ -346,8 +346,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			if (this.chatService.is_admin(user.userName, room_name) || this.chatService.is_owner(user.userName, room_name)) {
 				const add_user = this.chatService.find_user_with_name(user_to_add);
 				if (add_user) {
-					const user_id = this.chatService.find_id(add_user.userName);
-					this.server.to(user_id).emit('join_priv_room', room_name);
+					const check_user_add = await this.chatService.is_chan_mem(user_to_add,room_name);
+					if (!check_user_add)
+					{
+						const user_id = this.chatService.find_id(add_user.userName);
+						this.server.to(user_id).emit('join_priv_room', room_name);
+					}
 				}
 				else {
 					const data_to_send = {

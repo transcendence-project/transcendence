@@ -25,7 +25,8 @@ export class LogicGame {
     ) {
         this.gameType = gameType
         this.gameId = this.generateGameId();
-        this.winner = null
+        this.winner = null;
+        this.leaver = null;
         if (gameType == 'classic')
         {
             const colorBall = "#19A7CE";

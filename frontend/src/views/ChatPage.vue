@@ -250,7 +250,7 @@
 							Unblock
 						  </button>
 						</div>
-						<button class="intbtn px-2">Invite</button>
+						<button class="intbtn px-2" @click="send_invite(friend.user)">Invite</button>
 						<button class="intbtn px-2" @click="goToUserProfile(friend.user)">
 						  <router-link to="/users">Profile</router-link>
   						</button>
@@ -593,7 +593,7 @@ import { numberLiteralTypeAnnotation } from "@babel/types";
     },
     startCountdown() {
       const duration = 10; // Duration in seconds
-      const interval = 1000; // Update interval in milliseconds
+      const interval = 3000; // Update interval in milliseconds
       const step = 100 / duration;
 
        countdown = setInterval(() => {
@@ -615,6 +615,12 @@ import { numberLiteralTypeAnnotation } from "@babel/types";
       socket.socket?.emit('response-status', false);
       console.log("rejected ")
       // Handle rejection logic
+    },
+	send_invite(member: string)
+    {
+        socket.socket?.emit('invite', member);
+        console.log(this.$socket);
+        console.log("this is the members ", member);
     },
     handleDialogClose() {
         if (!this.invitationAccepted) {
@@ -720,7 +726,7 @@ import { numberLiteralTypeAnnotation } from "@babel/types";
     //   });
     // },
 	notify(){
-		store.state.chat.socket.off("notify");
+		// store.state.chat.socket.off("notify");
 		console.log("reached notify");
 		store.state.chat.socket.on("notify", (data: any) => {
         this.$toast.add({
@@ -1020,6 +1026,9 @@ import { numberLiteralTypeAnnotation } from "@babel/types";
     socket.socket?.off("route-to-game");
     socket.socket?.off("busy-invite");
     socket.socket?.off("offline-status");
+	store.state.chat.socket.off("unblocked");
+	store.state.chat.socket.off("join_priv_room");
+	store.state.chat.socket.off("notify");
     clearInterval(countdown);
   }
 });
