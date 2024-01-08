@@ -44,7 +44,6 @@
                 btnContent="Add"
                 @click="sendFriendRequest(item)"
               />
-              <ButtonComponent btnContent="Block" />
             </div>
           </div>
         </li>

@@ -9,14 +9,12 @@
 <script lang="ts">
 import LoginPage from "@/views/LoginPage.vue";
 import axios from "axios";
-// import { useToast } from "primevue/usetoast";
 import { ref, onMounted } from "vue";
 import router from "../../router/index";
 import store from "../../store/index";
 export default {
   setup() {
 
-	// const toast = useToast();/
     // onMounted(async () => {
     //   try {
     //     await store.dispatch("fetchUserData");
@@ -34,17 +32,7 @@ export default {
   },
   methods: {
     async login42() {
-    //   console.log("Button Clickedd");
-		// console.log('the backned url is: ', process.env.VUE_APP_BACKEND_URL)
       window.location.href = process.env.VUE_APP_BACKEND_URL + "/auth/42";
-	//   const response = await axios.get(process.env.VUE_APP_BACKEND_URL + "/users/check-is-first-login", {
-	// 	headers: {
-	// 	  Authorization: `Bearer ${localStorage.getItem("token")}`,
-	// 	},
-	//   });
-	//   if (response.data.isFirstLogin) {
-	// 	this.toast.add({ severity: "info", summary: "Update Profile", detail: "Don't forget you can update your profile!", life: 3000 });
-	//   }
     },
   },
 };
