@@ -71,8 +71,11 @@ export default defineComponent({
 		return {
 			student: null as IStudent | null,
 			username: "",
-            avail: '',
+            avail: "", 
 		};
+	},
+	components: {
+        StatusUser,
 	},
 	watch: {
 		'$route.params.username': {

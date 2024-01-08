@@ -109,7 +109,6 @@ export class LogicGame {
                 color: paddleColor,
             },
             gameID: this.gameId,
-
             ready: login == 'computer' ? true :  false,
         }
     }
@@ -246,7 +245,7 @@ export class LogicGame {
             if (this.checkPlayerCollision(ball, players[1].paddle, 1)) {
                 this.reflectBall(ball, players[1].paddle)
             } else if (ball.x > 1) {
-                players[0].score += 1
+                players[0].score += 1;
                 this.resetBallPosition(ball)
             }
         }

@@ -170,6 +170,18 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		if (this.chatService.user_exist(client.id))
 		{
 			const { channel_name, password } = payload;
+
+			if (password === "") {
+				console.log("the passwword is empty enter the condtiton");
+				const data_to_send = {
+					severity: "error",
+					summary: "Cannot Create Channel",
+					detail: `Password is empty.`
+				}
+				client.emit('notify', data_to_send);
+				return;
+			}
+
 			if (password.length > 20) {
 				const data_to_send = {
 					severity: "error",
@@ -177,6 +189,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					detail: `Password too long.`
 				}
 				client.emit('notify', data_to_send);
+				return;
 			}
 			const user = this.chatService.find_user_with_id(client.id);
 			const salt = await bcrypt.genSalt(10);
@@ -199,14 +212,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				client.emit('notify', data_to_send);
 				this.server.emit('update_chan_list', data_to_send);
 			}
-			else {
-				const data_to_send = {
-					severity: "error",
-					summary: "Cannot Create Channel",
-					detail: `Channel ${channel_name} already exists.`
-				}
-				client.emit('notify', data_to_send);
-			}
+			// else {
+			// 	const data_to_send = {
+			// 		severity: "error",
+			// 		summary: "Cannot Create Channel",
+			// 		detail: `Channel ${channel_name} already exists.`
+			// 	}
+			// 	client.emit('notify', data_to_send);
+			// }
 		}
 		else
 		{

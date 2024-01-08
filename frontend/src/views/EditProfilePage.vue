@@ -3,7 +3,7 @@
 		<div class="edit-cont">
 			<h2>Edit Profile</h2>
 			<div class="editform">
-				<input v-model="username" placeholder="New username" class="input text-black" />
+				<input v-model="username" placeholder="New Fullname" class="input text-black" />
 				<div class="acc-dec">
 					<div class="decline">
 						<button class="resbtn" @click="resetForm">Reset</button>

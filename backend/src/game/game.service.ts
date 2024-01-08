@@ -77,7 +77,7 @@ export class GameService {
         const userKey = this.getKeyByValue(this.connected_users, userLogin);
         const user = this.connected_users.get(userKey);
 
-        console.log("this is the user from get function ", user)
+        // console.log("this is the user from get function ", user)
         if (user)
         {
             if (user.status === 'online')
@@ -97,7 +97,7 @@ export class GameService {
         let logic: LogicGame;
         if (player)
         {
-            console.log("inside the player")
+            // console.log("inside the player")
             if (gameInfo.gameType === 'classic')
             {
                 if (player.logicGame == null)
@@ -154,24 +154,46 @@ export class GameService {
         const player1Key = this.getKeyByValue(this.connected_users, player1.user.userName);
         const player2Key = this.getKeyByValue(this.connected_users, player2.user.userName);
 
-        // if (player1.logicGame == null && player2.logicGame === null)
-        // {
-            logic = new LogicGame(player1.user.userName, player2.user.userName, gameType);
+            if (player1 && player2)
+            {
+                if (gameType === 'classic')
+                {
+                    if (player1.logicGame == null && player2.logicGame == null)
+                    {
+                        logic = new LogicGame(player1.user.userName, player2.user.userName, gameType);
+                        player1.logicGame = logic;
+                        player2.logicGame = logic;
+                        player1Key.join(logic.getGameID());
+                        player2Key.join(logic.getGameID());
+                        player1.status = 'ingame';
+                        player2.status = 'ingame';
+                        this.socketService.emitToServer('user-status', 'ingame');
+                        this.countDown(logic, player1, player2);
+                        this.startGame(logic);
+                    }
+                }
+                else 
+                {
+                    if (player1.logicGame == null && player1.logicGame == null)
+                    {
+                        logic = new LogicGame(player1.user.userName, player2.user.userName, gameType);
+                        player1.logicGame = logic;
+                        player2.logicGame = logic;
+                        player1Key.join(logic.getGameID());
+                        player2Key.join(logic.getGameID());
+                        player1.status = 'ingame';
+                        player2.status = 'ingame';
+                        this.socketService.emitToServer('user-status', 'ingame');
+                        this.countDown(logic, player1, player2);
+                        this.startGame(logic);
+                    }
+                }  
+            }
         // }
 
-        player1.logicGame = logic;
-        player2.logicGame = logic;
 
 
-        player1Key.join(logic.getGameID());
-        player2Key.join(logic.getGameID());
 
-        player1.status = 'ingame';
-        player2.status = 'ingame';
-        console.log("this is the player1 ", player1.user.userName, "this is player2 ", player2.user.userName);
-        this.socketService.emitToServer('user-status', 'ingame');
-        this.countDown(logic, player1, player2);
-        this.startGame(logic);
     }
 
     private async findOpponent(userLogin: string, gameType: string): Promise<{ user: User, logicGame: LogicGame | null, status: string, pendingInvitations: string} | null> {
@@ -413,17 +435,20 @@ export class GameService {
         else
         {
             const invited = this.connected_users.get(Ininvited);
-            const inviterLoginKey = this.getKeyByValue(this.connected_users, invited.pendingInvitations);
-            const inviter = this.connected_users.get(inviterLoginKey);
-
-            if (invited && inviter)   // i will remove this when the UserProfile page finish 
+            if (invited.pendingInvitations)
             {
-                if (invited.status === 'busy' || inviter.status === 'busy')
+                const inviterLoginKey = this.getKeyByValue(this.connected_users, invited.pendingInvitations);
+                const inviter = this.connected_users.get(inviterLoginKey);
+                if (invited && inviter)   // i will remove this when the UserProfile page finish 
                 {
-                    invited.status = null;
-                    inviter.status = null;
+                    if (invited.status === 'busy' || inviter.status === 'busy')
+                    {
+                        invited.status = null;
+                        inviter.status = null;
+                    }
                 }
             }
+
         }
     }
 }
