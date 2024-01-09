@@ -98,11 +98,11 @@ export class UsersService {
 	if (!user) throw new NotFoundException;
 
 	const user_list = await this.repo.find();
-	if (user_list.find((u) => u.userName === userName)){
+	if (user_list.find((u) => u.fullname === userName)){
 		throw new BadRequestException("Username already exists");
 	}
 
-	user.userName = userName;
+	user.fullname = userName;
 	return await this.repo.save(user);
   }
 

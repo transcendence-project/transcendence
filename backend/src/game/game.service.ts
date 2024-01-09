@@ -16,12 +16,6 @@ export class GameService {
     private connected_users: Map<Socket, { user: User, logicGame: LogicGame | null , status: string, pendingInvitations: string}> = new Map();
     private classic_queue: string[] = [];
     private custom_queue: string[] = [];
-    private paddle: Paddle;
-    private ball: Ball;
-    private computer: Computer;
-    private canvasWidth: number;
-    private canvasHeight: number;
-    private deltaTime: number;
 
     constructor(private readonly authService: AuthService, private socketService: SocketService, private userService: UsersService) {
     };
@@ -83,7 +77,7 @@ export class GameService {
         const userKey = this.getKeyByValue(this.connected_users, userLogin);
         const user = this.connected_users.get(userKey);
 
-        console.log("this is the user from get function ", user)
+        // console.log("this is the user from get function ", user)
         if (user)
         {
             if (user.status === 'online')
@@ -103,7 +97,7 @@ export class GameService {
         let logic: LogicGame;
         if (player)
         {
-            console.log("inside the player")
+            // console.log("inside the player")
             if (gameInfo.gameType === 'classic')
             {
                 if (player.logicGame == null)
@@ -160,23 +154,46 @@ export class GameService {
         const player1Key = this.getKeyByValue(this.connected_users, player1.user.userName);
         const player2Key = this.getKeyByValue(this.connected_users, player2.user.userName);
 
-        // if (player1.logicGame == null && player2.logicGame === null)
-        // {
-            logic = new LogicGame(player1.user.userName, player2.user.userName, gameType);
+            if (player1 && player2)
+            {
+                if (gameType === 'classic')
+                {
+                    if (player1.logicGame == null && player2.logicGame == null)
+                    {
+                        logic = new LogicGame(player1.user.userName, player2.user.userName, gameType);
+                        player1.logicGame = logic;
+                        player2.logicGame = logic;
+                        player1Key.join(logic.getGameID());
+                        player2Key.join(logic.getGameID());
+                        player1.status = 'ingame';
+                        player2.status = 'ingame';
+                        this.socketService.emitToServer('user-status', 'ingame');
+                        this.countDown(logic, player1, player2);
+                        this.startGame(logic);
+                    }
+                }
+                else 
+                {
+                    if (player1.logicGame == null && player1.logicGame == null)
+                    {
+                        logic = new LogicGame(player1.user.userName, player2.user.userName, gameType);
+                        player1.logicGame = logic;
+                        player2.logicGame = logic;
+                        player1Key.join(logic.getGameID());
+                        player2Key.join(logic.getGameID());
+                        player1.status = 'ingame';
+                        player2.status = 'ingame';
+                        this.socketService.emitToServer('user-status', 'ingame');
+                        this.countDown(logic, player1, player2);
+                        this.startGame(logic);
+                    }
+                }  
+            }
         // }
 
-        player1.logicGame = logic;
-        player2.logicGame = logic;
 
 
-        player1Key.join(logic.getGameID());
-        player2Key.join(logic.getGameID());
 
-        player1.status = 'ingame'
-        player2.status = 'ingame'
-        this.socketService.emitToServer('user-status', 'ingame');
-        this.countDown(logic, player1, player2);
-        this.startGame(logic);
     }
 
     private async findOpponent(userLogin: string, gameType: string): Promise<{ user: User, logicGame: LogicGame | null, status: string, pendingInvitations: string} | null> {
@@ -208,10 +225,11 @@ export class GameService {
         }
     }
 
-    private countDown(gameLogic: LogicGame, player1: { user: User, logicGame: LogicGame}, 
-                        player2: { user: User, logicGame: LogicGame})
+    private countDown(gameLogic: LogicGame, player1: { user: User, logicGame: LogicGame, status: string}, 
+                        player2: { user: User, logicGame: LogicGame, status: string})
     {
-        let countdown = 3;
+        // let countdown = 3;
+        const gameStatus = gameLogic.getObjectStatus();
         let player1Key: Socket;
         let player2Key: Socket;
 
@@ -225,12 +243,12 @@ export class GameService {
         }
 
         const countdownInterval = setInterval(() => {
-            if (countdown >= 0) {
-                if (player1Key)
-                    player1Key.emit('game-count', countdown);
-                if (player2Key)
-                    player2Key.emit('game-count', countdown);
-                countdown--;
+            if (gameStatus.countdown >= 0) {
+                if ((player1Key && player1.status === 'ingame') || (player2Key && player2.status === 'ingame'))
+                    player1Key.emit('game-count', gameStatus.countdown);
+                if ((player1Key && player1.status === 'ingame') && (player2Key && player2.status === 'ingame'))
+                    player2Key.emit('game-count', gameStatus.countdown);
+                    gameStatus.countdown--;
             } else {
                 clearInterval(countdownInterval);
             }
@@ -245,7 +263,7 @@ export class GameService {
             if (gameLogic.checkWinner())
             {
                 clearInterval(gameInterval);
-                await this.endGame(gameLogic)
+                await this.endGame(gameLogic);
                 return;
             }
         }, 1000 / 60);
@@ -258,52 +276,73 @@ export class GameService {
         const getKeyPlayer2 = this.getKeyByValue(this.connected_users, gameLogic.getPlayer2ID());
         const player2 = this.connected_users.get(getKeyPlayer2);
         const winner = gameLogic.getWinner();
-
-        if (!player1 || player1.status !== 'ingame') {
-            return; // Player is not in a game, so return early. 
-        }
-
-        if (player1 )
-        {
-            console.debug("this is from the endGame player1 ", player1.user.userName);
-            // getKeyPlayer1.leave(gameLogic.getGameID());
-            this.socketService.emitToServer('user-status', 'online');
-            player1.status = 'online';
-        }
         
-        if (player2 && gameLogic.getPlayer2ID() !== 'computer')
+        if (gameLogic.getPlayer2ID() === 'computer')
         {
-            if (player1.user.userName === winner.login) 
+            this.clearData(gameLogic);
+            return;    
+        }
+
+        if (player1 && player2 && gameLogic.getPlayer2ID() !== 'computer')
+        {
+            if (player1.user.userName === winner.login && player1.status === 'ingame') 
             {
                 const loser = gameLogic.getPlayer2Info();
-                console.log("the winner is : ", winner, player1.user.id);
-                console.log("the loser is : ", loser, player2.user.id);
-                console.log("the winner is score : ", winner.score);
-                console.log("the loser is score : ", loser.score); 
-                await this.userService.saveMatch(player1.user.id, winner.score, player2.user.id, loser.score);
+                // console.log("f the winner is : ", winner, player1.user.id);
+                // console.log("the loser is : ", loser, player2.user.id);
+                // console.log("the winner is score : ", winner.score);
+                // console.log("the loser is score : ", loser.score); 
+                // console.log("here before the saveMatch player1 status is ", player1.status);
+                // player1.status = 'online';
+                // console.log("first condition here the player status change should call one time", player1.status);
+                if (player1.status === 'ingame')
+                {
+                    console.log("inside the first condition ", player1.status);
+                    await this.userService.saveMatch(player1.user.id, winner.score, player2.user.id, loser.score);
+                    // this.socketService.emitToRoom(gameLogic.getGameID(), 'game-over',gameLogic.getWinner());
+                }
             }
             else
             {
                 const loser = gameLogic.getPlayer1Info();
-                console.log("the winner is : ", winner, player2.user.id);
+                console.log("t the winner is : ", winner, player2.user.id);
                 console.log("the loser is : ", loser, player1.user.id);
                 console.log("the winner is score : ", winner.score);
                 console.log("the loser is score : ", loser.score);
-                await this.userService.saveMatch(player2.user.id, winner.score, player1.user.id, loser.score);
+                if (player1.status === 'ingame')
+                {
+                    console.log("here before the saveMatch player2 status is ", player1.status, "this is the player2 status ", player2.status);
+                    // player1.status = 'online';
+                    await this.userService.saveMatch(player2.user.id, winner.score, player1.user.id, loser.score);
+                }
             }
-            player2.logicGame = null;
-            player2.pendingInvitations = null;
-            player1.logicGame = null;
-            player1.pendingInvitations = null;
-            // console.debug("this is from the endGame player2", this.classic_queue);
-			this.socketService.emitToRoom(gameLogic.getGameID(), 'game-over',gameLogic.getWinner());
-			getKeyPlayer1.leave(gameLogic.getGameID());
-            getKeyPlayer2.leave(gameLogic.getGameID());
-			console.log("the player2 is leave the room");
-            player2.status = 'online';
+            this.clearData(gameLogic)
         }
     }
 
+    private clearData(game: LogicGame) {
+        // const player1 = this.connected_users.find(user => user.login == game.getPlayer1ID())
+        this.socketService.emitToRoom(game.getGameID(), 'game-over',game.getWinner());
+        const getKeyPlayer1 = this.getKeyByValue(this.connected_users, game.getPlayer1ID());
+        const player1 = this.connected_users.get(getKeyPlayer1);
+        if (player1) {
+            player1.logicGame = null;
+            player1.pendingInvitations = null;
+            player1.status = 'online';
+            this.socketService.emitToServer('user-status', 'online');
+            getKeyPlayer1.leave(game.getGameID());
+        }
+        // const player2 = this.connected_users.find(user => user.login == game.getPlayer2ID())
+        const getKeyPlayer2 = this.getKeyByValue(this.connected_users, game.getPlayer2ID());
+        const player2 = this.connected_users.get(getKeyPlayer2);
+        if (player2) {
+            player2.logicGame = null;
+            player2.pendingInvitations = null;
+            player2.status = 'online';
+            this.socketService.emitToServer('user-status', 'online');
+            getKeyPlayer2.leave(game.getGameID())
+        }
+    }
     movePlayerPaddle(cleint: Socket, direction: string) {
         // const getKeyPlayer1 = this.getKeyByValue(this.connected_users, );
         const player = this.connected_users.get(cleint);
@@ -329,7 +368,8 @@ export class GameService {
                 if (player.logicGame)
                 {
                     player.logicGame.setLoser(player.user.userName);
-                    this.endGame(player.logicGame);
+                    // player.logicGame.leaver = player.user.userName;
+                    // this.endGame(player.logicGame);
                 }
             }
             if (deleteUser === 1)
@@ -396,17 +436,20 @@ export class GameService {
         else
         {
             const invited = this.connected_users.get(Ininvited);
-            const inviterLoginKey = this.getKeyByValue(this.connected_users, invited.pendingInvitations);
-            const inviter = this.connected_users.get(inviterLoginKey);
-
-            if (invited && inviter)   // i will remove this when the UserProfile page finish 
+            if (invited.pendingInvitations)
             {
-                if (invited.status === 'busy' || inviter.status === 'busy')
+                const inviterLoginKey = this.getKeyByValue(this.connected_users, invited.pendingInvitations);
+                const inviter = this.connected_users.get(inviterLoginKey);
+                if (invited && inviter)   // i will remove this when the UserProfile page finish 
                 {
-                    invited.status = null;
-                    inviter.status = null;
+                    if (invited.status === 'busy' || inviter.status === 'busy')
+                    {
+                        invited.status = null;
+                        inviter.status = null;
+                    }
                 }
             }
+
         }
     }
 }

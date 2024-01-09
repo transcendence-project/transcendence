@@ -48,10 +48,10 @@ import { Socket } from 'socket.io-client';
 import { faL } from '@fortawesome/free-solid-svg-icons';
 
     const isOnlineGame = ref<Boolean | false>(false);
-    const rightPlayerScore = ref<number | 0>(0);
-    const leftPlayerScore = ref<number | 0>(0);
+    const rightPlayerScore = ref(0);
+    const leftPlayerScore = ref(0);
     const winnerCompo = ref<boolean | false>(false);
-	const LoginPlayer1 = ref<string | null>(null)
+	const LoginPlayer1 = ref<string | null>(null);
 	const color_map = ref<string | null>(null);
 	const LoginPlayer2 = ref<string | null>(null)
 	const isGameSelectVisible = ref(true);
@@ -171,14 +171,15 @@ const removeEventListener = () => {
 	function calculateGameElementPositions(canvas: HTMLCanvasElement, gameData: GameData) {
     const leftPaddle = gameData.players[0].paddle;
     const rightPaddle = gameData.players[1].paddle;
+    const rightScore = gameData.players[0].score;
+    const leftScore = gameData.players[1].score;
     const ball = gameData.ball;
-    leftPlayerScore.value = gameData.players[0].score;
-    rightPlayerScore.value = gameData.players[1].score;
+	
+    leftPlayerScore.value = rightScore;
+    rightPlayerScore.value = leftScore;
     LoginPlayer1.value = gameData.players[0].login;
     LoginPlayer2.value = gameData.players[1].login;
-
-    // console.log("this is the player1", gameData.players[0].login)
-    // console.log("this is the player2", gameData.players[1].login)
+ 
     return {
         leftPaddle: {
             x: leftPaddle.x * canvas.width,
@@ -227,11 +228,11 @@ const removeEventListener = () => {
 				const render = () => { 
 						if (ctx && pongCanvas.value)
                         {
+							const positions = calculateGameElementPositions(pongCanvas.value, currentGameData);
 							ctx.clearRect(0, 0, pongCanvas.value.width, pongCanvas.value.height);
 
 							drawRect(ctx, 0, 0, pongCanvas.value.width, pongCanvas.value.height, color_map.value || "white");
 							// Calculate positions
-							const positions = calculateGameElementPositions(pongCanvas.value, currentGameData);
 
 							// Draw left paddle
 							drawRect(ctx, positions.leftPaddle.x, positions.leftPaddle.y, positions.leftPaddle.width, positions.leftPaddle.height,  currentGameData.players[0].paddle.color);
@@ -244,7 +245,7 @@ const removeEventListener = () => {
                         }
                     }
 					const game = () => {
-							calculateGameElementPositions(canvas,currentGameData);
+							// calculateGameElementPositions(canvas,currentGameData);
                             render();
                             animationFrameId = requestAnimationFrame(game);
                         };
@@ -254,15 +255,21 @@ const removeEventListener = () => {
 		// document.addEventListener('keydown', handleKeyDown);
         if (instance?.proxy)
         {
+			// let i = 0;
              socket = instance.proxy.$socket.socket;
              if (socket)
              {
                  socket.on('game-data', (data: GameData) => {
-                    //  console.log("this is data ", data);
+					console.log("this is the score ", rightPlayerScore);
+					console.log("this is the score left ", leftPlayerScore);
                      Object.assign(currentGameData, data);
                      movePaddle();
              });
-                 socket.on('game-over', (payload:any) => {
+            socket.on('game-over', (payload:any) => {
+					if (gameCountdown.value !== 0)
+					{
+						gameCountdown.value = 0;
+					}
                      winnerCompo.value = true;
                      winnerLogin.value = payload.login;
                      isCanvasVisible.value = false;
@@ -279,14 +286,12 @@ const removeEventListener = () => {
              }
     }
     });
-
-	import store  from '@/store';
 	
 	onBeforeUnmount(() => {
 		removeEventListener();
 		cancelAnimationFrame(animationFrameId);
 		console.log("this is call for before onmounted ");
-        socket.emit('route-leave');
+        socket.emit('route-leave', 2);
 
 		// socket.on('game-over', (payload: any) => {
 		// 	winnerCompo.value = true;
@@ -302,10 +307,7 @@ const removeEventListener = () => {
 	});
 
     const movePaddle = () => {
-        console.log("Test");
-        console.log(keys);
         if (keys.ArrowUp) {
-            console.log("Test2");
             socket.emit('paddleMove','up');
         } else if (keys.ArrowDown) {
             socket.emit('paddleMove','down');

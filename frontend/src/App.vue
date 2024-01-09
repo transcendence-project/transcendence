@@ -7,9 +7,9 @@
         <Button class="dialog-button" label="Accept" @click="acceptInvitation" />
         </template>
     </Dialog> -->
-    <TopNavBar v-if="!['login','game'].includes($route.name)" />
+    <TopNavBar v-if="!['login','game', 'twofactor'].includes($route.name)" />
     <div class="side-cont">
-      <SideNavBar v-if="!['login','game'].includes($route.name)" />
+      <SideNavBar v-if="!['login','game', 'twofactor'].includes($route.name)" />
       <router-view />
     </div>
   </div>

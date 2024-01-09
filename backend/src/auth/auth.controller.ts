@@ -82,6 +82,7 @@ export class AuthController {
 			req.user,
 		);
 		console.log(isCodeValid)
+		console.log(req.user); 
 		if (!isCodeValid) {
 			console.log("INCORRECT 2 FA CODE !!!!!!!!!!!!");
 			return null;

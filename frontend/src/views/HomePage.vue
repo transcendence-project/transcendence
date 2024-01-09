@@ -120,7 +120,7 @@ onMounted(async () => {
   const rank = computed(() => store.getters.getRank);
   const match = computed(() => store.getters.getMatches);
   const achievements = computed(() => store.getters.getAchievements || []);
-  const avail = ref(true);
+  const avail = ref("online");
   
   </script>
   

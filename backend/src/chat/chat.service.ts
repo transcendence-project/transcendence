@@ -271,15 +271,16 @@ export class ChatService {
 			if (chan.owner)
 				if (chan.owner.id === userIdToRemove)
 					chan.owner = null;
-			// if (!chan.members.length && !chan.admins.length && !chan.owner)
-			// {
-			// 	try {
-			// 		await this.channelRepo.remove(chan);
-			// 		console.log('Channel deleted successfully.');
-			// 	  } catch (error) {
-			// 		console.error('Error deleting channel:', error.message);
-			// 	  }
-			// }
+			if (!chan.members.length && !chan.admins.length && !chan.owner && chan.is_private === true)
+			{
+				try {
+					await this.channelRepo.remove(chan);
+					return;
+					console.log('Channel deleted successfully.');
+				  } catch (error) {
+					console.error('Error deleting channel:', error.message);
+				  }
+			}
 			await this.channelRepo.save(chan);
 		}
 	}

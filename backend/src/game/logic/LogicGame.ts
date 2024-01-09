@@ -25,7 +25,8 @@ export class LogicGame {
     ) {
         this.gameType = gameType
         this.gameId = this.generateGameId();
-        this.winner = null
+        this.winner = null;
+        this.leaver = null;
         if (gameType == 'classic')
         {
             const colorBall = "#19A7CE";
@@ -64,6 +65,8 @@ export class LogicGame {
                 radius: Ball_Radius,
                 color: ballColor,
             },
+            time: 120,
+            countdown:3,
         }
     }
 
@@ -108,7 +111,6 @@ export class LogicGame {
                 color: paddleColor,
             },
             gameID: this.gameId,
-
             ready: login == 'computer' ? true :  false,
         }
     }
@@ -175,8 +177,22 @@ export class LogicGame {
 
     // update the game by updating the ball position and checking for collisions
     public updateGame(): void {
-        this.updateBall()
+        if (this.objectGame.countdown > 0) {
+            // this.game_status.countDown -= 1 / 60
+            return
+        }
+        
+        this.updateBall();
+        this.updateTimer();
         if (this.getPlayer2ID() === 'computer') this.updateComputer()
+    }
+
+    public updateTimer(): void {
+        if (this.objectGame.time > 0) {
+            this.objectGame.time -= 1 / 60
+        } else {
+            this.objectGame.time = 0
+        }
     }
 
     // update the ball position and check for collisions
@@ -245,7 +261,7 @@ export class LogicGame {
             if (this.checkPlayerCollision(ball, players[1].paddle, 1)) {
                 this.reflectBall(ball, players[1].paddle)
             } else if (ball.x > 1) {
-                players[0].score += 1
+                players[0].score += 1;
                 this.resetBallPosition(ball)
             }
         }
