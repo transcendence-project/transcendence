@@ -118,7 +118,6 @@ const disable = async () => {
 
 onMounted(() => {
 //   store.dispatch("fetchUserData");
-const instance = getCurrentInstance();
   document.addEventListener("click", closeDropdownOnClickOutside);
 });
 
