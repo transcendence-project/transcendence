@@ -14,8 +14,10 @@ import {
 
 
 export class objectStatusDto {
-    players: PlayerDto[]
-    ball: BallDto
+    players: PlayerDto[];
+    ball: BallDto;
+    time:number;
+    countdown:number;
 }
 export class PlayerDto {
     @IsAscii()

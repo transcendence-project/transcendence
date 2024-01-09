@@ -65,6 +65,8 @@ export class LogicGame {
                 radius: Ball_Radius,
                 color: ballColor,
             },
+            time: 120,
+            countdown:3,
         }
     }
 
@@ -175,8 +177,22 @@ export class LogicGame {
 
     // update the game by updating the ball position and checking for collisions
     public updateGame(): void {
-        this.updateBall()
+        if (this.objectGame.countdown > 0) {
+            // this.game_status.countDown -= 1 / 60
+            return
+        }
+        
+        this.updateBall();
+        this.updateTimer();
         if (this.getPlayer2ID() === 'computer') this.updateComputer()
+    }
+
+    public updateTimer(): void {
+        if (this.objectGame.time > 0) {
+            this.objectGame.time -= 1 / 60
+        } else {
+            this.objectGame.time = 0
+        }
     }
 
     // update the ball position and check for collisions

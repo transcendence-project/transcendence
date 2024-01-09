@@ -266,6 +266,10 @@ const removeEventListener = () => {
                      movePaddle();
              });
             socket.on('game-over', (payload:any) => {
+					if (gameCountdown.value !== 0)
+					{
+						gameCountdown.value = 0;
+					}
                      winnerCompo.value = true;
                      winnerLogin.value = payload.login;
                      isCanvasVisible.value = false;

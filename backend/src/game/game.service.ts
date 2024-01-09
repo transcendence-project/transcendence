@@ -225,10 +225,11 @@ export class GameService {
         }
     }
 
-    private countDown(gameLogic: LogicGame, player1: { user: User, logicGame: LogicGame}, 
-                        player2: { user: User, logicGame: LogicGame})
+    private countDown(gameLogic: LogicGame, player1: { user: User, logicGame: LogicGame, status: string}, 
+                        player2: { user: User, logicGame: LogicGame, status: string})
     {
-        let countdown = 3;
+        // let countdown = 3;
+        const gameStatus = gameLogic.getObjectStatus();
         let player1Key: Socket;
         let player2Key: Socket;
 
@@ -242,12 +243,12 @@ export class GameService {
         }
 
         const countdownInterval = setInterval(() => {
-            if (countdown >= 0) {
-                if (player1Key)
-                    player1Key.emit('game-count', countdown);
-                if (player2Key)
-                    player2Key.emit('game-count', countdown);
-                countdown--;
+            if (gameStatus.countdown >= 0) {
+                if ((player1Key && player1.status === 'ingame') || (player2Key && player2.status === 'ingame'))
+                    player1Key.emit('game-count', gameStatus.countdown);
+                if ((player1Key && player1.status === 'ingame') && (player2Key && player2.status === 'ingame'))
+                    player2Key.emit('game-count', gameStatus.countdown);
+                    gameStatus.countdown--;
             } else {
                 clearInterval(countdownInterval);
             }
