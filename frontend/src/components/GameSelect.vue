@@ -61,7 +61,7 @@ const emit = defineEmits(['updateGameMode', 'updateGameType']);
       } 
       else  
       {
-          console.log("Socket is not connected or something is wrong in the component");
+        //   console.log("Socket is not connected or something is wrong in the component");
       }
     };
 </script>

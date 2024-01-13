@@ -97,7 +97,7 @@ export default defineComponent({
 				})
 				.then((resp: AxiosResponse<IStudent>) => {
 					this.student = resp.data;
-					console.log("the student in view: ",this.student.achievements);
+					// console.log("the student in view: ",this.student.achievements);
 				})
 				.catch((error) => {
 					console.error("Error fetching student data:", error);
@@ -109,7 +109,7 @@ export default defineComponent({
         this.username = this.$route.params.username as string;
         socket.socket?.emit('user-profile-status', this.username);
         socket.socket?.on('user-status', (status: string) => {
-            console.log("this is the status ", status);
+            // console.log("this is the sta tus ", status);
             if (status === 'online')
                 this.avail = 'online';
             else if (status === 'ingame')

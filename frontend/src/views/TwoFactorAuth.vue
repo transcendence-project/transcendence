@@ -31,7 +31,7 @@
   const v_code = ref('');
   const factor = ref('');
   
-console.log("test 2FAAAAA");
+// console.log("test 2FAAAAA");
   onMounted(async () => {
 	// console.log("localStorage:", localStorage);
 	// console.log("test 2FA");
@@ -51,7 +51,7 @@ console.log("test 2FAAAAA");
 });
 
 const verify_code = async () => {
-	console.log(v_code.value);
+	// console.log(v_code.value);
 	localStorage.setItem("2FACode", v_code.value);
 	await store.dispatch("ValidateTwoFA");
 }

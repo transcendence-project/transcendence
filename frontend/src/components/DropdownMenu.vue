@@ -79,7 +79,7 @@ const closeDropdown = () => {
 };
 
 const logout = () => {
-  console.log("logout jwt token: ", localStorage.getItem("token"));
+//   console.log("logout jwt token: ", localStorage.getItem("token"));
   try {
     const response = axios.get(process.env.VUE_APP_BACKEND_URL + "/auth/logout", {
       headers: {
@@ -91,7 +91,7 @@ const logout = () => {
 	router.push('/login');
   closeDropdown();
   } catch (error) {
-    console.log(error);
+    // console.log(error);
   }
 };
 
@@ -118,7 +118,6 @@ const disable = async () => {
 
 onMounted(() => {
 //   store.dispatch("fetchUserData");
-const instance = getCurrentInstance();
   document.addEventListener("click", closeDropdownOnClickOutside);
 });
 

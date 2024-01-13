@@ -128,7 +128,7 @@ export default defineComponent({
       const val_own = chan.value.owner;
       const val_ad = chan.value.admins;
       const val_mem = chan.value.members;
-      console.log(chan.value);
+    //   console.log(chan.value);
       mem_list.value = [];
       if (val_own) {
         const new_own: FriendsList = {
@@ -179,7 +179,7 @@ export default defineComponent({
           data.user != store.getters.getUserName &&
           localStorage.getItem("currentChanName") == data.chan_name
         ) {
-          console.log(data);
+        //   console.log(data);
           const new_mem: FriendsList = {
             user: data.user,
             owner: false,
@@ -270,8 +270,8 @@ export default defineComponent({
     send_invite(member: string)
     {
         socket.socket?.emit('invite', member);
-        console.log(this.$socket);
-        console.log("this is the members ", member);
+        // console.log(this.$socket);
+        // console.log("this is the members ", member);
     },
     mute_mem(member: string) {
       store.state.chat.socket.emit("mute_user", {

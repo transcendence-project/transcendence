@@ -26,7 +26,7 @@ import store from '@/store';
 onMounted(() => {
 	if (localStorage.getItem('token') && !store.getters.getUserName)
 	{
-		console.log('tokennnnn is: ', localStorage.getItem('token'));
+		// console.log('tokennnnn is: ', localStorage.getItem('token'));
 		store.dispatch('fetchUserData');
 	}
 	});

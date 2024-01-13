@@ -67,18 +67,17 @@ export class ChatService {
 	async frndchan_by_name(frnd_name: string, user: User, isGroupChan: boolean): Promise<Channel> {
 		const user_ = await this.usersService.findOne(user.id)
 		// console.log("the user channels is: ", user_.channels);
-		console.log(" the frnd name is: ", frnd_name, "the user is: ", user)
+		// console.log(" the frnd name is: ", frnd_name, "the user is: ", user)
 		for (const channel of user_.channels) {
 			const with_members = await this.chan_by_id(channel.id, isGroupChan);
-			console.log("the with membersssss is: ", with_members, "and the channel is: ", channel);
+			// console.log("the with membersssss is: ", with_members, "and the channel is: ", channel);
 			if (with_members){
 				for (const member of with_members.members) {
 					if (member.userName === frnd_name){
-						console.log("the with members is: ", with_members);
+						// console.log("the with members is: ", with_members);
 						return with_members;
 					}
-					else
-						console.log("the friend name is: ", frnd_name, "the member name is: ", member.userName);
+						// console.log("the friend name is: ", frnd_name, "the member name is: ", member.userName);
 				}
 			}
 			// const channel = await this.channelRepo.findOne({ where: { id: channel.id, isGroupChannel: false }, relations: ['members'] });
@@ -143,7 +142,7 @@ export class ChatService {
 						members: [], admins: [], messages: [], banned: [], muted: [], isGroupChannel: true, is_protected: true });
 					chan2.members.push(user);
 					await this.channelRepo.save(chan2);
-					console.log(`Channel ${chan_name} created successfully`);
+					// console.log(`Channel ${chan_name} created successfully`);
 					return (chan2)
 				}
 				else if (type === "pub")
@@ -152,17 +151,17 @@ export class ChatService {
 						members: [], admins: [], messages: [], banned: [], muted: [], isGroupChannel: true, is_public: true });
 					chan2.members.push(user);
 					await this.channelRepo.save(chan2);
-					console.log(`Channel ${chan_name} created successfully`);
+					// console.log(`Channel ${chan_name} created successfully`);
 					return (chan2)
 				}
 				else if (type === "priv")
 				{
-					console.log('type is priv');
+					// console.log('type is priv');
 					const chan2 = this.channelRepo.create({ room_name: chan_name, owner: user, password: pass, 
 					members: [], admins: [], messages: [], banned: [], muted: [], isGroupChannel: true, is_private: true });
 					chan2.members.push(user);
 					await this.channelRepo.save(chan2);
-					console.log(`Channel ${chan_name} created successfully`);
+					// console.log(`Channel ${chan_name} created successfully`);
 					return (chan2)
 
 				}
@@ -185,7 +184,7 @@ export class ChatService {
 	async create_friend_chan(user: User, friend: User) {
 		// console.log("the friend in cfc is: ",friend);
 		const channel = await this.frndchan_by_name(friend.userName, user, false);
-		console.log("the frienddddd chan is: ", channel);
+		// console.log("the frienddddd chan is: ", channel);
 		// console.log("the friend in cfc is: ",friend);
 		// console.log("the user in cfc is: ",user);
 		if (!channel){
@@ -194,7 +193,7 @@ export class ChatService {
 				chan.members.push(user);
 				chan.members.push(friend);
 				await this.channelRepo.save(chan);
-				console.log("the friend chan is: ", chan);
+				// console.log("the friend chan is: ", chan);
 		}
 	}
 
@@ -240,7 +239,7 @@ export class ChatService {
 	}
 
 	async save_frnd_chan_msg(sender: User, frnd_name: string, content: string) {
-		console.log(`frnd name = ${frnd_name}`);
+		// console.log(`frnd name = ${frnd_name}`);
 		const channel = await this.frndchan_by_name(frnd_name, sender, false);
 		// console.log(""channel)
 		const message = this.messageRepo.create({senderID: sender.id, sendername: sender.userName, sender: sender, channel: channel, content: content, createdAt: null });
@@ -276,7 +275,7 @@ export class ChatService {
 				try {
 					await this.channelRepo.remove(chan);
 					return;
-					console.log('Channel deleted successfully.');
+					// console.log('Channel deleted successfully.');
 				  } catch (error) {
 					console.error('Error deleting channel:', error.message);
 				  }

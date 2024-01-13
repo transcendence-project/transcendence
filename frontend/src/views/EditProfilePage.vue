@@ -32,6 +32,7 @@
 <script lang="ts">
 import { ref } from "vue";
 import axios from "axios";
+import { getCurrentInstance } from "vue";
 
 export default {
 	setup() {
@@ -39,16 +40,17 @@ export default {
 		const username = ref("");
 		const fileInput = ref(null);
 		const formData = new FormData();
+		const instance = getCurrentInstance();
 
 		const uploadFile = (event: any) => {
-			console.log("uploadFile function called");
+			// console.log("uploadFile function called");
 
 			const selectedFile = event.target.files[0];
 			if (selectedFile) {
 				Images.value = selectedFile;
-				console.log("File selected:", Images.value);
+				// console.log("File selected:", Images.value);
 			} else {
-				console.log("No file selected");
+				// console.log("No file selected");
 			}
 		};
 
@@ -67,16 +69,42 @@ export default {
 							},
 						}
 					);
-					console.log("Profile Picture Response:", profilePicResponse.data);
-
+					// console.log("Profile Picture Response:", profilePicResponse.data);
 					const binaryRepresentation = profilePicResponse.data.files;
 					const httpStatus = profilePicResponse.status;
-					console.log(binaryRepresentation, httpStatus);
-				} catch (error) {
-					console.error("Error updating profile picture:", error);
+					// console.log(binaryRepresentation, httpStatus);
+					instance?.proxy?.$toast.add({
+						severity: "success",
+						summary: "Profile picture updated",
+						detail: "Your profile picture has been updated.",
+						life: 3000,
+					});
+				} catch (error: any) {
+					 if (axios.isAxiosError(error) && error.response) {
+						if (error?.response.status === 400 && error?.response?.data?.message === 400) {
+							instance?.proxy?.$toast.add({
+								severity: "error",
+								summary: "Error uploading profile picture",
+								detail: "Profile picture must be a .PNG and less than 5kb.",
+								life: 3000,
+							});
+						}
+					} else {
+						instance?.proxy?.$toast.add({
+							severity: "error",
+							summary: "Error",
+							detail: `${error?.response?.data?.message}`,
+							life: 3000,
+						});
+					}
 				}
 			} else {
-				console.log("No file selected");
+					instance?.proxy?.$toast.add({
+					severity: "warn",
+					summary: "No file selected",
+					detail: "Please select a file to upload.",
+					life: 3000,
+				});
 			}
 
 			resetForm();
@@ -87,7 +115,7 @@ export default {
 				formData.append("username", username.value);
 
 				// Log formData to check if username is present
-				console.log("formData before axios call:", formData);
+				// console.log("formData before axios call:", formData);
 
 				try {
 					const usernameResponse = await axios.post(
@@ -100,7 +128,7 @@ export default {
 						}
 					);
 
-					console.log("Username Response:", usernameResponse.data);
+					// console.log("Username Response:", usernameResponse.data);
 				} catch (error) {
 					console.error("Error updating username:", error);
 				} finally {

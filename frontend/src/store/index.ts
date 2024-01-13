@@ -132,11 +132,11 @@ const store = createStore({
     // asynchronous functions used to perform operations and commit mutations, like API requests
     // axios requests to database / backend
     fetchUserData(context: any) {
-      console.log("inside fetch user data");
+      //   console.log("inside fetch user data");
       axiosInstance
         .get(process.env.VUE_APP_BACKEND_URL + "/auth/me")
         .then((response) => {
-          console.log("response dataaaaa: ", response.data);
+          //   console.log("response dataaaaa: ", response.data);
           store.commit("setId", response.data.id);
           store.commit("setDisplayName", response.data.fullname);
           store.commit("setUserName", response.data.userName);
@@ -149,10 +149,10 @@ const store = createStore({
             "Is2FAEnabled",
             response.data.is2FAEnabled.toString(),
           );
-          console.log(
-            "the is2fa in fetchuser: ",
-            response.data.is2FAEnabled.toString(),
-          );
+          //   console.log(
+          //     "the is2fa in fetchuser: ",
+          //     response.data.is2FAEnabled.toString(),
+          //   );
           //   store.commit("setAchievments", response.data.achievments);
           //   store.commit("setAuthenticated", true);
           // router.push("/home");
@@ -173,7 +173,7 @@ const store = createStore({
       // console.error("Error fetching all channels:", error);
     },
     async fetchMyChan(context: any) {
-      console.log("inside fetch my chan");
+      //   console.log("inside fetch my chan");
       const resp = await axiosInstance
         .get(process.env.VUE_APP_BACKEND_URL + "/users/my/channels")
         .then((resp: AxiosResponse<IChannel[]>) => {
@@ -222,7 +222,7 @@ const store = createStore({
         .get(process.env.VUE_APP_BACKEND_URL + "/users/achievements")
         .then((resp: AxiosResponse) => {
           context.commit("setAchievements", resp.data);
-          console.log("achievements: ", store.getters.getAchievements);
+          //   console.log("achievements: ", store.getters.getAchievements);
         })
         .catch((error) => {
           console.error("Error fetching achievements", error);
@@ -237,7 +237,7 @@ const store = createStore({
         .catch((error) => {
           console.error("Error fetching matches", error);
         });
-      console.log("matches: ", store.getters.getMatches);
+      //   console.log("matches: ", store.getters.getMatches);
     },
     // async fetchWins(context: any) {
     // 	await axiosInstance
@@ -248,7 +248,7 @@ const store = createStore({
       await axiosInstance
         .get(process.env.VUE_APP_BACKEND_URL + `/chat/current_frndchan/${cur}`)
         .then((resp: AxiosResponse<IChannel[]>) => {
-          console.log("the resp data in ffc: ", resp.data);
+          //   console.log("the resp data in ffc: ", resp.data);
           context.commit("setCurrentFriend", resp.data);
         })
         .catch((error) => {
@@ -281,7 +281,7 @@ const store = createStore({
     },
     async ValidateTwoFA(context: any) {
       const code = localStorage.getItem("2FACode");
-      console.log("reached the store to send verification store");
+      //   console.log("reached the store to send verification store");
       try {
         const response = await axiosInstance.get(
           process.env.VUE_APP_BACKEND_URL + `/auth/2fa/authenticate/${code}`,

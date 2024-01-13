@@ -35,7 +35,7 @@ export class GameGateway
   }
 
   async handleConnection(client: Socket, ...args: any[]) {
-      console.log("Connected Game Gatway");
+    //   console.log("Connected Game Gatway");
     const header = client.handshake.headers;
 
     const token = header.token;
@@ -43,13 +43,13 @@ export class GameGateway
   }
 
   handleDisconnect(client: any) {
-    console.log("Client Disconnected!");
+    // console.log("Client Disconnected!");
     this.gameService.removePlayer(client, 1);
   }
   
   @SubscribeMessage('info')
    handleInfoGame(@ConnectedSocket() client: Socket, @MessageBody() data: GameSelectDto ) {
-    console.log(data.gameMode);
+    // console.log(data.gameMode);
     if (data.gameMode === 'single')
     {
         this.gameService.creatSingleGame(client, data);
@@ -67,13 +67,13 @@ export class GameGateway
 
   @SubscribeMessage('user-profile-status')
    UserStatus(@ConnectedSocket() client: Socket, @MessageBody() status: string) {
-    console.log("this is the user profile name ", status);
+    // console.log("this is the user profile name ", status);
     this.gameService.getUserStatus(client, status);
   }
 
   @SubscribeMessage('route-leave')  
    routeLeaver(@ConnectedSocket() client: Socket, status: number) {
-    console.log('the player is route away from the game page');
+    // console.log('the player is route away from the game page');
     this.gameService.removePlayer(client, 2);
   }
   
@@ -96,7 +96,7 @@ export class GameGateway
         client.emit('error-status');
     else {
         this.gameService.responeInvite(client, data);
-        console.log("from the game socket for invite")
+        // console.log("from the game socket for invite")
     }
     // console.log("this is from the game socket and this is the user invite", data, inviter.user.userName);
   }

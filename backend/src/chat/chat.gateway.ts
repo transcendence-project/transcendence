@@ -37,7 +37,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		const user = await this.chatService.set_user(client);
 		if (user)
 		{
-			console.log(`Client connected in chat: ${client.id}`);
+			// console.log(`Client connected in chat: ${client.id}`);
 			if (user.channels)
 				for (const channel of user.channels)
 					client.join(channel.room_name);
@@ -55,7 +55,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	}
 
 	handleDisconnect(client: any) {
-		console.log(`Client disconnected: ${client.id}`);
+		// console.log(`Client disconnected: ${client.id}`);
 		this.chatService.delete_user(client);
 		client.emit('disconnection_success');
 	}
@@ -64,7 +64,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
 	@SubscribeMessage('send_msg_to_chan')
 	async send_message_chan(client: any, payload: any) {
-		console.log('payload', payload);
+		// console.log('payload', payload);
 		if (this.chatService.user_exist(client.id))
 		{
 			const user = this.chatService.find_user_with_id(client.id);
@@ -172,7 +172,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			const { channel_name, password } = payload;
 
 			if (password === "") {
-				console.log("the passwword is empty enter the condtiton");
+				// console.log("the passwword is empty enter the condtiton");
 				const data_to_send = {
 					severity: "error",
 					summary: "Cannot Create Channel",
@@ -400,7 +400,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	async leave_room(client: any, room_name: string) {
 		if (this.chatService.user_exist(client.id))
 		{
-			console.log('reached leave room in backend');
+			// console.log('reached leave room in backend');
 			const user = this.chatService.find_user_with_id(client.id);
 			await this.chatService.rem_chan_mem(user, room_name);
 			client.leave(room_name);
@@ -476,12 +476,12 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			if (await this.chatService.is_admin(user.userName, room_name) || await this.chatService.is_owner(user.userName, room_name)) {
 				await this.chatService.add_chan_mute(user1, room_name); // add the mute to the channel
 				this.server.to(id_to_mute).emit('muted', user1.userName);
-				console.log("client muted");
+				// console.log("client muted");
 				setTimeout(async () => {
 					await this.chatService.rem_chan_mute(user1, room_name);
 					this.server.to(id_to_mute).emit('unmuted', user1.userName);
 				}, 300000);
-				console.log("client muted");
+				// console.log("client muted");
 			}
 			else {
 				client.emit('not_admin');

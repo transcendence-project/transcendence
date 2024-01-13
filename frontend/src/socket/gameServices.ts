@@ -12,11 +12,10 @@
 //     const headers = {
 //       extraHeaders: _token ? { token:  _token} : undefined,
 //     };
-  
+
 //   socket.value = io(url, headers);
 //   console.log('WebSocket connected:', socket.value);
 // };
-
 
 // export const getSocket = (): Socket | null => {
 //   return socket.value;

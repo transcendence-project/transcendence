@@ -72,7 +72,7 @@ import { faL } from '@fortawesome/free-solid-svg-icons';
     }
 
     function handleGameModeUpdate(isOnline:Boolean) {
-        console.log("this is the value ",isOnline);
+        // console.log("this is the value ",isOnline);
         isOnlineGame.value = isOnline;
         isGameSelectVisible.value = false;
     }
@@ -81,7 +81,7 @@ import { faL } from '@fortawesome/free-solid-svg-icons';
         if (isOnline)
         {
             color_map.value = "#200E3A";
-            console.log("from insde the ggame type");
+            // console.log("from insde the ggame type");
         }
     }
 
@@ -131,27 +131,27 @@ import { faL } from '@fortawesome/free-solid-svg-icons';
         socket.emit('route-leave', 2);
     };
 	const handleKeyDown = (event: any) => {
-        console.log(event);
+        // console.log(event);
 			if (event.key === 'ArrowUp' || event.key === "ArrowUp") {
 				// Move left paddle up
 				// socket.emit('paddleMove','up');
                 keys[event.key] = true;
-                console.log("arrowUp set true");
+                // console.log("arrowUp set true");
 			} else if (event.key === 'ArrowDown' || event.key === "ArrowDown") {
 				// Move left paddle down
 				// socket.emit('paddleMove','down');
                 keys[event.key] = true;
-                console.log("arrowDown set true");
+                // console.log("arrowDown set true");
 			}
 	};
 
     const handleKeyUp = (event: any) => {
-        console.log(event);
+        // console.log(event);
 			if (event.key === 'ArrowUp' || event.key === "ArrowUp") {
 				// Move left paddle up
 				// socket.emit('paddleMove','up');
                 keys[event.key] = false;
-                console.log("arrowUp set false.");
+                // console.log("arrowUp set false.");
 			} else if (event.key === 'ArrowDown' || event.key === "ArrowDown") {
 				// Move left paddle down
 				// socket.emit('paddleMove','down');
@@ -260,8 +260,8 @@ const removeEventListener = () => {
              if (socket)
              {
                  socket.on('game-data', (data: GameData) => {
-					console.log("this is the score ", rightPlayerScore);
-					console.log("this is the score left ", leftPlayerScore);
+					// console.log("this is the score ", rightPlayerScore);
+					// console.log("this is the score left ", leftPlayerScore);
                      Object.assign(currentGameData, data);
                      movePaddle();
              });
@@ -290,7 +290,7 @@ const removeEventListener = () => {
 	onBeforeUnmount(() => {
 		removeEventListener();
 		cancelAnimationFrame(animationFrameId);
-		console.log("this is call for before onmounted ");
+		// console.log("this is call for before onmounted ");
         socket.emit('route-leave', 2);
 
 		// socket.on('game-over', (payload: any) => {

@@ -139,7 +139,7 @@ router.beforeEach((to: any, from: any, next: any) => {
     return;
   }
   if (isauth && is2fa && !is2FAVerified && to.path != "/twofactor") {
-    console.log("force 2fa: ", is2fa, is2FAVerified);
+    // console.log("force 2fa: ", is2fa, is2FAVerified);
     next("/twofactor");
     return;
   }
@@ -152,7 +152,7 @@ router.beforeEach((to: any, from: any, next: any) => {
     document.body.style.background =
       "linear-gradient(to bottom, #F39F5A, #451952)";
   }
-  console.log(`Navigating from ${from.fullPath} to ${to.fullPath}`);
+  //   console.log(`Navigating from ${from.fullPath} to ${to.fullPath}`);
   if (from.fullPath === "/chat" && to.fullPath != "/chat") {
     // Replace 'chatRoute' with your chat route name
     // Clear the channels array or perform any other necessary cleanup
@@ -166,7 +166,7 @@ router.beforeEach((to: any, from: any, next: any) => {
   }
   if (to.path == "/home" && to.query.code) {
     const token = to.query.code;
-    console.log("home route, the token is: ", token);
+    // console.log("home route, the token is: ", token);
     localStorage.setItem("token", token);
     store.dispatch("fetchUserData");
     const { connectSocket } = useWebSocket();
@@ -175,7 +175,7 @@ router.beforeEach((to: any, from: any, next: any) => {
     return;
   }
   if (to.path == "/twofactor" && to.query.code) {
-    console.log("twofactor route");
+    // console.log("twofactor route");
     const token = to.query.code;
     localStorage.setItem("token", token);
     // localStorage.setItem("2fa", "true");
