@@ -41,7 +41,7 @@ export class FriendRequestService {
 		}
 		
 		// add sender to receiver's friends
-		console.log("in acceptRequest")
+		// console.log("in acceptRequest")
 		await this.userService.addFriend(request.sender.id, request.receiver);
 		await this.userService.addFriend(request.receiver.id, request.sender);
 		await this.chatService.create_friend_chan(request.sender, request.receiver);

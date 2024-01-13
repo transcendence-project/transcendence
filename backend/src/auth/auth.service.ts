@@ -15,7 +15,7 @@ export class AuthService{
 		return user1;
 	}
 	generate_jwt_token(username: string, id: number, is2FAEnabled: boolean){
-		return this.jwtService.sign({ sub: id, username: username, Is2FAEnabled: is2FAEnabled, expiresIn: '1h' });
+		return this.jwtService.sign({ sub: id, username: username, Is2FAEnabled: is2FAEnabled });
 	}
 
 	update_isFirstLogin(id: number, isFirstLogin: boolean){

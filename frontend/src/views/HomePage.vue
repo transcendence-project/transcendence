@@ -74,7 +74,7 @@ onMounted(async () => {
 	const instance = getCurrentInstance();
 	const accessToken = localStorage.getItem("token");
     socket.socket?.on('multi-login', () => {
-		console.log("this is from the multi-login");
+		// console.log("this is from the multi-login");
         instance?.proxy?.$toast.add({
 			severity: "error",
 			summary: "Cannot Connect to Game",
@@ -110,7 +110,7 @@ onMounted(async () => {
   const fullname = computed(() => store.getters.getDisplayName);
   const userimage = computed(() => {
 	const image = store.getters.getImage;
-	console.log(`the image is: ${image}`);
+	// console.log(`the image is: ${image}`);
 	return image;
   });
   

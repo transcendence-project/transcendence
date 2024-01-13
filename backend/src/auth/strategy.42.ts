@@ -9,9 +9,9 @@ export class FortyTwoStrategy extends PassportStrategy(Strategy, '42') {
   constructor( private authService: AuthService, private configService: ConfigService,
   ) {
 	// console.log('in 42 strategy');
-	console.log(configService.getOrThrow<string>('CLIENT_ID'));
-	console.log(configService.getOrThrow<string>('CLIENT_SECRET'));
-	console.log(configService.getOrThrow<string>('CALLBACK_URL'));
+	// console.log(configService.getOrThrow<string>('CLIENT_ID'));
+	// console.log(configService.getOrThrow<string>('CLIENT_SECRET'));
+	// console.log(configService.getOrThrow<string>('CALLBACK_URL'));
 	  super({
 		    clientID: configService.getOrThrow<string>('CLIENT_ID'),
 		    clientSecret: configService.getOrThrow<string>('CLIENT_SECRET'),

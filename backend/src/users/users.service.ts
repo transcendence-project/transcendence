@@ -110,14 +110,14 @@ export class UsersService {
 	const user = await this.repo.findOne({ where: { id } });
 	if (!user) return NotFoundException;
 	user.image = this.configService.get('BACKEND_URL') + '/' + file_path;
-	console.log('in update profile pic, user.image: ', user.image);
+	// console.log('in update profile pic, user.image: ', user.image);
 	return await this.repo.save(user);
   }
 
   async remove(id: number) {
     const user = await this.findOne(id);
     if (!user) return NotFoundException;
-    console.log(user);
+    // console.log(user);
     return this.repo.delete(id);
   }
 
@@ -155,7 +155,7 @@ export class UsersService {
 }
 
   async removeFriend(userId: number, friendId: number) {
-	console.log('in remove friend, userId: ', userId);
+	// console.log('in remove friend, userId: ', userId);
     const user = await this.repo.findOne({
       where: { id: userId },
       relations: ["friends"],
@@ -208,7 +208,7 @@ export class UsersService {
     // console.log("in add achievement, achievement: ", achievement);
     // console.log("in add achievement, user.achievements: ", user.achievements);
     // console.log("in add achievement, user: ", user);
-	console.log('in add achievement: ', achievement);
+	// console.log('in add achievement: ', achievement);
     user.achievements.push(achievement);
     return await this.repo.save(user);
 }
@@ -241,9 +241,9 @@ export class UsersService {
 	const achievements: Achievement[] = await this.getAchievements(winner.id);
 
 	// console.log('in check achievements, matches: ', matches);
-	console.log('in check achievements, matches.length for the winner: ', matches.length);
+	// console.log('in check achievements, matches.length for the winner: ', matches.length);
 	if (matches.length === 1 && !achievements.find((a) => a.title === "First Match")) {
-		console.log('in check achievements, adding first match to winner');
+		// console.log('in check achievements, adding first match to winner');
 		await this.addAchievement(winner.id, "First Match");
 	}
 	if (winner.matchesAsPlayerOne.length === 1 && !achievements.find((a) => a.title === "First Win")) {
@@ -255,7 +255,7 @@ export class UsersService {
 
 	const loserMatches: Match[] = await this.matchesService.findMatches(loser.id);
 	const loserAchievements: Achievement[] = await this.getAchievements(loser.id);
-	console.log('in check achievements, loserMatches.length: ', loserMatches.length);
+	// console.log('in check achievements, loserMatches.length: ', loserMatches.length);
 	if (loserMatches.length === 1 && !loserAchievements.find((a) => a.title === "First Match")) {
 		this.addAchievement(loser.id, "First Match");
 	}

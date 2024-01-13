@@ -30,11 +30,11 @@ export class AuthController {
 	@Header('Cache-Control', 'no-store, no-cache, must-revalidate')
 	async callback(@Req() req, @Res() res) {
 		const user = req.user;
-		console.log("req.user: ", req.user);
+		// console.log("req.user: ", req.user);
 		const token = this.authService.generate_jwt_token(user.userName, user.id, user.is2FAEnabled);
 		if (user.is2FAEnabled == true)
 		{
-			console.log("2FA ENABLED !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+			// console.log("2FA ENABLED !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 			// redirect to 2fa page and then take them to homepage
 			const url = new URL(this.configService.get('FRONTEND_URL') + '/twofactor');
 			url.searchParams.set('code', token);
@@ -61,7 +61,7 @@ export class AuthController {
 	@Get('2fa/generate') // GET just for testing, will later be POST
 	@UseGuards(JwtAuthGuard) // will get the user which is linked to the sent Bearer token
 	async generateQr(@Req() req, @Res() res) {
-		console.log("reached jwt generate");
+		// console.log("reached jwt generate");
 		try {
 			const otp = this.authService.generateTwoFactorAuthenticationSecret(req.user);
 			const code = await this.authService.generateQrCodeDataURL((await otp).otpauthUrl);
@@ -76,20 +76,20 @@ export class AuthController {
 	@Get('2fa/authenticate/:code')
 	@UseGuards(JwtAuthGuard)
 	async authenticate2fa(@Param("code") code: string, @Req() req, @Res() res) {
-		console.log("inside verifying 2fa");
+		// console.log("inside verifying 2fa");
 		const isCodeValid = await this.authService.is2faCodeValid(
 			code,
 			req.user,
 		);
-		console.log(isCodeValid)
-		console.log(req.user); 
+		// console.log(isCodeValid)
+		// console.log(req.user); 
 		if (!isCodeValid) {
-			console.log("INCORRECT 2 FA CODE !!!!!!!!!!!!");
+			// console.log("INCORRECT 2 FA CODE !!!!!!!!!!!!");
 			return null;
 		}
 		else
 		{
-			console.log("! COOODEE SUCCESSFUULLLLLLL !");
+			// console.log("! COOODEE SUCCESSFUULLLLLLL !");
 			return res.status(200).json({ req: req.user });
 			// console.log("req.user in 2fa: ", req.user);
 			// return res.redirect(this.configService.get('FRONTEND_URL') + '/home');

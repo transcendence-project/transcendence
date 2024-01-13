@@ -489,12 +489,12 @@ import { numberLiteralTypeAnnotation } from "@babel/types";
 		const my_friends = computed(() => store.getters.getMyFriends);
 		const my_blocked = computed(() => store.getters.getMyBlocked);
 		const arrayProxy_f = my_friends.value;
-		console.log("teh blocked issssss: ", my_blocked.value);
+		// console.log("teh blocked issssss: ", my_blocked.value);
 		arrayProxy_f.forEach((item: any) => {
-			console.log("the item is: ", item)
+			// console.log("the item is: ", item)
 			if (my_blocked.value.find((friend: any) => friend.userName === item.userName))
 			{
-				console.log("goes inside for blocked is true")
+				// console.log("goes inside for blocked is true")
 				const my_frnds: FriendsList = {
 					user: item.userName,
 					status: false,
@@ -504,7 +504,7 @@ import { numberLiteralTypeAnnotation } from "@babel/types";
 			}
 			else
 			{
-				console.log("goes inside for blocked is false")
+				// console.log("goes inside for blocked is false")
 				const my_frnds: FriendsList = {
 					user: item.userName,
 					status: false,
@@ -608,24 +608,24 @@ import { numberLiteralTypeAnnotation } from "@babel/types";
         this.invitationAccepted = true;
       this.invitationModalVisible = false;
       socket.socket?.emit('response-status', true);
-      console.log("accept ");
+    //   console.log("accept ");
     },
     rejectInvitation() {
       this.invitationModalVisible = false;
       socket.socket?.emit('response-status', false);
-      console.log("rejected ")
+    //   console.log("rejected ")
       // Handle rejection logic
     },
 	send_invite(member: string)
     {
         socket.socket?.emit('invite', member);
-        console.log(this.$socket);
-        console.log("this is the members ", member);
+        // console.log(this.$socket);
+        // console.log("this is the members ", member);
     },
     handleDialogClose() {
         if (!this.invitationAccepted) {
         // Only reject if the invitation wasn't explicitly accepted
-        console.log("Dialog closed without explicit acceptance, considered as rejection.");
+        // console.log("Dialog closed without explicit acceptance, considered as rejection.");
         this.rejectInvitation();
       }
       // Reset the flag for future invitations
@@ -727,7 +727,7 @@ import { numberLiteralTypeAnnotation } from "@babel/types";
     // },
 	notify(){
 		// store.state.chat.socket.off("notify");
-		console.log("reached notify");
+		// console.log("reached notify");
 		store.state.chat.socket.on("notify", (data: any) => {
         this.$toast.add({
           severity: data.severity,
@@ -738,10 +738,10 @@ import { numberLiteralTypeAnnotation } from "@babel/types";
       });
 	},
     listenForMuteEvents() {
-      console.log("in listen for mute events");
+    //   console.log("in listen for mute events");
       store.state.chat.socket.off("muted");
       store.state.chat.socket.on("muted", (userName: string) => {
-        console.log("in listen for mute events");
+        // console.log("in listen for mute events");
         this.$toast.add({
           severity: "info",
           summary: "User Muted",
@@ -797,16 +797,16 @@ import { numberLiteralTypeAnnotation } from "@babel/types";
       this.chatMessage = [];
       await store.dispatch("fetchCurrentChan");
       const chan = computed(() => store.getters.getCurrentCahnnel);
-      console.log(chan.value.messages);
+    //   console.log(chan.value.messages);
       const val = chan.value.messages;
       val.forEach((item: any) => {
-		console.log(item)
+		// console.log(item)
         if (item.senderID === store.getters.getId)
           this.chatMessage.push({ send: true, chat: item.content, sender: item.sendername });
         else
 		{
 			const friend_found = this.friends.find((friend: FriendsList) => friend.user === item.sendername);
-			console.log(" the friend_found is: ", friend_found, " and the item.sendername is: ", item.sendername)
+			// console.log(" the friend_found is: ", friend_found, " and the item.sendername is: ", item.sendername)
 			if (friend_found)
 			{
 				if (friend_found.isBlock === false)
@@ -823,8 +823,8 @@ import { numberLiteralTypeAnnotation } from "@babel/types";
 	  localStorage.setItem("CurrentFriend", friend_name)
       await store.dispatch("fetchFriendChan");
       const chan = computed(() => store.getters.getCurrentFriend);
-	  console.log("chan value is: ", chan.value)
-      console.log("chan messages is: ",chan.value.messages);
+	//   console.log("chan value is: ", chan.value)
+    //   console.log("chan messages is: ",chan.value.messages);
       const val = chan.value.messages;
 	  val.forEach((item: any) => {
         if (item.senderID === store.getters.getId)
@@ -859,7 +859,7 @@ import { numberLiteralTypeAnnotation } from "@babel/types";
 
   created() {
     if (!store.state.chat.socket) {
-      console.log("establishing connection again");
+    //   console.log("establishing connection again");
       store.state.chat.socket = io(process.env.VUE_APP_BACKEND_URL + "/chat", {
         auth: {
           token: localStorage.getItem("token"),
@@ -898,10 +898,10 @@ import { numberLiteralTypeAnnotation } from "@babel/types";
     });
     socket.socket?.on("route-to-game", () =>{
         this.handleEvent();
-        console.log("this is from the route-to-game");
+        // console.log("this is from the route-to-game");
     });
     store.state.chat.socket.on("create_room_success", (data: any) => {
-      console.log("Room created successfully and back in front end", data);
+    //   console.log("Room created successfully and back in front end", data);
       if (data) {
         const newChannel: IChannel = {
           name: data.chan_name,
@@ -914,7 +914,7 @@ import { numberLiteralTypeAnnotation } from "@babel/types";
       }
     });
     store.state.chat.socket.on("join_room_success", (data: any) => {
-      console.log("Joined the channel successfully and back in front end");
+    //   console.log("Joined the channel successfully and back in front end");
       if (data) {
         const newChannel: IChannel = {
           name: data.chan_name,
@@ -928,7 +928,7 @@ import { numberLiteralTypeAnnotation } from "@babel/types";
       }
     });
     store.state.chat.socket.on("join_priv_room", (chan_name: string) => {
-      console.log("reached join room back in frontend");
+    //   console.log("reached join room back in frontend");
       if (chan_name) {
         store.state.chat.socket.emit("join_room", {
           room_name: chan_name,
@@ -956,10 +956,10 @@ import { numberLiteralTypeAnnotation } from "@babel/types";
         ) {
 
 			const friend_found = this.friends.find((friend: FriendsList) => friend.user === data.user);
-			console.log("the friendsss are: ", this.friends)
+			// console.log("the friendsss are: ", this.friends)
 			if (friend_found)
 			{
-				console.log("the friend_found issss: ", friend_found)
+				// console.log("the friend_found issss: ", friend_found)
 				if (friend_found.isBlock === false)
 				{
 					this.chatMessage.push({ send: false, chat: data.content, sender: data.user });
@@ -978,7 +978,7 @@ import { numberLiteralTypeAnnotation } from "@babel/types";
       }
     });
     store.state.chat.socket.on("priv_msg_success", (data: any) => {
-      console.log("Send priv successfully and back in front end");
+    //   console.log("Send priv successfully and back in front end");
 	  if (data)
 	  {
 		if (data.frnd == store.getters.getUserName && localStorage.getItem("currentFriend") == data.user){
@@ -995,7 +995,7 @@ import { numberLiteralTypeAnnotation } from "@babel/types";
       const index = this.my_chan.findIndex(
         (channel: IChannel) => channel.name === room_name,
       );
-      console.log(index);
+    //   console.log(index);
       if (index !== -1) this.my_chan.splice(index, 1);
     });
     store.state.chat.socket.on("kicked", (room_name: string) => {

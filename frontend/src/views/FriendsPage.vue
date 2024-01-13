@@ -212,11 +212,11 @@ export default defineComponent({
         );
 		this.hideDropdown();
       }catch (error) {
-		  console.log("Error", error);
+		//   console.log("Error", error);
 	  }
     },
     async removeFriend(selectedUser: number) {
-      console.log("in remove friend: ", selectedUser);
+    //   console.log("in remove friend: ", selectedUser);
       try {
         const response = await axios.delete(
           process.env.VUE_APP_BACKEND_URL + `/users/my/friends/${selectedUser}`,
@@ -231,7 +231,7 @@ export default defineComponent({
 			this.friendsNumber = this.myFriendsList.length;
 		}
       } catch (error) {
-        console.log("Error", error);
+        // console.log("Error", error);
       }
     },
 
@@ -249,7 +249,7 @@ export default defineComponent({
         );
         this.friendsNumber = response.data.length;
         this.myFriendsList = response.data;
-        console.log("testttttresp", response.data);
+        // console.log("testttttresp", response.data);
       } catch (error) {
         console.error("Error fetching friends:", error);
       }
@@ -285,9 +285,9 @@ export default defineComponent({
 		  }
         );
 
-        console.log("Friend request accepted:", response.data);
+        // console.log("Friend request accepted:", response.data);
 		if (response.status === 200 && response.data) {
-			console.log("selectedUser: ", selectedUser);
+			// console.log("selectedUser: ", selectedUser);
 			// this.myFriendsList.push(response.data);
 			// this.friendsNumber = this.myFriendsList.length;
 			this.myFriends();
@@ -318,7 +318,7 @@ export default defineComponent({
   },
 
   async mounted() {
-	console.log("mounted");
+	// console.log("mounted");
     await this.viewFriendRequest();
     await this.myFriends();
     axios
@@ -333,7 +333,7 @@ export default defineComponent({
 	.catch((error) => {
 		console.error("Error fetching student data:", error);
 	});
-	console.log("mounted test");
+	// console.log("mounted test");
   },
 },
 );

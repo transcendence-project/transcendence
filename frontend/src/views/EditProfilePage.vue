@@ -43,14 +43,14 @@ export default {
 		const instance = getCurrentInstance();
 
 		const uploadFile = (event: any) => {
-			console.log("uploadFile function called");
+			// console.log("uploadFile function called");
 
 			const selectedFile = event.target.files[0];
 			if (selectedFile) {
 				Images.value = selectedFile;
-				console.log("File selected:", Images.value);
+				// console.log("File selected:", Images.value);
 			} else {
-				console.log("No file selected");
+				// console.log("No file selected");
 			}
 		};
 
@@ -69,10 +69,10 @@ export default {
 							},
 						}
 					);
-					console.log("Profile Picture Response:", profilePicResponse.data);
+					// console.log("Profile Picture Response:", profilePicResponse.data);
 					const binaryRepresentation = profilePicResponse.data.files;
 					const httpStatus = profilePicResponse.status;
-					console.log(binaryRepresentation, httpStatus);
+					// console.log(binaryRepresentation, httpStatus);
 					instance?.proxy?.$toast.add({
 						severity: "success",
 						summary: "Profile picture updated",
@@ -115,7 +115,7 @@ export default {
 				formData.append("username", username.value);
 
 				// Log formData to check if username is present
-				console.log("formData before axios call:", formData);
+				// console.log("formData before axios call:", formData);
 
 				try {
 					const usernameResponse = await axios.post(
@@ -128,7 +128,7 @@ export default {
 						}
 					);
 
-					console.log("Username Response:", usernameResponse.data);
+					// console.log("Username Response:", usernameResponse.data);
 				} catch (error) {
 					console.error("Error updating username:", error);
 				} finally {

@@ -34,7 +34,7 @@ export default defineComponent({
       this.$emit('close');
     },
 	join_prot_chan() {
-      console.log("reached join prot chan");
+    //   console.log("reached join prot chan");
       if (store.state.chat.socket)
         store.state.chat.socket.emit("join_room", {
           room_name: localStorage.getItem('toJoinChan'),

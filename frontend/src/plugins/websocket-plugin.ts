@@ -29,7 +29,7 @@
 //             const headers = {
 //                 extraHeaders: _token ? { token:  _token} : undefined,
 //             };
-  
+
 //             const socket = io('http://localhost:3000/game', headers);
 //         app.config.globalProperties.$socket = socket;
 //   },
@@ -66,22 +66,22 @@
 //   },
 // };
 
-import { App, reactive } from 'vue';
-import { io, Socket } from 'socket.io-client';
+import { App, reactive } from "vue";
+import { io, Socket } from "socket.io-client";
 
 export const socketState = reactive({
-    socket: null as Socket | null,
+  socket: null as Socket | null,
 });
 
 export function useWebSocket() {
   return {
     connectSocket: () => {
-      const _token = localStorage.getItem('token');
+      const _token = localStorage.getItem("token");
       if (_token && !socketState.socket) {
         const headers = {
           extraHeaders: { token: _token },
         };
-        socketState.socket = io('http://localhost:3000/game', headers);
+        socketState.socket = io("http://localhost:3000/game", headers);
       }
     },
     disconnectSocket: () => {

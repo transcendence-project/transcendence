@@ -104,7 +104,7 @@ export class UsersController {
 	@Patch('/giveAchievement/:achievementTitle')
 	@UseGuards(JwtAuthGuard)
 	giveAchievement(@Req() req, @Param('achievementTitle') achievementTitle: string){
-		console.log('in give achievement, req.user.id: ', req.user.id);
+		// console.log('in give achievement, req.user.id: ', req.user.id);
 		return (this.userService.addAchievement(req.user.id, achievementTitle))
 	}
 	@Get('my/channels')
