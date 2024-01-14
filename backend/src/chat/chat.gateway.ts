@@ -590,23 +590,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		{
 			const { new_pass, room_name } = payload;
 			const user = this.chatService.find_user_with_id(client.id);
-			if (new_pass.length > 20 || new_pass == "" || !new_pass) {
+			if (new_pass.length > 20) {
 				if (new_pass.length > 20) {
 					const data_to_send = {
 						severity: "error",
-						summary: "Cannot Create Channel",
+						summary: "Cannot Change Password",
 						detail: `Password too long.`
 					}
 					client.emit('notify', data_to_send);
-				}
-				else {
-					const data_to_send = {
-						severity: "error",
-						summary: "Cannot Create Channel",
-						detail: `Password cannot be empty.`
-					}
-					client.emit('notify', data_to_send);
-	
 				}
 				return null;
 			}
