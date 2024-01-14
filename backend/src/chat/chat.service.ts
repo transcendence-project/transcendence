@@ -8,6 +8,7 @@ import { Socket } from 'socket.io';
 import { AuthService } from 'auth/auth.service';
 import * as bcrypt from 'bcrypt'
 import { UsersService } from 'users/users.service';
+import { use } from 'passport';
 
 
 @Injectable()
@@ -397,7 +398,7 @@ export class ChatService {
 
 	find_user_with_name(username: string){
 		for (const [userID, user] of this.connected_users.entries())
-			if (user.userName === username){
+			if (user && user.userName === username){
 				return user;
 			}
 	}
