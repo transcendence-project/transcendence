@@ -25,12 +25,12 @@
   
 		<div class="row flex-grow max-w-full">
 		  <div v-if="showGroupList">
+            <ButtonComponent
+              class="bg-[#f39f5a]"
+              btnContent="Create Channel"
+              @click="AddChannelForm"
+            />
 			<div class="max-w-full mb-2">
-			  <ButtonComponent
-				class="adbtn"
-				btnContent="Create Channel"
-				@click="AddChannelForm"
-			  />
 			  <CreateChannel
 				v-if="isAddChannelForm"
 				@close="closeAddChannelForm"
@@ -668,7 +668,7 @@ import { numberLiteralTypeAnnotation } from "@babel/types";
 
     showGroup() {
 		localStorage.setItem("chat", "group");
-      this.showGroupList = true;
+         this.showGroupList = true;
     },
 
     async showChatPage(channel: string) {

@@ -436,11 +436,11 @@ export class GameService {
         else
         {
             const invited = this.connected_users.get(Ininvited);
-            if (invited.pendingInvitations)
-            {
+            if (invited && invited.pendingInvitations)
+            { 
                 const inviterLoginKey = this.getKeyByValue(this.connected_users, invited.pendingInvitations);
-                const inviter = this.connected_users.get(inviterLoginKey);
-                if (invited && inviter)   // i will remove this when the UserProfile page finish 
+                const inviter = this.connected_users.get(inviterLoginKey); 
+                if (inviter)   // i will remove this when the UserProfile page finish 
                 {
                     if (invited.status === 'busy' || inviter.status === 'busy')
                     {

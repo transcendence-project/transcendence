@@ -80,24 +80,13 @@ export default {
 						life: 3000,
 					});
 				} catch (error: any) {
-					 if (axios.isAxiosError(error) && error.response) {
-						if (error?.response.status === 400 && error?.response?.data?.message === 400) {
 							instance?.proxy?.$toast.add({
 								severity: "error",
 								summary: "Error uploading profile picture",
-								detail: "Profile picture must be a .PNG and less than 5kb.",
+								detail: "There has been an error updating the profile picture. Picture must PNG and less than 5KB",
 								life: 3000,
 							});
 						}
-					} else {
-						instance?.proxy?.$toast.add({
-							severity: "error",
-							summary: "Error",
-							detail: `${error?.response?.data?.message}`,
-							life: 3000,
-						});
-					}
-				}
 			} else {
 					instance?.proxy?.$toast.add({
 					severity: "warn",
