@@ -14,12 +14,12 @@
 				class="mx-2 rounded-full object-cover w-20 h-20"
 			  />
 			</div>
-			<div v-if="avail">
+			<!-- <div v-if="avail"> -->
 			  <StatusUser :isFriend="avail" class="mt-12" />
-			</div>
-			<div v-else-if="avail">
+			<!-- </div> -->
+			<!-- <div v-else-if="avail">
 			  <StatusUser :isFriend="avail" class="mt-12" />
-			</div>
+			</div> -->
 			<div>
 			  <p class="mt-[40px] ml-[20px]">{{ student.fullname }}</p>
 			</div>
