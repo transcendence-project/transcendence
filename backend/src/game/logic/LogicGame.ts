@@ -159,13 +159,13 @@ export class LogicGame {
         if (computer) {
             if (ball.dx < 0) return
 
-            const distance = Math.abs(1 - ball.x)
-            const timeToReachPaddle = distance / Math.abs(ball.dx)
-            const predictedBallY = ball.y + ball.dy * timeToReachPaddle
+            const distance = Math.abs(1 - ball.x);
+            const timeToReachPaddle = distance / Math.abs(ball.dx);
+            const predictedBallY = ball.y + ball.dy * timeToReachPaddle;
 
-            let targetY = predictedBallY
+            let targetY = predictedBallY;
 
-            targetY = Math.max(paddle.height / 2, Math.min(1 - paddle.height / 2, targetY))
+            targetY = Math.max(paddle.height / 2, Math.min(1 - paddle.height / 2, targetY));
 
             if (paddle.y < targetY) {
                 paddle.y += Math.min(Computer_Speed, targetY - paddle.y)
