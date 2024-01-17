@@ -72,7 +72,6 @@ import { io, Socket } from "socket.io-client";
 export const socketState = reactive({
   socket: null as Socket | null,
 });
-
 export function useWebSocket() {
   return {
     connectSocket: () => {
@@ -81,7 +80,7 @@ export function useWebSocket() {
         const headers = {
           extraHeaders: { token: _token },
         };
-        socketState.socket = io("http://localhost:3000/game", headers);
+        socketState.socket = io(process.env.VUE_APP_BACKEND_URL + "/game", headers);
       }
     },
     disconnectSocket: () => {

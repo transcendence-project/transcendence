@@ -20,7 +20,7 @@
       </li>
       <li class="mb-5">
         <router-link to="/friends"
-          ><img src="@/assets/friends.svg" alt="Friends"
+          ><img src="@/assets/handshake-deal-svgrepo-com.svg" alt="Friends"
         /></router-link>
       </li>
       <li class="mb-5">

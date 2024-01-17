@@ -11,6 +11,7 @@ import { GameSelectDto } from './dto/game.dto';
 const configService = new ConfigService();
 @WebSocketGateway({
 	namespace: 'game',
+    // cors:{origin: '*'},
 	cors: {
 		origin: configService.get('FRONTEND_URL'),
 		credentials: true,
@@ -35,7 +36,7 @@ export class GameGateway
   }
 
   async handleConnection(client: Socket, ...args: any[]) {
-    //   console.log("Connected Game Gatway");
+      console.log("Connected Game Gatway");
     const header = client.handshake.headers;
 
     const token = header.token;
