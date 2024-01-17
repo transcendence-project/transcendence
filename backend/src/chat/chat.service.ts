@@ -343,6 +343,22 @@ export class ChatService {
 		}
 	}
 
+	async admin_owner(chan_name: string){
+		const owner = await this.owner_by_chan(chan_name);
+		const admins = await this.admin_by_chan(chan_name);
+		if (!owner && !admins)
+		{
+			const mem = await this.mem_by_chan(chan_name);
+			if (mem)
+			{
+				await this.add_chan_admin(mem[0].userName, chan_name);
+				return mem[0].userName;
+			}
+			return null;
+		}
+		return null;
+	}
+
 	async can_join(user: User, room: Channel, arg: string, client: any): Promise<boolean> {
 		if (await this.is_ban(user.userName, room.room_name) === true)
 		{

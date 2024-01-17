@@ -434,6 +434,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			this.server.to(room_name).emit('leave_room_update', data_to_send);
 			client.emit('notify', data_to_send);
 			client.emit('leave_room_success', room_name);
+			const admin_to_add = await this.chatService.admin_owner(room_name);
+			if (admin_to_add)
+			{
+				const data = {
+					chan_name: room_name,
+					admin: admin_to_add,
+				};
+				this.server.to(room_name).emit('update_admin', data)
+			}
 		}
 		else
 		{
@@ -481,7 +490,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					chan_name: room_name,
 					admin: admin_to_add,
 				};
-				this.server.emit('update_admin', data_to_send);
+				// this.server.emit('update_admin', data_to_send);
 				this.server.to(room_name).emit('update_admin', data_to_send)
 			}
 			else {
@@ -559,6 +568,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				this.server.to(room_name).emit('leave_room_update', data_to_send);
 				this.server.to(id_to_rem).emit('kicked', room_name);
 				this.server.to(id_to_rem).emit('notify', data_to_send);
+				const admin_to_add = await this.chatService.admin_owner(room_name);
+				if (admin_to_add)
+				{
+					const data = {
+						chan_name: room_name,
+						admin: admin_to_add,
+					};
+					this.server.to(room_name).emit('update_admin', data)
+				}
 			}
 			else {
 				const data_to_send = {
