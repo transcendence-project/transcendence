@@ -122,6 +122,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 				};
 				this.server.emit('priv_msg_success', data_to_send);
 			}
+			else
+			{
+				const data_to_send = {
+					severity: "error",
+					summary: "Cannot Send Message",
+					detail: `You are blocked by the user ${user.userName}`
+	
+				};
+				client.emit('notify', data_to_send);
+			}
 		}
 		else
 		{

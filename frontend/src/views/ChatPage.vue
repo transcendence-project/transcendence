@@ -834,6 +834,8 @@ import { numberLiteralTypeAnnotation } from "@babel/types";
     },
     sendMessage() {
       if (this.message) {
+		// console.log(localStorage.getItem("currentChanName"))
+		// console.log(this.selectedRoom)
 		const chat = localStorage.getItem("chat");
 		if (chat === "dm")
 			this.send_priv_msg(this.message);
