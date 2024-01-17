@@ -1003,6 +1003,9 @@ import { numberLiteralTypeAnnotation } from "@babel/types";
         (channel: IChannel) => channel.name === room_name,
       );
       if (index !== -1) this.my_chan.splice(index, 1);
+	  store.state.chat.socket.emit("other_leave_chan",
+        localStorage.getItem("currentChanName"),
+      );
     });
 	store.state.chat.socket.on("blocked", (friend_name: string) => {
       const friend_found = this.friends.find((friend: FriendsList) => friend.user === friend_name);

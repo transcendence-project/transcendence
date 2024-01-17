@@ -70,7 +70,8 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			const user = this.chatService.find_user_with_id(client.id);
 			const { room_name, message } = payload;
 			const chan = await this.chatService.chan_by_name(room_name);
-			if (await this.chatService.is_mute(user.userName, room_name) === false) {
+			if (await this.chatService.is_mute(user.userName, room_name) === false && 
+				await this.chatService.is_chan_mem(user.userName, room_name) === true) {
 				await this.chatService.save_chan_message(user, room_name, message);
 				const data_to_send = {
 					content: message,
@@ -78,6 +79,15 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 					chan: room_name,
 				};
 				this.server.to(room_name).emit('update_chan_message', data_to_send);
+			}
+			else if (await await this.chatService.is_chan_mem(user.userName, room_name) === false) {
+				const data_to_send = {
+					severity: "error",
+					summary: "Cannot Send Message",
+					detail: `You are no longer part of the channel ${room_name}`
+	
+				};
+				client.emit('notify', data_to_send);
 			}
 			else
 				client.emit('mute_message');
@@ -414,6 +424,26 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			this.server.to(room_name).emit('leave_room_update', data_to_send);
 			client.emit('notify', data_to_send);
 			client.emit('leave_room_success', room_name);
+		}
+		else
+		{
+			const data_to_send = {
+				severity: "error",
+				summary: "Cannot Connect to Chat",
+				detail: `User already logged in another session`
+
+			};
+			client.emit('notify', data_to_send);
+		}
+	}
+
+	@SubscribeMessage('other_leave_chan')
+	async other_leave_room(client: any, room_name: string) {
+		if (this.chatService.user_exist(client.id))
+		{
+			// console.log('reached leave room in backend');
+			const user = this.chatService.find_user_with_id(client.id);
+			client.leave(room_name);
 		}
 		else
 		{
