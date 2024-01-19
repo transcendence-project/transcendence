@@ -313,7 +313,9 @@ export class ChatService {
 				return true;
 		return false;
 	}
+
 	async is_chan_mem(user_name: string, chan_name: string) {
+		console.log("this is the username ", user_name, "this is chan name ",chan_name);
 		const memebers = await this.mem_by_chan(chan_name);
 		const user = memebers.find(memeber => memeber.userName === user_name);
 		if (user)

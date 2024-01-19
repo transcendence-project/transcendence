@@ -213,6 +213,7 @@ export default defineComponent({
       }
     });
     store.state.chat.socket.on("leave_room_update", (data: any) => {
+      // console.log(localStorage.getItem("currentChanName"));
       if (data) {
         if (
           data.user != store.getters.getUserName &&

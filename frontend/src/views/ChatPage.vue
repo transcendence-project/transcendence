@@ -267,8 +267,7 @@
 	  <div class="container1 flex flex-col-reverse min-h-[50vh]">
 		<div v-if="msgField">
 		  <h1 class="cht">Chat</h1>
-  
-		  <div class="row1 flex-grow max-w-full">
+		  <div v-if="containerChat" class="row1 flex-grow max-w-full">
 			<div
 			  class="flex flex-col bg-white h-[60vh] p-2 mb-10 m-3 text-black"
 			  style="text-align: right"
@@ -425,6 +424,7 @@ import { numberLiteralTypeAnnotation } from "@babel/types";
 		chatMessage: [] as { send: boolean; chat: string; sender: string }[],
 		isPrivate: false,
 		isOptions: false,
+		containerChat:false,
 		searchQuery: "" as string,
 		userList: [] as string[],
 		selectedChannel: null as IChannel | null,
@@ -445,6 +445,7 @@ import { numberLiteralTypeAnnotation } from "@babel/types";
     };
   },
   setup() {
+	localStorage.setItem("chat", "group");
     const all = async () => {
       await store.dispatch("fetchAllChan");
       const channel = computed(() => store.getters.getAllChannel);
@@ -669,16 +670,19 @@ import { numberLiteralTypeAnnotation } from "@babel/types";
     showGroup() {
 		localStorage.setItem("chat", "group");
          this.showGroupList = true;
+		 this.containerChat = false;
     },
 
     async showChatPage(channel: string) {
       this.msgField = true;
+	  this.containerChat = true,
       localStorage.setItem("currentChanName", channel);
       await this.displayMessage();
       this.selectedRoom = channel;
     },
     async showChatPageFriend(friend: string) {
       this.msgField = true;
+	  this.containerChat = true,
       localStorage.setItem("currentFriend", friend);
         // console.log(localStorage.getItem("currentFriend"));
       await this.displayFriendMessage(friend);
@@ -691,6 +695,7 @@ import { numberLiteralTypeAnnotation } from "@babel/types";
     showDm() {
 		localStorage.setItem("chat", "dm");
       this.showGroupList = false;
+	  this.containerChat = false;
     },
     join_pub_chan(room_name: string) {
       if (store.state.chat.socket)
@@ -702,8 +707,8 @@ import { numberLiteralTypeAnnotation } from "@babel/types";
     send_chan_msg(message: string) {
       if (store.state.chat.socket)
         store.state.chat.socket.emit("send_msg_to_chan", {
-          room_name: localStorage.getItem("currentChanName"),
-          message: message,
+          room_name: this.selectedRoom,
+          message: message, 
         });
     },
 	send_priv_msg(message: string) {
@@ -832,17 +837,29 @@ import { numberLiteralTypeAnnotation } from "@babel/types";
         else this.chatMessage.push({ send: false, chat: item.content, sender: item.sendername });
       });
     },
+	isAscii(str:string) {
+    	return /^[\x00-\x7F]*$/.test(str);
+	},
     sendMessage() {
-      if (this.message) {
-		// console.log(localStorage.getItem("currentChanName"))
-		// console.log(this.selectedRoom)
+      if (this.message.length < 1000 && this.isAscii(this.message)) {
+		console.log("this is sele room ",this.selectedRoom);
+		console.log("this is local storage ",localStorage.getItem("currentChanName"));
 		const chat = localStorage.getItem("chat");
 		if (chat === "dm")
 			this.send_priv_msg(this.message);
-		else
+		else 
 			this.send_chan_msg(this.message);
         this.message = "";
       }
+	  else
+	  {
+		this.$toast.add({
+			severity: "error",
+			summary: "Invaild message",
+			detail: "There is a limit for messages.",
+			life: 3000,
+		});
+	  }
     },
 
     closeChannelPage(): void {
@@ -954,7 +971,7 @@ import { numberLiteralTypeAnnotation } from "@babel/types";
       if (data) {
         if (
           data.user != store.getters.getUserName &&
-          localStorage.getItem("currentChanName") == data.chan
+          this.selectedRoom == data.chan
         ) {
 
 			const friend_found = this.friends.find((friend: FriendsList) => friend.user === data.user);
@@ -968,11 +985,11 @@ import { numberLiteralTypeAnnotation } from "@babel/types";
 					this.isMessageSent = true;
 				}
 			}
-			else
+			else 
 				this.chatMessage.push({ send: false, chat: data.content, sender: data.user });
         } else if (
           data.user == store.getters.getUserName &&
-          localStorage.getItem("currentChanName") == data.chan
+          this.selectedRoom == data.chan
         ) {
           this.chatMessage.push({ send: true, chat: data.content, sender: data.user  });
           this.isMessageSent = true;

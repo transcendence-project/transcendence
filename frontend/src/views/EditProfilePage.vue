@@ -6,7 +6,7 @@
 				<input v-model="username" placeholder="New Fullname" class="input text-black" />
 				<div class="acc-dec">
 					<div class="decline">
-						<button class="resbtn" @click="resetForm">Reset</button>
+						<button class="resbtn" @click="resetInput">Reset</button>
 					</div>
 					<div class="accept">
 						<button class="accbtn" @click="updateUserName">update</button>
@@ -41,6 +41,7 @@ export default {
 		const fileInput = ref(null);
 		const formData = new FormData();
 		const instance = getCurrentInstance();
+
 
 		const uploadFile = (event: any) => {
 			// console.log("uploadFile function called");
@@ -100,7 +101,7 @@ export default {
 		};
 
 		const updateUserName = async () => {
-			if (username.value) {
+			if (username.value.toString().length < 20) {
 				formData.append("username", username.value);
 
 				// Log formData to check if username is present
@@ -125,6 +126,12 @@ export default {
 					formData.delete("userName");
 				}
 			} else {
+				instance?.proxy?.$toast.add({
+					severity: "error",
+					summary: "Invaild fullName",
+					detail: "The max is 10 character.",
+					life: 3000,
+				});
 				console.error("Insert a username");
 			}
 
@@ -141,6 +148,13 @@ export default {
 			if (fileInput) {
 				fileInput.value = "";
 			}
+
+		};
+		const resetInput = () => {
+			if (username.value) {
+				username.value = "";
+			}
+
 		};
 
 		return {
@@ -150,6 +164,7 @@ export default {
 			submitFile,
 			resetForm,
 			updateUserName,
+			resetInput,
 		};
 	},
 };

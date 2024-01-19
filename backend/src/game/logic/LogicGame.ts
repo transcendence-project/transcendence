@@ -3,8 +3,8 @@ import {objectStatusDto, PlayerDto, BallDto, PaddleDto} from '../dto/game.dto'
 
 const Paddle_Width = 0.02
 const Paddle_Height = 0.2
-const Paddle_Speed = 0.0170
-const Ball_Radius = 0.027
+const Paddle_Speed = 0.0160
+const Ball_Radius = 0.03
 const Collision_Angle = 80
 const Ball_XSpeed = 0.010
 const Ball_YSpeed = 0.0
@@ -165,8 +165,8 @@ export class LogicGame {
 
             let targetY = predictedBallY;
 
-            targetY = Math.max(paddle.height / 2, Math.min(1 - paddle.height / 2, targetY));
-
+            targetY = Math.max(0 + paddle.height / 2, Math.min(targetY, 1 - paddle.height));
+            
             if (paddle.y < targetY) {
                 paddle.y += Math.min(Computer_Speed, targetY - paddle.y)
             } else if (paddle.y > targetY) {
@@ -192,11 +192,13 @@ export class LogicGame {
 
     // move the ball to the next position
     private moveBall(ball: BallDto): void {
+        if (ball.dx > Ball_Radius) ball.dx = Ball_Radius - 0.001
         ball.x += ball.dx;
         ball.y += ball.dy;
     }
     
-    public updatePaddlePosition(playerID: string, direction: string): void {
+    public updatePaddlePosition(playerID: string, direction: string): void 
+    {
         const player = this.objectGame.players.find(player => player.login === playerID)
 
         if (direction === 'up') {
@@ -207,7 +209,7 @@ export class LogicGame {
 
         
         player.paddle.y = Math.max(
-            0,Math.min(player.paddle.y, 1 - player.paddle.height / 2),
+            0 + player.paddle.height / 2 , Math.min(player.paddle.y, 1 - player.paddle.height),
         )
     }
 
@@ -216,8 +218,14 @@ export class LogicGame {
     // reset the ball position that is out of bounds to the center
     private checkWallCollision(ball: BallDto): void {
         if ((ball.y <= ball.radius) || (ball.y >= 1 - ball.radius)) {
-            ball.dy *= -1
+            ball.dy *= -1.1
         }
+        // if (ball.y <= ball.radius) {
+        //     ball.dy *= -1;
+        // } else if (ball.y >= 1 - ball.radius) {
+        //     ball.dy *= -1; // Adjust the value as necessary
+        // }
+        
     }
 
     // check if the ball collided with a player paddle

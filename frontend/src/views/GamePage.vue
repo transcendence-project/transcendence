@@ -29,7 +29,7 @@
 				{{ rightPlayerScore }}
 			</div>
 		</div>
-        <canvas width="900" height="600" ref="pongCanvas" id="pong"></canvas>
+        <canvas width="900" height="500" ref="pongCanvas" id="pong"></canvas>
     </div>
 	<Result v-if="winnerCompo" :winner="winnerLogin" class="winner">
 	</Result>
