@@ -207,9 +207,8 @@ export class LogicGame {
             player.paddle.y += player.paddle.speed;
         }
 
-        
         player.paddle.y = Math.max(
-            0 + player.paddle.height / 2 , Math.min(player.paddle.y, 1 - player.paddle.height),
+            (0 + player.paddle.height / 2 ) - 0.06 , Math.min(player.paddle.y, 1 - player.paddle.height),
         )
     }
 
@@ -218,22 +217,18 @@ export class LogicGame {
     // reset the ball position that is out of bounds to the center
     private checkWallCollision(ball: BallDto): void {
         if ((ball.y <= ball.radius) || (ball.y >= 1 - ball.radius)) {
-            ball.dy *= -1.1
+            ball.dy *= -1
         }
-        // if (ball.y <= ball.radius) {
-        //     ball.dy *= -1;
-        // } else if (ball.y >= 1 - ball.radius) {
-        //     ball.dy *= -1; // Adjust the value as necessary
-        // }
-        
     }
 
+    
     // check if the ball collided with a player paddle
     private checkPlayerCollision(ball: BallDto, paddle: PaddleDto, playerIndex: number): boolean {
         const paddleLeft = playerIndex === 0 ? paddle.x : paddle.x - paddle.width
         const paddleRight = playerIndex === 0 ? paddle.x + paddle.width : paddle.x
         const paddleTop = paddle.y
         const paddleBottom = paddle.y + paddle.height
+
         return (
             ball.y + ball.radius >= paddleTop &&
             ball.y - ball.radius <= paddleBottom &&
@@ -260,6 +255,20 @@ export class LogicGame {
             } else if (ball.x > 1) {
                 players[0].score += 1;
                 this.resetBallPosition(ball)
+            }
+        }
+        if (ball.y >= 1 - ball.radius) {
+            // Check if within horizontal bounds of either paddle
+            const isUnderLeftPaddle = ball.x < players[0].paddle.x + players[0].paddle.width / 2;
+            const isUnderRightPaddle = ball.x > players[1].paddle.x - players[1].paddle.width / 2;
+            if (isUnderLeftPaddle) {
+                this.resetBallPosition(ball);
+                players[1].score += 1;
+            }
+            if (isUnderRightPaddle)
+            {
+                this.resetBallPosition(ball);
+                players[0].score += 1;
             }
         }
     }

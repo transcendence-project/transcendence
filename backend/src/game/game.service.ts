@@ -347,7 +347,8 @@ export class GameService {
         // const getKeyPlayer1 = this.getKeyByValue(this.connected_users, );
         const player = this.connected_users.get(cleint);
         // console.log(player.user.userName);
-        player.logicGame.updatePaddlePosition(player.user.userName, direction);
+        if (player.logicGame)
+            player.logicGame.updatePaddlePosition(player.user.userName, direction);
     }
 
     public  removePlayer(socket: Socket, deleteUser: number)
