@@ -856,7 +856,7 @@ import { numberLiteralTypeAnnotation } from "@babel/types";
 		this.$toast.add({
 			severity: "error",
 			summary: "Invaild message",
-			detail: "There is a limit for messages.",
+			detail: "The message is longer than 1000 characters or contains non-ascii characters.",
 			life: 3000,
 		});
 	  }

@@ -129,7 +129,7 @@ export default {
 				instance?.proxy?.$toast.add({
 					severity: "error",
 					summary: "Invaild fullName",
-					detail: "The max is 10 character.",
+					detail: "Full name cannot be longer than 20 characters.",
 					life: 3000,
 				});
 				console.error("Insert a username");
