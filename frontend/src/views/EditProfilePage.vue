@@ -54,7 +54,9 @@ export default {
 				// console.log("No file selected");
 			}
 		};
-
+		const isAscii = (str: string) => {
+			return /^[\x00-\x7F]*$/.test(str);
+		};
 
 		const submitFile = async () => {
 			if (Images.value) {
@@ -99,9 +101,8 @@ export default {
 
 			resetForm();
 		};
-
 		const updateUserName = async () => {
-			if (username.value.toString().length < 20) {
+			if (username.value.toString().length && isAscii(username.value.toString()) ) {
 				formData.append("username", username.value);
 
 				// Log formData to check if username is present
@@ -129,7 +130,7 @@ export default {
 				instance?.proxy?.$toast.add({
 					severity: "error",
 					summary: "Invaild fullName",
-					detail: "Full name cannot be longer than 20 characters.",
+					detail: "Full name cannot be longer than 20 characters and has to be ASCII characters only.",
 					life: 3000,
 				});
 				console.error("Insert a username");
