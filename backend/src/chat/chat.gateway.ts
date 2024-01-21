@@ -65,7 +65,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 	@SubscribeMessage('send_msg_to_chan')
 	async send_message_chan(client: any, payload: any) {
 		// console.log('payload', payload);
-		console.log(payload);
+		// console.log(payload);
 		if (this.chatService.user_exist(client.id))
 		{
 			const user = this.chatService.find_user_with_id(client.id);
@@ -74,7 +74,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			if (await this.chatService.is_mute(user.userName, room_name) === false && 
 				await this.chatService.is_chan_mem(user.userName, room_name) === true) {
 				await this.chatService.save_chan_message(user, room_name, message);
-				console.log(`userName reach here ${user.userName}`);
+				// console.log(`userName reach here ${user.userName}`);
 				const data_to_send = {
 					content: message,
 					user: user.userName,
@@ -521,7 +521,17 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 		if (this.chatService.user_exist(client.id))
 		{
 			const { user_to_mute, room_name } = payload;
-			const user = this.chatService.find_user_with_id(client.id); // the one who id muting the other person
+			const user = this.chatService.find_user_with_id(client.id);
+			if (user.userName === user_to_mute)
+			{
+				const data_to_send = {
+					severity: "error",
+					summary: "Cannot Mute User",
+					detail: `You cannot mute yourself.`
+				}
+				client.emit('notify', data_to_send);
+				return;
+			} // the one who id muting the other person
 			const user1 = this.chatService.find_user_with_name(user_to_mute); // the one being muted
 			const id_to_mute = this.chatService.find_id(user1.userName); // id of the one being muted // the channel
 			if (await this.chatService.is_admin(user.userName, room_name) || await this.chatService.is_owner(user.userName, room_name)) {
@@ -558,6 +568,16 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 			const user = this.chatService.find_user_with_id(client.id);
 			const user1 = this.chatService.find_user_with_name(user_to_rem);
 			const id_to_rem = this.chatService.find_id(user1.userName);
+			if (user.userName === user_to_rem)
+			{
+				const data_to_send = {
+					severity: "error",
+					summary: "Cannot Kick User",
+					detail: `You cannot kick yourself.`
+				}
+				client.emit('notify', data_to_send);
+				return;
+			}
 			if (await this.chatService.is_admin(user.userName, room_name) || await this.chatService.is_owner(user.userName, room_name)) {
 				await this.chatService.rem_chan_mem(user1, room_name)
 				const data_to_send = {
