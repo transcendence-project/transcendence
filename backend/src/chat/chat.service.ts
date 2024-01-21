@@ -315,7 +315,7 @@ export class ChatService {
 	}
 
 	async is_chan_mem(user_name: string, chan_name: string) {
-		console.log("this is the username ", user_name, "this is chan name ",chan_name);
+		// console.log("this is the username ", user_name, "this is chan name ",chan_name);
 		const memebers = await this.mem_by_chan(chan_name);
 		const user = memebers.find(memeber => memeber.userName === user_name);
 		if (user)
@@ -348,10 +348,10 @@ export class ChatService {
 	async admin_owner(chan_name: string){
 		const owner = await this.owner_by_chan(chan_name);
 		const admins = await this.admin_by_chan(chan_name);
-		console.log("the owner is: ", owner, "the admins are: ", admins);
+		// console.log("the owner is: ", owner, "the admins are: ", admins);
 		if (!owner && admins.length === 0)
 		{
-			console.log("the ownerrrrr is: ", owner, "the adminsssss are: ", admins);
+			// console.log("the ownerrrrr is: ", owner, "the adminsssss are: ", admins);
 			const mem = await this.mem_by_chan(chan_name);
 			if (mem)
 			{
