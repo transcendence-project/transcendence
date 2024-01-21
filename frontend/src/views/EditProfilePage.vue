@@ -102,7 +102,7 @@ export default {
 			resetForm();
 		};
 		const updateUserName = async () => {
-			if (username.value.toString().length && isAscii(username.value.toString()) ) {
+			if (username.value.toString().length < 20 && isAscii(username.value.toString()) ) {
 				formData.append("username", username.value);
 
 				// Log formData to check if username is present

@@ -115,7 +115,7 @@ export default defineComponent({
     },
 	create_priv_room(){
     if (store.state.chat.socket) {
-      if (this.channel_name < 0 && this.isAscii(this.channel_name))
+      if (this.channel_name.length > 0 && this.isAscii(this.channel_name))
        {
 		    	store.state.chat.socket.emit("create_priv_room", this.channel_name);
 		  }
@@ -133,7 +133,7 @@ export default defineComponent({
 	},
     create_room() {
       if (store.state.chat.socket) {
-        if (this.channel_name < 0 && this.isAscii(this.channel_name))
+        if (this.channel_name.length > 0 && this.isAscii(this.channel_name))
         {
           store.state.chat.socket.emit("create_pub_room", {
             channel_name: this.channel_name,
@@ -158,9 +158,9 @@ export default defineComponent({
       // console.log(this.password);
       if (store.state.chat.socket) {
         // if (this.password != "")
-        if (this.channel_name < 0 && this.isAscii(this.channel_name))
+        if (this.channel_name.length > 0 && this.isAscii(this.channel_name))
         {
-          if (this.password < 0 && this.isAscii(this.password))
+          if (this.password.length > 0 && this.isAscii(this.password))
           {
             store.state.chat.socket.emit("create_prot_room", {
               channel_name: this.channel_name,

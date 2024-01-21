@@ -14,7 +14,6 @@ import { Achievement } from "entities/achievement.entity";
 import { SeederService } from "../achievements/achievement.seed";
 import { MatchesService } from "matches/matches.service";
 import {ConfigService} from "@nestjs/config";
-import { ChatService } from "chat/chat.service";
 
 @Injectable()
 export class UsersService {
@@ -59,6 +58,7 @@ export class UsersService {
   async findOne(id: number) {
 	return await (this.repo.findOne({where: {id}, relations: ['channels']}))
   }
+
   async findOneByUserName(userName: string) {
     const user = await this.repo.findOne({ where: {userName}, relations: ['blocked', 'achievements'] });
     return user;
