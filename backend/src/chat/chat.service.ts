@@ -353,7 +353,7 @@ export class ChatService {
 		{
 			// console.log("the ownerrrrr is: ", owner, "the adminsssss are: ", admins);
 			const mem = await this.mem_by_chan(chan_name);
-			if (mem)
+			if (mem && mem[0])
 			{
 				await this.add_chan_admin(mem[0].userName, chan_name);
 				return mem[0].userName;

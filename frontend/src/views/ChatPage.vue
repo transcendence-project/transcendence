@@ -676,6 +676,7 @@ import { numberLiteralTypeAnnotation } from "@babel/types";
     async showChatPage(channel: string) {
       this.msgField = true;
 	  this.containerChat = true,
+	  localStorage.setItem("currentFriend", "");
       localStorage.setItem("currentChanName", channel);
       await this.displayMessage();
       this.selectedRoom = channel;
@@ -800,6 +801,7 @@ import { numberLiteralTypeAnnotation } from "@babel/types";
     },
     async displayMessage() {
       this.chatMessage = [];
+	  localStorage.setItem("currentFriend", "");
       await store.dispatch("fetchCurrentChan");
       const chan = computed(() => store.getters.getCurrentCahnnel);
     //   console.log(chan.value.messages);
@@ -825,7 +827,7 @@ import { numberLiteralTypeAnnotation } from "@babel/types";
     },
     async displayFriendMessage(friend_name: string) {
       this.chatMessage = [];
-	  localStorage.setItem("CurrentFriend", friend_name)
+	  localStorage.setItem("currentFriend", friend_name)
       await store.dispatch("fetchFriendChan");
       const chan = computed(() => store.getters.getCurrentFriend);
 	//   console.log("chan value is: ", chan.value)

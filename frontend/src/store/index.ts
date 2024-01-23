@@ -244,7 +244,7 @@ const store = createStore({
     // }
 
     async fetchFriendChan(context: any) {
-      const cur = localStorage.getItem("CurrentFriend");
+      const cur = localStorage.getItem("currentFriend");
       await axiosInstance
         .get(process.env.VUE_APP_BACKEND_URL + `/chat/current_frndchan/${cur}`)
         .then((resp: AxiosResponse<IChannel[]>) => {
