@@ -636,7 +636,8 @@ import { numberLiteralTypeAnnotation } from "@babel/types";
 		this.isProfile = !this.isProfile;
 	  },
 	  showChagnePassword(channel: string) {
-		if (channel) localStorage.setItem("currentChanName", channel);
+		if (channel) 
+			localStorage.setItem("currentChanName", channel);
 		this.isChangePassword = !this.isChangePassword;
 	  },
 	  showHideBlock(friend: FriendsList) {
@@ -676,6 +677,7 @@ import { numberLiteralTypeAnnotation } from "@babel/types";
     async showChatPage(channel: string) {
       this.msgField = true;
 	  this.containerChat = true,
+	  localStorage.setItem("currentFriend", "");
       localStorage.setItem("currentChanName", channel);
       await this.displayMessage();
       this.selectedRoom = channel;
@@ -705,6 +707,7 @@ import { numberLiteralTypeAnnotation } from "@babel/types";
         });
     },
     send_chan_msg(message: string) {
+		localStorage.setItem("currentChanName", this.selectedRoom);
       if (store.state.chat.socket)
         store.state.chat.socket.emit("send_msg_to_chan", {
           room_name: this.selectedRoom,
@@ -800,6 +803,7 @@ import { numberLiteralTypeAnnotation } from "@babel/types";
     },
     async displayMessage() {
       this.chatMessage = [];
+	  localStorage.setItem("currentFriend", "");
       await store.dispatch("fetchCurrentChan");
       const chan = computed(() => store.getters.getCurrentCahnnel);
     //   console.log(chan.value.messages);
@@ -825,7 +829,7 @@ import { numberLiteralTypeAnnotation } from "@babel/types";
     },
     async displayFriendMessage(friend_name: string) {
       this.chatMessage = [];
-	  localStorage.setItem("CurrentFriend", friend_name)
+	  localStorage.setItem("currentFriend", friend_name)
       await store.dispatch("fetchFriendChan");
       const chan = computed(() => store.getters.getCurrentFriend);
 	//   console.log("chan value is: ", chan.value)
@@ -842,13 +846,17 @@ import { numberLiteralTypeAnnotation } from "@babel/types";
 	},
     sendMessage() {
       if (this.message.length < 1000 && this.isAscii(this.message)) {
-		console.log("this is sele room ",this.selectedRoom);
-		console.log("this is local storage ",localStorage.getItem("currentChanName"));
 		const chat = localStorage.getItem("chat");
 		if (chat === "dm")
+		{
+			// console.log("shouldnt go into dm");
 			this.send_priv_msg(this.message);
+		}
 		else 
+		{
+			// console.log("reaches here");
 			this.send_chan_msg(this.message);
+		}
         this.message = "";
       }
 	  else
@@ -968,6 +976,8 @@ import { numberLiteralTypeAnnotation } from "@babel/types";
       }
     });
     store.state.chat.socket.on("update_chan_message", (data: any) => {
+		console.log("data.user: ", data.user);
+		console.log("this.SelectedRoom: ", this.selectedRoom);
       if (data) {
         if (
           data.user != store.getters.getUserName &&
@@ -1023,7 +1033,7 @@ import { numberLiteralTypeAnnotation } from "@babel/types";
       );
       if (index !== -1) this.my_chan.splice(index, 1);
 	  store.state.chat.socket.emit("other_leave_chan",
-        localStorage.getItem("currentChanName"),
+        room_name,
       );
     });
 	store.state.chat.socket.on("blocked", (friend_name: string) => {

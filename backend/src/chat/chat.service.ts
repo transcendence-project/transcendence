@@ -274,6 +274,8 @@ export class ChatService {
 			if (!chan.members.length && !chan.admins.length && !chan.owner && chan.is_private === true)
 			{
 				try {
+					const message = await this.messageRepo.find({ where: { channel: chan } });
+					await this.messageRepo.remove(message);
 					await this.channelRepo.remove(chan);
 					return;
 					// console.log('Channel deleted successfully.');
@@ -346,21 +348,25 @@ export class ChatService {
 	}
 
 	async admin_owner(chan_name: string){
-		const owner = await this.owner_by_chan(chan_name);
-		const admins = await this.admin_by_chan(chan_name);
-		// console.log("the owner is: ", owner, "the admins are: ", admins);
-		if (!owner && admins.length === 0)
+		const chan = await this.chan_by_name(chan_name);
+		if (chan)
 		{
-			// console.log("the ownerrrrr is: ", owner, "the adminsssss are: ", admins);
-			const mem = await this.mem_by_chan(chan_name);
-			if (mem)
+			const owner = await this.owner_by_chan(chan_name);
+			const admins = await this.admin_by_chan(chan_name);
+			// console.log("the owner is: ", owner, "the admins are: ", admins);
+			if (!owner && admins.length === 0)
 			{
-				await this.add_chan_admin(mem[0].userName, chan_name);
-				return mem[0].userName;
+				// console.log("the ownerrrrr is: ", owner, "the adminsssss are: ", admins);
+				const mem = await this.mem_by_chan(chan_name);
+				if (mem && mem[0])
+				{
+					await this.add_chan_admin(mem[0].userName, chan_name);
+					return mem[0].userName;
+				}
+				return null;
 			}
 			return null;
 		}
-		return null;
 	}
 
 	async can_join(user: User, room: Channel, arg: string, client: any): Promise<boolean> {

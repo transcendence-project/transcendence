@@ -10,7 +10,7 @@ export class Channel {
     @Column()
     room_name: string;
 
-    @OneToMany(() => Message, message => message.channel)
+    @OneToMany(() => Message, message => message.channel, {onDelete: 'CASCADE'})
     messages: Message[];
 
 	//   @JoinColumn()
