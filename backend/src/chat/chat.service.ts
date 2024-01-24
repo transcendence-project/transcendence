@@ -274,6 +274,8 @@ export class ChatService {
 			if (!chan.members.length && !chan.admins.length && !chan.owner && chan.is_private === true)
 			{
 				try {
+					const message = await this.messageRepo.find({ where: { channel: chan } });
+					await this.messageRepo.remove(message);
 					await this.channelRepo.remove(chan);
 					return;
 					// console.log('Channel deleted successfully.');
