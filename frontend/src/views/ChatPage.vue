@@ -707,8 +707,6 @@ import { numberLiteralTypeAnnotation } from "@babel/types";
         });
     },
     send_chan_msg(message: string) {
-		console.log("selected roo is: ", this.selectedRoom);
-		console.log("message is : ", message)
 		localStorage.setItem("currentChanName", this.selectedRoom);
       if (store.state.chat.socket)
         store.state.chat.socket.emit("send_msg_to_chan", {
