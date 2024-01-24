@@ -115,41 +115,75 @@ export default defineComponent({
     },
 	create_priv_room(){
     if (store.state.chat.socket) {
-      if (this.channel_name.length > 0 && this.isAscii(this.channel_name))
-       {
-		    	store.state.chat.socket.emit("create_priv_room", this.channel_name);
-		  }
-      else
+      if (this.channel_name.length === 0)
       {
         this.$toast.add({
         severity: "error",
         summary: "Invaild channel name",
-        detail: "The channel name is empty or contains non-ascii characters.",
+        detail: "The channel name is empty.",
         life: 3000,
       });
       }
-
+     else if (!this.isAscii(this.channel_name))
+      {
+        this.$toast.add({
+        severity: "error",
+        summary: "Invaild channel name",
+        detail: "The channel name contains non-ascii characters.",
+        life: 3000,
+      });
+      }
+     else if (this.channel_name.trim().length === 0)
+      {
+        this.$toast.add({
+        severity: "error",
+        summary: "Invaild channel name",
+        detail: "The channel name contains only spaces.",
+        life: 3000,
+      });
+      }
+      else
+      {
+        store.state.chat.socket.emit("create_priv_room", this.channel_name);
+      }
     }
 	},
     create_room() {
       if (store.state.chat.socket) {
-        if (this.channel_name.length > 0 && this.isAscii(this.channel_name))
-        {
-          store.state.chat.socket.emit("create_pub_room", {
+        if (this.channel_name.length === 0)
+      {
+        this.$toast.add({
+        severity: "error",
+        summary: "Invaild channel name",
+        detail: "The channel name is empty.",
+        life: 3000,
+      });
+      }
+     else if (!this.isAscii(this.channel_name))
+      {
+        this.$toast.add({
+        severity: "error",
+        summary: "Invaild channel name",
+        detail: "The channel name contains non-ascii characters.",
+        life: 3000,
+      });
+      }
+     else if (this.channel_name.trim().length === 0)
+      {
+        this.$toast.add({
+        severity: "error",
+        summary: "Invaild channel name",
+        detail: "The channel name contains only spaces.",
+        life: 3000,
+      });
+      }
+      else {
+        store.state.chat.socket.emit("create_pub_room", {
             channel_name: this.channel_name,
             password: this.password,
           });
-        }
-        else
-        {
-          this.$toast.add({
-          severity: "error",
-          summary: "Invaild channel name",
-          detail: "The channel name is empty or contains non-ascii characters.",
-          life: 3000,
-		});
-        }
       }
+        }
       this.channel_name = "";
       this.password = "";
     },
@@ -157,34 +191,48 @@ export default defineComponent({
       // console.log(this.channel_name);
       // console.log(this.password);
       if (store.state.chat.socket) {
-        // if (this.password != "")
-        if (this.channel_name.length > 0 && this.isAscii(this.channel_name))
-        {
-          if (this.password.length > 0 && this.isAscii(this.password))
-          {
-            store.state.chat.socket.emit("create_prot_room", {
-              channel_name: this.channel_name,
-              password: this.password,
-            });
-          }
-          else
-          {
-              this.$toast.add({
-            severity: "error",
-            summary: "Invaild Password",
-            detail: "The password is empty or contains non-ascii characters.",
-            life: 3000,
-          });
-          }
-      }
-      else
+        if (this.channel_name.length === 0)
       {
         this.$toast.add({
         severity: "error",
         summary: "Invaild channel name",
-        detail: "The channel name is empty or contains non-ascii characters.",
+        detail: "The channel name is empty.",
         life: 3000,
-  });
+      });
+      }
+     else if (!this.isAscii(this.channel_name))
+      {
+        this.$toast.add({
+        severity: "error",
+        summary: "Invaild channel name",
+        detail: "The channel name contains non-ascii characters.",
+        life: 3000,
+      });
+      }
+     else if (this.channel_name.trim().length === 0)
+      {
+        this.$toast.add({
+        severity: "error",
+        summary: "Invaild channel name",
+        detail: "The channel name contains only spaces.",
+        life: 3000,
+      });
+      }
+      else if (!this.isAscii(this.password))
+      {
+        this.$toast.add({
+            severity: "error",
+            summary: "Invaild Password",
+            detail: "The password contains non-ascii characters.",
+            life: 3000,
+          });
+      }
+      else
+      {
+        store.state.chat.socket.emit("create_prot_room", {
+              channel_name: this.channel_name,
+              password: this.password,
+            });
       }
     }
       this.channel_name = "";
